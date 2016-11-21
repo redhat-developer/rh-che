@@ -1,2 +1,1 @@
-# rh-che
-Red Hat Che internal repository
+# Eclipse Che Distribution for Almighty 
