@@ -1,0 +1,162 @@
+#!/bin/sh
+#
+# This script allow to deploy/delete Che on OpenShift. 
+# To run it:
+#     ./openche.sh [deploy|delete]
+#
+# Before running the script OpenShift should be configured properly:
+#
+# 1. Run OpenShift
+# ----------------
+# If we don't have a running OpenShift instance we can start it as a container:
+# docker run -d --name "origin" \
+#         --privileged --pid=host --net=host \
+#         -v /:/rootfs:ro -v /var/run:/var/run:rw -v /sys:/sys -v /var/lib/docker:/var/lib/docker:rw \
+#         -v /var/lib/origin/openshift.local.volumes:/var/lib/origin/openshift.local.volumes \
+#         openshift/origin start
+#
+# 2. Create an OpenShift project
+# ------------------------------
+# oc login -u mario
+# oc new-project openche
+#
+# 3. Create a serviceaccount with privileged scc
+# -------------------------------------------------
+# oc login -u system:admin
+# oc create serviceaccount cheserviceaccount
+# oc adm policy add-scc-to-user privileged -z cheserviceaccount
+#
+# 4. Set the env variables (optional)
+# ------------------------------------
+# export CHE_HOSTNAME=che.openshift.mini
+# export CHE_IMAGE=codenvy/che-server:local
+# export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+
+
+set_parameters() {
+    echo "Setting parameters"
+    DEFAULT_CHE_HOSTNAME=che.openshift.adb
+    DEFAULT_CHE_IMAGE=codenvy/che-server:nightly
+    DEFAULT_CHE_LOG_LEVEL=DEBUG
+    DEFAULT_CHE_TEMPLATE="../os-templates/che.json"
+
+    CHE_HOSTNAME=${CHE_HOSTNAME:-${DEFAULT_CHE_HOSTNAME}}
+    CHE_IMAGE=${CHE_IMAGE:-${DEFAULT_CHE_IMAGE}}
+    CHE_LOG_LEVEL=${CHE_LOG_LEVEL:-${DEFAULT_CHE_LOG_LEVEL}}
+
+    DEFAULT_CHE_OPENSHIFT_ENDPOINT=https://${CHE_HOSTNAME}:8443/
+    CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT:-${DEFAULT_CHE_OPENSHIFT_ENDPOINT}}
+
+    CHE_TEMPLATE=${CHE_TEMPLATE:-${DEFAULT_CHE_TEMPLATE}}
+}
+
+check_prerequisites() {
+    echo "Checking prerequisites"
+    # oc must be installed
+    command -v oc >/dev/null 2>&1 || { echo >&2 "I require oc but it's not installed.  Aborting."; exit 1; }
+
+    # there should be a service account called cheserviceaccount
+    oc get serviceaccounts cheserviceaccount >/dev/null 2>&1 || { echo >&2 "Command 'oc get serviceaccounts cheserviceaccount' failed. A serviceaccount named cheserviceaccount should exist. Aborting."; exit 1; }
+    
+    # docker must be installed
+    command -v docker >/dev/null 2>&1 || { echo >&2 "I require docker but it's not installed.  Aborting."; exit 1; }
+    
+    if [ -z ${DOCKER0_IP+x} ]; then 
+      ip addr show docker0  >/dev/null 2>&1 || { echo >&2 "Bridge docker0 not found.  Aborting."; exit 1; }
+    fi
+    
+    # Check if -v /nonexistantfolder:Z works
+    # A workaround is to remove --selinux-enabled option in /etc/sysconfig/docker
+    docker create --name openchetest -v /tmp/nonexistingfolder:/tmp:Z docker.io/busybox sh >/dev/null 2>&1 || { echo >&2 "Command 'docker create -v /tmp/nonexistingfolder:/tmp:Z busybox sh' failed. Che won't be able to create workspaces in this conditions. To solve this you can either install the latest docker version or deactivate Docker SELinux option. Aborting."; exit 1; }
+    docker rm openchetest >/dev/null 2>&1
+
+}
+
+## Intstall eclipse-che template (download the json file from github if not found locally)
+install_template() {
+    echo "Installing template"
+    if [ ! -f ${CHE_TEMPLATE} ]; then
+        echo "Template not found locally. Downloading from internet"
+        TEMPLATE_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/os-templates/che.json
+        curl -sSL ${TEMPLATE_URL} > ${CHE_TEMPLATE}
+        echo "${TEMPLATE_URL} downladed"
+    fi
+    oc create -f ${CHE_TEMPLATE} >/dev/null 2>&1 || oc replace -f ${CHE_TEMPLATE} >/dev/null 2>&1
+    echo "Template installed"
+}
+
+## Create a new app based on `eclipse_che` template and deploy it
+deploy() {
+    echo "Deploying Che"
+    if [ -z ${DOCKER0_IP+x} ]; then 
+      DOCKER0_IP=$(ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+    fi
+
+    oc new-app --template=eclipse-che --param=HOSTNAME_HTTP=${CHE_HOSTNAME} \
+                                    --param=CHE_SERVER_DOCKER_IMAGE=${CHE_IMAGE} \
+                                    --param=DOCKER0_BRIDGE_IP=${DOCKER0_IP} \
+                                    --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL} \
+                                    --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT}
+    oc deploy che-host --latest
+    echo "OPENCHE: Waiting 5 seconds for the pod to start"
+    sleep 5
+    POD_ID=$(oc get pods | grep che-host | grep -v "\-deploy" | awk '{print $1}')
+    echo "Che pod starting (id $POD_ID)..."
+}
+
+## Uninstall everything
+delete() {
+    echo "Deleting resources"
+    # POD_ID=$(oc get pods | grep che-host | awk '{print $1}')
+    # oc delete pod/${POD_ID}
+    oc delete route/che-host || true
+    oc delete svc/che-host || true
+    oc delete dc/che-host || true
+}
+
+parse_command_line () {
+  if [ $# -eq 0 ]; then
+    usage
+    exit
+  fi
+
+  case $1 in
+    deploy|delete)
+      ACTION=$1
+    ;;
+    -h|--help)
+      usage
+      exit
+    ;;
+    *)
+      # unknown option
+      echo "ERROR: You passed an unknown command line option."
+      exit
+    ;;
+  esac
+}
+
+usage () {
+  USAGE="Usage: ${0} [COMMAND]
+     deploy                             Install and deploys che-host Application on OpenShift
+     delete                             Delete che-host related objects from OpenShift
+"
+  printf "%s" "${USAGE}"
+}
+
+set -e
+set -u
+
+set_parameters
+check_prerequisites
+parse_command_line "$@"
+
+case ${ACTION} in
+  deploy)
+    install_template
+    deploy
+  ;;
+  delete)
+    delete
+  ;;
+esac

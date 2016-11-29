@@ -1,0 +1,283 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "annotations": {
+            "description": "Application template for Eclipse Che",
+            "iconClass" : "icon-openjdk",
+            "tags" : "eclipse,che,java,angular,ide",
+            "version" : "5.0.0"
+        },
+        "name": "eclipse-che"
+    },
+    "labels": {
+        "template": "eclipse-che",
+        "xpaas" : "5.0.0"
+    },
+    "parameters": [
+        {
+            "description": "The name for the application.",
+            "name": "APPLICATION_NAME",
+            "value": "che-host",
+            "required": true
+        },
+        {
+            "description": "Custom hostname for http service route.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
+            "name": "HOSTNAME_HTTP",
+            "value": "che.openshift.local",
+            "required": false
+        },
+        {
+            "description": "Name of the che-server Docker image.",
+            "name": "CHE_SERVER_DOCKER_IMAGE",
+            "value": "codenvy/che-server:5.0.0-latest",
+            "required": true
+        },
+        {
+            "description": "Url of the OpenShift API",
+            "name": "CHE_OPENSHIFT_ENDPOINT",
+            "value": "",
+            "required": true
+        },
+        {
+            "description": "OpenShift username",
+            "name": "CHE_OPENSHIFT_USERNAME",
+            "value": "openshift-dev",
+            "required": true
+        },
+        {
+            "description": "OpenShift userpassword.",
+            "name": "CHE_OPENSHIFT_PASSWORD",
+            "value": "devel",
+            "required": true
+        },
+        {
+            "description": "OpenShift project.",
+            "name": "CHE_OPENSHIFT_PROJECT",
+            "value": "eclipse-che",
+            "required": true
+        },
+        {
+            "description": "OpenShift service account name.",
+            "name": "CHE_OPENSHIFT_SERVICEACCOUNTNAME",
+            "value": "cheserviceaccount",
+            "required": true
+        },
+        {
+            "description": "Che log level (INFO or DEBUG)",
+            "name": "CHE_LOG_LEVEL",
+            "value": "INFO",
+            "required": false
+        },
+        {
+            "description": "IP of the host docker0 bridge. This IP is used by che-server to communicate with che workspaces",
+            "name": "DOCKER0_BRIDGE_IP",
+            "value": "172.17.0.1",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8080,
+                        "targetPort": 8080,
+                        "protocol": "TCP",
+                        "name": "tomcat"
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Che http port."
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "${APPLICATION_NAME}-http",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Route for application's http service."
+                }
+            },
+            "spec": {
+                "host": "${HOSTNAME_HTTP}",
+                "to": {
+                    "name": "${APPLICATION_NAME}"
+                },
+                "port": {
+                    "targetPort": "tomcat"
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${APPLICATION_NAME}",
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}",
+                            "application": "${APPLICATION_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "terminationGracePeriodSeconds": 75,
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}",
+                                "image": "${CHE_SERVER_DOCKER_IMAGE}",
+                                "imagePullPolicy": "Always",
+                                "privileged": true,
+                                "livenessProbe": {
+                                    "tcpSocket": {
+                                        "port": 8080
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1
+                                },
+                                "readinessProbe": {
+                                    "tcpSocket": {
+                                        "port": 8080
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "name": "che-conf-volume",
+                                        "mountPath": "/conf",
+                                        "readOnly": false
+                                    },
+                                    {
+                                        "name": "docker-socket-volume",
+                                        "mountPath": "/var/run/docker.sock",
+                                        "readOnly": false
+                                    },
+                                    {
+                                        "name": "che-data-volume",
+                                        "mountPath": "/data"
+                                    }
+                                ],
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "CHE_DOCKER_MACHINE_HOST_EXTERNAL",
+                                        "value": "${HOSTNAME_HTTP}"
+                                    },
+                                    {
+                                        "name": "CHE_WORKSPACE_STORAGE",
+                                        "value": "/home/user/che/workspaces"
+                                    },
+                                    {
+                                        "name": "CHE_WORKSPACE_STORAGE_CREATE_FOLDERS",
+                                        "value": "false"
+                                    },
+                                    {
+                                        "name": "CHE_LOCAL_CONF_DIR",
+                                        "value": "/etc/conf"
+                                    },
+                                    {
+                                        "name": "CHE_OPENSHIFT_ENDPOINT",
+                                        "value": "${CHE_OPENSHIFT_ENDPOINT}"
+                                    },
+                                    {
+                                        "name": "CHE_OPENSHIFT_USERNAME",
+                                        "value": "${CHE_OPENSHIFT_USERNAME}"
+                                    },
+                                    {
+                                        "name": "CHE_OPENSHIFT_PASSWORD",
+                                        "value": "${CHE_OPENSHIFT_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "CHE_OPENSHIFT_PROJECT",
+                                        "value": "${CHE_OPENSHIFT_PROJECT}"
+                                    },
+                                    {
+                                        "name": "CHE_OPENSHIFT_SERVICEACCOUNTNAME",
+                                        "value": "${CHE_OPENSHIFT_SERVICEACCOUNTNAME}"
+                                    },
+                                    {
+                                        "name": "CHE_IP",
+                                        "value": "${DOCKER0_BRIDGE_IP}"
+                                    },
+                                    {
+                                        "name": "CHE_LOG_LEVEL",
+                                        "value": "${CHE_LOG_LEVEL}"
+                                    }
+                                ],
+                                "args": [],
+                                "securityContext": {
+                                        "privileged": true,
+                                        "runAsUser": 0
+                                }
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "che-conf-volume",
+                                "hostPath": {
+                                    "path": "/etc/conf"
+                                }
+                            },
+                            {
+                                "name": "docker-socket-volume",
+                                "hostPath": {
+                                    "path": "/var/run/docker.sock"
+                                }
+                            },
+                            {
+                                "name": "che-data-volume",
+                                "hostPath": {
+                                    "path": "/home/user/che"
+                                }
+                            }
+                        ],
+                        "serviceAccountName": "${CHE_OPENSHIFT_SERVICEACCOUNTNAME}"
+                    }
+                }
+            }
+        }
+    ]
+}
