@@ -54,10 +54,11 @@ git clone https://github.com/redhat-developer/rh-che
 cd rh-che/scripts
 # Prepare the environment
 oc login -u openshift-dev che.ci.centos.org
-export CHE_HOSTNAME=che.ci.centos.org
+export CHE_HOSTNAME=demo.che.ci.centos.org
+export CHE_OPENSHIFT_ENDPOINT=https://che.ci.centos.org:8443/
 export CHE_IMAGE=mariolet/che-server:openshiftconnector
 export DOCKER0_IP=10.1.0.1
-export CHE_LOG_LEVEL=DEBUG
+export CHE_LOG_LEVEL=INFO
 # If a previous version of Che was deployed, delete it
 ./openche.sh delete
 # Install OpenShift Che templat eand deploy Che 
