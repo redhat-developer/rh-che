@@ -57,6 +57,10 @@
             <directory>${project.basedir}/src/assembly/webapps</directory>
             <outputDirectory>webapps</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/keycloak/</directory>
+            <outputDirectory>lib</outputDirectory>
+       </fileSet>
     </fileSets>
     <files>
         <file>

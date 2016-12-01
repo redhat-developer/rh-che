@@ -28,6 +28,7 @@
     </modules>
     <properties>
         <che.version>5.0.0-M8-SNAPSHOT</che.version>
+        <keycloak.version>2.4.0.Final</keycloak.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -67,6 +68,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
+                <version>${keycloak.version}</version>
+                <type>zip</type>
+        </dependency>
         </dependencies>
     </dependencyManagement>
     <repositories>

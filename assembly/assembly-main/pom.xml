@@ -77,8 +77,13 @@
         <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>che-plugin-sdk-tools</artifactId>
-            <type>jar</type>
+            <type>jar</type>    
             <classifier>jar-with-dependencies</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
+            <type>zip</type>
         </dependency>
     </dependencies>
     <build>
@@ -143,6 +148,24 @@
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>package-keycloak-adapter</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                   <groupId>org.keycloak</groupId>
+                                    <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
