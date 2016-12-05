@@ -48,6 +48,8 @@ set_parameters() {
     CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT:-${DEFAULT_CHE_OPENSHIFT_ENDPOINT}}
 
     CHE_TEMPLATE=${CHE_TEMPLATE:-${DEFAULT_CHE_TEMPLATE}}
+
+    CHE_APPLICATION_NAME=che-host
 }
 
 check_prerequisites() {
@@ -92,26 +94,28 @@ deploy() {
       DOCKER0_IP=$(ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
     fi
 
-    oc new-app --template=eclipse-che --param=HOSTNAME_HTTP=${CHE_HOSTNAME} \
+    echo "calling oc new-app"
+    oc new-app --template=eclipse-che --param=APPLICATION_NAME=${CHE_APPLICATION_NAME} \
+                                    --param=HOSTNAME_HTTP=${CHE_HOSTNAME} \
                                     --param=CHE_SERVER_DOCKER_IMAGE=${CHE_IMAGE} \
                                     --param=DOCKER0_BRIDGE_IP=${DOCKER0_IP} \
                                     --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL} \
                                     --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT}
-    oc deploy che-host --latest
+    
     echo "OPENCHE: Waiting 5 seconds for the pod to start"
     sleep 5
-    POD_ID=$(oc get pods | grep che-host | grep -v "\-deploy" | awk '{print $1}')
+    POD_ID=$(oc get pods | grep ${CHE_APPLICATION_NAME} | grep -v "\-deploy" | awk '{print $1}')
     echo "Che pod starting (id $POD_ID)..."
 }
 
 ## Uninstall everything
 delete() {
     echo "Deleting resources"
-    # POD_ID=$(oc get pods | grep che-host | awk '{print $1}')
+    # POD_ID=$(oc get pods | grep ${CHE_APPLICATION_NAME} | awk '{print $1}')
     # oc delete pod/${POD_ID}
-    oc delete route/che-host || true
-    oc delete svc/che-host || true
-    oc delete dc/che-host || true
+    oc delete route/${CHE_APPLICATION_NAME} || true
+    oc delete svc/${CHE_APPLICATION_NAME} || true
+    oc delete dc/${CHE_APPLICATION_NAME} || true
 }
 
 parse_command_line () {

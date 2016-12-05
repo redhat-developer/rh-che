@@ -19,22 +19,17 @@ mvnche() {
 }
 
 cd plugins/plugin-docker
-mvnche clean install
-cd ../..
-
-cd wsmaster/che-core-api-agent
-mvnche clean install
-cd ../che-core-api-workspace
-mvnche clean install
+mvnche install
 cd ../..
 
 cd assembly/assembly-wsmaster-war
-mvnche clean install
+mvnche install
 cd ../..
 
 cd assembly/assembly-main/
-mvnche clean install
+mvnche install
 cd ../..
 
 docker build -t ${CHE_IMAGE} .
 cd ${CURRENT_DIR}
+

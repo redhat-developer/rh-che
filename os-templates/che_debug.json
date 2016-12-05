@@ -92,6 +92,7 @@
                     {
                         "port": 8000,
                         "targetPort": 8000,
+                        "nodePort": 32306,
                         "protocol": "TCP",
                         "name": "tomcat-debug"
                     }
@@ -169,7 +170,7 @@
                             {
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${CHE_SERVER_DOCKER_IMAGE}",
-                                "imagePullPolicy": "Always",
+                                "imagePullPolicy": "IfNotPresent",
                                 "privileged": true,
                                 "livenessProbe": {
                                     "tcpSocket": {
