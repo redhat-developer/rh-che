@@ -11,7 +11,7 @@ Instructions to build the image:
 
 ```sh
 # Get the source code 
-git clone https://github.com/l0rd/che.git
+git clone https://github.com/eclipse/che.git
 cd che
 git checkout openshift-connector
 
