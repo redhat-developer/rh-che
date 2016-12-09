@@ -59,6 +59,8 @@ export CHE_OPENSHIFT_ENDPOINT=https://che.ci.centos.org:8443/
 export CHE_IMAGE=mariolet/che-server:openshiftconnector
 export DOCKER0_IP=10.1.0.1
 export CHE_LOG_LEVEL=INFO
+export CHE_OPENSHIFT_USERNAME=<replacewithusername>
+export CHE_OPENSHIFT_PASSWORD=<replacewithpassword>
 # If a previous version of Che was deployed, delete it
 ./openche.sh delete
 # Install OpenShift Che templat eand deploy Che 
