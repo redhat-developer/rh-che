@@ -39,6 +39,8 @@ set_parameters() {
     DEFAULT_CHE_IMAGE=codenvy/che-server:nightly
     DEFAULT_CHE_LOG_LEVEL=DEBUG
     DEFAULT_CHE_TEMPLATE="../os-templates/che.json"
+    DEFAULT_CHE_OPENSHIFT_USERNAME="openshift-dev"
+    DEFAULT_CHE_OPENSHIFT_PASSWORD="devel"
 
     CHE_HOSTNAME=${CHE_HOSTNAME:-${DEFAULT_CHE_HOSTNAME}}
     CHE_IMAGE=${CHE_IMAGE:-${DEFAULT_CHE_IMAGE}}
@@ -50,6 +52,9 @@ set_parameters() {
     CHE_TEMPLATE=${CHE_TEMPLATE:-${DEFAULT_CHE_TEMPLATE}}
 
     CHE_APPLICATION_NAME=che-host
+
+    CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME:-${DEFAULT_CHE_OPENSHIFT_USERNAME}}
+    CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD:-${DEFAULT_CHE_OPENSHIFT_PASSWORD}}
 }
 
 check_prerequisites() {
@@ -100,7 +105,9 @@ deploy() {
                                     --param=CHE_SERVER_DOCKER_IMAGE=${CHE_IMAGE} \
                                     --param=DOCKER0_BRIDGE_IP=${DOCKER0_IP} \
                                     --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL} \
-                                    --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT}
+                                    --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT} \
+                                    --param=CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME} \
+                                    --param=CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD}
     
     echo "OPENCHE: Waiting 5 seconds for the pod to start"
     sleep 5
