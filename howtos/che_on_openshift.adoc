@@ -1,0 +1,109 @@
+= Openshift Connector for Eclipse Che
+
+Current plan for OpenShift integration to Che project:
+
+1. Provide PR with initial OpenShift Connector implementation to Che project
+
+2. Implement all OpenShift connector methods
+
+3. Define SPI
+
+image::images/che-on-openshift/spi.png[width="500", height="300",aption="SPI"]
+
+[start=4]
+4. Refactor OpenShift Connector for using SPI
+
+image::images/che-on-openshift/spi-imp.png[width="500", height="300",aption="SPI Implementation"]
+
+NOTE: working on item *3* could start before *2* is completed.
+
+NOTE: Epic Jira - https://issues.jboss.org/browse/CHE-26[OpenShift Integration to Che]
+
+## Workflow
+
+First thing, make sure that you can build `openshift-connector` branch:
+
+```
+cd che/
+
+git fetch origin openshift-connector:openshift-connector
+git checkout openshift-connector
+
+mvn -Dskip-enforce -Dskip-validate-sources -DskipTests -Dfindbugs.skip -Dgwt.compiler.localWorkers=2 -T 1C clean install
+```
+
+NOTE: For now PRs are expected to be provided against `openshift-connector` branch
+
+
+== How to deploy Eclipse Che (`openshift-connector` branch) on Minishift?
+
+Pre-requirements:
+
+- OpenShift CLI (`oc`) - `v1.2.2` and above
+- Minishift (`minishift`) - `v0.9.0` and above
+
+First 4 steps are identical to the ones described in https://github.com/l0rd/openche#deployment-che-on-minishift[Deployment Che on Minishift] document. 
+
+[start=5]
+5. build 'codenvy/che-server:local' image:
+
+```sh
+# Get the script from github
+git clone https://github.com/l0rd/openche
+cd openche
+
+export GITHUB_REPO=path/to/che
+./build_che.sh 
+```
+
+NOTE: Minishift docker daemon should be used for building the image: `eval $(minishift docker-env)`
+
+[start=6]
+6. Update Openshift template `che.json` / `che_debug.json` with the following values:
+
+
+```
+HOSTNAME_HTTP => che.openshift.mini
+CHE_SERVER_DOCKER_IMAGE => codenvy/che-server:local
+CHE_OPENSHIFT_ENDPOINT => https://$(minishift ip):8443 e.g. https://192.168.42.195:8443
+
+imagePullPolicy => "IfNotPresent"
+```
+[start=7]
+7. Deploy Che:
+
+```
+oc login -u openshift-dev -p devel
+export CHE_HOSTNAME=che.openshift.mini
+export CHE_IMAGE=codenvy/che-server:local
+export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+export CHE_OPENSHIFT_ENDPOINT=https://$(minishift ip):8443
+
+# If a previous version of Che was deployed, delete it
+./openche.sh delete
+
+# Install OpenShift Che template and deploy Che 
+./openche.sh deploy
+
+```
+NOTE: For removing Che workspaces `./remove_ws.sh` script can be used
+
+== Debugging Che on Minishift
+
+In order to debug Che running on Minishift `che_debug.json` template should be used. Just change `DEFAULT_CHE_TEMPLATE` value in `openche.sh`:
+
+```
+DEFAULT_CHE_TEMPLATE="./che_debug.json"
+```
+
+Other steps are identical to the ones described in the previous section. Once Che is deployed you can see that the port for debugging is exposed by `che-host` service: 
+
+image::images/che-on-openshift/debug_port.png[width="700", height="300",aption="Debugging Port"]
+
+Now you can use it for remote debugging in your IDE:
+
+image::images/che-on-openshift/debug_conf.png[width="700", height="500",aption="Debug Configuration"]
+
+NOTE: Hot swap debugging feature does not work for Eclipse IDE. In order to make changes in the code rebuilding / redeploying `codenvy/che-server:local` image is required
+
+NOTE: More info about Che remote debugging can be found in the document https://github.com/ibuziuk/docs/blob/master/che_remote_debugging.adoc[Eclipse Che - remote debugging setup] 
