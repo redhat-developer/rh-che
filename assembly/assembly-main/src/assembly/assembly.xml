@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (c) 2012-2016 Codenvy, S.A.
+    Copyright (c) 2012-2017 Codenvy, S.A.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -23,9 +23,18 @@
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <outputDirectory>tomcat/webapps</outputDirectory>
+            <outputFileNameMapping>docs.war</outputFileNameMapping>
+            <includes>
+                <include>org.eclipse.che.docs:che-docs</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>ROOT.war</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che:assembly-ide-war</include>
+                <include>com.redhat.che:almighty-ide-assembly-ide-war</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -34,7 +43,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>wsmaster.war</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che:assembly-wsmaster-war</include>
+                <include>com.redhat.che:almighty-ide-assembly-wsmaster-war</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -43,7 +52,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>dashboard.war</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che.dashboard:che-dashboard-war</include>
+                <include>com.redhat.che:che-dashboard-war</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -61,7 +70,7 @@
             <outputDirectory>lib</outputDirectory>
             <outputFileNameMapping>ws-agent.tar.gz</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che:assembly-wsagent-server</include>
+                <include>com.redhat.che:almighty-ide-assembly-wsagent-server</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -70,7 +79,7 @@
             <outputDirectory>lib/linux_amd64/terminal</outputDirectory>
             <outputFileNameMapping>websocket-terminal-linux_amd64.tar.gz</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che.lib:che-websocket-terminal:tar.gz:linux_amd64</include>
+                <include>org.eclipse.che:exec-agent:tar.gz:linux_amd64</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -79,7 +88,7 @@
             <outputDirectory>lib/linux_arm7/terminal</outputDirectory>
             <outputFileNameMapping>websocket-terminal-linux_arm7.tar.gz</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che.lib:che-websocket-terminal:tar.gz:linux_arm7</include>
+                <include>org.eclipse.che:exec-agent:tar.gz:linux_arm7</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -196,24 +205,6 @@
        </fileSet>
     </fileSets>
       <files>
-        <file>
-            <source>${project.basedir}/src/assembly/bin/docker.sh</source>
-            <outputDirectory>bin</outputDirectory>
-            <destName>docker.sh</destName>
-            <fileMode>755</fileMode>
-        </file>
-        <file>
-            <source>${project.basedir}/src/assembly/bin/che.sh</source>
-            <outputDirectory>bin</outputDirectory>
-            <destName>che.sh</destName>
-            <fileMode>755</fileMode>
-        </file>
-        <file>
-            <source>${project.basedir}/src/assembly/bin/che.bat</source>
-            <outputDirectory>bin</outputDirectory>
-            <destName>che.bat</destName>
-            <fileMode>755</fileMode>
-        </file>
         <file>
             <source>${project.basedir}/src/assembly/bin/che-install-plugin.sh</source>
             <outputDirectory>bin</outputDirectory>

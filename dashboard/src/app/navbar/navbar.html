@@ -1,0 +1,71 @@
+<!--
+
+    Copyright (c) 2015 Codenvy, S.A.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+      Codenvy, S.A. - initial API and implementation
+
+-->
+<div class="left-sidebar-container">
+  <md-toolbar class="flex-shrink-none">
+    <md-progress-linear md-mode="indeterminate" ng-hide="navbarCtrl.email"></md-progress-linear>
+    <div ng-show="navbarCtrl.email">
+      <section class="navbar-top-logo logo-color-white" layout="column" layout-align="center left" ng-include="branding.logoText">
+      </section>
+
+      <md-divider md-theme="factory-theme"></md-divider>
+
+      <div class="admin-navbar-menu">
+        <section class="left-sidebar-menu" layout="column" layout-align="center center">
+          <md-list layout="column">
+            <md-list-item flex class="navbar-subsection-item">
+              <md-button nav-bar-selected flex che-reload-href href="{{navbarCtrl.menuItemUrl.dashboard}}" layout-align="left"
+                         target="_self">
+                <div class="navbar-item" layout="row" layout-align="start center">
+                  <md-icon md-font-icon="navbar-icon chefont cheico-dashboard" aria-label="Dashboard"></md-icon>
+                  <span>Dashboard</span>
+                </div>
+              </md-button>
+            </md-list-item>
+            <md-list-item flex class="navbar-subsection-item">
+              <md-button nav-bar-selected flex che-reload-href href="{{navbarCtrl.menuItemUrl.workspaces}}" layout-align="left">
+                <div class="navbar-item" layout="row" layout-align="start center">
+                  <md-icon md-font-icon="navbar-icon chefont cheico-workspace"></md-icon>
+                  <span>Workspaces</span>
+                  <span class="navbar-number" ng-show="navbarCtrl.getWorkspacesNumber()">&nbsp;({{navbarCtrl.getWorkspacesNumber()}})</span>
+                </div>
+              </md-button>
+            </md-list-item>
+            <md-list-item flex class="navbar-subsection-item">
+              <md-button nav-bar-selected flex che-reload-href
+                         href="{{navbarCtrl.menuItemUrl.stacks}}" layout-align="left">
+                <div class="navbar-item" layout="row" layout-align="start center">
+                  <md-icon md-font-icon="navbar-icon material-design icon-ic_inbox_24px"></md-icon>
+                  <span>Stacks</span>
+                </div>
+              </md-button>
+            </md-list-item>
+            <md-list-item flex class="navbar-subsection-item">
+              <md-button nav-bar-selected flex che-reload-href
+                         href="{{navbarCtrl.menuItemUrl.administration}}" layout-align="left">
+                <div class="navbar-item" layout="row" layout-align="start center">
+                  <md-icon md-font-icon="navbar-icon material-design icon-ic_settings_24px"></md-icon>
+                  <span>Administration</span>
+                </div>
+              </md-button>
+            </md-list-item>
+          </md-list>
+        </section>
+      </div>
+
+      <navbar-recent-workspaces></navbar-recent-workspaces>
+
+    </div>
+  </md-toolbar>
+
+  <div class="navbar-iframe-button-left-border" ng-show="showIDE"></div>
+</div>

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "allowJs": true
+  },
+
+  "exclude": [
+    "node_modules",
+    "bower_components"
+  ]
+
+}

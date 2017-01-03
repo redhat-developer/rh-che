@@ -1,0 +1,84 @@
+<!--
+
+    Copyright (c) 2015 Codenvy, S.A.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+      Codenvy, S.A. - initial API and implementation
+
+-->
+<che-toolbar che-title="Workspaces" border-none></che-toolbar>
+<che-description che-link-title="Learn more." che-link="/docs/workspace/admin-intro/index.html">A workspace is where your projects live and run. Create workspaces from stacks that define projects, runtimes, and commands.</che-description>
+<md-content md-scroll-y flex layout="column" md-theme="maincontent-theme">
+  <md-progress-linear md-mode="indeterminate" class="workspaces-list-progress"
+                      ng-show="listWorkspacesCtrl.isInfoLoading"></md-progress-linear>
+  <md-content flex class="workspace-list-content" ng-hide="listWorkspacesCtrl.isInfoLoading">
+    <che-list-header che-input-placeholder="Search"
+                     che-search-model="listWorkspacesCtrl.workspaceFilter.config.name"
+                     che-hide-search="listWorkspacesCtrl.userWorkspaces.length === 0"
+                     che-add-button-title="Add Workspace"
+                     che-add-button-href="#/create-workspace"
+                     che-delete-button-title="Delete"
+                     che-on-delete="listWorkspacesCtrl.deleteSelectedWorkspaces()"
+                     che-filter-values="listWorkspacesCtrl.namespaceLabels"
+                     che-on-filter-changed="listWorkspacesCtrl.onFilterChanged"
+                     che-hide-delete="listWorkspacesCtrl.isNoSelected"
+                     che-hide-header="(listWorkspacesCtrl.userWorkspaces | filter:listWorkspacesCtrl.workspaceFilter | filter:listWorkspacesCtrl.namespaceFilter:listWorkspacesCtrl.isExactMatch).length === 0">
+      <div flex="100"
+           layout="row"
+           layout-align="start stretch"
+           class="che-list-item-row">
+        <div layout="column" layout-gt-xs="row"
+             layout-align="start center"
+             class="che-checkbox-area">
+          <div layout="row" layout-align="center center" class="che-list-item-checkbox-main">
+            <md-checkbox class="che-list-item-checkbox"
+                         aria-label="Workspace list"
+                         ng-checked="listWorkspacesCtrl.isBulkChecked"
+                         ng-click="listWorkspacesCtrl.changeBulkSelection()"></md-checkbox>
+          </div>
+        </div>
+        <div flex hide-xs layout-gt-xs="row"
+             layout-align="start center"
+             class="che-list-item-details">
+          <che-list-header-column flex-gt-xs="25"
+                                  che-sort-value="listWorkspacesCtrl.workspaceOrderBy"
+                                  che-sort-item="config.name"
+                                  che-column-title="Name"></che-list-header-column>
+          <che-list-header-column flex-gt-xs="15"
+                                  che-sort-value="listWorkspacesCtrl.workspaceOrderBy"
+                                  che-sort-item="config.environments[0].machineConfigs[0].limits.ram"
+                                  che-column-title="RAM"></che-list-header-column>
+          <che-list-header-column flex-gt-xs="15"
+                                  che-sort-value="listWorkspacesCtrl.workspaceOrderBy"
+                                  che-sort-item="config.projects"
+                                  che-column-title="Projects"></che-list-header-column>
+          <che-list-header-column flex-gt-xs="30"
+                                  che-sort-value="listWorkspacesCtrl.workspaceOrderBy"
+                                  che-sort-item="attributes.stackId"
+                                  che-column-title="Stack"></che-list-header-column>
+          <che-list-header-column flex-gt-xs="15"
+                                  che-column-title="Actions"></che-list-header-column>
+        </div>
+      </div>
+    </che-list-header>
+    <che-list ng-show="(listWorkspacesCtrl.userWorkspaces | filter:listWorkspacesCtrl.workspaceFilter | filter:listWorkspacesCtrl.namespaceFilter:listWorkspacesCtrl.isExactMatch).length > 0">
+      <che-workspace-item
+              ng-repeat="workspace in listWorkspacesCtrl.userWorkspaces | orderBy:[listWorkspacesCtrl.workspaceOrderBy, 'config.name'] | filter:listWorkspacesCtrl.workspaceFilter | filter:listWorkspacesCtrl.namespaceFilter:listWorkspacesCtrl.isExactMatch"
+              ng-model="listWorkspacesCtrl.workspacesSelectedStatus[workspace.id]"
+              che-selectable="true"
+              che-display-labels="false"
+              che-on-checkbox-click="listWorkspacesCtrl.updateSelectedStatus()"
+              che-workspace-item="workspace"></che-workspace-item>
+    </che-list>
+    <div class="che-list-empty">
+        <span ng-show="listWorkspacesCtrl.userWorkspaces.length > 0 && (listWorkspacesCtrl.userWorkspaces | filter:listWorkspacesCtrl.workspaceFilter | filter:listWorkspacesCtrl.namespaceFilter:listWorkspacesCtrl.isExactMatch).length === 0">
+          No workspaces found.
+        </span>
+      <span ng-show="listWorkspacesCtrl.userWorkspaces.length === 0">There are no workspaces.</span>
+    </div>
+  </md-content>
+</md-content>

@@ -1,0 +1,7 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.trace.server": "verbose",
+    "files.exclude":{
+        "**/target/**":true
+    }
+}
