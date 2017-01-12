@@ -35,7 +35,7 @@
 
 set_parameters() {
     echo "Setting parameters"
-    DEFAULT_CHE_HOSTNAME=che.openshift.adb
+    DEFAULT_CHE_HOSTNAME=che.openshift.mini
     DEFAULT_CHE_IMAGE=codenvy/che-server:nightly
     DEFAULT_CHE_LOG_LEVEL=DEBUG
     DEFAULT_CHE_TEMPLATE="../os-templates/che.json"

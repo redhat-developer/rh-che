@@ -2,14 +2,14 @@
 
 set -e
 
-DEFAULT_CHE_IMAGE=codenvy/che-server:local
+DEFAULT_CHE_IMAGE_TAG=nightly
 
 if [ -z ${GITHUB_REPO+x} ]; then 
   echo >&2 "Variable GITHUB_REPO not found. Aborting"
   exit 1
 fi
 
-CHE_IMAGE=${CHE_IMAGE:-${DEFAULT_CHE_IMAGE}}
+CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
 
 CURRENT_DIR=$(pwd)
 cd ${GITHUB_REPO}
@@ -30,6 +30,8 @@ cd assembly/assembly-main/
 mvnche install
 cd ../..
 
-docker build -t ${CHE_IMAGE} .
+cd dockerfiles/che/
+./build.sh ${CHE_IMAGE_TAG}
+
 cd ${CURRENT_DIR}
 

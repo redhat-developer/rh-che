@@ -255,6 +255,10 @@
                                         "value": "${CHE_LOG_LEVEL}"
                                     },
                                     {
+                                        "name": "CHE_DOCKER_CONNECTOR",
+                                        "value": "openshift"
+                                    },
+                                    {
                                         "name": "CHE_DEBUG_SERVER",
                                         "value": "true"
                                     }

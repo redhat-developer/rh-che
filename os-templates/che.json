@@ -245,6 +245,10 @@
                                     {
                                         "name": "CHE_LOG_LEVEL",
                                         "value": "${CHE_LOG_LEVEL}"
+                                    },
+                                    {
+                                        "name": "CHE_DOCKER_CONNECTOR",
+                                        "value": "openshift"
                                     }
                                 ],
                                 "args": [],
