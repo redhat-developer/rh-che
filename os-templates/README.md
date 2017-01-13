@@ -17,7 +17,7 @@ git checkout openshift-connector
 
 # Install pre-requisites (CentOS)
 yum -y update
-yum -y install centos-release-scl  java-1.8.0-openjdk-devel  git  patch
+yum -y install centos-release-scl java-1.8.0-openjdk-devel golang git patch
 yum -y install rh-maven33 rh-nodejs4
 
 source scl_source enable rh-maven33 rh-nodejs4
@@ -63,7 +63,7 @@ export CHE_OPENSHIFT_USERNAME=<replacewithusername>
 export CHE_OPENSHIFT_PASSWORD=<replacewithpassword>
 # If a previous version of Che was deployed, delete it
 ./openche.sh delete
-# Install OpenShift Che templat eand deploy Che 
+# Install OpenShift Che template and deploy Che 
 ./openche.sh deploy
 ```
 Once the pod is successfully started Che dashboard should be now available at http://che.ci.centos.org/
@@ -104,17 +104,21 @@ git clone https://github.com/redhat-developer/rh-che
 cd rh-che/scripts
 # Prepare the environment
 oc login -u openshift-dev -p devel
+
 export CHE_HOSTNAME=che.openshift.mini
-export CHE_IMAGE=mariolet/che-server:openshiftconnector
+export CHE_IMAGE=eclipse/che-server:nightly
 export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 export CHE_OPENSHIFT_ENDPOINT=https://$(minishift ip):8443
 docker pull $CHE_IMAGE
+
 # If a previous version of Che was deployed, delete it
 ./openche.sh delete
 # Install OpenShift Che templat eand deploy Che 
 ./openche.sh deploy
 ```
 Once the pod is successfully started Che dashboard should be now available on the minishift console.
+
+>`./build_openshift_connector.sh` script can be used for building `eclipse/che-server:nightly` image locally
 
 ## Deployment of Che on ADB (deprecated, use minishift instead)
 
@@ -177,4 +181,3 @@ docker pull $CHE_IMAGE
 ./openche.sh deploy
 ```
 Once the pod is successfully started Che dashboard should be now available at http://che.openshift.adb/
-
