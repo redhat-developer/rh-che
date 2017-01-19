@@ -203,7 +203,7 @@
                                 ],
                                 "env": [
                                     {
-                                        "name": "CHE_DOCKER_MACHINE_HOST_EXTERNAL",
+                                        "name": "CHE_DOCKER_IP_EXTERNAL",
                                         "value": "${HOSTNAME_HTTP}"
                                     },
                                     {
@@ -239,7 +239,7 @@
                                         "value": "${CHE_OPENSHIFT_SERVICEACCOUNTNAME}"
                                     },
                                     {
-                                        "name": "CHE_IP",
+                                        "name": "CHE_DOCKER_IP",
                                         "value": "${DOCKER0_BRIDGE_IP}"
                                     },
                                     {
