@@ -36,7 +36,7 @@
 set_parameters() {
     echo "Setting parameters"
     DEFAULT_CHE_HOSTNAME=che.openshift.mini
-    DEFAULT_CHE_IMAGE=eclipse/che-server:nightly
+    DEFAULT_CHE_IMAGE=rhche/che-server:nightly
     DEFAULT_CHE_LOG_LEVEL=DEBUG
     DEFAULT_CHE_TEMPLATE="../os-templates/che.json"
     DEFAULT_CHE_OPENSHIFT_USERNAME="openshift-dev"

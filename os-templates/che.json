@@ -30,7 +30,7 @@
         {
             "description": "Name of the che-server Docker image.",
             "name": "CHE_SERVER_DOCKER_IMAGE",
-            "value": "eclipse/che-server:nightly",
+            "value": "rhche/che-server:nightly",
             "required": true
         },
         {

@@ -2,6 +2,7 @@
 
 set -e
 
+DEFAULT_CHE_IMAGE_REPO=rhche/che-server
 DEFAULT_CHE_IMAGE_TAG=nightly
 
 if [ -z ${GITHUB_REPO+x} ]; then 
@@ -9,6 +10,7 @@ if [ -z ${GITHUB_REPO+x} ]; then
   exit 1
 fi
 
+CHE_IMAGE_REPO=${CHE_IMAGE_REPO:-${DEFAULT_CHE_IMAGE_REPO}}
 CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
 
 CURRENT_DIR=$(pwd)
@@ -32,6 +34,7 @@ cd ../..
 
 cd dockerfiles/che/
 ./build.sh ${CHE_IMAGE_TAG}
+docker tag eclipse/che-server:${CHE_IMAGE_TAG} ${CHE_IMAGE_REPO}:${CHE_IMAGE_TAG}
 
 cd ${CURRENT_DIR}
 
