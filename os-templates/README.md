@@ -69,47 +69,61 @@ export CHE_OPENSHIFT_PASSWORD=<replacewithpassword>
 Once the pod is successfully started Che dashboard should be now available at http://che.ci.centos.org/
 
 
-## Deployment Che on Minishift
+## Deployment Che on Minishift or with "oc cluster"
 
 1\. Get [minishift](https://github.com/minishift/minishift#installation), create an OpenShift cluster (`minishift start`), open the web console (`minishift console`) and read the instructions to install the OpenShift CLI (help->Command Line Tools).
 
 2\. Use that command to use minishift docker daemon: `eval $(minishift docker-env)`
+Skip this step if you use "oc cluster".
 
 3\. Configure OpenShift
 
 ```sh
-# Enable OpenShift router
-oc login -u admin -p admin -n default
-docker pull openshift/origin-haproxy-router:`oc version | awk '{ print $2; exit }'`
-oc adm policy add-scc-to-user hostnetwork -z router
-oc adm router --create --service-account=router --expose-metrics --subdomain="openshift.mini"
-
 # Create OpenShift project
-oc login -u openshift-dev -p devel
+oc login -u developer -p developer
 oc new-project eclipse-che
 
 # Create a serviceaccount with privileged scc
-oc login -u admin -p admin -n eclipse-che
+oc login -u system:admin -n eclipse-che
 oc create serviceaccount cheserviceaccount
 oc adm policy add-scc-to-user privileged -z cheserviceaccount
 ```
 
-4\. Update `/etc/hosts` with a line that associates minishift IP address (`minishift ip`) and the hostname `che.openshift.mini`
+4\. Update `/etc/hosts` with a line that associates minishift/openshift IP address (`minishift ip`) and the hostname `che.openshift.mini`
 
-5\. Deploy Che
+5\. Create Persistent Volumes
+
+```sh
+oc login -u system:admin
+oc create -f os-templates/hostPath/pv0001.yaml
+oc create -f os-templates/hostPath/pv0002.yaml
+```
+
+or, if you use "oc cluster" and have set nfs, you can use the following:
+
+```sh
+oc login -u system:admin
+oc create -f os-templates/nfs/pv0001.yaml
+oc create -f os-templates/nfs/pv0002.yaml
+```
+
+6\. Deploy Che
 
 ```sh
 # Get the script from github
 git clone https://github.com/redhat-developer/rh-che
 cd rh-che/scripts
 # Prepare the environment
-oc login -u openshift-dev -p devel
+oc login -u developer -p developer
 
 export CHE_HOSTNAME=che.openshift.mini
 export CHE_IMAGE=rhche/che-server:nightly
 export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 export CHE_OPENSHIFT_ENDPOINT=https://$(minishift ip):8443
 docker pull $CHE_IMAGE
+
+When using "oc cluster", replace "$(minishift ip)" with your openshift ip.
+You will get that ip address when starting a cluster (oc cluster up).
 
 # If a previous version of Che was deployed, delete it
 ./openche.sh delete

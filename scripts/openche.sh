@@ -39,8 +39,8 @@ set_parameters() {
     DEFAULT_CHE_IMAGE=rhche/che-server:nightly
     DEFAULT_CHE_LOG_LEVEL=DEBUG
     DEFAULT_CHE_TEMPLATE="../os-templates/che.json"
-    DEFAULT_CHE_OPENSHIFT_USERNAME="openshift-dev"
-    DEFAULT_CHE_OPENSHIFT_PASSWORD="devel"
+    DEFAULT_CHE_OPENSHIFT_USERNAME="developer"
+    DEFAULT_CHE_OPENSHIFT_PASSWORD="developer"
 
     CHE_HOSTNAME=${CHE_HOSTNAME:-${DEFAULT_CHE_HOSTNAME}}
     CHE_IMAGE=${CHE_IMAGE:-${DEFAULT_CHE_IMAGE}}
@@ -91,6 +91,16 @@ install_template() {
     oc create -f ${CHE_TEMPLATE} >/dev/null 2>&1 || oc replace -f ${CHE_TEMPLATE} >/dev/null 2>&1
     echo "Template installed"
 }
+## Install pvc
+install_pvc() {
+    echo "Installing PVC"
+    PVC1=../os-templates/pvc-checonf.yaml
+    oc create -f $PVC1 >/dev/null 2>&1 || true
+    PVC2=../os-templates/pvc-chedata.yaml
+    oc create -f $PVC2 >/dev/null 2>&1 || true
+    echo "PVCs installed"
+}
+
 
 ## Create a new app based on `eclipse_che` template and deploy it
 deploy() {
@@ -123,6 +133,8 @@ delete() {
     oc delete route/${CHE_APPLICATION_NAME} || true
     oc delete svc/${CHE_APPLICATION_NAME} || true
     oc delete dc/${CHE_APPLICATION_NAME} || true
+    #oc delete pvc claim-che-conf
+    #oc delete pvc claim-che-data
 }
 
 parse_command_line () {
@@ -164,6 +176,7 @@ parse_command_line "$@"
 
 case ${ACTION} in
   deploy)
+    install_pvc
     install_template
     deploy
   ;;

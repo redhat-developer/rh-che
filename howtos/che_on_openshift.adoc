@@ -39,8 +39,8 @@ NOTE: For now PRs are expected to be provided against `openshift-connector` bran
 
 Pre-requirements:
 
-- OpenShift CLI (`oc`) - `v1.2.2` and above
-- Minishift (`minishift`) - `v0.9.0` and above
+- OpenShift CLI (`oc`) - `v1.3.1` and above
+- Minishift (`minishift`) - `v1.0.0` and above
 
 Detailed instructions can be found in the https://github.com/redhat-developer/rh-che/tree/master/os-templates#deployment-che-on-minishift[Deployment Che on Minishift] document.
 

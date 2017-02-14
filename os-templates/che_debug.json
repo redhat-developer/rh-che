@@ -273,8 +273,8 @@
                         "volumes": [
                             {
                                 "name": "che-conf-volume",
-                                "hostPath": {
-                                    "path": "/etc/conf"
+                                "persistentVolumeClaim": {
+                                    "claimName": "claim-che-conf"
                                 }
                             },
                             {
@@ -285,8 +285,8 @@
                             },
                             {
                                 "name": "che-data-volume",
-                                "hostPath": {
-                                    "path": "/home/user/che"
+                                "persistentVolumeClaim": {
+                                    "claimName": "claim-che-data"
                                 }
                             }
                         ],
