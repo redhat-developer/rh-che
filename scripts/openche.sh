@@ -30,7 +30,6 @@
 # ------------------------------------
 # export CHE_HOSTNAME=che.openshift.mini
 # export CHE_IMAGE=codenvy/che-server:local
-# export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 
 
 set_parameters() {
@@ -39,8 +38,9 @@ set_parameters() {
     DEFAULT_CHE_IMAGE=rhche/che-server:nightly
     DEFAULT_CHE_LOG_LEVEL=DEBUG
     DEFAULT_CHE_TEMPLATE="../os-templates/che.json"
-    DEFAULT_CHE_OPENSHIFT_USERNAME="developer"
-    DEFAULT_CHE_OPENSHIFT_PASSWORD="developer"
+    DEFAULT_CHE_OPENSHIFT_TOKEN=""
+    DEFAULT_CHE_OPENSHIFT_USERNAME=""
+    DEFAULT_CHE_OPENSHIFT_PASSWORD=""
 
     CHE_HOSTNAME=${CHE_HOSTNAME:-${DEFAULT_CHE_HOSTNAME}}
     CHE_IMAGE=${CHE_IMAGE:-${DEFAULT_CHE_IMAGE}}
@@ -53,6 +53,7 @@ set_parameters() {
 
     CHE_APPLICATION_NAME=che-host
 
+    CHE_OPENSHIFT_TOKEN=${CHE_OPENSHIFT_TOKEN:-${DEFAULT_CHE_OPENSHIFT_TOKEN}}
     CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME:-${DEFAULT_CHE_OPENSHIFT_USERNAME}}
     CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD:-${DEFAULT_CHE_OPENSHIFT_PASSWORD}}
 }
@@ -67,10 +68,6 @@ check_prerequisites() {
     
     # docker must be installed
     command -v docker >/dev/null 2>&1 || { echo >&2 "I require docker but it's not installed.  Aborting."; exit 1; }
-    
-    if [ -z ${DOCKER0_IP+x} ]; then 
-      ip addr show docker0  >/dev/null 2>&1 || { echo >&2 "Bridge docker0 not found.  Aborting."; exit 1; }
-    fi
     
     # Check if -v /nonexistantfolder:Z works
     # A workaround is to remove --selinux-enabled option in /etc/sysconfig/docker
@@ -105,17 +102,13 @@ install_pvc() {
 ## Create a new app based on `eclipse_che` template and deploy it
 deploy() {
     echo "Deploying Che"
-    if [ -z ${DOCKER0_IP+x} ]; then 
-      DOCKER0_IP=$(ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
-    fi
-
     echo "calling oc new-app"
     oc new-app --template=eclipse-che --param=APPLICATION_NAME=${CHE_APPLICATION_NAME} \
                                     --param=HOSTNAME_HTTP=${CHE_HOSTNAME} \
                                     --param=CHE_SERVER_DOCKER_IMAGE=${CHE_IMAGE} \
-                                    --param=DOCKER0_BRIDGE_IP=${DOCKER0_IP} \
                                     --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL} \
                                     --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT} \
+                                    --param=CHE_OPENSHIFT_TOKEN=${CHE_OPENSHIFT_TOKEN} \
                                     --param=CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME} \
                                     --param=CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD}
     

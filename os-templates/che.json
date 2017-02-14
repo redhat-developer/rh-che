@@ -40,16 +40,22 @@
             "required": true
         },
         {
+            "description": "OpenShift token",
+            "name": "CHE_OPENSHIFT_TOKEN",
+            "value": "",
+            "required": false
+        },
+        {
             "description": "OpenShift username",
             "name": "CHE_OPENSHIFT_USERNAME",
             "value": "openshift-dev",
-            "required": true
+            "required": false
         },
         {
             "description": "OpenShift userpassword.",
             "name": "CHE_OPENSHIFT_PASSWORD",
             "value": "devel",
-            "required": true
+            "required": false
         },
         {
             "description": "OpenShift project.",
@@ -68,12 +74,6 @@
             "name": "CHE_LOG_LEVEL",
             "value": "INFO",
             "required": false
-        },
-        {
-            "description": "IP of the host docker0 bridge. This IP is used by che-server to communicate with che workspaces",
-            "name": "DOCKER0_BRIDGE_IP",
-            "value": "172.17.0.1",
-            "required": true
         }
     ],
     "objects": [
@@ -223,6 +223,10 @@
                                         "value": "${CHE_OPENSHIFT_ENDPOINT}"
                                     },
                                     {
+                                        "name": "CHE_OPENSHIFT_TOKEN",
+                                        "value": "${CHE_OPENSHIFT_TOKEN}"
+                                    },
+                                    {
                                         "name": "CHE_OPENSHIFT_USERNAME",
                                         "value": "${CHE_OPENSHIFT_USERNAME}"
                                     },
@@ -239,8 +243,8 @@
                                         "value": "${CHE_OPENSHIFT_SERVICEACCOUNTNAME}"
                                     },
                                     {
-                                        "name": "CHE_DOCKER_IP",
-                                        "value": "${DOCKER0_BRIDGE_IP}"
+                                        "name": "CHE_DOCKER_SERVER__EVALUATION__STRATEGY",
+                                        "value": "docker-local"
                                     },
                                     {
                                         "name": "CHE_LOG_LEVEL",
