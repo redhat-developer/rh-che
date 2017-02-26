@@ -44,6 +44,7 @@ oc new-project eclipse-che
 oc login -u system:admin -n eclipse-che
 oc create serviceaccount cheserviceaccount
 oc adm policy add-scc-to-user privileged -z cheserviceaccount
+oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:eclipse-che:cheserviceaccount
 ```
 
 3\. Deploy Che
@@ -87,6 +88,7 @@ oc new-project eclipse-che
 oc login -u system:admin -n eclipse-che
 oc create serviceaccount cheserviceaccount
 oc adm policy add-scc-to-user privileged -z cheserviceaccount
+oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:eclipse-che:cheserviceaccount
 ```
 
 4\. Update `/etc/hosts` with a line that associates minishift/openshift IP address (`minishift ip`) and the hostname `che.openshift.mini`
@@ -176,6 +178,7 @@ oc new-project eclipse-che
 oc login -u admin -p admin -n eclipse-che
 oc create serviceaccount cheserviceaccount
 oc adm policy add-scc-to-user privileged -z cheserviceaccount
+oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:eclipse-che:cheserviceaccount
 ```
 
 5\. Deploy Che
