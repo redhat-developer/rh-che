@@ -40,24 +40,6 @@
             "required": true
         },
         {
-            "description": "OpenShift token",
-            "name": "CHE_OPENSHIFT_TOKEN",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "OpenShift username",
-            "name": "CHE_OPENSHIFT_USERNAME",
-            "value": "openshift-dev",
-            "required": false
-        },
-        {
-            "description": "OpenShift userpassword.",
-            "name": "CHE_OPENSHIFT_PASSWORD",
-            "value": "devel",
-            "required": false
-        },
-        {
             "description": "OpenShift project.",
             "name": "CHE_OPENSHIFT_PROJECT",
             "value": "eclipse-che",
@@ -221,18 +203,6 @@
                                     {
                                         "name": "CHE_OPENSHIFT_ENDPOINT",
                                         "value": "${CHE_OPENSHIFT_ENDPOINT}"
-                                    },
-                                    {
-                                        "name": "CHE_OPENSHIFT_TOKEN",
-                                        "value": "${CHE_OPENSHIFT_TOKEN}"
-                                    },
-                                    {
-                                        "name": "CHE_OPENSHIFT_USERNAME",
-                                        "value": "${CHE_OPENSHIFT_USERNAME}"
-                                    },
-                                    {
-                                        "name": "CHE_OPENSHIFT_PASSWORD",
-                                        "value": "${CHE_OPENSHIFT_PASSWORD}"
                                     },
                                     {
                                         "name": "CHE_OPENSHIFT_PROJECT",

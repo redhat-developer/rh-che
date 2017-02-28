@@ -107,11 +107,8 @@ deploy() {
                                     --param=HOSTNAME_HTTP=${CHE_HOSTNAME} \
                                     --param=CHE_SERVER_DOCKER_IMAGE=${CHE_IMAGE} \
                                     --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL} \
-                                    --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT} \
-                                    --param=CHE_OPENSHIFT_TOKEN=${CHE_OPENSHIFT_TOKEN} \
-                                    --param=CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME} \
-                                    --param=CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD}
-    
+                                    --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT}
+                                        
     echo "OPENCHE: Waiting 5 seconds for the pod to start"
     sleep 5
     POD_ID=$(oc get pods | grep ${CHE_APPLICATION_NAME} | grep -v "\-deploy" | awk '{print $1}')
