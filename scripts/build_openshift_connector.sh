@@ -33,7 +33,10 @@ mvnche install
 cd ../..
 
 cd dockerfiles/che/
+mv Dockerfile Dockerfile.alpine
+cp Dockerfile.centos Dockerfile
 ./build.sh ${CHE_IMAGE_TAG}
+mv Dockerfile.alpine Dockerfile
 docker tag eclipse/che-server:${CHE_IMAGE_TAG} ${CHE_IMAGE_REPO}:${CHE_IMAGE_TAG}
 
 cd ${CURRENT_DIR}

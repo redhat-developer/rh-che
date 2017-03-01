@@ -58,7 +58,6 @@ oc login -u openshift-dev che.ci.centos.org
 export CHE_HOSTNAME=demo.che.ci.centos.org
 export CHE_OPENSHIFT_ENDPOINT=https://che.ci.centos.org:8443/
 export CHE_IMAGE=rhche/che-server:nightly
-export DOCKER0_IP=10.1.0.1
 export CHE_LOG_LEVEL=INFO
 export CHE_OPENSHIFT_USERNAME=<replacewithusername>
 export CHE_OPENSHIFT_PASSWORD=<replacewithpassword>
@@ -120,7 +119,6 @@ oc login -u developer -p developer
 
 export CHE_HOSTNAME=che.openshift.mini
 export CHE_IMAGE=rhche/che-server:nightly
-export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 export CHE_OPENSHIFT_ENDPOINT=https://$(minishift ip):8443
 docker pull $CHE_IMAGE
 
