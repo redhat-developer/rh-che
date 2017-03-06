@@ -38,24 +38,14 @@ set_parameters() {
     DEFAULT_CHE_IMAGE=rhche/che-server:nightly
     DEFAULT_CHE_LOG_LEVEL=DEBUG
     DEFAULT_CHE_TEMPLATE="../os-templates/che.json"
-    DEFAULT_CHE_OPENSHIFT_TOKEN=""
-    DEFAULT_CHE_OPENSHIFT_USERNAME=""
-    DEFAULT_CHE_OPENSHIFT_PASSWORD=""
 
     CHE_HOSTNAME=${CHE_HOSTNAME:-${DEFAULT_CHE_HOSTNAME}}
     CHE_IMAGE=${CHE_IMAGE:-${DEFAULT_CHE_IMAGE}}
     CHE_LOG_LEVEL=${CHE_LOG_LEVEL:-${DEFAULT_CHE_LOG_LEVEL}}
 
-    DEFAULT_CHE_OPENSHIFT_ENDPOINT=https://${CHE_HOSTNAME}:8443/
-    CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT:-${DEFAULT_CHE_OPENSHIFT_ENDPOINT}}
-
     CHE_TEMPLATE=${CHE_TEMPLATE:-${DEFAULT_CHE_TEMPLATE}}
 
     CHE_APPLICATION_NAME=che-host
-
-    CHE_OPENSHIFT_TOKEN=${CHE_OPENSHIFT_TOKEN:-${DEFAULT_CHE_OPENSHIFT_TOKEN}}
-    CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME:-${DEFAULT_CHE_OPENSHIFT_USERNAME}}
-    CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD:-${DEFAULT_CHE_OPENSHIFT_PASSWORD}}
 }
 
 check_prerequisites() {
@@ -88,6 +78,7 @@ install_template() {
     oc create -f ${CHE_TEMPLATE} >/dev/null 2>&1 || oc replace -f ${CHE_TEMPLATE} >/dev/null 2>&1
     echo "Template installed"
 }
+
 ## Install pvc
 install_pvc() {
     echo "Installing PVC"
@@ -106,9 +97,8 @@ deploy() {
     oc new-app --template=eclipse-che --param=APPLICATION_NAME=${CHE_APPLICATION_NAME} \
                                     --param=HOSTNAME_HTTP=${CHE_HOSTNAME} \
                                     --param=CHE_SERVER_DOCKER_IMAGE=${CHE_IMAGE} \
-                                    --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL} \
-                                    --param=CHE_OPENSHIFT_ENDPOINT=${CHE_OPENSHIFT_ENDPOINT}
-                                        
+                                    --param=CHE_LOG_LEVEL=${CHE_LOG_LEVEL}
+    
     echo "OPENCHE: Waiting 5 seconds for the pod to start"
     sleep 5
     POD_ID=$(oc get pods | grep ${CHE_APPLICATION_NAME} | grep -v "\-deploy" | awk '{print $1}')
@@ -120,11 +110,12 @@ delete() {
     echo "Deleting resources"
     # POD_ID=$(oc get pods | grep ${CHE_APPLICATION_NAME} | awk '{print $1}')
     # oc delete pod/${POD_ID}
-    oc delete route/${CHE_APPLICATION_NAME} || true
-    oc delete svc/${CHE_APPLICATION_NAME} || true
-    oc delete dc/${CHE_APPLICATION_NAME} || true
-    #oc delete pvc claim-che-conf
-    #oc delete pvc claim-che-data
+    # oc delete route/${CHE_APPLICATION_NAME} || true
+    # oc delete svc/${CHE_APPLICATION_NAME} || true
+    # oc delete dc/${CHE_APPLICATION_NAME} || true
+    # oc delete pvc claim-che-conf || true
+    # oc delete pvc claim-che-data || true
+    oc -n eclipse-che delete dc,route,svc,po,pvc --all || true
 }
 
 parse_command_line () {

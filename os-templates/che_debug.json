@@ -34,12 +34,6 @@
             "required": true
         },
         {
-            "description": "Url of the OpenShift API",
-            "name": "CHE_OPENSHIFT_ENDPOINT",
-            "value": "",
-            "required": true
-        },
-        {
             "description": "OpenShift project.",
             "name": "CHE_OPENSHIFT_PROJECT",
             "value": "eclipse-che",
@@ -207,10 +201,6 @@
                                     {
                                         "name": "CHE_LOCAL_CONF_DIR",
                                         "value": "/etc/conf"
-                                    },
-                                    {
-                                        "name": "CHE_OPENSHIFT_ENDPOINT",
-                                        "value": "${CHE_OPENSHIFT_ENDPOINT}"
                                     },
                                     {
                                         "name": "CHE_OPENSHIFT_PROJECT",

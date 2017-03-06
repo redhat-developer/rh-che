@@ -10,31 +10,25 @@ minishift start
 eval $(minishift docker-env)
 
 # Default OpenShift credentials
-DEFAULT_CHE_OPENSHIFT_USERNAME="openshift-dev"
-DEFAULT_CHE_OPENSHIFT_PASSWORD="devel"
+DEFAULT_CHE_OPENSHIFT_USERNAME="developer"
+DEFAULT_CHE_OPENSHIFT_PASSWORD="developer"
 
 # CHE_OPENSHIFT_USERNAME and CHE_OPENSHIFT_PASSWORD variables can be used for custom credentials
 CHE_OPENSHIFT_USERNAME=${CHE_OPENSHIFT_USERNAME:-${DEFAULT_CHE_OPENSHIFT_USERNAME}}
 CHE_OPENSHIFT_PASSWORD=${CHE_OPENSHIFT_PASSWORD:-${DEFAULT_CHE_OPENSHIFT_PASSWORD}}
-
-# Enable OpenShift router
-oc login -u admin -p admin -n default
-docker pull openshift/origin-haproxy-router:`oc version | awk '{ print $2; exit }'`
-oc adm policy add-scc-to-user hostnetwork -z router
-oc adm router --create --service-account=router --expose-metrics --subdomain="openshift.mini"
 
 # Create OpenShift project
 oc login -u ${CHE_OPENSHIFT_USERNAME} -p ${CHE_OPENSHIFT_PASSWORD}
 oc new-project eclipse-che
 
 # Create a serviceaccount with privileged scc
-oc login -u admin -p admin -n eclipse-che
+oc login -u system:admin
 oc create serviceaccount cheserviceaccount
 oc adm policy add-scc-to-user privileged -z cheserviceaccount
+oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:eclipse-che:cheserviceaccount
 
 oc login -u ${CHE_OPENSHIFT_USERNAME} -p ${CHE_OPENSHIFT_PASSWORD}
 export CHE_HOSTNAME=che.openshift.mini
-export DOCKER0_IP=$(docker run -ti --rm --net=host alpine ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 export CHE_OPENSHIFT_ENDPOINT=https://$(minishift ip):8443
 
 # Reminder for updating /etc/hosts file with a line that associates minishift IP address and the hostname che.openshift.mini
