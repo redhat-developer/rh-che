@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-data-volume
+  annotations:
+      volume.beta.kubernetes.io/storage-class: "che-data"
+spec:
+    capacity:
+      storage: 10Gi
+    accessModes:
+      - ReadWriteMany
+    persistentVolumeReclaimPolicy: Recycle
+    hostPath:
+     path: /nfsvolumes/data
+

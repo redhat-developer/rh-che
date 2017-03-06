@@ -1,9 +1,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: claim-che-conf
+  name: claim-che-workspace
   annotations:
-      volume.beta.kubernetes.io/storage-class: "che-conf"
+    volume.beta.kubernetes.io/storage-class: "che-workspace"
 spec:
   accessModes:
     - ReadWriteMany

@@ -86,6 +86,8 @@ install_pvc() {
     oc create -f $PVC1 >/dev/null 2>&1 || true
     PVC2=../os-templates/pvc-chedata.yaml
     oc create -f $PVC2 >/dev/null 2>&1 || true
+    PVC3=../os-templates/pvc-cheworkspace.yaml
+    oc create -f $PVC3 >/dev/null 2>&1 || true
     echo "PVCs installed"
 }
 

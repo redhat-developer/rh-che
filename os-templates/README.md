@@ -96,16 +96,18 @@ oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:eclip
 
 ```sh
 oc login -u system:admin
-oc create -f os-templates/hostPath/pv0001.yaml
-oc create -f os-templates/hostPath/pv0002.yaml
+oc create -f os-templates/hostPath/pvconf.yaml
+oc create -f os-templates/hostPath/pvdata.yaml
+oc create -f os-templates/hostPath/pvworkspace.yaml
 ```
 
 or, if you use "oc cluster" and have set nfs, you can use the following:
 
 ```sh
 oc login -u system:admin
-oc create -f os-templates/nfs/pv0001.yaml
-oc create -f os-templates/nfs/pv0002.yaml
+oc create -f os-templates/nfs/pvconf.yaml
+oc create -f os-templates/nfs/pvdata.yaml
+oc create -f os-templates/nfs/pvworkspace.yaml
 ```
 
 6\. Deploy Che
@@ -115,11 +117,10 @@ oc create -f os-templates/nfs/pv0002.yaml
 git clone https://github.com/redhat-developer/rh-che
 cd rh-che/scripts
 # Prepare the environment
-oc login -u developer -p developer
+oc login -u developer -p developer -n eclipse-che
 
 export CHE_HOSTNAME=che.openshift.mini
 export CHE_IMAGE=rhche/che-server:nightly
-export CHE_OPENSHIFT_ENDPOINT=https://$(minishift ip):8443
 docker pull $CHE_IMAGE
 
 When using "oc cluster", replace "$(minishift ip)" with your openshift ip.
@@ -127,7 +128,7 @@ You will get that ip address when starting a cluster (oc cluster up).
 
 # If a previous version of Che was deployed, delete it
 ./openche.sh delete
-# Install OpenShift Che templat eand deploy Che 
+# Install OpenShift Che template and deploy Che
 ./openche.sh deploy
 ```
 Once the pod is successfully started Che dashboard should be now available on the minishift console.
