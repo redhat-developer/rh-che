@@ -13,6 +13,13 @@ fi
 CHE_IMAGE_REPO=${CHE_IMAGE_REPO:-${DEFAULT_CHE_IMAGE_REPO}}
 CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
 
+# Build openshift-connector branch of che-dependencies
+git clone -b openshift-connector --single-branch https://github.com/eclipse/che-dependencies.git che-deps
+cd che-deps
+mvn clean install
+cd ..
+rm -rf ./che-deps
+
 CURRENT_DIR=$(pwd)
 cd ${GITHUB_REPO}
 

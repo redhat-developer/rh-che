@@ -6,7 +6,7 @@ metadata:
       volume.beta.kubernetes.io/storage-class: "che-conf"
 spec:
     capacity:
-      storage: 10Gi
+      storage: 2Gi
     accessModes:
       - ReadWriteMany
     persistentVolumeReclaimPolicy: Recycle

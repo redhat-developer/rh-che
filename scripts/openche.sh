@@ -117,7 +117,7 @@ delete() {
     # oc delete dc/${CHE_APPLICATION_NAME} || true
     # oc delete pvc claim-che-conf || true
     # oc delete pvc claim-che-data || true
-    oc -n eclipse-che delete dc,route,svc,po,pvc --all || true
+    oc -n eclipse-che delete dc,route,svc,po,pvc,deployment --all || true
 }
 
 parse_command_line () {
