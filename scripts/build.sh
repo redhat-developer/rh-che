@@ -35,6 +35,17 @@ cd assembly/assembly-wsmaster-war
 mvnche install
 cd ../..
 
+# Uncomment this to rebuild stacks.json
+#
+# cd ide
+# mv ide/src/main/resources/stacks.json ide/src/main/resources/stacks.json.orig
+# cp ide/src/main/resources/stacks.json.centos ide/src/main/resources/stacks.json
+# mvnche install
+# mv ide/src/main/resources/stacks.json.orig ide/src/main/resources/stacks.json
+# cd ../assembly/assembly-ide-war
+# mvnche install
+# cd ..
+
 cd assembly/assembly-main/
 mvnche install
 cd ../..
