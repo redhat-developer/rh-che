@@ -22,8 +22,8 @@ export GITHUB_REPO="/Users/mariolet/Github/che"
 eval $(minishift docker-env)
 ```
 
-CHE_IMAGE_REPO and CHE_IMAGE_TAG are the Docker image name and tag which will be built.
-GITHUB_REPO points to the local directory where the official Che repo was checked out
+* CHE_IMAGE_REPO and CHE_IMAGE_TAG are the Docker image name and tag which will be built.
+* GITHUB_REPO points to the local directory where the official Che repo was checked out
 
 ### Build Che
 
@@ -55,12 +55,12 @@ export CHE_DEBUGGING_ENABLED="false"
 export FABRIC8_ONLINE_PATH="/home/user/github/fabric8-online/"
 ```
 
-OPENSHIFT_USERNAME and OPENSHIFT_PASSWORD are used to configure which Openshift account will be used
-CHE_OPENSHIFT_PROJECT is the name of the project in Openshift in which Che will be deployed
-CHE_HOSTNAME will be the hostname from which Che will be accessible after deployment
-CHE_LOG_LEVEL is the logging level (DEBUG, INFO, WARN, ERROR etc)
-CHE_DEBUGGING_ENABLED set this to "true" to allow remote Java debugging of the Che server
-FABRIC8_ONLINE_PATH is the full path to the fabric8-online binary
+* OPENSHIFT_USERNAME and OPENSHIFT_PASSWORD are used to configure which Openshift account will be used
+* CHE_OPENSHIFT_PROJECT is the name of the project in Openshift in which Che will be deployed
+* CHE_HOSTNAME will be the hostname from which Che will be accessible after deployment
+* CHE_LOG_LEVEL is the logging level (DEBUG, INFO, WARN, ERROR etc)
+* CHE_DEBUGGING_ENABLED set this to "true" to allow remote Java debugging of the Che server
+* FABRIC8_ONLINE_PATH is the full path to the fabric8-online binary
 
 ### Deploy Che and all needed resources (configmaps, service account, pvc, pv, services, routes)
 
