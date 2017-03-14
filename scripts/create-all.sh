@@ -103,7 +103,9 @@ $(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/deployment.yml)
   selector:
     project: che
     provider: fabric8
-" | oc apply -f -
+" |  \
+sed "s/image:.*/image: \"rhche\/che-server:nightly\"/g" | \
+oc apply -f -
 
 #Create Che service
 echo "# Create service..."
