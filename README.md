@@ -38,6 +38,8 @@ scripts/build.sh
 ### Runtime prerequisites
 
 * Get [minishift](https://github.com/minishift/minishift#installation) (we have tested with v1.0.0beta4)
+  * Minishift v1.0.0beta4 includes the `oc` binary, and this should be added to your `$PATH`. The binary is located
+    in the `.minishift/cache/oc/<oc version>/` directory (e.g. on Linux, it is in `~/.minishift/cache/oc/v1.4.1/`).
 * Get [gofabric8](https://github.com/fabric8io/gofabric8#getting-started) (we have tested with v0.4.121)
 * Clone fabric8-online git repository:
 
