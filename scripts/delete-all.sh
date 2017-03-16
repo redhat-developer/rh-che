@@ -17,6 +17,9 @@ oc delete dc,rc,pod,rs -n ${CHE_OPENSHIFT_PROJECT} --all
 echo "# Deleting serviceaccount..."
 oc get serviceaccount che &> /dev/null && oc delete serviceaccount che
 
+echo "# Deleting rolebinding..."
+oc get rolebinding che &> /dev/null && oc delete rolebinding che
+
 oc login -u system:admin -n ${CHE_OPENSHIFT_PROJECT} > /dev/null
 echo "# Deleting PVCs..."
 oc delete pvc --all -n ${CHE_OPENSHIFT_PROJECT} 

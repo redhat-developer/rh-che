@@ -54,37 +54,24 @@ oc login -u system:admin -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
 gofabric8 volumes
 oc login -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
 
-# Deploy PVs (template way)
-# oc apply -f os-templates/hostPath/pvconf.yaml
-# oc apply -f os-templates/hostPath/pvdata.yaml
-# oc apply -f os-templates/hostPath/pvworkspace.yaml
-# oc login -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
-# oc apply -f ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/config-pvc.yml
-# oc apply -f ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/data-pvc.yml
-# oc apply -f ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/workspace-pvc.yml
+# Wait a few seconds for the PVCs to be bound to a PV before the starting the pods
+sleep 5
 
 # Create and configure service account
 # TODO check if service account already exists
-# echo "# Create service account..."
-# echo "apiVersion: \"v1\"
-# kind: \"ServiceAccount\"
-# $(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/sa.yml)
-# " | oc apply -f -
+echo "# Create service account..."
+echo "apiVersion: \"v1\"
+kind: \"ServiceAccount\"
+$(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/sa.yml)
+" | oc apply -f -
 
-# echo "apiVersion: \"v1\"
-# kind: \"RoleBinding\"
-# $(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/rb.yml)
-# " | oc apply -f -
+# Create and configure service account
+echo "# Create role bindings..."
+echo "apiVersion: \"v1\"
+kind: \"RoleBinding\"
+$(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/rb.yml)
+" | oc apply -f -
 
-oc login -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT} > /dev/null
-export CHE_OPENSHIFT_SERVICE_ACCOUNT=che
-oc create serviceaccount ${CHE_OPENSHIFT_SERVICE_ACCOUNT}
-oc login -u system:admin -n ${CHE_OPENSHIFT_PROJECT} > /dev/null
-#oadm policy add-role-to-user -n ${CHE_OPENSHIFT_PROJECT} edit system:serviceaccount:${CHE_OPENSHIFT_PROJECT}:${CHE_OPENSHIFT_SERVICE_ACCOUNT}
-oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:${CHE_OPENSHIFT_PROJECT}:${CHE_OPENSHIFT_SERVICE_ACCOUNT}
-# oc adm policy add-scc-to-user anyuid ${CHE_OPENSHIFT_SERVICE_ACCOUNT}
-oc adm policy add-scc-to-group anyuid system:authenticated
-oc login -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT} > /dev/null
 
 #Deploy Che server
 echo "# Deploy che..."
