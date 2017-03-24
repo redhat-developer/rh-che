@@ -39,7 +39,9 @@ oc create configmap che \
       --from-literal=log-level=${CHE_LOG_LEVEL} \
       --from-literal=docker-connector="openshift" \
       --from-literal=port="8080" \
-      --from-literal=remote-debugging-enabled=${CHE_DEBUGGING_ENABLED} 
+      --from-literal=remote-debugging-enabled=${CHE_DEBUGGING_ENABLED} \
+      --from-literal=che-oauth-github-forceactivation="true" 
+
 
 # Deploy PVs (gofabric8 way)
 #   gofabric8 should be installed:
