@@ -44,7 +44,7 @@
             <outputDirectory>webapps</outputDirectory>
             <outputFileNameMapping>ROOT.war</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che:assembly-wsagent-war</include>
+                <include>com.redhat.che:almighty-ide-assembly-wsagent-war</include>
             </includes>
         </dependencySet>
     </dependencySets>
@@ -57,10 +57,6 @@
             <directory>${project.basedir}/src/assembly/webapps</directory>
             <outputDirectory>webapps</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/keycloak/</directory>
-            <outputDirectory>lib</outputDirectory>
-       </fileSet>
     </fileSets>
     <files>
         <file>

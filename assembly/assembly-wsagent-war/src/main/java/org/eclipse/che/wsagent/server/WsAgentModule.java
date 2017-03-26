@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.wsagent.server;
 
-import elemental.json.Json;
-import elemental.json.JsonFactory;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -31,6 +27,7 @@ import org.eclipse.che.api.core.jsonrpc.JsonRpcMessageReceiver;
 import org.eclipse.che.api.core.jsonrpc.RequestHandlerConfigurator;
 import org.eclipse.che.api.core.rest.ApiInfoService;
 import org.eclipse.che.api.core.rest.CoreRestModule;
+import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.util.FileCleaner.FileCleanerModule;
 import org.eclipse.che.api.core.websocket.WebSocketMessageReceiver;
 import org.eclipse.che.api.core.websocket.WebSocketMessageTransmitter;
@@ -44,7 +41,6 @@ import org.eclipse.che.api.ssh.server.HttpSshServiceClient;
 import org.eclipse.che.api.ssh.server.SshServiceClient;
 import org.eclipse.che.api.user.server.spi.PreferenceDao;
 import org.eclipse.che.commons.lang.Pair;
-import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.git.impl.jgit.JGitConnectionFactory;
 import org.eclipse.che.inject.DynaModule;
 import org.eclipse.che.plugin.java.server.rest.WsAgentURLProvider;
@@ -62,6 +58,7 @@ public class WsAgentModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ApiInfoService.class);
+
 
         bind(PreferenceDao.class).to(org.eclipse.che.RemotePreferenceDao.class);
 
@@ -90,6 +87,8 @@ public class WsAgentModule extends AbstractModule {
 
         bind(String.class).annotatedWith(Names.named("wsagent.endpoint"))
                           .toProvider(WsAgentURLProvider.class);
+                       
+        bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
 
         configureJsonRpc();
         configureWebSocket();
