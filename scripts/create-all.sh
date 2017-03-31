@@ -15,8 +15,8 @@ if [ -z ${CHE_OPENSHIFT_PROJECT+x} ]; then echo "Env var CHE_OPENSHIFT_PROJECT i
 
 # if [ ! -d "${FABRIC8_ONLINE_PATH}"apps/che/src/main/fabric8 ]; then echo "Folder ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8 does not exists. Aborting"; exit 1; fi 
 
-echo "# oc login..."
-oc login -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} > /dev/null
+echo "# oc login ${OPENSHIFT_ENDPOINT}..."
+oc login ${OPENSHIFT_ENDPOINT} -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} > /dev/null
 
 # Check if the project exists othewise create it
 if ! oc get project ${CHE_OPENSHIFT_PROJECT} &> /dev/null; then
@@ -40,21 +40,24 @@ oc create configmap che \
       --from-literal=docker-connector="openshift" \
       --from-literal=port="8080" \
       --from-literal=remote-debugging-enabled=${CHE_DEBUGGING_ENABLED} \
-      --from-literal=che-oauth-github-forceactivation="true" 
-
+      --from-literal=che-oauth-github-forceactivation="true" \
+      --from-literal=workspaces-memory-limit="1500Mi" \
+      --from-literal=workspaces-memory-request="500Mi" \
+      --from-literal=enable-workspaces-autostart="false" \
+      --from-literal=che-server-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1000m" \
+      --from-literal=che-workspaces-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1500m"
 
 # Deploy PVs (gofabric8 way)
 #   gofabric8 should be installed:
 #   https://github.com/fabric8io/gofabric8#getting-started
 echo "# Create pvc..."
 # TODO check if the pvc exist
-oc apply -f ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/config-pvc.yml
 oc apply -f ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/data-pvc.yml
 oc apply -f ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/workspace-pvc.yml
-oc login -u system:admin -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
+oc login ${OPENSHIFT_ENDPOINT} -u system:admin -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
 # TODO check if pv exists (or if pvc has been bounded)
 gofabric8 volumes
-oc login -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
+oc login ${OPENSHIFT_ENDPOINT} -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT}  > /dev/null
 
 # Wait a few seconds for the PVCs to be bound to a PV before the starting the pods
 sleep 5

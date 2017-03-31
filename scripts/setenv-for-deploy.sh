@@ -1,3 +1,4 @@
+export OPENSHIFT_ENDPOINT="https://$(minishift ip):8443/"
 export OPENSHIFT_USERNAME="developer"
 export OPENSHIFT_PASSWORD="developer"
 export CHE_OPENSHIFT_PROJECT="eclipse-che"
