@@ -1,96 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2012-2016 Codenvy, S.A.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-      Codenvy, S.A. - initial API and implementation
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- Copyright (c) 2012-2016 Codenvy, S.A. All rights reserved. This program 
+    and the accompanying materials are made available under the terms of the 
+    Eclipse Public License v1.0 which accompanies this distribution, and is available 
+    at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A. 
+    - initial API and implementation -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <groupId>org.eclipse.che.depmgt</groupId>
-        <version>5.0.0-M8-SNAPSHOT</version>
-    </parent>
     <groupId>com.redhat.che</groupId>
-    <artifactId>almighty-ide-parent</artifactId>
+    <artifactId>almighty-ide-builder</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Almighty IDE (parent)</name>
-    <modules>
-        <module>assembly</module>
-    </modules>
+    <name>Almighty IDE (builder)</name>
+    <scm>
+    </scm>
     <properties>
-        <che.version>5.0.0-M8-SNAPSHOT</che.version>
+        <almighty-ide-che-version>5.6.0-openshift-connector-SNAPSHOT</almighty-ide-che-version>
+        <che-fork>amisevsk</che-fork>
+        <che-branch>openshift-fix-nullable</che-branch>
+        <che-dependencies-fork>eclipse</che-dependencies-fork>
+        <che-dependencies-branch>openshift-connector</che-dependencies-branch>
+        <skipCheckoutIfExists>true</skipCheckoutIfExists>
     </properties>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-ide-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-main</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-wsagent-server</artifactId>
-                <version>${project.version}</version>
-                <type>tar.gz</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-wsagent-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-wsmaster-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che</groupId>
-                <artifactId>che-parent</artifactId>
-                <version>${che.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <repositories>
-        <repository>
-            <id>codenvy-public-repo</id>
-            <name>codenvy public</name>
-            <url>https://maven.codenvycorp.com/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>codenvy-public-snapshots-repo</id>
-            <name>codenvy public snapshots</name>
-            <url>https://maven.codenvycorp.com/content/repositories/codenvy-public-snapshots/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codenvy-public-repo</id>
-            <name>codenvy public</name>
-            <url>https://maven.codenvycorp.com/content/groups/public/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>codenvy-public-snapshots-repo</id>
-            <name>codenvy public snapshots</name>
-            <url>https://maven.codenvycorp.com/content/repositories/codenvy-public-snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.9.4</version>
+                <configuration>
+                    <skipCheckoutIfExists>${skipCheckoutIfExists}</skipCheckoutIfExists>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-eclipse-che-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <connectionUrl>scm:git:https://github.com/${che-dependencies-fork}/che-dependencies.git</connectionUrl>
+                            <developerConnectionUrl>scm:git:https://github.com/${che-dependencies-fork}/che-dependencies.git</developerConnectionUrl>
+                            <checkoutDirectory>target/export/che-dependencies</checkoutDirectory>
+                            <scmVersionType>branch</scmVersionType>
+                            <scmVersion>${che-dependencies-branch}</scmVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-eclipse-che</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <connectionUrl>scm:git:https://github.com/${che-fork}/che.git</connectionUrl>
+                            <developerConnectionUrl>scm:git:https://github.com/${che-fork}/che-dependencies.git</developerConnectionUrl>
+                            <checkoutDirectory>target/export/che-dependencies/che</checkoutDirectory>
+                            <scmVersionType>branch</scmVersionType>
+                            <scmVersion>${che-branch}</scmVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <!-- To bypass a problem in the build when rebuilding without the clean option. --> 
+                                <delete dir="${project.build.directory}/export/che-dependencies/che/assembly/assembly-ide-war/target/generated-sources" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>            
+            <plugin>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <streamLogs>true</streamLogs>
+                    <projectsDirectory>${basedir}</projectsDirectory>
+                    <setupIncludes>
+                        <setupInclude>invoker/base-che/pom.xml</setupInclude>
+                    </setupIncludes>
+                    <pomIncludes>
+                        <pomInclude>invoker/rh-changes/pom.xml</pomInclude>
+                    </pomIncludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>RedHat assembly build Clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>run</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                           <ignoreFailures>true</ignoreFailures>
+                           <invokerPropertiesFile>clean.properties</invokerPropertiesFile>
+                        </configuration>
+                    </execution>
+                    <execution>                    
+                        <id>RedHat assembly build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                           <invokerPropertiesFile>install.properties</invokerPropertiesFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

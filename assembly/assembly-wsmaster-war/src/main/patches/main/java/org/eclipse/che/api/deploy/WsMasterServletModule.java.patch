@@ -1,0 +1,11 @@
+--- src/main/java/org/eclipse/che/api/deploy/WsMasterServletModule.java
++++ src/main/java/org/eclipse/che/api/deploy/WsMasterServletModule.java
+@@ -52,4 +52,8 @@
+         serveRegex("^/api((?!(/(ws|eventbus)($|/.*)))/.*)").with(GuiceEverrestServlet.class);
+         install(new org.eclipse.che.swagger.deploy.BasicSwaggerConfigurationModule());
+     }
++    
++    public void aNewMethod() {
++        
++    }
+ }
