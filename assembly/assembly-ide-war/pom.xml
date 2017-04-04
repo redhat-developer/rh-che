@@ -22,9 +22,14 @@
     <packaging>war</packaging>
     <name>Almighty IDE :: Compiling GWT Application</name>
     <properties>
-        <original-project-basedir>../../target/export/che-dependencies/che/assembly/assembly-ide-war</original-project-basedir>
+        <original-project-basedir>../../target/export/che-dependencies/che/assembly/${original-project-name}</original-project-basedir>
+        <original-project-name>assembly-ide-war</original-project-name>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>che-keycloak-plugin-ide</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-ide-war</artifactId>
@@ -74,6 +79,9 @@
                         <id>patch-sources</id>
                         <configuration>
                             <patches>
+                                <patch>main/webapp/WEB-INF/web.xml.patch</patch>
+                                <patch>main/webapp/META-INF/context.xml.patch</patch>
+                                <patch>main/webapp/IDE.jsp.patch</patch>
                             </patches>
                         </configuration>
                     </execution>

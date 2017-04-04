@@ -1,11 +1,13 @@
 --- src/main/java/org/eclipse/che/api/deploy/WsMasterServletModule.java
 +++ src/main/java/org/eclipse/che/api/deploy/WsMasterServletModule.java
-@@ -52,4 +52,8 @@
-         serveRegex("^/api((?!(/(ws|eventbus)($|/.*)))/.*)").with(GuiceEverrestServlet.class);
-         install(new org.eclipse.che.swagger.deploy.BasicSwaggerConfigurationModule());
-     }
-+    
-+    public void aNewMethod() {
+@@ -26,7 +26,9 @@
+     @Override
+     protected void configureServlets() {
+         getServletContext().addListener(new org.everrest.websockets.WSConnectionTracker());
+-
++        bind(KeycloakCheckFilter.class).in(Singleton.class);
++        filter("/*").through(KeycloakCheckFilter.class);
 +        
-+    }
- }
+         final Map<String, String> corsFilterParams = new HashMap<>();
+         corsFilterParams.put("cors.allowed.origins", "*");
+         corsFilterParams.put("cors.allowed.methods", "GET," +

@@ -1,10 +1,13 @@
 --- src/main/webapp/WEB-INF/web.xml
 +++ src/main/webapp/WEB-INF/web.xml
-@@ -59,5 +59,7 @@
-         <res-type>javax.sql.DataSource</res-type>
-         <res-auth>Container</res-auth>
-     </resource-ref>
-+    
-+    <!--  additional comment -->
+@@ -49,10 +49,6 @@
+         <filter-name>guiceFilter</filter-name>
+         <url-pattern>/*</url-pattern>
+     </filter-mapping>
+-    <security-role>
+-        <description>the user role</description>
+-        <role-name>developer</role-name>
+-    </security-role>
  
- </web-app>
+     <resource-ref>
+         <res-ref-name>jdbc/che</res-ref-name>

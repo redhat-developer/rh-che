@@ -1,0 +1,30 @@
+--- src/main/java/org/eclipse/che/wsagent/server/WsAgentModule.java
++++ src/main/java/org/eclipse/che/wsagent/server/WsAgentModule.java
+@@ -10,10 +10,6 @@
+  *******************************************************************************/
+ package org.eclipse.che.wsagent.server;
+ 
+-import elemental.json.Json;
+-import elemental.json.JsonFactory;
+-
+-import com.google.gson.Gson;
+ import com.google.gson.JsonParser;
+ import com.google.inject.AbstractModule;
+ import com.google.inject.Provides;
+@@ -31,6 +31,7 @@
+ import org.eclipse.che.api.core.jsonrpc.RequestHandlerConfigurator;
+ import org.eclipse.che.api.core.rest.ApiInfoService;
+ import org.eclipse.che.api.core.rest.CoreRestModule;
++import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
+ import org.eclipse.che.api.core.util.FileCleaner.FileCleanerModule;
+ import org.eclipse.che.api.core.websocket.WebSocketMessageReceiver;
+ import org.eclipse.che.api.core.websocket.WebSocketMessageTransmitter;
+@@ -91,6 +92,8 @@
+ 
+         bind(String.class).annotatedWith(Names.named("wsagent.endpoint"))
+                           .toProvider(WsAgentURLProvider.class);
++                       
++        bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
+ 
+         configureJsonRpc();
+         configureWebSocket();
