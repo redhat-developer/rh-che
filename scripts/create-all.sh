@@ -45,7 +45,9 @@ oc create configmap che \
       --from-literal=workspaces-memory-request="500Mi" \
       --from-literal=enable-workspaces-autostart="false" \
       --from-literal=che-server-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1000m" \
-      --from-literal=che-workspaces-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1500m"
+      --from-literal=che-workspaces-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1500m" \
+      --from-literal=che-openshift-secure-routes="false" \
+      --from-literal=che-secure-external-urls="false"
 
 # Deploy PVs (gofabric8 way)
 #   gofabric8 should be installed:
