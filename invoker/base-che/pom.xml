@@ -17,12 +17,7 @@
     <artifactId>almighty-ide-che-base</artifactId>
     <packaging>pom</packaging>
     <name>Almighty IDE Che Base</name>
-    <parent>
-        <groupId>com.redhat.che</groupId>
-        <artifactId>almighty-ide-parent</artifactId>
-        <version>@project.version@</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+    <version>@project.version@</version>
     <modules>
         <module>../../target/export/che-dependencies</module>
         <module>../../target/export/che-dependencies/che</module>
