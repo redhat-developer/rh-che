@@ -131,7 +131,9 @@
           <streamLogs>true</streamLogs>
           <projectsDirectory>${basedir}</projectsDirectory>
           <setupIncludes>
-             <setupInclude>invoker/base-che/pom.xml</setupInclude>
+<!-- 
+              <setupInclude>invoker/base-che/pom.xml</setupInclude>
+ -->          
           </setupIncludes>
           <pomIncludes>
             <pomInclude>invoker/rh-changes/pom.xml</pomInclude>

@@ -133,6 +133,10 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>prepare-patch-files</id>
+                        <phase>generate-sources</phase>
+                    </execution>
+                    <execution>
                         <id>copy-patched-files</id>
                         <phase>generate-sources</phase>
                     </execution>
@@ -167,11 +171,6 @@
                 <executions>
                     <execution>
                         <id>patch-sources</id>
-                        <configuration>
-                            <patches>
-                                <patch>main/java/org/eclipse/che/wsagent/server/WsAgentModule.java.patch</patch>
-                            </patches>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -7,7 +7,7 @@
 +  <script type="text/javascript" language="javascript" src="/_app/keycloak/keycloak.js"></script>
 +  <script>
 +    window.keycloak = Keycloak({
-+      url: 'http://sso.prod-preview.openshift.io/auth',
++      url: 'https://sso.prod-preview.openshift.io/auth',
 +      realm: 'fabric8',
 +      clientId: 'redhat-che',
 +    });

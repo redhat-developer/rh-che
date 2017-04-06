@@ -46,6 +46,15 @@
                 <include>com.redhat.che:almighty-ide-assembly-wsagent-server</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <outputDirectory>tomcat/webapps</outputDirectory>
+            <outputFileNameMapping>dashboard.war</outputFileNameMapping>
+            <includes>
+                <include>com.redhat.che:almighty-ide-che-dashboard-war</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
@@ -55,6 +64,7 @@
                 <exclude>**/tomcat/webapps/ROOT.war</exclude>
                 <exclude>**/tomcat/webapps/wsmaster.war</exclude>
                 <exclude>**/lib/ws-agent.tar.gz</exclude>
+                <exclude>**/tomcat/webapps/dashboard.war</exclude>
             </excludes>
         </fileSet>
         <fileSet>
