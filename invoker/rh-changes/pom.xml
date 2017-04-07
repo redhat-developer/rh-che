@@ -67,6 +67,12 @@
                 <groupId>org.eclipse.che</groupId>
                 <artifactId>assembly-ide-war</artifactId>
                 <version>${che.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che</groupId>
+                <artifactId>assembly-ide-war</artifactId>
+                <version>${che.version}</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
