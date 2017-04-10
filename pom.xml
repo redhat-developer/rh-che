@@ -14,8 +14,8 @@
   <scm></scm>
   <properties>
     <almighty-ide-che-version>5.6.0-openshift-connector-SNAPSHOT</almighty-ide-che-version>
-    <che-fork>amisevsk</che-fork>
-    <che-branch>openshift-fix-nullable</che-branch>
+    <che-fork>eclipse</che-fork>
+    <che-branch>openshift-connector</che-branch>
     <che-dependencies-fork>eclipse</che-dependencies-fork>
     <che-dependencies-branch>openshift-connector</che-dependencies-branch>
     <skipCheckoutIfExists>true</skipCheckoutIfExists>

@@ -37,9 +37,16 @@
                             </goals>
                             <configuration>
                                 <target name="prepare the Che patch files to flatten the directory path">
+                                    <mkdir dir= "${project.build.directory}/prepared-patches"/>
+                                    <mkdir dir= "${project.build.directory}/patched"/>
                                     <copy todir="${project.build.directory}/prepared-patches" verbose="true">
-                                        <fileset dir="${basedir}/src/main/patches" />
-                                        <packagemapper from="*.patch" to="*.patch" />
+                                        <fileset dir="${basedir}">
+                                            <include name="src/main/patches/**/*.patch"/>
+                                        </fileset>
+                                        <chainedmapper>
+                                            <packagemapper from="*.patch" to="*.patch" />
+                                            <globmapper from="src.main.patches.*.patch" to="*.patch" />
+                                        </chainedmapper>
                                     </copy>
                                 </target>
                             </configuration>
@@ -53,10 +60,13 @@
                                 <target name="copy original Che files that will be patched">
                                     <pathconvert pathsep="," property="pathForRequiredSourceFiles">
                                         <mappedresources>
-                                            <fileset dir="${basedir}/src/main/patches" includes="**/*.patch" />
-                                            <globmapper from="*.patch" to="*" />
+                                            <fileset dir="${basedir}">
+                                                <include name="src/main/patches/**/*.patch"/>
+                                            </fileset>
+                                            <globmapper from="src/main/patches/*.patch" to="*" />
                                         </mappedresources>
                                     </pathconvert>
+                                    <echo>${pathForRequiredSourceFiles}</echo>
                                     <condition property="noFilesToPatch">
                                         <equals arg1="${pathForRequiredSourceFiles}" arg2="" trim="true" />
                                     </condition>
