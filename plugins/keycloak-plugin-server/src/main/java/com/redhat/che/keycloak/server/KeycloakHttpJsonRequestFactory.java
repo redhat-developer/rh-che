@@ -1,4 +1,4 @@
-package org.eclipse.che.wsagent.server;
+package com.redhat.che.keycloak.server;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -15,7 +15,7 @@ import org.eclipse.che.api.core.rest.shared.dto.Link;
 public class KeycloakHttpJsonRequestFactory extends DefaultHttpJsonRequestFactory {
 
     @Inject
-    public KeycloakHttpJsonRequestFactory(@javax.inject.Named("user.token") String token) {
+    public KeycloakHttpJsonRequestFactory() {
     }
 
     @Override
