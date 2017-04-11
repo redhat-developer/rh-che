@@ -1,6 +1,6 @@
 {
   "realm" : "fabric8",
-  "resource" : "redhat-che",
+  "resource" : "openshiftio-public",
   "auth-server-url" : "https://sso.prod-preview.openshift.io/auth",
   "ssl-required" : "external",
   "enable-cors" : true,

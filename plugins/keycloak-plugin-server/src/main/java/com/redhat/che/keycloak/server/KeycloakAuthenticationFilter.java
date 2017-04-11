@@ -1,4 +1,4 @@
-package org.eclipse.che.api.deploy;
+package com.redhat.che.keycloak.server;
 
 import java.io.IOException;
 
@@ -9,7 +9,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class KeycloakCheckFilter extends org.keycloak.adapters.servlet.KeycloakOIDCFilter {
+public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.KeycloakOIDCFilter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
