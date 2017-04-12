@@ -16,7 +16,7 @@
     <name>Almighty IDE :: Che Dashboard WAR</name>
     <properties>
         <npm-build-root>${project.build.directory}/patched</npm-build-root>
-        <original-project-basedir>../../target/export/che-dependencies/che/${original-project-name}</original-project-basedir>
+        <original-project-basedir>${original-project-name}</original-project-basedir>
         <original-project-name>dashboard</original-project-name>
     </properties>
     <dependencies>
@@ -120,7 +120,7 @@
                         <configuration>
                             <target name="copy all original Che files">
                                 <copy todir="${project.build.directory}/patched" verbose="true">
-                                    <fileset dir="${original-project-basedir}">
+                                    <fileset dir="${baseCheRepository}/${original-project-basedir}">
                                         <include name="e2e/**" />
                                         <include name="gulp/**" />
                                         <include name="src/**" />

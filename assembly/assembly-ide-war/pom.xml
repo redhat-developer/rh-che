@@ -24,7 +24,7 @@
     <properties>
         <generated.sources.directory>${project.build.directory}/generated-sources/gen</generated.sources.directory>
         <gwt.log.enable>false</gwt.log.enable>
-        <original-project-basedir>../../target/export/che-dependencies/che/assembly/${original-project-name}</original-project-basedir>
+        <original-project-basedir>assembly/${original-project-name}</original-project-basedir>
         <original-project-name>assembly-ide-war</original-project-name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -204,7 +204,7 @@
                         <configuration>
                             <target name="copy all original Che files">
                                 <copy todir="${project.build.directory}/patched" verbose="true">
-                                    <fileset dir="${original-project-basedir}">
+                                    <fileset dir="${baseCheRepository}/${original-project-basedir}">
                                         <include name="src/**" />
                                     </fileset>
                                 </copy>

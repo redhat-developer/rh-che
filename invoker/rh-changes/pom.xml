@@ -11,7 +11,7 @@
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
         <version>5.6.0-openshift-connector-SNAPSHOT</version>
-        <relativePath>../../target/export/che-dependencies/che</relativePath>
+        <relativePath>@baseCheRepository@</relativePath>
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>almighty-ide-parent</artifactId>

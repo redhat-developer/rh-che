@@ -71,7 +71,7 @@
                                         <equals arg1="${pathForRequiredSourceFiles}" arg2="" trim="true" />
                                     </condition>
                                     <copy todir="${project.build.directory}/patched" verbose="true">
-                                        <fileset dir="${original-project-basedir}" includes="dummy,${pathForRequiredSourceFiles}" />
+                                        <fileset dir="${baseCheRepository}/${original-project-basedir}" includes="dummy,${pathForRequiredSourceFiles}" />
                                     </copy>
                                 </target>
                             </configuration>

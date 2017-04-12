@@ -15,7 +15,7 @@
     <packaging>war</packaging>
     <name>Almighty IDE :: Compiling WS Master WAR</name>
     <properties>
-        <original-project-basedir>../../target/export/che-dependencies/che/assembly/${original-project-name}</original-project-basedir>
+        <original-project-basedir>assembly/${original-project-name}</original-project-basedir>
         <original-project-name>assembly-wsmaster-war</original-project-name>
     </properties>
     <dependencies>
