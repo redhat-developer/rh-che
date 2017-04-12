@@ -81,11 +81,24 @@
                     <pomIncludes>
                         <pomInclude>invoker/rh-changes/pom.xml</pomInclude>
                     </pomIncludes>
-                    <environmentVariables>
+                    <properties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
-                    </environmentVariables>
+                        <withoutDashboard>${withoutDashboard}</withoutDashboard>
+                    </properties>
+                    <debug>true</debug>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-help-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                          <goal>active-profiles</goal>
+                        </goals>
+                      </execution>
+                </executions>
+            </plugin>            
         </plugins>
     </build>
     <profiles>
@@ -252,6 +265,24 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+          <id>withoutDashboard</id>
+          <activation>
+            <property>
+                <name>withoutDashboard</name>
+                <value>true</value>
+            </property>
+          </activation>
+        </profile>
+        <profile>
+          <id>withDashboard</id>
+          <activation>
+            <property>
+                <name>withoutDashboard</name>
+                <value>!true</value>
+            </property>
+          </activation>
         </profile>
     </profiles>
 </project>

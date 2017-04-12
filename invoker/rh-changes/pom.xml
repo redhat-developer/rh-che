@@ -145,5 +145,18 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-help-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                          <goal>active-profiles</goal>
+                        </goals>
+                      </execution>
+                </executions>
+            </plugin>            
+        </plugins>
     </build>
 </project>
