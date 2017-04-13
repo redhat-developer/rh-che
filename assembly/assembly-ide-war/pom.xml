@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2012-2016 Codenvy, S.A.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-      Codenvy, S.A. - initial API and implementation
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- Copyright (c) 2012-2016 Codenvy, S.A. All rights reserved. This program 
+    and the accompanying materials are made available under the terms of the 
+    Eclipse Public License v1.0 which accompanies this distribution, and is available 
+    at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A. 
+    - initial API and implementation -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>almighty-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${redhat.che.version}</version>
+        <relativePath>..</relativePath>
     </parent>
     <artifactId>almighty-ide-assembly-ide-war</artifactId>
     <packaging>war</packaging>
@@ -41,7 +36,7 @@
                 <executions>
                     <execution>
                         <id>copy-web-resources</id>
-                        <phase>generate-sources</phase>
+                        <phase>process-sources</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -150,7 +145,7 @@
                     <execution>
                         <goals>
                             <goal>compile</goal>
-                            <!--<goal>test</goal>-->
+                            <!--<goal>test</goal> -->
                         </goals>
                     </execution>
                 </executions>
@@ -177,8 +172,9 @@
                     <modules>
                         <module>org.eclipse.che.ide.IDE</module>
                     </modules>
-                    <!-- don' remove it we will use it then need to found bug in compiled JS -->
-                    <!--style>DETAILED</style-->
+                    <!-- don' remove it we will use it then need to found 
+                        bug in compiled JS -->
+                    <!--style>DETAILED</style -->
                     <logLevel>${gwt.compiler.logLevel}</logLevel>
                 </configuration>
             </plugin>
@@ -198,8 +194,11 @@
                         </goals>
                         <configuration>
                             <target name="copy all original Che files">
-                                <copy todir="${project.build.directory}/patched" verbose="true">
-                                    <fileset dir="${baseCheRepository}/${original-project-basedir}">
+                                <copy
+                                    todir="${project.build.directory}/patched"
+                                    verbose="true">
+                                    <fileset
+                                        dir="${baseCheRepository}/${original-project-basedir}">
                                         <include name="src/**" />
                                     </fileset>
                                 </copy>
@@ -214,9 +213,11 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <echo append="false" file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
+                                <echo append="false"
+                                    file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
                                     buildTime = ${timestamp}
-                                    version = ${project.version}</echo>
+                                    version =
+                                    ${project.version}</echo>
                             </tasks>
                         </configuration>
                     </execution>
@@ -279,29 +280,29 @@
     </build>
     <profiles>
         <profile>
-          <id>withDashboard</id>
-          <activation>
-            <property>
-                <name>withoutDashboard</name>
-                <value>!true</value>
-            </property>
-          </activation>
+            <id>withDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>!true</value>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.che</groupId>
                     <artifactId>assembly-ide-war</artifactId>
                     <type>pom</type>
                 </dependency>
-           </dependencies>
+            </dependencies>
         </profile>
         <profile>
-          <id>withoutDashboard</id>
-          <activation>
-            <property>
-                <name>withoutDashboard</name>
-                <value>true</value>
-            </property>
-          </activation>
+            <id>withoutDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.che</groupId>

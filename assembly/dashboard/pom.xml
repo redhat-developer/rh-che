@@ -4,12 +4,14 @@
     Eclipse Public License v1.0 which accompanies this distribution, and is available 
     at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A. 
     - initial API and implementation -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>almighty-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${redhat.che.version}</version>
+        <relativePath>..</relativePath>
     </parent>
     <artifactId>almighty-ide-che-dashboard-war</artifactId>
     <packaging>war</packaging>
@@ -48,15 +50,16 @@
                 <executions>
                     <execution>
                         <id>copy-web-resources</id>
-                        <phase>generate-sources</phase>
+                        <phase>process-sources</phase>
                     </execution>
                     <execution>
                         <id>copy-src-components</id>
-                        <phase>generate-sources</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
+                            <overwrite>true</overwrite>
                             <outputDirectory>${project.build.directory}/patched/src/components</outputDirectory>
                             <resources>
                                 <resource>
@@ -119,8 +122,11 @@
                         </goals>
                         <configuration>
                             <target name="copy all original Che files">
-                                <copy todir="${project.build.directory}/patched" verbose="true">
-                                    <fileset dir="${baseCheRepository}/${original-project-basedir}">
+                                <copy
+                                    todir="${project.build.directory}/patched"
+                                    verbose="true">
+                                    <fileset
+                                        dir="${baseCheRepository}/${original-project-basedir}">
                                         <include name="e2e/**" />
                                         <include name="gulp/**" />
                                         <include name="src/**" />
@@ -141,11 +147,14 @@
                         <configuration>
                             <target>
                                 <!-- Download NPM dependencies -->
-                                <exec dir="${npm-build-root}" executable="npm" failonerror="true">
+                                <exec dir="${npm-build-root}"
+                                    executable="npm" failonerror="true">
                                     <arg value="install" />
                                 </exec>
-                                <!-- Change base HREF of the application that will be hosted on /dashboard -->
-                                <replace file="${npm-build-root}/dist/index.html">
+                                <!-- Change base HREF of the application 
+                                    that will be hosted on /dashboard -->
+                                <replace
+                                    file="${npm-build-root}/dist/index.html">
                                     <replacetoken><![CDATA[<base href="/">]]></replacetoken>
                                     <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
                                 </replace>
