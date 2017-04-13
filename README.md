@@ -51,19 +51,19 @@ which is :`rh-che`
 
 This checks out and builds the upstream Che before building the RedHat distribution.
 
-    maven clean install
+    mvn clean install
 
 ##### Default build - quick version (bypass upstream Che)
 
 This allows reusing a previously checked-out and built upstream Che.
     
-    maven --activate-profiles=-checkout-base-che clean install 
+    mvn --activate-profiles=-checkout-base-che clean install 
 
 ##### Build using a local upstream Che
 
 This allows using a local che repository you already have on your machine.
 
-    maven -DlocalCheRepository=<root of your local upstream Che Git repo> clean install
+    mvn -DlocalCheRepository=<root of your local upstream Che Git repo> clean install
 
 ##### Enabling / Disabling the Dashboard
 
