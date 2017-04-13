@@ -125,6 +125,10 @@
             <artifactId>everrest-websockets</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
@@ -134,6 +138,7 @@
             <artifactId>tomcat-catalina</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- 
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-wsagent-war</artifactId>
@@ -141,6 +146,7 @@
             <classifier>classes</classifier>
             <scope>provided</scope>
         </dependency>
+ -->
     </dependencies>
     <build>
         <plugins>

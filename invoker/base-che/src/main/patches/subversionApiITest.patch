@@ -1,0 +1,18 @@
+--- plugins/plugin-svn/che-plugin-svn-ext-server/src/test/java/org/eclipse/che/plugin/svn/server/SubversionApiITest.java
++++ plugins/plugin-svn/che-plugin-svn-ext-server/src/test/java/org/eclipse/che/plugin/svn/server/SubversionApiITest.java
+@@ -32,6 +32,7 @@ import org.eclipse.che.plugin.svn.shared.SubversionItem;
+ import org.eclipse.che.plugin.svn.shared.SwitchRequest;
+ import org.eclipse.che.plugin.svn.shared.UpdateRequest;
+ import org.junit.Before;
++import org.junit.Ignore;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.mockito.Mock;
+@@ -339,6 +340,7 @@ public class SubversionApiITest {
+         assertTrue(coRevision <= response.getRevision());
+     }
+
++    @Ignore
+     @Test
+     public void testInfo() throws Exception {
+         subversionApi.checkout(DtoFactory.getInstance()
