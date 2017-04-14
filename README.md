@@ -16,12 +16,13 @@ RedHat modifications against the upstream Che include:
 
 #### How the RedHat Che distribution build works
 
-The default behavior is to:
-- checkout the upstream GitHub `che-dependencies` and `che` repositories into the
+The RedHat Che distribution build is a *maven* build. By default, it *automatically* takes care 
+of *everything* as part of the root maven build, which means that it:
+- checks out the upstream GitHub `che-dependencies` and `che` repositories into the
 `target/export`, based on a given fork (`eclipse` by default) and branch
-(`openshift-connector` by default)
-- build the upstream repositories first
-- then build the RedHat distribution based on this upstream build.
+(`openshift-connector` by default),
+- builds the upstream repositories first as a pre-step,
+- then builds the RedHat distribution maven sub-project based on this upstream build.
 
 However, by passing a given propetrty, it is also possible to bypass the checkout and build
 of the upstream projects if the upstream che project is present locally on the developer's
