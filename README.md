@@ -41,7 +41,7 @@ Dashboard has been enabled.
 
 And the result of the RedHat Che distribution build is available at the following location:
     
-    rh-che/assembly/assembly-main/target/eclipse-ide-5.6.0-openshift-connector-openshiftio-SNAPSHOT
+    rh-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-openshiftio-SNAPSHOT
 
 #### How to start the  RedHat Che distribution build
 
