@@ -58,7 +58,7 @@ This checks out and builds the upstream Che before building the RedHat distribut
 
 This allows reusing a previously checked-out and built upstream Che.
     
-    mvn --activate-profiles=-checkout-base-che clean install 
+    mvn -P '!checkout-base-che' clean install 
 
 ##### Build using a local upstream Che
 
