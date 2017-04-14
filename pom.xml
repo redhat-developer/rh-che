@@ -8,10 +8,10 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.redhat.che</groupId>
-    <artifactId>almighty-ide-builder</artifactId>
+    <artifactId>fabric8-ide-builder</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Almighty IDE (builder)</name>
+    <name>Fabric8 IDE (builder)</name>
     <scm>
         <connection>scm:git:https://github.com/${che-fork}/che.git</connection>
         <developerConnection>scm:git:https://github.com/${che-fork}/che.git</developerConnection>
@@ -23,7 +23,8 @@
         <che-dependencies-branch>openshift-connector</che-dependencies-branch>
         <skipCheckoutIfExists>true</skipCheckoutIfExists>
         <che.version>5.6.0-openshift-connector-SNAPSHOT</che.version>
-        <redhat.che.version>5.6.0-openshift-connector-${redhat-version-qualifier}-SNAPSHOT</redhat.che.version>
+        <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
+        <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
     </properties>
     <build>
         <plugins>
@@ -83,7 +84,8 @@
                                         </tokenfilter>
                                     </filterchain>
                                 </loadfile>
-                                <echo>${guessed.che.version}</echo>
+                                <echo>Upstream Che version:
+                                    ${guessed.che.version}</echo>
                             </target>
                         </configuration>
                     </execution>
@@ -104,8 +106,8 @@
                                     <filterchain>
                                         <tokenfilter>
                                             <replaceregex
-                                                pattern="(.*)(-SNAPSHOT)?"
-                                                replace="\1${redhat-version-qualifier}\2" />
+                                                pattern="^(.+?)(?>(-SNAPSHOT)|())$"
+                                                replace="\1-${redhat-version-qualifier}\2" />
                                         </tokenfilter>
                                     </filterchain>
                                 </loadresource>
@@ -131,12 +133,13 @@
                                     <filterchain>
                                         <tokenfilter>
                                             <replaceregex
-                                                pattern="(.*)(-SNAPSHOT)?"
-                                                replace="\1${redhat-version-qualifier}\2" />
+                                                pattern="^(.+?)(?>(-SNAPSHOT)|())$"
+                                                replace="\1-${redhat-version-qualifier}\2" />
                                         </tokenfilter>
                                     </filterchain>
                                 </loadresource>
-                                <echo>${redhat.che.version}</echo>
+                                <echo>RedHat Che version:
+                                    ${redhat.che.version}</echo>
                             </target>
                         </configuration>
                     </execution>
@@ -444,7 +447,7 @@
                 </property>
             </activation>
             <properties>
-                <redhat-version-qualifier>openshiftio-without-dashboard</redhat-version-qualifier>
+                <redhat-version-qualifier>${redhat.che.version.suffix}-${redhat.che.without-dashboard.suffix}</redhat-version-qualifier>
             </properties>
         </profile>
         <profile>
@@ -456,7 +459,7 @@
                 </property>
             </activation>
             <properties>
-                <redhat-version-qualifier>openshiftio</redhat-version-qualifier>
+                <redhat-version-qualifier>${redhat.che.version.suffix}</redhat-version-qualifier>
             </properties>
         </profile>
     </profiles>

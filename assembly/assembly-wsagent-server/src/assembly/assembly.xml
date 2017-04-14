@@ -25,7 +25,7 @@
             <outputDirectory>webapps</outputDirectory>
             <outputFileNameMapping>ROOT.war</outputFileNameMapping>
             <includes>
-                <include>com.redhat.che:almighty-ide-assembly-wsagent-war</include>
+                <include>com.redhat.che:fabric8-ide-assembly-wsagent-war</include>
             </includes>
         </dependencySet>
     </dependencySets>

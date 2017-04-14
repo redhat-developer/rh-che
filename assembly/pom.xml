@@ -8,15 +8,15 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>almighty-ide-parent</artifactId>
+        <artifactId>fabric8-ide-parent</artifactId>
         <groupId>com.redhat.che</groupId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../invoker/rh-changes</relativePath>
     </parent>
-    <artifactId>almighty-ide-assembly-parent</artifactId>
+    <artifactId>fabric8-ide-assembly-parent</artifactId>
     <version>${redhat.che.version}</version>
     <packaging>pom</packaging>
-    <name>Almighty IDE assembly (parent)</name>
+    <name>Fabric8 IDE assembly (parent)</name>
     <modules>
         <module>assembly-wsagent-war</module>
         <module>assembly-wsagent-server</module>

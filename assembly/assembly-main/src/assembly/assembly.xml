@@ -20,7 +20,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>ROOT.war</outputFileNameMapping>
             <includes>
-                <include>com.redhat.che:almighty-ide-assembly-ide-war</include>
+                <include>com.redhat.che:fabric8-ide-assembly-ide-war</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -29,7 +29,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>wsmaster.war</outputFileNameMapping>
             <includes>
-                <include>com.redhat.che:almighty-ide-assembly-wsmaster-war</include>
+                <include>com.redhat.che:fabric8-ide-assembly-wsmaster-war</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -38,7 +38,7 @@
             <outputDirectory>lib</outputDirectory>
             <outputFileNameMapping>ws-agent.tar.gz</outputFileNameMapping>
             <includes>
-                <include>com.redhat.che:almighty-ide-assembly-wsagent-server</include>
+                <include>com.redhat.che:fabric8-ide-assembly-wsagent-server</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -47,7 +47,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>dashboard.war</outputFileNameMapping>
             <includes>
-                <include>com.redhat.che:almighty-ide-che-dashboard-war</include>
+                <include>com.redhat.che:fabric8-ide-che-dashboard-war</include>
             </includes>
         </dependencySet>
     </dependencySets>

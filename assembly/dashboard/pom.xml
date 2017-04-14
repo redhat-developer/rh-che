@@ -8,14 +8,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>almighty-ide-assembly-parent</artifactId>
+        <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
         <version>${redhat.che.version}</version>
         <relativePath>..</relativePath>
     </parent>
-    <artifactId>almighty-ide-che-dashboard-war</artifactId>
+    <artifactId>fabric8-ide-che-dashboard-war</artifactId>
     <packaging>war</packaging>
-    <name>Almighty IDE :: Che Dashboard WAR</name>
+    <name>Fabric8 IDE :: Che Dashboard WAR</name>
     <properties>
         <npm-build-root>${project.build.directory}/patched</npm-build-root>
         <original-project-basedir>${original-project-name}</original-project-basedir>

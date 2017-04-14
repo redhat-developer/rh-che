@@ -8,14 +8,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>almighty-ide-parent</artifactId>
+        <artifactId>fabric8-ide-parent</artifactId>
         <groupId>com.redhat.che</groupId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../invoker/rh-changes</relativePath>
     </parent>
-    <artifactId>almighty-ide-plugins-parent</artifactId>
+    <artifactId>fabric8-ide-plugins-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Almighty IDE plugins (parent)</name>
+    <name>Fabric8 IDE plugins (parent)</name>
     <modules>
         <module>keycloak-plugin-server</module>
         <module>keycloak-plugin-ide</module>
