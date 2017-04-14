@@ -316,6 +316,34 @@
                     </exclusions>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-src-without-dashboard</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                                <configuration>
+                                    <overwrite>true</overwrite>
+                                    <outputDirectory>${project.build.directory}/patched/src</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src-without-dashboard/main</directory>
+                                        </resource>
+                                        <resource>
+                                            <directory>src-without-dashboard/test</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

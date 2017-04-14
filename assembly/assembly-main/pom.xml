@@ -32,11 +32,6 @@
             <artifactId>almighty-ide-assembly-wsmaster-war</artifactId>
             <type>war</type>
         </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>almighty-ide-che-dashboard-war</artifactId>
-            <type>war</type>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -104,4 +99,22 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>withDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.redhat.che</groupId>
+                    <artifactId>almighty-ide-che-dashboard-war</artifactId>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
