@@ -34,14 +34,14 @@ the version of the upstream Che project. For example, if version of the used ups
 branch is:
 `5.6.0-openshift-connector-SNAPSHOT`,
 then the version of the generated RedHat Che distribution will be:
-`5.6.0-openshift-connector-openshiftio-SNAPSHOT`
+`5.6.0-openshift-connector-fabric8-SNAPSHOT`
 or:
-`5.6.0-openshift-connector-openshiftio-without-dashboard-SNAPSHOT` if the option to remove the
+`5.6.0-openshift-connector-fabric8-without-dashboard-SNAPSHOT` if the option to remove the
 Dashboard has been enabled.
 
 And the result of the RedHat Che distribution build is available at the following location:
     
-    rh-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-openshiftio-SNAPSHOT
+    rh-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-fabric8-SNAPSHOT
 
 #### How to start the  RedHat Che distribution build
 
