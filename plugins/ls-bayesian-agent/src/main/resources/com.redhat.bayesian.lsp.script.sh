@@ -5,6 +5,8 @@ unset PAYLOAD
 command -v bzip2 >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" bzip2"; }
 command -v tar >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" tar"; }
 command -v curl >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" curl"; }
+command -v nodejs >/dev/null 2>&1 || { PACKAGES=${PACKAGES}" nodejs"; }
+
 test "$(id -u)" = 0 || SUDO="sudo"
 
 CHE_DIR=$HOME/che
