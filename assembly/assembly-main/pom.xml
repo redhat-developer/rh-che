@@ -1,110 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2012-2016 Codenvy, S.A.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-      Codenvy, S.A. - initial API and implementation
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- Copyright (c) 2012-2016 Codenvy, S.A. All rights reserved. This program 
+    and the accompanying materials are made available under the terms of the 
+    Eclipse Public License v1.0 which accompanies this distribution, and is available 
+    at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A. 
+    - initial API and implementation -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>almighty-ide-assembly-parent</artifactId>
+        <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${redhat.che.version}</version>
+        <relativePath>..</relativePath>
     </parent>
-    <artifactId>almighty-ide-assembly-main</artifactId>
+    <artifactId>fabric8-ide-assembly-main</artifactId>
     <packaging>pom</packaging>
-    <name>Almighty IDE :: Assemblies Tomcat</name>
+    <name>Fabric8 IDE :: Assemblies Tomcat</name>
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.che</groupId>
-            <artifactId>assembly-ide-war</artifactId>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-assembly-ide-war</artifactId>
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.che</groupId>
-            <artifactId>assembly-wsagent-server</artifactId>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
             <type>tar.gz</type>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.che</groupId>
-            <artifactId>assembly-wsmaster-war</artifactId>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
             <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-ide-stacks</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-ide-templates</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.dashboard</groupId>
-            <artifactId>che-dashboard-war</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.lib</groupId>
-            <artifactId>che-swagger-war</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.lib</groupId>
-            <artifactId>che-tomcat8-slf4j-logback</artifactId>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.lib</groupId>
-            <artifactId>che-websocket-terminal</artifactId>
-            <type>tar.gz</type>
-            <classifier>linux_amd64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.lib</groupId>
-            <artifactId>che-websocket-terminal</artifactId>
-            <type>tar.gz</type>
-            <classifier>linux_arm7</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.plugin</groupId>
-            <artifactId>che-plugin-sdk-tools</artifactId>
-            <type>jar</type>
-            <classifier>jar-with-dependencies</classifier>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-stack</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <loadfile property="stack.che-in-che" srcFile="${project.basedir}/src/assembly/stack/che-in-che.json" />
-                                <unzip dest="${project.build.directory}/stacks" src="${org.eclipse.che.core:che-core-ide-stacks:jar}" />
-                                <replaceregexp file="${project.build.directory}/stacks/stacks.json" flags="m">
-                                    <regexp pattern="^]$" />
-                                    <substitution expression=", ${stack.che-in-che} ]" />
-                                </replaceregexp>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -130,7 +60,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-tomcat</id>
+                        <id>unpack-original-che-assembly</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -138,11 +68,29 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.eclipse.che.lib</groupId>
-                                    <artifactId>che-tomcat8-slf4j-logback</artifactId>
+                                    <groupId>org.eclipse.che</groupId>
+                                    <artifactId>assembly-main</artifactId>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>package-keycloak-adapter</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.keycloak</groupId>
+                                    <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -151,4 +99,22 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>withDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.redhat.che</groupId>
+                    <artifactId>fabric8-ide-che-dashboard-war</artifactId>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

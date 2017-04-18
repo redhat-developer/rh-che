@@ -1,96 +1,466 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2012-2016 Codenvy, S.A.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-      Codenvy, S.A. - initial API and implementation
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- Copyright (c) 2012-2016 Codenvy, S.A. All rights reserved. This program 
+    and the accompanying materials are made available under the terms of the 
+    Eclipse Public License v1.0 which accompanies this distribution, and is available 
+    at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A. 
+    - initial API and implementation -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <groupId>org.eclipse.che.depmgt</groupId>
-        <version>5.0.0-M8-SNAPSHOT</version>
-    </parent>
     <groupId>com.redhat.che</groupId>
-    <artifactId>almighty-ide-parent</artifactId>
+    <artifactId>fabric8-ide-builder</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Almighty IDE (parent)</name>
-    <modules>
-        <module>assembly</module>
-    </modules>
+    <name>Fabric8 IDE (builder)</name>
+    <scm>
+        <connection>scm:git:https://github.com/${che-fork}/che.git</connection>
+        <developerConnection>scm:git:https://github.com/${che-fork}/che.git</developerConnection>
+    </scm>
     <properties>
-        <che.version>5.0.0-M8-SNAPSHOT</che.version>
+        <che-fork>eclipse</che-fork>
+        <che-branch>openshift-connector</che-branch>
+        <che-dependencies-fork>eclipse</che-dependencies-fork>
+        <che-dependencies-branch>openshift-connector</che-dependencies-branch>
+        <skipCheckoutIfExists>true</skipCheckoutIfExists>
+        <che.version>5.6.0-openshift-connector-SNAPSHOT</che.version>
+        <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
+        <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
     </properties>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-ide-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-main</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-wsagent-server</artifactId>
-                <version>${project.version}</version>
-                <type>tar.gz</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-wsagent-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>almighty-ide-assembly-wsmaster-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che</groupId>
-                <artifactId>che-parent</artifactId>
-                <version>${che.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <repositories>
-        <repository>
-            <id>codenvy-public-repo</id>
-            <name>codenvy public</name>
-            <url>https://maven.codenvycorp.com/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>codenvy-public-snapshots-repo</id>
-            <name>codenvy public snapshots</name>
-            <url>https://maven.codenvycorp.com/content/repositories/codenvy-public-snapshots/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codenvy-public-repo</id>
-            <name>codenvy public</name>
-            <url>https://maven.codenvycorp.com/content/groups/public/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>codenvy-public-snapshots-repo</id>
-            <name>codenvy public snapshots</name>
-            <url>https://maven.codenvycorp.com/content/repositories/codenvy-public-snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>clean generated sources in assembly-ide-war</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- To bypass a problem in the build when 
+                                    rebuilding without the clean option. -->
+                                <delete
+                                    dir="${basedir}/assembly/assembly-ide-war/target/generated-sources" />
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>clean generated sources in upstream assembly-ide-war</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- To bypass a problem in the build when 
+                                    rebuilding without the clean option. -->
+                                <delete
+                                    dir="${baseCheRepository}/assembly/assembly-ide-war/target/generated-sources" />
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get che version from pom.xml</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <property name="che.version.pattern"><![CDATA[.*<che.version>(.+)</che.version>.*]]></property>
+                                <loadfile property="guessed.che.version"
+                                    srcFile="${baseCheRepository}/pom.xml">
+                                    <filterchain>
+                                        <striplinebreaks />
+                                        <tokenfilter>
+                                            <replaceregex
+                                                pattern="${che.version.pattern}"
+                                                replace="\1" />
+                                        </tokenfilter>
+                                    </filterchain>
+                                </loadfile>
+                                <echo>Upstream Che version:
+                                    ${guessed.che.version}</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get redhat che version from che version before clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <property name="cheVersion_"
+                                    value="${che.version}" />
+                                <loadresource property="redhat.che.version">
+                                    <propertyresource
+                                        name="cheVersion_" />
+                                    <filterchain>
+                                        <tokenfilter>
+                                            <replaceregex
+                                                pattern="^(.+?)(?>(-SNAPSHOT)|())$"
+                                                replace="\1-${redhat-version-qualifier}\2" />
+                                        </tokenfilter>
+                                    </filterchain>
+                                </loadresource>
+                                <echo>RedHat Che version:
+                                    ${redhat.che.version}</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get redhat che version from che version</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <property name="cheVersion_"
+                                    value="${che.version}" />
+                                <loadresource property="redhat.che.version">
+                                    <propertyresource
+                                        name="cheVersion_" />
+                                    <filterchain>
+                                        <tokenfilter>
+                                            <replaceregex
+                                                pattern="^(.+?)(?>(-SNAPSHOT)|())$"
+                                                replace="\1-${redhat-version-qualifier}\2" />
+                                        </tokenfilter>
+                                    </filterchain>
+                                </loadresource>
+                                <echo>RedHat Che version:
+                                    ${redhat.che.version}</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>expected-che-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>guessed.che.version</property>
+                                    <regex>${che.version}</regex>
+                                    <regexMessage>The version of the
+                                        upstream Che repository
+                                        (${guessed.che.version}) is not
+                                        the same of the one specified by
+                                        the 'che.version' property
+                                        (${che.version})</regexMessage>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>RedHat assembly build Clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>run</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <ignoreFailures>false</ignoreFailures>
+                            <invokerPropertiesFile>clean.properties</invokerPropertiesFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>RedHat assembly build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <invokerPropertiesFile>install.properties</invokerPropertiesFile>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <streamLogs>true</streamLogs>
+                    <projectsDirectory>${basedir}</projectsDirectory>
+                    <pomIncludes>
+                        <pomInclude>invoker/rh-changes/pom.xml</pomInclude>
+                    </pomIncludes>
+                    <properties>
+                        <baseCheRepository>${baseCheRepository}</baseCheRepository>
+                        <withoutDashboard>${withoutDashboard}</withoutDashboard>
+                        <redhat.che.version>${redhat.che.version}</redhat.che.version>
+                    </properties>
+                    <debug>false</debug>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>onClean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>use-checked-out-base-che</id>
+            <activation>
+                <property>
+                    <name>!localCheRepository</name>
+                </property>
+            </activation>
+            <properties>
+                <baseCheRepository>${project.build.directory}/export/che-dependencies/che</baseCheRepository>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>target</directory>
+                                    <excludes>
+                                        <exclude>export/**</exclude>
+                                    </excludes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>checkout-base-che</id>
+            <activation>
+                <property>
+                    <name>!localCheRepository</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <version>1.9.4</version>
+                        <executions>
+                            <execution>
+                                <id>build-eclipse-che-dependencies</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <connectionUrl>scm:git:https://github.com/${che-dependencies-fork}/che-dependencies.git</connectionUrl>
+                                    <developerConnectionUrl>scm:git:https://github.com/${che-dependencies-fork}/che-dependencies.git</developerConnectionUrl>
+                                    <checkoutDirectory>target/export/che-dependencies</checkoutDirectory>
+                                    <scmVersionType>branch</scmVersionType>
+                                    <scmVersion>${che-dependencies-branch}</scmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-eclipse-che</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <connectionUrl>scm:git:https://github.com/${che-fork}/che.git</connectionUrl>
+                                    <developerConnectionUrl>scm:git:https://github.com/${che-fork}/che.git</developerConnectionUrl>
+                                    <checkoutDirectory>target/export/che-dependencies/che</checkoutDirectory>
+                                    <scmVersionType>branch</scmVersionType>
+                                    <scmVersion>${che-branch}</scmVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skipCheckoutIfExists>${skipCheckoutIfExists}</skipCheckoutIfExists>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-patch-plugin</artifactId>
+                        <version>1.2</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>apply</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <targetDirectory>target/export/che-dependencies/che</targetDirectory>
+                            <patchDirectory>invoker/base-che/src/main/patches</patchDirectory>
+                            <patches>
+                                <!-- Patch to ignore 1 unit test for SVN 
+                                    plugin that sometimes fails on CentOS 7 That is probably related to the version 
+                                    of subversion that comes with CentOS 7. -->
+                                <patch>subversionApiITest.patch</patch>
+                            </patches>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <version>2.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>RedHat assembly build</id>
+                                <configuration>
+                                    <setupIncludes>
+                                        <setupInclude>invoker/base-che/pom.xml</setupInclude>
+                                    </setupIncludes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>use-local-base-che</id>
+            <activation>
+                <property>
+                    <name>localCheRepository</name>
+                </property>
+            </activation>
+            <properties>
+                <baseCheRepository>${localCheRepository}</baseCheRepository>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>target</directory>
+                                    <excludes>
+                                        <exclude>export/**</exclude>
+                                    </excludes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>buildnumber-maven-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>toRetrieveBranchName</id>
+                                <goals>
+                                    <goal>create</goal>
+                                </goals>
+                                <phase>validate</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <scmDirectory>${baseCheRepository}</scmDirectory>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>1.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>expected-che-branch-exists</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireFilesExist>
+                                            <files>
+                                                <file>${baseCheRepository}/Chefile</file>
+                                                <file>${baseCheRepository}/CUSTOMIZING.md</file>
+                                            </files>
+                                            <message>Directory
+                                                '${baseCheRepository}'
+                                                doesn't seem to be a Che
+                                                root directory</message>
+                                        </requireFilesExist>
+                                        <requireProperty>
+                                            <property>scmBranch</property>
+                                            <regex>${che-branch}</regex>
+                                            <regexMessage>The local Che
+                                                repository is not on the
+                                                expected branch
+                                                (${che-branch})</regexMessage>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>withoutDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <redhat-version-qualifier>${redhat.che.version.suffix}-${redhat.che.without-dashboard.suffix}</redhat-version-qualifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>withDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <properties>
+                <redhat-version-qualifier>${redhat.che.version.suffix}</redhat-version-qualifier>
+            </properties>
+        </profile>
+    </profiles>
 </project>

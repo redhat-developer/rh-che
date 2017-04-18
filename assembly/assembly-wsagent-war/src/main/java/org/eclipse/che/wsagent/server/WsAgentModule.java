@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2016 Codenvy, S.A.
+ * Copyright (c) 2012-2017 Codenvy, S.A.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,38 +10,30 @@
  *******************************************************************************/
 package org.eclipse.che.wsagent.server;
 
+import com.google.gson.JsonParser;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.multibindings.MapBinder;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import com.redhat.che.keycloak.server.KeycloakHttpJsonRequestFactory;
 
 import org.eclipse.che.ApiEndpointAccessibilityChecker;
 import org.eclipse.che.EventBusURLProvider;
 import org.eclipse.che.UriApiEndpointProvider;
 import org.eclipse.che.UserTokenProvider;
 import org.eclipse.che.api.auth.oauth.OAuthTokenProvider;
-import org.eclipse.che.api.core.jsonrpc.JsonRpcRequestReceiver;
-import org.eclipse.che.api.core.jsonrpc.JsonRpcRequestTransmitter;
-import org.eclipse.che.api.core.jsonrpc.JsonRpcResponseReceiver;
-import org.eclipse.che.api.core.jsonrpc.JsonRpcResponseTransmitter;
-import org.eclipse.che.api.core.jsonrpc.impl.BasicJsonRpcObjectValidator;
-import org.eclipse.che.api.core.jsonrpc.impl.JsonRpcDispatcher;
-import org.eclipse.che.api.core.jsonrpc.impl.JsonRpcObjectValidator;
-import org.eclipse.che.api.core.jsonrpc.impl.WebSocketJsonRpcDispatcher;
-import org.eclipse.che.api.core.jsonrpc.impl.WebSocketJsonRpcRequestDispatcher;
-import org.eclipse.che.api.core.jsonrpc.impl.WebSocketJsonRpcRequestTransmitter;
-import org.eclipse.che.api.core.jsonrpc.impl.WebSocketJsonRpcResponseDispatcher;
-import org.eclipse.che.api.core.jsonrpc.impl.WebSocketJsonRpcResponseTransmitter;
-import org.eclipse.che.api.core.notification.WSocketEventBusClient;
+import org.eclipse.che.api.core.jsonrpc.BuildingRequestTransmitter;
+import org.eclipse.che.api.core.jsonrpc.JsonRpcFactory;
+import org.eclipse.che.api.core.jsonrpc.JsonRpcMessageReceiver;
+import org.eclipse.che.api.core.jsonrpc.RequestHandlerConfigurator;
 import org.eclipse.che.api.core.rest.ApiInfoService;
 import org.eclipse.che.api.core.rest.CoreRestModule;
+import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.util.FileCleaner.FileCleanerModule;
 import org.eclipse.che.api.core.websocket.WebSocketMessageReceiver;
 import org.eclipse.che.api.core.websocket.WebSocketMessageTransmitter;
 import org.eclipse.che.api.core.websocket.impl.BasicWebSocketMessageTransmitter;
-import org.eclipse.che.api.core.websocket.impl.BasicWebSocketTransmissionValidator;
 import org.eclipse.che.api.core.websocket.impl.GuiceInjectorEndpointConfigurator;
-import org.eclipse.che.api.core.websocket.impl.WebSocketTransmissionValidator;
 import org.eclipse.che.api.git.GitConnectionFactory;
 import org.eclipse.che.api.git.GitUserResolver;
 import org.eclipse.che.api.git.LocalGitUserResolver;
@@ -56,6 +48,7 @@ import org.eclipse.che.plugin.java.server.rest.WsAgentURLProvider;
 import org.eclipse.che.security.oauth.RemoteOAuthTokenProvider;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.net.URI;
 
 /**
@@ -66,6 +59,7 @@ public class WsAgentModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ApiInfoService.class);
+
 
         bind(PreferenceDao.class).to(org.eclipse.che.RemotePreferenceDao.class);
 
@@ -87,7 +81,6 @@ public class WsAgentModule extends AbstractModule {
 
         bind(URI.class).annotatedWith(Names.named("che.api")).toProvider(UriApiEndpointProvider.class);
         bind(String.class).annotatedWith(Names.named("user.token")).toProvider(UserTokenProvider.class);
-        bind(WSocketEventBusClient.class).asEagerSingleton();
 
         bind(String.class).annotatedWith(Names.named("event.bus.url")).toProvider(EventBusURLProvider.class);
         bind(ApiEndpointAccessibilityChecker.class);
@@ -95,6 +88,8 @@ public class WsAgentModule extends AbstractModule {
 
         bind(String.class).annotatedWith(Names.named("wsagent.endpoint"))
                           .toProvider(WsAgentURLProvider.class);
+                       
+        bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
 
         configureJsonRpc();
         configureWebSocket();
@@ -118,32 +113,20 @@ public class WsAgentModule extends AbstractModule {
 
     private void configureWebSocket() {
         requestStaticInjection(GuiceInjectorEndpointConfigurator.class);
-
-        bind(WebSocketTransmissionValidator.class).to(BasicWebSocketTransmissionValidator.class);
-
         bind(WebSocketMessageTransmitter.class).to(BasicWebSocketMessageTransmitter.class);
 
-        MapBinder<String, WebSocketMessageReceiver> receivers =
-                MapBinder.newMapBinder(binder(), String.class, WebSocketMessageReceiver.class);
-
-        receivers.addBinding("jsonrpc-2.0").to(WebSocketJsonRpcDispatcher.class);
+        bind(WebSocketMessageReceiver.class).to(JsonRpcMessageReceiver.class);
     }
 
     private void configureJsonRpc() {
-        bind(JsonRpcObjectValidator.class).to(BasicJsonRpcObjectValidator.class);
+        install(new FactoryModuleBuilder().build(JsonRpcFactory.class));
+        install(new FactoryModuleBuilder().build(RequestHandlerConfigurator.class));
+        install(new FactoryModuleBuilder().build(BuildingRequestTransmitter.class));
+    }
 
-        bind(JsonRpcResponseTransmitter.class).to(WebSocketJsonRpcResponseTransmitter.class);
-        bind(JsonRpcRequestTransmitter.class).to(WebSocketJsonRpcRequestTransmitter.class);
-
-        MapBinder<String, JsonRpcDispatcher> dispatchers =
-                MapBinder.newMapBinder(binder(), String.class, JsonRpcDispatcher.class);
-
-        dispatchers.addBinding("request").to(WebSocketJsonRpcRequestDispatcher.class);
-        dispatchers.addBinding("response").to(WebSocketJsonRpcResponseDispatcher.class);
-
-        MapBinder<String, JsonRpcRequestReceiver> requestReceivers =
-                MapBinder.newMapBinder(binder(), String.class, JsonRpcRequestReceiver.class);
-        MapBinder<String, JsonRpcResponseReceiver> responseReceivers =
-                MapBinder.newMapBinder(binder(), String.class, JsonRpcResponseReceiver.class);
+    @Provides
+    @Singleton
+    public JsonParser jsonParser(){
+        return new JsonParser();
     }
 }

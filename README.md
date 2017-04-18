@@ -1,6 +1,80 @@
 # Eclipse Che on OpenShift
 
-## How to build openshift-connector branch
+## How to build the RedHat Che distribution
+
+#### What is the RedHat Che distribution
+
+The RedHat distribution of Eclipse Che is a RedHat-specific packaging of the Che assemblies
+that allows adding some RedHat specific plugins / behaviors upton the standard upstream Che
+distribution. It is currently based on the `openshift-connector` branch of the upstream
+Che repository.
+
+RedHat modifications against the upstream Che include:
+- the ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
+- The Keycloak integration
+- The Bayesian integration (soon)
+
+#### How the RedHat Che distribution build works
+
+The RedHat Che distribution build is a *maven* build. By default, it *automatically* takes care 
+of *everything* as part of the root maven build, which means that it:
+- checks out the upstream GitHub `che-dependencies` and `che` repositories into the
+`target/export`, based on a given fork (`eclipse` by default) and branch
+(`openshift-connector` by default),
+- builds the upstream repositories first as a pre-step,
+- then builds the RedHat distribution maven sub-project based on this upstream build.
+
+However, by passing a given propetrty, it is also possible to bypass the checkout and build
+of the upstream projects if the upstream che project is present locally on the developer's
+machine and has already been fully built by maven. In this case, this local Che repository
+is reused, which make the RedHat Che distribution build much faster.
+
+The version of the RedHat Che distribution assembly and dashboard artifacts is derived from
+the version of the upstream Che project. For example, if version of the used upstream Che
+branch is:
+`5.6.0-openshift-connector-SNAPSHOT`,
+then the version of the generated RedHat Che distribution will be:
+`5.6.0-openshift-connector-openshiftio-SNAPSHOT`
+or:
+`5.6.0-openshift-connector-openshiftio-without-dashboard-SNAPSHOT` if the option to remove the
+Dashboard has been enabled.
+
+And the result of the RedHat Che distribution build is available at the following location:
+    
+    rh-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-openshiftio-SNAPSHOT
+
+#### How to start the  RedHat Che distribution build
+
+The build is started by running *maven* in the root of the current git repository,
+which is :`rh-che`
+
+##### Default build (Upstream che + RedHat Che)
+
+This checks out and builds the upstream Che before building the RedHat distribution.
+
+    mvn clean install
+
+##### Default build - quick version (bypass upstream Che)
+
+This allows reusing a previously checked-out and built upstream Che.
+    
+    mvn -P '!checkout-base-che' clean install 
+
+##### Build using a local upstream Che
+
+This allows using a local che repository you already have on your machine.
+
+    mvn -DlocalCheRepository=<root of your local upstream Che Git repo> clean install
+
+##### Enabling / Disabling the Dashboard
+
+By default the Dashboard is part of the RedHat Che distribution.
+Howvever it can removed by adding the following option to the maven command:
+
+    -DwithoutDashboard
+
+
+## How to build the upstream openshift-connector branch for development purposes
 
 ### Build prerequisites
 
