@@ -229,15 +229,23 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <cloneProjectsTo>${basedir}/target</cloneProjectsTo>
                     <streamLogs>true</streamLogs>
-                    <projectsDirectory>${basedir}</projectsDirectory>
+                    <projectsDirectory>${basedir}/invoker</projectsDirectory>
                     <pomIncludes>
-                        <pomInclude>invoker/rh-changes/pom.xml</pomInclude>
+                        <pomInclude>rh-changes/pom.xml</pomInclude>
                     </pomIncludes>
+                    <filterProperties>
+                        <baseCheRepository>${baseCheRepository}</baseCheRepository>
+                        <withoutDashboard>${withoutDashboard}</withoutDashboard>
+                        <redhat.che.version>${redhat.che.version}</redhat.che.version>
+                        <che.version>${che.version}</che.version>
+                    </filterProperties>
                     <properties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
+                        <che.version>${che.version}</che.version>
                     </properties>
                     <debug>false</debug>
                 </configuration>
@@ -377,7 +385,7 @@
                                 <id>RedHat assembly build</id>
                                 <configuration>
                                     <setupIncludes>
-                                        <setupInclude>invoker/base-che/pom.xml</setupInclude>
+                                        <setupInclude>base-che/pom.xml</setupInclude>
                                     </setupIncludes>
                                 </configuration>
                             </execution>
