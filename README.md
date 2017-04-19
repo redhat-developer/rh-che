@@ -125,7 +125,7 @@ scripts/build.sh
 export OPENSHIFT_USERNAME="developer"
 export OPENSHIFT_PASSWORD="developer"
 export CHE_OPENSHIFT_PROJECT="eclipse-che"
-export CHE_HOSTNAME="che.$(minishift ip).nip.io"
+export OPENSHIFT_NAMESPACE_URL="${CHE_OPENSHIFT_PROJECT}.$(minishift ip).nip.io"
 export CHE_LOG_LEVEL="INFO"
 export CHE_DEBUGGING_ENABLED="false"
 export FABRIC8_ONLINE_PATH="/home/user/github/fabric8-online/"
@@ -133,7 +133,7 @@ export FABRIC8_ONLINE_PATH="/home/user/github/fabric8-online/"
 
 * OPENSHIFT_USERNAME and OPENSHIFT_PASSWORD are used to configure which Openshift account will be used
 * CHE_OPENSHIFT_PROJECT is the name of the project in Openshift in which Che will be deployed
-* CHE_HOSTNAME will be the hostname from which Che will be accessible after deployment
+* OPENSHIFT_NAMESPACE_URL is the base URL used for all Che routes. Once deployed Che dashboard will be available at http://che-${OPENSHIFT_NAMESPACE_URL}.
 * CHE_LOG_LEVEL is the logging level (DEBUG, INFO, WARN, ERROR etc)
 * CHE_DEBUGGING_ENABLED set this to "true" to allow remote Java debugging of the Che server
 * FABRIC8_ONLINE_PATH is the full path to the fabric8-online binary

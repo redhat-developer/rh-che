@@ -7,7 +7,7 @@ minishift status | grep -q "Running" ||(echo "Minishift is not running. Aborting
 
 if [ -z ${OPENSHIFT_USERNAME+x} ]; then echo "Env var OPENSHIFT_USERNAME is unset. Aborting"; exit 1; fi
 if [ -z ${OPENSHIFT_PASSWORD+x} ]; then echo "Env var OPENSHIFT_PASSWORD is unset. Aborting"; exit 1; fi
-if [ -z ${CHE_HOSTNAME+x} ]; then echo "Env var CHE_HOSTNAME is unset. Aborting"; exit 1; fi
+if [ -z ${OPENSHIFT_NAMESPACE_URL+x} ]; then echo "Env var OPENSHIFT_NAMESPACE_URL is unset. Aborting"; exit 1; fi
 if [ -z ${CHE_LOG_LEVEL+x} ]; then echo "Env var CHE_LOG_LEVEL is unset. Aborting"; exit 1; fi
 if [ -z ${CHE_DEBUGGING_ENABLED+x} ]; then echo "Env var CHE_DEBUGGING_ENABLED is unset. Aborting"; exit 1; fi
 if [ -z ${FABRIC8_ONLINE_PATH+x} ]; then echo "Env var FABRIC8_ONLINE_PATH is unset. Aborting"; exit 1; fi
@@ -30,7 +30,7 @@ oc project ${CHE_OPENSHIFT_PROJECT}
 echo "# Create configmaps..."
 if oc get configmap che &> /dev/null ; then oc delete configmap che &> /dev/null; fi
 oc create configmap che \
-      --from-literal=hostname-http=${CHE_HOSTNAME} \
+      --from-literal=hostname-http=${OPENSHIFT_NAMESPACE_URL} \
       --from-literal=workspace-storage="/home/user/che/workspaces" \
       --from-literal=workspace-storage-create-folders="false" \
       --from-literal=local-conf-dir="/etc/conf" \
@@ -108,21 +108,21 @@ sed "s/\${project.artifactId}/che/g" \
 
 #Create Che route
 echo "# Create route..."
-oc expose service che-host --hostname=${CHE_HOSTNAME}
+oc expose --name=che service che-host
 
-echo "Che has been successfully deployed on $(oc get route che-host -o jsonpath='{.spec.host}')"
+echo "Che has been successfully deployed on $(oc get route che -o jsonpath='{.spec.host}')"
 
 if [ "${CHE_DEBUGGING_ENABLED}" == "true" ]; then
   echo "# Create debug route..."
-  oc expose dc che --name=che-host-debug --target-port=http-debug --port=8000 --type=NodePort
-  NodePort=$(oc get service che-host-debug -o jsonpath='{.spec.ports[0].nodePort}')
+  oc expose dc che --name=che-debug --target-port=http-debug --port=8000 --type=NodePort
+  NodePort=$(oc get service che-debug -o jsonpath='{.spec.ports[0].nodePort}')
   echo "And remote debugging is possible attaching to URL $(minishift ip):${NodePort}"
 fi
 
 # A simpler solution would be:
 # export CHE_TEMPLATE_VERSION=1.0.54
 # curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/${CHE_TEMPLATE_VERSION}/che-${CHE_TEMPLATE_VERSION}-openshift.yml | \
-#       sed "s/    hostname-http:.*/    hostname-http: ${CHE_HOSTNAME}/" | \
+#       sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" | \
 #       sed "s/    log-level:.*/    log-level: ${CHE_LOG_LEVEL}/" | \
 #       sed "s/    remote-debugging-enabled:.*/    hostname-http: ${CHE_DEBUGGING_ENABLED}/" | \
 #       oc apply -f -
