@@ -20,9 +20,8 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         }
         if(auth != null && auth.equals("Internal")){
             chain.doFilter(req, res);
-        }else
-        if (request.getRequestURI().endsWith("/ws") || request.getRequestURI().endsWith("/eventbus")
-                || request.getScheme().equals("ws") || req.getScheme().equals("wss")) {
+        } else if (request.getRequestURI().endsWith("/ws") || request.getRequestURI().endsWith("/eventbus")
+                   || request.getScheme().equals("ws") || req.getScheme().equals("wss") || request.getRequestURI().contains("/websocket/")) {
             System.out.println("Skipping " + request.getRequestURI());
             chain.doFilter(req, res);
         } else {
