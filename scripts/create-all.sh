@@ -41,11 +41,11 @@ oc create configmap che \
       --from-literal=port="8080" \
       --from-literal=remote-debugging-enabled=${CHE_DEBUGGING_ENABLED} \
       --from-literal=che-oauth-github-forceactivation="true" \
-      --from-literal=workspaces-memory-limit="1500Mi" \
+      --from-literal=workspaces-memory-limit="1300Mi" \
       --from-literal=workspaces-memory-request="500Mi" \
       --from-literal=enable-workspaces-autostart="false" \
-      --from-literal=che-server-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1000m" \
-      --from-literal=che-workspaces-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1500m" \
+      --from-literal=che-server-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=700m" \
+      --from-literal=che-workspaces-java-opts="-XX:+UseSerialGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1300m" \
       --from-literal=che-openshift-secure-routes="false" \
       --from-literal=che-secure-external-urls="false"
 
