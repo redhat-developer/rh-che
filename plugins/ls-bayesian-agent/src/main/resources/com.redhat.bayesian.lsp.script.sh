@@ -152,4 +152,4 @@ curl -sSL ${AGENT_BINARIES_URI} | tar vxj
 
 touch ${LS_LAUNCHER}
 chmod +x ${LS_LAUNCHER}
-echo "nodejs ${LS_DIR}/server.js --stdio" > ${LS_LAUNCHER}
+echo "node ${LS_DIR}/server.js --stdio" > ${LS_LAUNCHER}
