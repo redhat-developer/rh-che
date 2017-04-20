@@ -23,7 +23,7 @@
         <module>../../assembly</module>
     </modules>
     <properties>
-        <keycloak.plugins.version>1.0.0-SNAPSHOT</keycloak.plugins.version>
+        <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
         <keycloak.version>2.5.0.Final</keycloak.version>
     </properties>
     <dependencyManagement>
@@ -41,15 +41,15 @@
                 <type>tar.gz</type>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che.plugin</groupId>
+                <groupId>com.redhat.che</groupId>
                 <artifactId>che-plugin-bayesian-lang-server</artifactId>
-                <version>${che.version}</version>
+                <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
             </dependency>
-                       <dependency>
-                <groupId>org.eclipse.che</groupId>
+           <dependency>
+                <groupId>com.redhat.che</groupId>
                 <artifactId>ls-bayesian-agent</artifactId>
-                <version>${che.version}</version>
+                <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
@@ -79,13 +79,13 @@
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>che-keycloak-plugin-ide</artifactId>
-                <version>${keycloak.plugins.version}</version>
+                <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>che-keycloak-plugin-server</artifactId>
-                <version>${keycloak.plugins.version}</version>
+                <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>

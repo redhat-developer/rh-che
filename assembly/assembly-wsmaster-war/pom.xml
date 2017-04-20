@@ -59,7 +59,7 @@
             <artifactId>go-agents</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.che</groupId>
+            <groupId>com.redhat.che</groupId>
             <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
