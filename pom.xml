@@ -29,6 +29,33 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>clean without export</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <phase>clean</phase>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>target</directory>
+                                    <excludes>
+                                        <exclude>export/**</exclude>
+                                    </excludes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.8</version>
@@ -202,15 +229,23 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <cloneProjectsTo>${basedir}/target</cloneProjectsTo>
                     <streamLogs>true</streamLogs>
-                    <projectsDirectory>${basedir}</projectsDirectory>
+                    <projectsDirectory>${basedir}/invoker</projectsDirectory>
                     <pomIncludes>
-                        <pomInclude>invoker/rh-changes/pom.xml</pomInclude>
+                        <pomInclude>rh-changes/pom.xml</pomInclude>
                     </pomIncludes>
+                    <filterProperties>
+                        <baseCheRepository>${baseCheRepository}</baseCheRepository>
+                        <withoutDashboard>${withoutDashboard}</withoutDashboard>
+                        <redhat.che.version>${redhat.che.version}</redhat.che.version>
+                        <che.version>${che.version}</che.version>
+                    </filterProperties>
                     <properties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
+                        <che.version>${che.version}</che.version>
                     </properties>
                     <debug>false</debug>
                 </configuration>
@@ -247,26 +282,6 @@
             <properties>
                 <baseCheRepository>${project.build.directory}/export/che-dependencies/che</baseCheRepository>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>target</directory>
-                                    <excludes>
-                                        <exclude>export/**</exclude>
-                                    </excludes>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>checkout-base-che</id>
@@ -277,6 +292,30 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>clean Export</id>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                                <phase>clean</phase>
+                                <configuration>
+                                    <filesets>
+                                        <fileset>
+                                            <directory>target</directory>
+                                            <includes>
+                                                <exclude>export/**</exclude>
+                                            </includes>
+                                            <followSymlinks>false</followSymlinks>
+                                        </fileset>
+                                    </filesets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-scm-plugin</artifactId>
@@ -346,7 +385,7 @@
                                 <id>RedHat assembly build</id>
                                 <configuration>
                                     <setupIncludes>
-                                        <setupInclude>invoker/base-che/pom.xml</setupInclude>
+                                        <setupInclude>base-che/pom.xml</setupInclude>
                                     </setupIncludes>
                                 </configuration>
                             </execution>
@@ -367,22 +406,6 @@
             </properties>
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>target</directory>
-                                    <excludes>
-                                        <exclude>export/**</exclude>
-                                    </excludes>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>buildnumber-maven-plugin</artifactId>

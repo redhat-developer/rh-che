@@ -11,7 +11,7 @@
         <artifactId>fabric8-ide-parent</artifactId>
         <groupId>com.redhat.che</groupId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../invoker/rh-changes</relativePath>
+        <relativePath>../target/rh-changes</relativePath>
     </parent>
     <artifactId>fabric8-ide-assembly-parent</artifactId>
     <version>${redhat.che.version}</version>

@@ -10,7 +10,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>5.6.0-openshift-connector-SNAPSHOT</version>
+        <version>@che.version@</version>
         <relativePath>@baseCheRepository@</relativePath>
     </parent>
     <groupId>com.redhat.che</groupId>
