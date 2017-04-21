@@ -25,6 +25,9 @@
     <artifactId>che-keycloak-plugin-server</artifactId>
     <packaging>jar</packaging>
     <name>Che Keycloak Server plugin</name>
+    <properties>
+        <src.java.dir>src/main/java</src.java.dir>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -49,6 +52,7 @@
         </dependency>
     </dependencies>
     <build>
+        <sourceDirectory>${src.java.dir}</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -58,4 +62,18 @@
             </resource>
         </resources>
     </build>
+    <profiles>
+        <profile>
+            <id>withoutKeycloak</id>
+            <activation>
+                <property>
+                    <name>withoutKeycloak</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <src.java.dir>src-without-keycloak/main/java</src.java.dir>
+            </properties>
+        </profile>
+    </profiles>
 </project>

@@ -73,6 +73,14 @@ Howvever it can removed by adding the following option to the maven command:
 
     -DwithoutDashboard
 
+##### Enabling / Disabling the Keycloak integration
+
+By default the Keycloak integration is part of the RedHat Che distribution.
+Howvever it can removed by adding the following option to the maven command:
+
+    -DwithoutKeycloak
+
+
 
 ## How to build the upstream openshift-connector branch for development purposes
 

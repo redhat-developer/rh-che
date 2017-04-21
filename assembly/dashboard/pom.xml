@@ -76,15 +76,6 @@
                 <executions>
                     <execution>
                         <id>patch-sources</id>
-                        <configuration>
-                            <patches>
-                                <patch>gulp/scripts.js.patch</patch>
-                                <patch>src/app/index.module.ts.patch</patch>
-                                <patch>src/components/api/remote/che-remote-login.ts.patch</patch>
-                                <patch>src/index.html.patch</patch>
-                                <patch>tsconfig.json.patch</patch>
-                            </patches>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -178,4 +169,43 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>withoutKeycloak</id>
+            <activation>
+                <property>
+                    <name>withoutKeycloak</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>Remove Keycloak Patches</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target name="copy all original Che files">
+                                        <delete
+                                            verbose="true">
+                                            <fileset
+                                                dir="${project.build.directory}/prepared-patches">
+                                                <include name="*.patch" />
+                                            </fileset>
+                                        </delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

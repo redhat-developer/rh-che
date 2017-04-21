@@ -163,6 +163,7 @@
                             <goals>
                                 <goal>apply</goal>
                             </goals>
+                            <phase>process-resources</phase>
                         </execution>
                     </executions>
                     <configuration>
