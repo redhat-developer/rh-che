@@ -238,12 +238,14 @@
                     <filterProperties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
+                        <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
                     </filterProperties>
                     <properties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
+                        <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
                     </properties>
