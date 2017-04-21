@@ -55,7 +55,7 @@ elif echo ${LINUX_TYPE} | grep -qi "Red Hat"; then
         ${SUDO} yum install ${PACKAGES};
     }
 
-    command -v nodejs >/dev/null 2>&1 || {
+    command -v nodejs >/dev/null 2>&1 || command -v node >/dev/null 2>&1 || {
         curl --silent --location https://rpm.nodesource.com/setup_6.x | ${SUDO} bash -;
         ${SUDO} yum -y install nodejs;
     }
@@ -69,7 +69,7 @@ elif echo ${LINUX_TYPE} | grep -qi "ubuntu"; then
         ${SUDO} apt-get -y install ${PACKAGES};
     }
 
-    command -v nodejs >/dev/null 2>&1 || {
+    command -v nodejs >/dev/null 2>&1 || command -v node >/dev/null 2>&1 || {
         {
             curl -sL https://deb.nodesource.com/setup_6.x | ${SUDO} bash -;
         };
@@ -87,7 +87,7 @@ elif echo ${LINUX_TYPE} | grep -qi "debian"; then
         ${SUDO} apt-get -y install ${PACKAGES};
     }
 
-    command -v nodejs >/dev/null 2>&1 || {
+    command -v nodejs >/dev/null 2>&1 || command -v node >/dev/null 2>&1 || {
         {
             curl -sL https://deb.nodesource.com/setup_6.x | ${SUDO} bash -;
         };
@@ -104,7 +104,7 @@ elif echo ${LINUX_TYPE} | grep -qi "fedora"; then
         ${SUDO} dnf -y install ${PACKAGES};
     }
 
-    command -v nodejs >/dev/null 2>&1 || {
+    command -v nodejs >/dev/null 2>&1 || command -v node >/dev/null 2>&1 || {
         curl --silent --location https://rpm.nodesource.com/setup_6.x | ${SUDO} bash -;
         ${SUDO} dnf -y install nodejs;
     }
@@ -117,7 +117,7 @@ elif echo ${LINUX_TYPE} | grep -qi "centos"; then
         ${SUDO} yum -y install ${PACKAGES};
     }
 
-    command -v nodejs >/dev/null 2>&1 || {
+    command -v nodejs >/dev/null 2>&1 || command -v node >/dev/null 2>&1 || {
         curl --silent --location https://rpm.nodesource.com/setup_6.x | ${SUDO} bash -;
         ${SUDO} yum -y install nodejs;
     }
@@ -129,7 +129,7 @@ elif echo ${LINUX_TYPE} | grep -qi "opensuse"; then
         ${SUDO} zypper install -y ${PACKAGES};
     }
 
-    command -v nodejs >/dev/null 2>&1 || {
+    command -v nodejs >/dev/null 2>&1 || command -v node >/dev/null 2>&1 || {
         ${SUDO} zypper ar http://download.opensuse.org/repositories/devel:/languages:/nodejs/openSUSE_13.1/ Node.js
         ${SUDO} zypper in nodejs
     }
@@ -152,4 +152,8 @@ curl -sSL ${AGENT_BINARIES_URI} | tar vxj
 
 touch ${LS_LAUNCHER}
 chmod +x ${LS_LAUNCHER}
-echo "node ${LS_DIR}/server.js --stdio" > ${LS_LAUNCHER}
+
+NODE="node"
+command -v node >/dev/null 2>&1 || NODE="nodejs"
+
+echo "${NODE} ${LS_DIR}/server.js --stdio" > ${LS_LAUNCHER}
