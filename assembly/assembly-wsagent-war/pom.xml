@@ -46,6 +46,10 @@
             <artifactId>che-keycloak-plugin-server</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>che-plugin-bayesian-lang-server</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jaxrs</artifactId>
         </dependency>
