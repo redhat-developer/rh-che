@@ -76,7 +76,7 @@ $(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/sa.yml)
 echo "# Create role bindings..."
 echo "apiVersion: \"v1\"
 kind: \"RoleBinding\"
-$(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/rb.yml)
+$(cat ${FABRIC8_ONLINE_PATH}packages/fabric8-online-che/src/main/fabric8/sa-rb.yml)
 " | oc apply -f -
 
 
