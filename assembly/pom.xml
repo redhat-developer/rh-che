@@ -189,10 +189,12 @@
                         <execution>
                             <id>analyze</id>
                             <configuration>
-                                <!-- required because of overlays -->
                                 <ignoredUnusedDeclaredDependencies>
+                                    <!-- required because of overlays -->
                                     <ignoredUnusedDeclaredDependency>org.eclipse.che:assembly-*:war:</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>com.redhat.che:che-keycloak-plugin-ide:jar:</ignoredUnusedDeclaredDependency>
+                                    <!-- required because it's declared in fabric8-ide-assembly-wsagent-war, butnot used in the code -->
+                                    <ignoredUnusedDeclaredDependency>com.redhat.che:che-plugin-bayesian-lang-server:jar:</ignoredUnusedDeclaredDependency>
                                 </ignoredUnusedDeclaredDependencies>
                             </configuration>
                         </execution>
