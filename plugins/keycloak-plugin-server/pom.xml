@@ -71,6 +71,25 @@
                     <value>true</value>
                 </property>
             </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>analyze</id>
+                                <configuration>
+                                    <ignoredUnusedDeclaredDependencies>
+                                        <!-- Required because in the case of withoutKeycloak profile, these dependencies are not used anymore -->
+                                        <ignoredUnusedDeclaredDependency>org.keycloak:keycloak-servlet-filter-adapter:jar:</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>javax.validation:validation-api:jar:</ignoredUnusedDeclaredDependency>
+                                    </ignoredUnusedDeclaredDependencies>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
             <properties>
                 <src.java.dir>src-without-keycloak/main/java</src.java.dir>
             </properties>
