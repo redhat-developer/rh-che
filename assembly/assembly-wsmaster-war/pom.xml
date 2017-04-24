@@ -46,6 +46,10 @@
             <artifactId>che-keycloak-plugin-server</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>ls-bayesian-agent</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
         </dependency>
@@ -57,10 +61,6 @@
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>go-agents</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>

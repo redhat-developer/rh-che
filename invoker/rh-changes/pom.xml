@@ -23,11 +23,29 @@
         <module>../../assembly</module>
     </modules>
     <properties>
-        <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
         <keycloak.version>2.5.0.Final</keycloak.version>
+        <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>che-keycloak-plugin-ide</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>che-keycloak-plugin-server</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>che-plugin-bayesian-lang-server</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-ide-assembly-ide-war</artifactId>
@@ -39,18 +57,6 @@
                 <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>tar.gz</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-plugin-bayesian-lang-server</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-           <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>ls-bayesian-agent</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
@@ -76,15 +82,9 @@
                 <version>${redhat.che.version}</version>
                 <type>war</type>
             </dependency>
-            <dependency>
+           <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>che-keycloak-plugin-ide</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-keycloak-plugin-server</artifactId>
+                <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
             </dependency>
