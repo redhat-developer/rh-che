@@ -80,6 +80,25 @@ Howvever it can removed by adding the following option to the maven command:
 
     -DwithoutKeycloak
 
+##### Enabling / Disabling the checks and tests
+
+By default the build enables various checks (dependency validation, license check, 
+pom sorting, etc ...), and runs the units / integration tests.
+
+However this can be long in development phase, so you can disable these checks as well as
+skip tests by enabling the `fast` profile with the following option:
+
+    -Pfast
+
+##### Enabling / Disabling multi-thread builds
+
+By default the build is single-threaded, to ensure robustness and avoid *any* concurrency issue
+that might occur by one of the involved maven plugins.
+
+However, it is possible to enable multi-thread builds (1 thread per core) by enabling the
+`multiThread` profile with the following option:
+
+    -PmultiThread
 
 
 ## How to build the upstream openshift-connector branch for development purposes

@@ -160,10 +160,10 @@
                     <executions>
                         <execution>
                             <id>patch-sources</id>
+                            <phase>process-resources</phase>
                             <goals>
                                 <goal>apply</goal>
                             </goals>
-                            <phase>process-resources</phase>
                         </execution>
                     </executions>
                     <configuration>

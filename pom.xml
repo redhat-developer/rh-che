@@ -25,6 +25,7 @@
         <che.version>5.6.0-openshift-connector-SNAPSHOT</che.version>
         <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
         <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
+        <multiThread></multiThread>
     </properties>
     <build>
         <plugins>
@@ -241,6 +242,7 @@
                         <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
+                        <multiThread>${multiThread}</multiThread>
                     </filterProperties>
                     <properties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
@@ -248,6 +250,12 @@
                         <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
+                        <skip-enforce>${skip-enforce}</skip-enforce>
+                        <skipTests>${skipTests}</skipTests>
+                        <findbugs.skip>${findbugs.skip}</findbugs.skip>
+                        <skip-validate-sources>${skip-validate-sources}</skip-validate-sources>
+                        <mdep.analyze.skip>${mdep.analyze.skip}</mdep.analyze.skip>
+                        <license.skip>${license.skip}</license.skip>
                     </properties>
                     <debug>false</debug>
                 </configuration>
@@ -485,6 +493,22 @@
             </activation>
             <properties>
                 <redhat-version-qualifier>${redhat.che.version.suffix}</redhat-version-qualifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>fast</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <findbugs.skip>true</findbugs.skip>
+                <skip-validate-sources>true</skip-validate-sources>
+                <mdep.analyze.skip>true</mdep.analyze.skip>
+                <license.skip>true</license.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>multiThread</id>
+            <properties>
+                <multiThread>-T 1C</multiThread>
             </properties>
         </profile>
     </profiles>

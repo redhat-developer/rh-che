@@ -23,8 +23,6 @@
         <original-project-name>assembly-ide-war</original-project-name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <dependencies>
-    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -353,19 +351,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.che</groupId>
-                    <artifactId>assembly-ide-war</artifactId>
-                    <type>pom</type>
-                    <exclusions>
-                        <exclusion>
-                            <artifactId>che-plugin-ext-dashboard-client</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -373,10 +358,10 @@
                         <executions>
                             <execution>
                                 <id>copy-src-without-dashboard</id>
+                                <phase>process-sources</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
-                                <phase>process-sources</phase>
                                 <configuration>
                                     <overwrite>true</overwrite>
                                     <outputDirectory>${project.build.directory}/patched/src</outputDirectory>
@@ -394,6 +379,19 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.che</groupId>
+                    <artifactId>assembly-ide-war</artifactId>
+                    <type>pom</type>
+                    <exclusions>
+                        <exclusion>
+                            <artifactId>che-plugin-ext-dashboard-client</artifactId>
+                            <groupId>org.eclipse.che.plugin</groupId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>
