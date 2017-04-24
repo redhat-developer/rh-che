@@ -12,7 +12,7 @@ CHE_DIR=$HOME/che
 LS_DIR=${CHE_DIR}/ls-bayesian
 LS_LAUNCHER=${LS_DIR}/launch.sh
 
-AGENT_BINARIES_URI=https://msrb.fedorapeople.org/ca-lsp-server.tar
+AGENT_BINARIES_URI=https://github.com/msrb/component-analysis-lsp-server/releases/download/0.0.3/ca-lsp-server.tar
 
 
 if [ -f /etc/centos-release ]; then
@@ -30,7 +30,7 @@ fi
 MACHINE_TYPE=$(uname -m)
 
 mkdir -p ${CHE_DIR}
-mkdir -p ${LS_DIR}
+rm -rf ${LS_DIR} && mkdir -p ${LS_DIR}
 
 ########################
 ### Install packages ###
