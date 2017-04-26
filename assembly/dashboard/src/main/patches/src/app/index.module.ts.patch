@@ -9,7 +9,7 @@
 +
 +
 +let keycloakConfig = {
-+  "url": "https://sso.prod-preview.openshift.io/auth",
++  "url": "https://sso.openshift.io/auth",
 +  "realm": "fabric8",
 +  "clientId": "openshiftio-public",
 +};
