@@ -1,7 +1,7 @@
 {
   "realm" : "fabric8",
   "resource" : "openshiftio-public",
-  "auth-server-url" : "https://sso.prod-preview.openshift.io/auth",
+  "auth-server-url" : "https://sso.openshift.io/auth",
   "ssl-required" : "external",
   "enable-cors" : true,
   "bearer-only" : true,

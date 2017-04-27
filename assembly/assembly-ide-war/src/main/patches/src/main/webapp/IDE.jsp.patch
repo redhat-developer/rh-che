@@ -7,7 +7,7 @@
 +  <script type="text/javascript" language="javascript" src="/_app/keycloak/keycloak.js"></script>
 +  <script>
 +    window.keycloak = Keycloak({
-+      url: 'https://sso.prod-preview.openshift.io/auth',
++      url: 'https://sso.openshift.io/auth',
 +      realm: 'fabric8',
 +      clientId: 'openshiftio-public',
 +    });
@@ -18,7 +18,7 @@
 +    });
 
 +    // Until there's a synchronous way to call updateToken from within gwt (it's currently
-+    // asynchronous), just attempt to refresh it every 30 sec.
++    // asynchronous), just attempt to refresh it every 5 mins.
 +    setInterval(function() { window.keycloak.updateToken()
 +        .success(function(refreshed){
 +            console.log('IDE.js token.refresh :'+refreshed);
@@ -26,7 +26,7 @@
 +                console.log('IDE.js setting token to'+ window.keycloak.token);
 +            }
 +        })
-+        ; }, 30000);
++        ; }, 300000);
 +  </script>
      <script type="text/javascript" language="javascript" src="/_app/browserNotSupported.js"></script>
      <script type="text/javascript" language="javascript" async="true" src="/_app/_app.nocache.js"></script>
