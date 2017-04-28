@@ -19,8 +19,8 @@
     <packaging>pom</packaging>
     <name>Fabric8 IDE (parent)</name>
     <modules>
-        <module>../../plugins</module>
-        <module>../../assembly</module>
+        <module>plugins</module>
+        <module>assembly</module>
     </modules>
     <properties>
         <keycloak.version>2.5.0.Final</keycloak.version>
@@ -174,4 +174,46 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>startedByInvoker</id>
+            <activation>
+                <property>
+                    <name>startedByInvoker</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>clean everything in interpolated pom</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                                <configuration>
+                                    <filesets>
+                                        <fileset>
+                                            <directory>${basedir}</directory>
+                                            <excludes>
+                                                <exclude>pom.xml</exclude>
+                                            </excludes>
+                                            <followSymlinks>false</followSymlinks>
+                                        </fileset>
+                                    </filesets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

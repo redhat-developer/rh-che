@@ -11,7 +11,7 @@
         <artifactId>fabric8-ide-parent</artifactId>
         <groupId>com.redhat.che</groupId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../target/rh-changes</relativePath>
+        <relativePath>..</relativePath>
     </parent>
     <artifactId>fabric8-ide-plugins-parent</artifactId>
     <packaging>pom</packaging>

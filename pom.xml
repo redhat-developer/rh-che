@@ -26,6 +26,10 @@
         <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
         <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
         <multiThread></multiThread>
+        <am-cli-option></am-cli-option>
+        <amd-cli-option></amd-cli-option>
+        <pl-cli-option></pl-cli-option>
+        <rf-cli-option></rf-cli-option>
     </properties>
     <build>
         <plugins>
@@ -45,6 +49,7 @@
                                     <directory>target</directory>
                                     <excludes>
                                         <exclude>export/**</exclude>
+                                        <exclude>builds/**</exclude>
                                     </excludes>
                                     <followSymlinks>false</followSymlinks>
                                 </fileset>
@@ -72,7 +77,7 @@
                                 <!-- To bypass a problem in the build when 
                                     rebuilding without the clean option. -->
                                 <delete
-                                    dir="${basedir}/assembly/assembly-ide-war/target/generated-sources" />
+                                    dir="${project.build.directory}/builds/${redhat-version-qualifier}/fabric8-che/assembly/assembly-ide-war/target/generated-sources" />
                             </target>
                         </configuration>
                     </execution>
@@ -230,11 +235,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <cloneProjectsTo>${basedir}/target</cloneProjectsTo>
+                    <cloneProjectsTo>${project.build.directory}/builds/${redhat-version-qualifier}</cloneProjectsTo>
                     <streamLogs>true</streamLogs>
-                    <projectsDirectory>${basedir}/invoker</projectsDirectory>
+                    <projectsDirectory>${basedir}/builds</projectsDirectory>
                     <pomIncludes>
-                        <pomInclude>rh-changes/pom.xml</pomInclude>
+                        <pomInclude>fabric8-che/pom.xml</pomInclude>
                     </pomIncludes>
                     <filterProperties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
@@ -243,8 +248,13 @@
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
                         <multiThread>${multiThread}</multiThread>
+                        <am-cli-option>${am-cli-option}</am-cli-option>
+                        <amd-cli-option>${amd-cli-option}</amd-cli-option>
+                        <pl-cli-option>${pl-cli-option}</pl-cli-option>
+                        <rf-cli-option>${rf-cli-option}</rf-cli-option>
                     </filterProperties>
                     <properties>
+                        <startedByInvoker>true</startedByInvoker>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
                         <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
@@ -317,7 +327,7 @@
                                         <fileset>
                                             <directory>target</directory>
                                             <includes>
-                                                <exclude>export/**</exclude>
+                                                <include>export/**</include>
                                             </includes>
                                             <followSymlinks>false</followSymlinks>
                                         </fileset>
@@ -378,7 +388,7 @@
                         </executions>
                         <configuration>
                             <targetDirectory>target/export/che-dependencies/che</targetDirectory>
-                            <patchDirectory>invoker/base-che/src/main/patches</patchDirectory>
+                            <patchDirectory>builds/base-che/src/main/patches</patchDirectory>
                             <patches>
                                 <!-- Patch to ignore 1 unit test for SVN 
                                     plugin that sometimes fails on CentOS 7 That is probably related to the version 
@@ -510,6 +520,98 @@
             <properties>
                 <multiThread>-T 1C</multiThread>
             </properties>
+        </profile>
+        <profile>
+            <id>alsoMakeDependents</id>
+            <properties>
+                <amd-cli-option>-amd</amd-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>also-make-dependents</name>
+                    <value>true</value>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>alsoMakeDependents_</id>
+            <properties>
+                <amd-cli-option>-amd</amd-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>amd</name>
+                    <value>true</value>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>alsoMake</id>
+            <properties>
+                <am-cli-option>-am</am-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>also-make</name>
+                    <value>true</value>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>alsoMake_</id>
+            <properties>
+                <am-cli-option>-am</am-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>am</name>
+                    <value>true</value>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>projects</id>
+            <properties>
+                <pl-cli-option>-pl ${projects}</pl-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>projects</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>projects_</id>
+            <properties>
+                <pl-cli-option>-pl ${pl}</pl-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>pl</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>resumeFrom</id>
+            <properties>
+                <rf-cli-option>-rf ${resume-from}</rf-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>resume-from</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>resumeFrom_</id>
+            <properties>
+                <rf-cli-option>-rf ${rf}</rf-cli-option>
+            </properties>
+            <activation>
+                <property>
+                    <name>rf</name>
+                </property>
+            </activation>
         </profile>
     </profiles>
 </project>

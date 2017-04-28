@@ -10,7 +10,7 @@
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>${redhat.che.version}</version>
+        <version>@redhat.che.version@</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>fabric8-ide-che-dashboard-war</artifactId>

@@ -10,26 +10,16 @@
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>${redhat.che.version}</version>
+        <version>@redhat.che.version@</version>
         <relativePath>..</relativePath>
     </parent>
-    <artifactId>fabric8-ide-assembly-main</artifactId>
+    <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
     <packaging>pom</packaging>
-    <name>Fabric8 IDE :: Assemblies Tomcat</name>
+    <name>Fabric8 IDE Assembly Workspace Agent Server</name>
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-assembly-ide-war</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
-            <type>tar.gz</type>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
+            <artifactId>fabric8-ide-assembly-wsagent-war</artifactId>
             <type>war</type>
         </dependency>
     </dependencies>
@@ -51,8 +41,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <updateOnly>false</updateOnly>
                     <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
-                    <finalName>eclipse-che-${project.version}</finalName>
-                    <tarLongFileMode>posix</tarLongFileMode>
+                    <finalName>ext-server-${project.version}</finalName>
                 </configuration>
             </plugin>
             <plugin>
@@ -60,7 +49,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-original-che-assembly</id>
+                        <id>unpack-tomcat</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -69,28 +58,10 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.eclipse.che</groupId>
-                                    <artifactId>assembly-main</artifactId>
+                                    <artifactId>assembly-wsagent-server</artifactId>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>package-keycloak-adapter</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.keycloak</groupId>
-                                    <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -99,22 +70,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>withDashboard</id>
-            <activation>
-                <property>
-                    <name>withoutDashboard</name>
-                    <value>!true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.redhat.che</groupId>
-                    <artifactId>fabric8-ide-che-dashboard-war</artifactId>
-                    <type>war</type>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

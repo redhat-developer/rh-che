@@ -24,7 +24,7 @@ of *everything* as part of the root maven build, which means that it:
 - builds the upstream repositories first as a pre-step,
 - then builds the RedHat distribution maven sub-project based on this upstream build.
 
-However, by passing a given propetrty, it is also possible to bypass the checkout and build
+However, by passing a given property, it is also possible to bypass the checkout and build
 of the upstream projects if the upstream che project is present locally on the developer's
 machine and has already been fully built by maven. In this case, this local Che repository
 is reused, which make the RedHat Che distribution build much faster.
@@ -35,36 +35,58 @@ branch is:
 `5.6.0-openshift-connector-SNAPSHOT`,
 then the version of the generated RedHat Che distribution will be:
 `5.6.0-openshift-connector-fabric8-SNAPSHOT`
-or:
-`5.6.0-openshift-connector-fabric8-without-dashboard-SNAPSHOT` if the option to remove the
-Dashboard has been enabled.
-
-And the result of the RedHat Che distribution build is available at the following location:
+and the result of the RedHat Che distribution build will be available at the following location:
     
-    rh-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-fabric8-SNAPSHOT
+    rh-che/target/builds/fabric8/fabric8-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-fabric8-SNAPSHOT
+
+Alternatively, if the option to remove the Dashboard has been enabled then the version of the
+generated RedHat Che distribution will be:
+`5.6.0-openshift-connector-fabric8-without-dashboard-SNAPSHOT` .
+and the result of the RedHat Che distribution build will be available at the following location:
+    
+    rh-che/target/builds/fabric8-without-dashboard/fabric8-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-fabric8-without-dashboard-SNAPSHOT
+
 
 #### How to start the  RedHat Che distribution build
 
 The build is started by running *maven* in the root of the current git repository,
 which is :`rh-che`
 
-##### Default build (Upstream che + RedHat Che)
+##### CI-oriented build (Upstream che + RedHat Che)
 
 This checks out and builds the upstream Che before building the RedHat distribution.
 
     mvn clean install
 
-##### Default build - quick version (bypass upstream Che)
-
-This allows reusing a previously checked-out and built upstream Che.
+To reuse a previously checked-out and built upstream Che, it is possible to use the 
+`!checkout-base-che` profile:
     
     mvn -P '!checkout-base-che' clean install 
 
-##### Build using a local upstream Che
+##### Developer-oriented build
 
-This allows using a local che repository you already have on your machine.
+You can also use a local upstream che repository you already have on your machine.
+In this case oyu *have to* define the location of this local reporitory with the
+`localCheRepository` property:
 
     mvn -DlocalCheRepository=<root of your local upstream Che Git repo> clean install
+
+*This is the recomended way if you work on both the upstream che and the RedHat distribution.*
+    
+##### Change the forks / branches used for the upstream Che repositories
+
+If you want to use a different fork / branch for the `che` or `che-dependencies` repositories,
+you can specify this with the following properties:
+- `che-fork`
+- `che-branch`
+- `che-dependencies-fork`
+- `che-dependencies-branch`
+
+For example if you want to use the `fix` branch on the `yourname/che` GitHub repository
+that contains your fork of Che, you can use the following options:
+
+    -Dche-fork=yourname -Dche-branch=fix
+
 
 ##### Enabling / Disabling the Dashboard
 
@@ -100,7 +122,50 @@ However, it is possible to enable multi-thread builds (1 thread per core) by ena
 
     -PmultiThread
 
+##### Build only some modules of the RedHat Che Distribution
 
+The advanced Maven Reactor options described [here](http://books.sonatype.com/mvnref-book/reference/_using_advanced_reactor_options.html)
+are also available in the RedHat Che distribution build using the following properties:
+
+- List of reactor projects to build:
+    
+    -Dprojects=<comma separated list of modules>
+
+or 
+    
+    -Dpl=<comma separated list of modules>
+    
+- Reactor project to resume the build from:
+    
+    -Dresume-from=<module to resume from>
+
+or 
+    
+    -Drf=<module to resume from>
+    
+- Also make the projects *required by* the projects specified in the `projects` option:
+
+    -Dalso-make
+
+or 
+    
+    -Dam
+    
+- Also make the projects *that depend on* the projects specified in the `projects` option:
+
+    -Dalso-make-dependents
+
+or 
+    
+    -Damd
+    
+
+So for example if you only want to rebuild the Keycloak server plugin and have the main assembly
+up-to-date, just use the following options:
+
+    -Dpl=plugins/keycloak-plugin-server -Damd
+    
+    
 ## How to build the upstream openshift-connector branch for development purposes
 
 ### Build prerequisites
