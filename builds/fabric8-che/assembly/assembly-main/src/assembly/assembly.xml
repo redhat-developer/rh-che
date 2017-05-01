@@ -62,11 +62,16 @@
                 <exclude>**/tomcat/webapps/dashboard.war</exclude>
                 <exclude>**/tomcat/webapps/swagger.war</exclude>
                 <exclude>**/tomcat/webapps/docs.war</exclude>
+                <exclude>**/stacks/stacks.json</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/keycloak/</directory>
             <outputDirectory>tomcat/lib</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/stacks/</directory>
+            <outputDirectory>stacks/</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

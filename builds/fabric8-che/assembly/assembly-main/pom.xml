@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2012-2016 Codenvy, S.A. All rights reserved. This program 
-    and the accompanying materials are made available under the terms of the 
-    Eclipse Public License v1.0 which accompanies this distribution, and is available 
-    at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A. 
+<!-- Copyright (c) 2012-2016 Codenvy, S.A. All rights reserved. This program
+    and the accompanying materials are made available under the terms of the
+    Eclipse Public License v1.0 which accompanies this distribution, and is available
+    at http://www.eclipse.org/legal/epl-v10.html Contributors: Codenvy, S.A.
     - initial API and implementation -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -32,9 +32,36 @@
             <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
             <type>war</type>
         </dependency>
+        <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-ide-stacks</artifactId>
+                <type>jar</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-stack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <loadfile property="stack.che-in-che" srcFile="${project.basedir}/src/assembly/stack/che-in-che.json" />
+                                <unzip dest="${project.build.directory}/stacks" src="${com.redhat.che:fabric8-ide-stacks:jar}" />
+                                <replaceregexp file="${project.build.directory}/stacks/stacks.json" flags="m">
+                                    <regexp pattern="^]$" />
+                                    <substitution expression=", ${stack.che-in-che} ]" />
+                                </replaceregexp>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
