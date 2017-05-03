@@ -1,0 +1,77 @@
+--- dockerfiles/che/Dockerfile.centos
++++ dockerfiles/che/Dockerfile.centos
+@@ -29,6 +29,16 @@ ENV LANG=C.UTF-8 \
+     DOCKER_BUCKET=get.docker.com \
+     CHE_IN_CONTAINER=true
+
++# Install pcp - collection basics
++# would prefer only pmcd, and not the /bin/pm*tools etc.
++COPY pcp.repo /etc/yum.repos.d/pcp.repo
++RUN yum install -y pcp && yum clean all
++COPY ./run-pmcd.sh /run-pmcd.sh
++RUN chmod a+x     /run-pmcd.sh
++RUN mkdir -p      /etc/pcp /var/run/pcp /var/lib/pcp /var/log/pcp
++RUN chmod -R 0777 /etc/pcp /var/run/pcp /var/lib/pcp /var/log/pcp
++EXPOSE 44321
++
+ RUN yum -y update && \
+     yum -y install openssl java sudo && \
+     curl -sSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-${DOCKER_VERSION}" -o /usr/bin/docker && \
+--- dockerfiles/che/entrypoint.sh
++++ dockerfiles/che/entrypoint.sh
+@@ -356,6 +356,9 @@ init
+ init_global_variables
+ set_environment_variables
+
++# run pmcd in background; no special signaling treatment needed
++/run-pmcd.sh &
++
+ # run che
+ start_che_server &
+
+--- /dev/null
++++ dockerfiles/che/pcp.repo
+@@ -0,0 +1,10 @@
++[fche-pcp]
++name=Copr repo for pcp owned by fche
++baseurl=https://copr-be.cloud.fedoraproject.org/results/fche/pcp/epel-7-$basearch/
++type=rpm-md
++skip_if_unavailable=True
++gpgcheck=1
++gpgkey=https://copr-be.cloud.fedoraproject.org/results/fche/pcp/pubkey.gpg
++repo_gpgcheck=0
++enabled=1
++enabled_metadata=1
+ \ No newline at end of file
+--- /dev/null
++++ dockerfiles/che/run-pmcd.sh
+@@ -0,0 +1,28 @@
++#! /bin/bash -e
++
++: "${PCP_HOSTNAME:=`hostname`}"
++
++# Set up internal pmcd
++
++# Setup pmcd to run in unprivileged mode of operation
++. /etc/pcp.conf
++
++# Configure pmcd with a minimal set of DSO agents
++rm -f $PCP_PMCDCONF_PATH; # start empty
++echo "# Name  ID  IPC  IPC Params  File/Cmd" >> $PCP_PMCDCONF_PATH;
++echo "pmcd     2  dso  pmcd_init   $PCP_PMDAS_DIR/pmcd/pmda_pmcd.so"   >> $PCP_PMCDCONF_PATH;
++echo "proc     3  dso  proc_init   $PCP_PMDAS_DIR/proc/pmda_proc.so"   >> $PCP_PMCDCONF_PATH;
++echo "linux   60  dso  linux_init  $PCP_PMDAS_DIR/linux/pmda_linux.so" >> $PCP_PMCDCONF_PATH;
++rm -f $PCP_VAR_DIR/pmns/root_xfs $PCP_VAR_DIR/pmns/root_jbd2 $PCP_VAR_DIR/pmns/root_root $PCP_VAR_DIR/pmns/root
++touch $PCP_VAR_DIR/pmns/.NeedRebuild
++
++# allow unauthenticated access to proc.* metrics (default is false)
++export PROC_ACCESS=1
++export PMCD_ROOT_AGENT=0
++
++# NB: we can't use the rc.pmcd script.  It assumes that it's run as root.
++cd $PCP_VAR_DIR/pmns
++./Rebuild
++
++cd $PCP_LOG_DIR
++exec /usr/libexec/pcp/bin/pmcd -l /dev/no-such-file -f -A -H $PCP_HOSTNAME
+ 

@@ -394,6 +394,9 @@
                                     plugin that sometimes fails on CentOS 7 That is probably related to the version 
                                     of subversion that comes with CentOS 7. -->
                                 <patch>subversionApiITest.patch</patch>
+                                <!-- Patch to install/run Performance Co-Pilot
+                                     (http://pcp.io/) in che-server image . -->
+                                <patch>addPCPInDockerImage.patch</patch>
                             </patches>
                         </configuration>
                     </plugin>
