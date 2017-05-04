@@ -25,7 +25,7 @@
         <che.version>5.6.0-openshift-connector-SNAPSHOT</che.version>
         <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
         <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
-        <multiThread></multiThread>
+        <multiThread-option></multiThread-option>
         <am-cli-option></am-cli-option>
         <amd-cli-option></amd-cli-option>
         <pl-cli-option></pl-cli-option>
@@ -247,7 +247,7 @@
                         <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
-                        <multiThread>${multiThread}</multiThread>
+                        <multiThread-option>${multiThread-option}</multiThread-option>
                         <am-cli-option>${am-cli-option}</am-cli-option>
                         <amd-cli-option>${amd-cli-option}</amd-cli-option>
                         <pl-cli-option>${pl-cli-option}</pl-cli-option>
@@ -514,12 +514,24 @@
                 <mdep.analyze.skip>true</mdep.analyze.skip>
                 <license.skip>true</license.skip>
             </properties>
+            <activation>
+                <property>
+                    <name>fast</name>
+                    <value>true</value>
+                </property>
+            </activation>
         </profile>
         <profile>
             <id>multiThread</id>
             <properties>
-                <multiThread>-T 1C</multiThread>
+                <multiThread-option>-T 1C</multiThread-option>
             </properties>
+            <activation>
+                <property>
+                    <name>multiThread</name>
+                    <value>true</value>
+                </property>
+            </activation>
         </profile>
         <profile>
             <id>alsoMakeDependents</id>

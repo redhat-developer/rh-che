@@ -110,7 +110,7 @@ pom sorting, etc ...), and runs the units / integration tests.
 However this can be long in development phase, so you can disable these checks as well as
 skip tests by enabling the `fast` profile with the following option:
 
-    -Pfast
+    -Dfast 
 
 ##### Enabling / Disabling multi-thread builds
 
@@ -120,7 +120,7 @@ that might occur by one of the involved maven plugins.
 However, it is possible to enable multi-thread builds (1 thread per core) by enabling the
 `multiThread` profile with the following option:
 
-    -PmultiThread
+    -DmultiThread 
 
 ##### Build only some modules of the RedHat Che Distribution
 
