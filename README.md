@@ -128,44 +128,61 @@ The advanced Maven Reactor options described [here](http://books.sonatype.com/mv
 are also available in the RedHat Che distribution build using the following properties:
 
 - List of reactor projects to build:
-    
-    -Dprojects=<comma separated list of modules>
 
-or 
-    
-    -Dpl=<comma separated list of modules>
-    
+```
+-Dprojects=<comma separated list of modules>
+```
+
+or
+
+```
+-Dpl=<comma separated list of modules>
+```
+
 - Reactor project to resume the build from:
     
-    -Dresume-from=<module to resume from>
+```
+-Dresume-from=<module to resume from>
+```
 
 or 
-    
-    -Drf=<module to resume from>
-    
+
+```
+-Drf=<module to resume from>
+```
+
 - Also make the projects *required by* the projects specified in the `projects` option:
 
-    -Dalso-make
+```
+-Dalso-make
+```
 
 or 
-    
-    -Dam
-    
+
+```
+-Dam
+```
+
 - Also make the projects *that depend on* the projects specified in the `projects` option:
 
-    -Dalso-make-dependents
+```
+-Dalso-make-dependents
+```
 
 or 
-    
-    -Damd
-    
+
+```
+-Damd
+```
+
 
 So for example if you only want to rebuild the Keycloak server plugin and have the main assembly
 up-to-date, just use the following options:
 
-    -Dpl=plugins/keycloak-plugin-server -Damd
-    
-    
+```
+-Dpl=plugins/keycloak-plugin-server -Damd
+```    
+
 ## How to build the upstream openshift-connector branch for development purposes
 
 ### Build prerequisites
