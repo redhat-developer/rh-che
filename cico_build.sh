@@ -22,7 +22,7 @@ systemctl start docker
 chown ${BuildUser}:${BuildUser} .
 
 currentDir=`pwd`
-buildCommand="cd ${currentDir} && ./build_che.sh"
+buildCommand="cd ${currentDir} && ./build_che.sh $*"
 runuser - ${BuildUser} -c "$buildCommand"
 if [ $? -eq 0 ]; then
 
