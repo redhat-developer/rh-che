@@ -1,0 +1,29 @@
+# Config used by the different scripts
+
+BuildUser=${BuildUser:-chebuilder}
+
+export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
+export RH_CHE_GIT_BRANCH=master
+
+export CHE_FORK=eclipse
+export CHE_BRANCH=openshift-connector
+
+export CHE_DEP_FORK=eclipse
+export CHE_DEP_BRANCH=openshift-connector
+
+export NPM_CONFIG_PREFIX=~/.che_node_modules
+export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
+
+export RH_DIST_SUFFIX=fabric8
+export RH_NO_DASHBOARD_SUFFIX=without-dashboard
+
+export RHCHEBOT_DOCKER_HUB_USER=rhchebot
+export RHCHEBOT_DOCKER_HUB_PASSWORD=${RHCHEBOT_DOCKER_HUB_PASSWORD:-nopassword}
+export RH_CHE_DOCKER_HUB_NAMESPACE=rhche
+
+DEFAULT_RH_CHE_DOCKER_IMAGE_VERSION=nightly-fabric8-no-dashboard
+export RH_CHE_DOCKER_IMAGE_VERSION=${RH_CHE_DOCKER_IMAGE_VERSION:-${DEFAULT_RH_CHE_DOCKER_IMAGE_VERSION}}
+
+export DOCKER_HUB_USER=${DOCKER_HUB_USER:-${RHCHEBOT_DOCKER_HUB_USER}}
+export DOCKER_HUB_PASSWORD=${DOCKER_HUB_PASSWORD:-${RHCHEBOT_DOCKER_HUB_PASSWORD}}
+export DOCKER_HUB_NAMESPACE=${DOCKER_HUB_NAMESPACE:-${RH_CHE_DOCKER_HUB_NAMESPACE}}
