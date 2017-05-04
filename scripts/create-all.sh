@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+DEFAULT_CHE_IMAGE_REPO=rhche/che-server
+DEFAULT_CHE_IMAGE_TAG=nightly
+
+CHE_IMAGE_REPO=${CHE_IMAGE_REPO:-${DEFAULT_CHE_IMAGE_REPO}}
+CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
+
+CHE_IMAGE_REPO=$(echo $CHE_IMAGE_REPO | sed 's/\//\\\//g')
+
 # minishift is running
 echo "# Checking if minishift is running..."
 minishift status | grep -q "Running" ||(echo "Minishift is not running. Aborting"; exit 1)
@@ -99,7 +107,7 @@ $(cat ${FABRIC8_ONLINE_PATH}apps/che/src/main/fabric8/deployment.yml)
     project: che
     provider: fabric8
 " |  \
-sed "s/image:.*/image: \"rhche\/che-server:nightly\"/g" | \
+sed "s/image:.*/image: \"${CHE_IMAGE_REPO}:${CHE_IMAGE_TAG}\"/g" | \
 oc apply -f -
 
 #Create Che service
