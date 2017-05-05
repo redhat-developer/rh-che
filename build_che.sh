@@ -12,7 +12,7 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-scl enable rh-maven33 rh-nodejs4 "mvn -B -P'!checkout-base-che' -DwithoutDashboard $* clean install -U"
+scl enable rh-maven33 rh-nodejs4 "mvn -B -P'!checkout-base-che' -DwithoutDashboard $* install -U"
 if [ $? -ne 0 ]; then
   echo "Error building che/rh-che without dashboard"
   exit 1;
