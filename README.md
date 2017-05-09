@@ -1,28 +1,57 @@
 # Eclipse Che on OpenShift
 
+## Table Of Content
+
+* [How to build the RedHat Che distribution](#how-to-build-the-redhat-che-distribution)
+* [How to build the upstream openshift-connector branch for development purposes](#how-to-build-the-upstream-openshift-connector-branch-for-development-purposes)
+* [How to run Che on OpenShift](#how-to-run-che-on-openshift)
+
 ## How to build the RedHat Che distribution
+
+### TL;DR
+
+There is a good chance that you want to build rh-che with the dashboard but without keycloak support (because it's easier to test) and as fast as possible :bowtie::
+
+```
+git clone https://github.com/redhat-developer/rh-che
+cd rh-che
+mvn -DwithoutKeycloak `# disable Keycloak support` \
+    -Pfast            `# skip tests and other verifications` \
+    -PmultiThread     `# enable maven multi threading` \
+    clean install
+```
+
+If you have already cloned [eclipse/che](https://github.com/eclipse/che) and built [openshift-connector branch](https://github.com/eclipse/che/tree/openshift-connector) you will want to:
+
+```
+UPSTREAM_CHE_PATH=/path/to/upstream/che
+mvn -DwithoutKeycloak                          `# disable Keycloak support` \
+    -Pfast                                     `# skip tests and other verifications` \
+    -PmultiThread                              `# enable maven multi threading` \
+    -DlocalCheRepository=${UPSTREAM_CHE_PATH}  `# get already built upstream Che` \
+    clean install
+```
 
 #### What is the RedHat Che distribution
 
-The RedHat distribution of Eclipse Che is a RedHat-specific packaging of the Che assemblies
-that allows adding some RedHat specific plugins / behaviors upton the standard upstream Che
+The RedHat distribution of Eclipse Che is a RedHat-specific packaging of Che assemblies
+that adds some RedHat specific plugins / behaviors up to the standard upstream Che
 distribution. It is currently based on the `openshift-connector` branch of the upstream
-Che repository.
+Che repository. The RedHat distribution powers [openshift.io](https://openshift.io) developers workspaces.
 
 RedHat modifications against the upstream Che include:
-- the ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
-- The Keycloak integration
-- The Bayesian integration (soon)
+- The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
+- Keycloak integration
+- [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server) 
 
 #### How the RedHat Che distribution build works
 
-The RedHat Che distribution build is a *maven* build. By default, it *automatically* takes care 
-of *everything* as part of the root maven build, which means that it:
-- checks out the upstream GitHub `che-dependencies` and `che` repositories into the
+RedHat Che distribution build does the following:
+- Checks out the upstream GitHub `che-dependencies` and `che` repositories into folder
 `target/export`, based on a given fork (`eclipse` by default) and branch
 (`openshift-connector` by default),
-- builds the upstream repositories first as a pre-step,
-- then builds the RedHat distribution maven sub-project based on this upstream build.
+- Builds the upstream repositories first as a pre-step,
+- Then builds the RedHat distribution maven sub-project based on this upstream build.
 
 However, by passing a given property, it is also possible to bypass the checkout and build
 of the upstream projects if the upstream che project is present locally on the developer's
@@ -30,8 +59,7 @@ machine and has already been fully built by maven. In this case, this local Che 
 is reused, which make the RedHat Che distribution build much faster.
 
 The version of the RedHat Che distribution assembly and dashboard artifacts is derived from
-the version of the upstream Che project. For example, if version of the used upstream Che
-branch is:
+the version of the upstream Che project. For example, if upstream version is:
 `5.6.0-openshift-connector-SNAPSHOT`,
 then the version of the generated RedHat Che distribution will be:
 `5.6.0-openshift-connector-fabric8-SNAPSHOT`
