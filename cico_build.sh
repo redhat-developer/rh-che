@@ -19,9 +19,10 @@ gpasswd -a ${BuildUser} docker
 
 systemctl start docker
 
-chown ${BuildUser}:${BuildUser} .
-
 currentDir=`pwd`
+
+chown -R ${BuildUser}:${BuildUser} ${currentDir}
+
 buildCommand="cd ${currentDir} && ./build_che.sh $*"
 runuser - ${BuildUser} -c "$buildCommand"
 if [ $? -eq 0 ]; then
