@@ -21,6 +21,7 @@ systemctl start docker
 
 currentDir=`pwd`
 
+chmod a+x ..
 chown -R ${BuildUser}:${BuildUser} ${currentDir}
 
 buildCommand="cd ${currentDir} && ./build_che.sh $*"
