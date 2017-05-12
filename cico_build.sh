@@ -77,6 +77,7 @@ if [ $? -eq 0 ]; then
     # We are not pushing the nightly tag because we don't need it and CI has an issue
     # when publishing > 1 tag at a time 
     # docker push ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
+    echo 'export CHE_SERVER_DOCKER_IMAGE_TAG='${TAG} >> ~/che_image_tag.env
     docker push ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
     
     if [ "${DOCKER_HUB_USER}" == "${RHCHEBOT_DOCKER_HUB_USER}" ]; then
