@@ -35,7 +35,7 @@ oc apply -f -
 ## Check status of deployment
 che_server_status=$(oc get pods | awk '{ if ($1 ~ /che-[0-9]+-.*/ && $1 !~ /che-[0-9]+-deploy/) print $3 }')
 counter=0
-timeout=60
+timeout=240
 echo "Checking state of Che pod."
 # Wait up to 1 minutes for running Che pod
 while [ "${che_server_status}" != "Running" ]; do
@@ -50,7 +50,7 @@ done
 echo "Che pod is running."
 server_log=$(oc logs dc/che)
 counter=0
-timeout=120
+timeout=180
 echo "Checking whether a Che server in Che pod has already started."
 # Wait up to 1 minute for running Che server in pod 
 while [[ $(echo "${server_log}" | grep "Server startup in" | wc -l) -ne 1 ]]; do
