@@ -3,7 +3,7 @@ set -u
 set +e
 
 # Source build variables
-cat jenkins-env | grep -e ^CHE_ > inherit-env
+cat jenkins-env | grep PASS > inherit-env
 . inherit-env
 . config 
 . ~/che_image_tag.env
