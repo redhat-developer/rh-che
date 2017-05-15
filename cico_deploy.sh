@@ -12,7 +12,7 @@ cat jenkins-env | grep -e ^CHE_ > inherit-env
 yum install -y centos-release-openshift-origin
 yum install -y origin-clients
 
-OSO_TOKEN=$(curl -sSL -H "X-Vault-Token: ${RHCHEBOT_DOCKER_HUB_PASSWORD}" -H "Content-Type: application/json" \
+OSO_TOKEN=$(curl -sSL -H "X-Vault-Token: ${DOCKER_HUB_PASSWORD}" -H "Content-Type: application/json" \
 	-X GET http://li546-232.members.linode.com:8200/v1/secret/os_token | cut -d\" -f18)
 if [[ -z "$OSO_TOKEN" ]]; then
     echo "OSO token is empty, cannot proceed with verification"
