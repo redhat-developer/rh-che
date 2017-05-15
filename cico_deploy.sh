@@ -14,12 +14,17 @@ yum install -y origin-clients
 
 OSO_TOKEN=$(curl -sSL -H "X-Vault-Token: ${RHCHEBOT_DOCKER_HUB_PASSWORD}" -H "Content-Type: application/json" \
 	-X GET http://li546-232.members.linode.com:8200/v1/secret/os_token | cut -d\" -f18)
+if [[ -z "$OSO_TOKEN" ]]; then
+    echo "OSO token is empty, cannot proceed with verification"
+    exit 1
+fi
 OSO_USER=mloriedo
 OSO_DOMAIN=8a09.starter-us-east-2.openshiftapps.com
 OSO_API_ENDPOINT=https://api.starter-us-east-2.openshift.com
 OSIO_VERSION=$(curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/maven-metadata.xml | grep latest | sed -e 's,.*<latest>\([^<]*\)</latest>.*,\1,g')
 CHE_OPENSHIFT_HOSTNAME=${OSO_USER}-che.${OSO_DOMAIN}
 CHE_OPENSHIFT_PROJECT=${OSO_USER}-che
+
 oc login ${OSO_API_ENDPOINT} --token=${OSO_TOKEN}
 oc project ${CHE_OPENSHIFT_PROJECT}
 echo "Getting version of OSIO and applying template"
