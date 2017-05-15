@@ -50,10 +50,10 @@ done
 echo "Che pod is running."
 server_log=$(oc logs dc/che)
 counter=0
-timeout=60
+timeout=120
 echo "Checking whether a Che server in Che pod has already started."
 # Wait up to 1 minute for running Che server in pod 
-while [[ $(echo "${server_log}" | grep ".*Server startup in [0-9]\+ ms.*" | wc -l) -ne 1 ]]; do
+while [[ $(echo "${server_log}" | grep "Server startup in" | wc -l) -ne 1 ]]; do
     server_log=$(oc logs dc/che)
     counter=$((counter+1))
     if [ $counter -gt $timeout ]; then
