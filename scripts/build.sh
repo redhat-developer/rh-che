@@ -24,7 +24,7 @@ CURRENT_DIR=$(pwd)
 cd ${GITHUB_REPO}
 
 mvnche() {
-  mvn -Dskip-enforce -Dskip-validate-sources -DskipTests -Dfindbugs.skip -Dgwt.compiler.localWorkers=2 -T 1C -Dskip-validate-sources $@
+  mvn -Dskip-enforce -Dskip-validate-sources -DskipTests -Dfindbugs.skip -Dgwt.compiler.localWorkers=2 -T 1C $@
 }
 
 cd plugins/plugin-docker
