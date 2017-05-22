@@ -15,6 +15,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.redhat.bayesian.agent.BayesianAgent;
 import com.redhat.che.keycloak.server.KeycloakHttpJsonRequestFactory;
+import com.redhat.che.keycloak.token.provider.contoller.KeycloakTokenController;
 
 import org.eclipse.che.api.agent.ExecAgent;
 import org.eclipse.che.api.agent.ExecAgentLauncher;
@@ -93,6 +94,7 @@ public class WsMasterModule extends AbstractModule {
         bind(org.eclipse.che.everrest.EverrestDownloadFileResponseFilter.class);
         bind(org.eclipse.che.everrest.ETagResponseFilter.class);
         bind(org.eclipse.che.api.agent.server.AgentRegistryService.class);
+        bind(com.redhat.che.keycloak.token.provider.contoller.KeycloakTokenController.class);
 
         bind(org.eclipse.che.security.oauth.OAuthAuthenticatorProvider.class)
                 .to(org.eclipse.che.security.oauth.OAuthAuthenticatorProviderImpl.class);

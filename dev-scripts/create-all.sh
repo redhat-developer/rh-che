@@ -57,7 +57,9 @@ oc create configmap che \
       --from-literal=che-openshift-secure-routes="false" \
       --from-literal=che-secure-external-urls="false" \
       --from-literal=che-server-timeout-ms="0" \
-      --from-literal=che-openshift-precreate-subpaths="true"
+      --from-literal=che-openshift-precreate-subpaths="true" \
+      --from-literal=keycloak-oso-endpoint="https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" \
+      --from-literal=keycloak-github-endpoint="https://sso.openshift.io/auth/realms/fabric8/broker/github/token"
 
 # Deploy PVs (gofabric8 way)
 #   gofabric8 should be installed:

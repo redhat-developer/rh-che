@@ -47,6 +47,10 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>che-keycloak-plugin-token-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
