@@ -140,6 +140,12 @@
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
+                <groupId>org.eclipse.che</groupId>
+                <artifactId>assembly-wsmaster-war</artifactId>
+                <version>${che.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-servlet-filter-adapter</artifactId>
                 <version>${keycloak.version}</version>
