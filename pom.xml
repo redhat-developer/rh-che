@@ -18,11 +18,11 @@
     </scm>
     <properties>
         <che-fork>eclipse</che-fork>
-        <che-branch>openshift-connector</che-branch>
+        <che-branch>openshift-connector-wip</che-branch>
         <che-dependencies-fork>eclipse</che-dependencies-fork>
         <che-dependencies-branch>openshift-connector</che-dependencies-branch>
         <skipCheckoutIfExists>true</skipCheckoutIfExists>
-        <che.version>5.6.0-openshift-connector-SNAPSHOT</che.version>
+        <che.version>5.11.0-SNAPSHOT</che.version>
         <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
         <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
         <multiThread-option></multiThread-option>
