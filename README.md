@@ -28,7 +28,8 @@ UPSTREAM_CHE_PATH=/path/to/upstream/che
 mvn -DwithoutKeycloak                          `# disable Keycloak support` \
     -Pfast                                     `# skip tests and other verifications` \
     -PmultiThread                              `# enable maven multi threading` \
-    -DlocalCheRepository=${UPSTREAM_CHE_PATH}  `# get already built upstream Che` \
+    -DlocalCheRepository=${UPSTREAM_CHE_PATH}  `# get already built upstream Che local folder` \ 
+    -P '!checkout-base-che'                    `# skip checkout and build upstream Che` \
     clean install
 ```
 
