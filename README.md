@@ -2,11 +2,12 @@
 
 ## Table Of Content
 
-* [How to build the RedHat Che distribution](#how-to-build-the-redhat-che-distribution)
+* [How to build the RedHat Che maven assembly](#how-to-build-the-redhat-che-maven-assembly)
+* [How to build the RedHat Che Docker image](#how-to-build-the-redhat-che-docker-image)
 * [How to build the upstream openshift-connector branch for development purposes](#how-to-build-the-upstream-openshift-connector-branch-for-development-purposes)
 * [How to run Che on OpenShift](#how-to-run-che-on-openshift)
 
-## How to build the RedHat Che distribution
+## How to build the RedHat Che maven assembly
 
 ### TL;DR
 
@@ -31,6 +32,8 @@ mvn -DwithoutKeycloak                          `# disable Keycloak support` \
     -DlocalCheRepository=${UPSTREAM_CHE_PATH}  `# get already built upstream Che` \
     clean install
 ```
+
+Once the build is completed, in order to deploy Che on Openshift, you need to [build a Docker image containing the assembly](#how-to-build-the-upstream-openshift-connector-branch-for-development-purposes)
 
 #### What is the RedHat Che distribution
 
@@ -209,7 +212,41 @@ up-to-date, just use the following options:
 
 ```
 -Dpl=plugins/keycloak-plugin-server -Damd
-```    
+```
+
+## How to build the RedHat Che Docker image
+
+Once you have build the rh-che assembly with maven you will still need to build the Docker image in order to deploy it to OpenShift.
+
+```bash
+export UPSTREAM_CHE_PATH=/path/to/upstream/che
+export RH_CHE_PATH=/path/to/rh-che
+export CHE_IMAGE_REPO=rhche/che-server
+export CHE_IMAGE_TAG=nightly
+
+# Backup upstream assembly
+cd ${UPSTREAM_CHE_PATH}/assembly/assembly-main/target/
+mv eclipse-che-*.tar.gz eclipse-che-*.tar.gz.upstream
+
+# Copy rh che assembly in upstream target folder 
+cd ${RH_CHE_PATH}/target/builds/fabric8/fabric8-che/assembly/assembly-main/target/
+cp eclipse-che-*.tar.gz \
+   ${UPSTREAM_CHE_PATH}/assembly/assembly-main/target/
+
+# Point to minishift docker daemon
+eval $(minishift docker-env)
+
+# Build Che Docker image
+cd ${UPSTREAM_CHE_PATH}/dockerfiles/che
+mv Dockerfile Dockerfile.alpine
+cp Dockerfile.centos Dockerfile
+./build.sh --tag:${CHE_IMAGE_TAG}
+mv Dockerfile.alpine Dockerfile
+docker tag eclipse/che-server:${CHE_IMAGE_TAG} ${CHE_IMAGE_REPO}:${CHE_IMAGE_TAG}
+```
+
+Once the build is complete you can [deploy it on OpenShift](#how-to-run-che-on-openshift)
+
 
 ## How to build the upstream openshift-connector branch for development purposes
 
