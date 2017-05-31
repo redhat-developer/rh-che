@@ -82,6 +82,19 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>dump the place of the upstream che repository (for build and deployment scripts)</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo
+                                    file="${project.build.directory}/upstreamCheRepository.env">export upstreamCheRepository=${baseCheRepository}</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>clean generated sources in upstream assembly-ide-war</id>
                         <phase>prepare-package</phase>
                         <goals>
@@ -587,7 +600,7 @@
         <profile>
             <id>projects</id>
             <properties>
-                <pl-cli-option>-pl ${projects}</pl-cli-option>
+                <pl-cli-option>-pl '${projects}'</pl-cli-option>
             </properties>
             <activation>
                 <property>
@@ -598,7 +611,7 @@
         <profile>
             <id>projects_</id>
             <properties>
-                <pl-cli-option>-pl ${pl}</pl-cli-option>
+                <pl-cli-option>-pl '${pl}'</pl-cli-option>
             </properties>
             <activation>
                 <property>
