@@ -28,7 +28,7 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-if [ $DeveloperBuild != "true" ]
+if [ "$DeveloperBuild" != "true" ]
   then
     mvnche -B -P'!checkout-base-che' -DwithoutDashboard $* install -U
     if [ $? -ne 0 ]; then

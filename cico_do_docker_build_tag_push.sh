@@ -50,7 +50,7 @@ do
   
   docker tag eclipse/che-server:nightly ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
   
-  if [ $DeveloperBuild != "true" ]
+  if [ "$DeveloperBuild" != "true" ]
   then
     docker tag eclipse/che-server:nightly ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
     docker login -u ${DOCKER_HUB_USER} -p $DOCKER_HUB_PASSWORD -e noreply@redhat.com 

@@ -7,7 +7,7 @@
 
 currentDir=`pwd`
 
-if [ $DeveloperBuild != "true" ]
+if [ "$DeveloperBuild" != "true" ]
 then
   cat jenkins-env | grep PASS > inherit-env
   . inherit-env
