@@ -5,7 +5,7 @@ if [ $(minishift status) != "Running" ]; then
   exit 1
 fi
 
-commandDir = $(dirname "$0")
+commandDir=$(dirname "$0")
 
 eval $(minishift docker-env)
 bash ${commandDir}/build_fabric8.sh $*
