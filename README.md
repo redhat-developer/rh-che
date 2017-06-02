@@ -13,7 +13,7 @@ There is a good chance that you want to build rh-che with the dashboard but with
 ```
 git clone https://github.com/redhat-developer/rh-che
 cd rh-che
-dev-scripts/build_fabric8.sh
+dev-scripts/build_fabric8.sh \
     -Pfast            `# skip tests and other verifications` \
     -PmultiThread     `# enable maven multi threading` \
     clean
@@ -24,7 +24,7 @@ you will need to set the `UPSTREAM_CHE_PATH` variable before :
 
 ```
 UPSTREAM_CHE_PATH=/path/to/upstream/che
-dev-scripts/build_fabric8.sh
+dev-scripts/build_fabric8.sh \
     -Pfast                                     `# skip tests and other verifications` \
     -PmultiThread                              `# enable maven multi threading` \
     clean
