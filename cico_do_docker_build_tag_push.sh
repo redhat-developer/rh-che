@@ -29,6 +29,10 @@ do
     ${currentDir}/target/builds/fabric8/fabric8-che/assembly/assembly-main/target/eclipse-che-*-${RH_DIST_SUFFIX}*)
       TAG=${UPSTREAM_TAG}-${RH_DIST_SUFFIX}-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}
+      # File che_image_tag.env will be used by the verification script to
+      # retrieve the image tag to promote to production. That's the only
+      # mechanism we have found to share the tag amongs the two scripts
+      echo 'export CHE_SERVER_DOCKER_IMAGE_TAG='${TAG} >> ~/che_image_tag.env
       ;;
     ${upstreamCheRepoFullPath}/assembly/assembly-main/target/eclipse-che-*)
       TAG=${UPSTREAM_TAG}
@@ -47,43 +51,22 @@ do
   fi
   
   # lets change the tag and push it to the registry
-  
   docker tag eclipse/che-server:nightly ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
+  docker tag eclipse/che-server:nightly ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
   
   if [ "$DeveloperBuild" != "true" ]
   then
-    docker tag eclipse/che-server:nightly ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
     docker login -u ${DOCKER_HUB_USER} -p $DOCKER_HUB_PASSWORD -e noreply@redhat.com 
     
-    # We are not pushing the nightly tag because we don't need it and CI has an issue
-    # when publishing > 1 tag at a time 
-    # docker push ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
-    echo 'export CHE_SERVER_DOCKER_IMAGE_TAG='${TAG} >> ~/che_image_tag.env
+    docker push ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
     docker push ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
     
     if [ "${DOCKER_HUB_USER}" == "${RHCHEBOT_DOCKER_HUB_USER}" ]; then
     # lets also push it to registry.devshift.net
       docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} registry.devshift.net/che/che:${NIGHTLY}
       docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} registry.devshift.net/che/che:${TAG}
-      # We are not pushing the nightly tag because we don't need it and CI has an issue
-      # when publishing > 1 tag at a time 
-      #docker push registry.devshift.net/che/che:${NIGHTLY}
-      if [ ${TAG} == "*-no-dashboard*" ]
-      then
-        # We are not pushing the the no-dashboard tag because CI has an issue
-        # when publishing > 1 tag at a time 
-        continue
-      fi
-
-      if [ ${TAG} == "${UPSTREAM_TAG}" ]
-      then
-        # We are not pushing the the upstream tag because CI has an issue
-        # when publishing > 1 tag at a time 
-        continue
-      fi
-      
+      docker push registry.devshift.net/che/che:${NIGHTLY}
       docker push registry.devshift.net/che/che:${TAG}
-      
     fi
   fi
 done
