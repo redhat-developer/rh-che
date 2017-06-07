@@ -15,8 +15,10 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.redhat.bayesian.agent.BayesianAgent;
 import com.redhat.che.keycloak.server.KeycloakHttpJsonRequestFactory;
-import com.redhat.che.keycloak.token.provider.contoller.KeycloakTokenController;
+import com.redhat.che.keycloak.token.provider.contoller.TokenController;
+import com.redhat.che.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
 
+import org.eclipse.che.security.oauth.OAuthAuthenticator;
 import org.eclipse.che.api.agent.ExecAgent;
 import org.eclipse.che.api.agent.ExecAgentLauncher;
 import org.eclipse.che.api.agent.LSCSharpAgent;
@@ -94,7 +96,7 @@ public class WsMasterModule extends AbstractModule {
         bind(org.eclipse.che.everrest.EverrestDownloadFileResponseFilter.class);
         bind(org.eclipse.che.everrest.ETagResponseFilter.class);
         bind(org.eclipse.che.api.agent.server.AgentRegistryService.class);
-        bind(com.redhat.che.keycloak.token.provider.contoller.KeycloakTokenController.class);
+        bind(com.redhat.che.keycloak.token.provider.contoller.TokenController.class);
 
         bind(org.eclipse.che.security.oauth.OAuthAuthenticatorProvider.class)
                 .to(org.eclipse.che.security.oauth.OAuthAuthenticatorProviderImpl.class);
@@ -161,6 +163,9 @@ public class WsMasterModule extends AbstractModule {
 
         bind(org.eclipse.che.api.environment.server.MachineInstanceProvider.class)
                 .to(org.eclipse.che.plugin.docker.machine.MachineProviderImpl.class);
+
+        Multibinder<OAuthAuthenticator> oAuthAuthenticators = Multibinder.newSetBinder(binder(), OAuthAuthenticator.class);
+        oAuthAuthenticators.addBinding().to(OpenShiftGitHubOAuthAuthenticator.class);
 
         install(new org.eclipse.che.api.core.rest.CoreRestModule());
         install(new org.eclipse.che.api.core.util.FileCleaner.FileCleanerModule());
