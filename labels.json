@@ -1,0 +1,130 @@
+[
+  {
+    "name": "kind/bug",
+    "color": "#fc2929"
+  },
+  {
+    "name": "kind/docs",
+    "color": "#d4c5f9"
+  },
+  {
+    "name": "kind/enhancement",
+    "color": "#84b6eb"
+  },
+  {
+    "name": "kind/epic",
+    "color": "#fbca04"
+  },
+  {
+    "name": "kind/planning",
+    "color": "#333399"
+  },
+  {
+    "name": "kind/question",
+    "color": "#cc317c"
+  },
+  {
+    "name": "kind/task",
+    "color": "#f7c6c7"
+  },
+  {
+    "name": "level/advanced",
+    "color": "#FFC0CB"
+  },
+  {
+    "name": "level/beginner",
+    "color": "#FFEFD5"
+  },
+  {
+    "name": "level/intermediate",
+    "color": "#FFDAB9"
+  },
+  {
+    "name": "roadmap/next-QTR",
+    "color": "#cc6600"
+  },
+  {
+    "name": "roadmap/this-QTR",
+    "color": "#ff9900"
+  },
+  {
+    "name": "severity/blocker",
+    "color": "#000000"
+  },
+  {
+    "name": "severity/P1",
+    "color": "#666666"
+  },
+  {
+    "name": "severity/P2",
+    "color": "#cccccc"
+  },
+  {
+    "name": "sprint/current-sprint",
+    "color": "#FFFFFF"
+  },
+  {
+    "name": "sprint/next-sprint",
+    "color": "#0052cc"
+  },
+  {
+    "name": "status/analyzing",
+    "color": "#bfdadc"
+  },
+  {
+    "name": "status/blocked",
+    "color": "#FF8C00"
+  },
+  {
+    "name": "status/code-review",
+    "color": "#0052cc"
+  },
+  {
+    "name": "status/in-progress",
+    "color": "#bfe5bf"
+  },
+  {
+    "name": "status/info-needed",
+    "color": "#505050"
+  },
+  {
+    "name": "status/open-for-dev",
+    "color": "#159818"
+  },
+  {
+    "name": "status/pending-merge",
+    "color": "#f7c6c7"
+  },
+  {
+    "name": "target/branch",
+    "color": "#0e8a16"
+  },
+  {
+    "name": "team/enterprise",
+    "color": "#fef2c0"
+  },
+  {
+    "name": "team/ide",
+    "color": "#f9d0c4"
+  },
+  {
+    "name": "team/platform",
+    "color": "#c5def5"
+  },
+  {
+    "name": "team/plugin",
+    "color": "#c2e0c6"
+  },
+  {
+    "name": "team/pm",
+    "color": "#d4c5f9"
+  },
+  {
+    "name": "team/production",
+    "color": "#bfdadc"
+  },
+  {
+    "name": "team/support",
+    "color": "#ffd27f"
+  }
+]
