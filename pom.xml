@@ -22,7 +22,7 @@
         <che-dependencies-fork>eclipse</che-dependencies-fork>
         <che-dependencies-branch>master</che-dependencies-branch>
         <skipCheckoutIfExists>true</skipCheckoutIfExists>
-        <che.version>5.12.0-SNAPSHOT</che.version>
+        <che.version>5.13.0-SNAPSHOT</che.version>
         <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>
         <redhat.che.version.suffix>fabric8</redhat.che.version.suffix>
         <multiThread-option></multiThread-option>
