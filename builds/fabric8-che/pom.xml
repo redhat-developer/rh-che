@@ -48,12 +48,6 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>che-nosvn-plugin-ide</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
                 <artifactId>che-plugin-bayesian-lang-server</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>

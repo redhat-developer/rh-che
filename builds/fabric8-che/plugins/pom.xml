@@ -20,7 +20,6 @@
         <module>keycloak-plugin-server</module>
         <module>keycloak-plugin-ide</module>
         <module>keycloak-plugin-token-provider</module>
-        <module>nosvn-plugin-ide</module>
         <module>ls-bayesian-agent</module>
         <module>che-plugin-bayesian-lang-server</module>
     </modules>
