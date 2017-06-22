@@ -1,11 +1,25 @@
 #!/bin/bash
 set -e
 
-DEFAULT_CHE_IMAGE_REPO=rhche/che-server
-DEFAULT_CHE_IMAGE_TAG=nightly
+commandDir=$(dirname "$0")
+source ${commandDir}/../config
+source ${commandDir}/env-for-minishift
+
+DEFAULT_CHE_IMAGE_REPO=${RH_CHE_DOCKER_HUB_NAMESPACE}/che-server
+DEFAULT_CHE_IMAGE_TAG=nightly-fabric8
 
 CHE_IMAGE_REPO=${CHE_IMAGE_REPO:-${DEFAULT_CHE_IMAGE_REPO}}
 CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
+
+echo "!"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "!"
+echo "! Deploying docker image:"
+echo "!     ${CHE_IMAGE_REPO}:${CHE_IMAGE_TAG}"
+echo "! to Minishift"
+echo "!"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo ""
 
 CHE_IMAGE_REPO=$(echo $CHE_IMAGE_REPO | sed 's/\//\\\//g')
 

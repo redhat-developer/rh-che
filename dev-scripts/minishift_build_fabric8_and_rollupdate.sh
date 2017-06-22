@@ -7,12 +7,11 @@ fi
 
 commandDir=$(dirname "$0")
 
-eval $(minishift docker-env)
+source ${commandDir}/env-for-minishift
 bash ${commandDir}/build_fabric8.sh $*
 if [ $? -ne 0 ]; then
   echo 'Build Failed!'
   exit 1
 fi
 
-source ${commandDir}/setenv-for-deploy.sh
-oc rollout latest che -n eclipse-che
+oc rollout latest che -n ${CHE_OPENSHIFT_PROJECT}

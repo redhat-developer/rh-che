@@ -7,17 +7,9 @@ fi
 
 commandDir=$(dirname "$0")
 
-eval $(minishift docker-env)
-bash ${commandDir}/build_fabric8.sh $*
-if [ $? -ne 0 ]; then
-  echo 'Build Failed!'
-  exit 1
-fi
-
 source ${commandDir}/../config
+source ${commandDir}/env-for-minishift
 export CHE_IMAGE_REPO=${DOCKER_HUB_NAMESPACE}/che-server
-
-set -x
 
 if [[ "$@" =~ "-DwithoutDashboard" ]]; then
   export CHE_IMAGE_TAG=nightly-${RH_DIST_SUFFIX}-no-dashboard
@@ -25,8 +17,11 @@ else
   export CHE_IMAGE_TAG=nightly-${RH_DIST_SUFFIX}
 fi
 
-set +x
+bash ${commandDir}/build_fabric8.sh $*
+if [ $? -ne 0 ]; then
+  echo 'Build Failed!'
+  exit 1
+fi
 
-source ${commandDir}/setenv-for-deploy.sh
-bash ${commandDir}/delete-all.sh
-bash ${commandDir}/create-all.sh
+bash ${commandDir}/minishift_clean.sh
+bash ${commandDir}/minishift_deploy.sh

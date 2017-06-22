@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-if [ -z ${OPENSHIFT_USERNAME+x} ]; then echo "Env var OPENSHIFT_USERNAME is unset. Aborting"; exit 1; fi
-if [ -z ${OPENSHIFT_PASSWORD+x} ]; then echo "Env var OPENSHIFT_PASSWORD is unset. Aborting"; exit 1; fi
-if [ -z ${CHE_OPENSHIFT_PROJECT+x} ]; then echo "Env var CHE_OPENSHIFT_PROJECT is unset. Aborting"; exit 1; fi
 
 # TODO Check minishift is running
+
+commandDir=$(dirname "$0")
+source ${commandDir}/env-for-minishift
 
 oc login ${OPENSHIFT_ENDPOINT} -u ${OPENSHIFT_USERNAME} -p ${OPENSHIFT_PASSWORD} -n ${CHE_OPENSHIFT_PROJECT} > /dev/null
 echo "# Deleting route..."

@@ -2,7 +2,7 @@
 
 export DeveloperBuild="true"
 
-currentDir = `pwd`
+currentDir=$(pwd)
 
 cd $(dirname "$0")/..
 
