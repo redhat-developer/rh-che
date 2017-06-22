@@ -57,9 +57,9 @@ oc create configmap che \
       --from-literal=workspace-storage-create-folders="false" \
       --from-literal=local-conf-dir="/etc/conf" \
       --from-literal=openshift-serviceaccountname="che" \
-      --from-literal=che-server-evaluation-strategy="single-port" \
+      --from-literal=che-server-evaluation-strategy="docker-local-custom" \
       --from-literal=che.docker.server_evaluation_strategy.custom.template="<serverName>-<if(isDevMachine)><workspaceIdWithoutPrefix><else><machineName><endif>-<externalAddress>" \
-      --from-literal=che.docker.server_evaluation_strategy.custom.external.protocol="https" \
+      --from-literal=che.docker.server_evaluation_strategy.custom.external.protocol="http" \
       --from-literal=che.predefined.stacks.reload_on_start="true" \
       --from-literal=log-level=${CHE_LOG_LEVEL} \
       --from-literal=docker-connector="openshift" \
