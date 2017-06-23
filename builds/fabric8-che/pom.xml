@@ -10,7 +10,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>@che.version@</version>
+        <version>5.13.0-SNAPSHOT</version>
         <relativePath>@baseCheRepository@</relativePath>
     </parent>
     <groupId>com.redhat.che</groupId>
@@ -197,6 +197,14 @@
                 </executions>
             </plugin>
             <plugin>
+              <groupId>com.google.code.sortpom</groupId>
+              <artifactId>maven-sortpom-plugin</artifactId>
+              <inherited>false</inherited>
+              <configuration>
+                <sortProperties>false</sortProperties>
+              </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -248,8 +256,82 @@
                             <excludeDefaultDirectories>true</excludeDefaultDirectories>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>expected-versions</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <inherited>false</inherited>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>project.parent.version</property>
+                                            <regex>${che.version}</regex>
+                                            <message>The version of the
+                                                parent pom (${project.parent.version}) is not
+                                                the same as the one specified by
+                                                the 'che.version' property
+                                                (${che.version}) that is defined
+                                                in the Git repository root build ('rh-che/pom.xml')</message>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>startedDirectly</id>
+            <activation>
+                <property>
+                    <name>startedByInvoker</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>alwaysFail</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>startedByInvoker</property>
+                                            <regex>true</regex>
+                                            <message>The build should always be run from the root of the Git repository
+                                                ('rh-che/pom.xml'). See the Readme for more details.</message>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <!--  These 2 properties are used for the m2e intregration 
+                      and should be consistent with the 'che.version' property
+                      defined in the defined in the root build ('fabric8-ide-builder/pom.xml') -->
+                <che.version.prefix>5.13.0</che.version.prefix>
+                <che.version.suffix>-SNAPSHOT</che.version.suffix>
+
+                <che.version>${che.version.prefix}${che.version.suffix}</che.version>
+                <redhat.che.version>${che.version.prefix}-fabric8${che.version.suffix}</redhat.che.version>
+            </properties>
         </profile>
     </profiles>
 </project>

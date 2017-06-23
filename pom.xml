@@ -78,6 +78,8 @@
                                     rebuilding without the clean option. -->
                                 <delete
                                     dir="${project.build.directory}/builds/${redhat-version-qualifier}/fabric8-che/assembly/assembly-ide-war/target/generated-sources" />
+                                <delete
+                                    dir="${basedir}/builds/fabric8-che/assembly/assembly-ide-war/target/generated-sources" />
                             </target>
                         </configuration>
                     </execution>
