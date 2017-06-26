@@ -35,8 +35,8 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
 
     private static final String LANGUAGE_ID = "bayesian";
     private static final String[] EXTENSIONS = new String[] {};
-    private static final String[] PATTERNS = new String[] { "package\\.json", "pom\\.xml" };
-    private static final String[] MIME_TYPES = new String[] { "application/json", "text/xml" };
+    private static final String[] PATTERNS = new String[] { "package\\.json", "pom\\.xml", "requirements\\.txt" };
+    private static final String[] MIME_TYPES = new String[] { "application/json", "text/xml", "text/plain" };
     private static final LanguageDescriptionImpl description;
 
     private final Path launchScript;
