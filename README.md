@@ -364,3 +364,4 @@ up-to-date, just use the following options:
 ```
 -Dpl=plugins/keycloak-plugin-server -Damd
 ```
+
