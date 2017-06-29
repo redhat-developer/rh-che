@@ -15,14 +15,22 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         String auth = request.getHeader("Authorization");
-        if(auth == null ){
+        String uri = request.getRequestURI();
+
+        if (uri.endsWith("/api/system/state")) {
+            System.out.println("Che server status endpoint should not be secured: " + uri);
+            chain.doFilter(req, res);
+        }
+
+        if (auth == null) {
             System.out.println("No auth header for " + request.getRequestURI());
         }
-        if(auth != null && auth.equals("Internal")){
+
+        if (auth != null && auth.equals("Internal")) {
             chain.doFilter(req, res);
-        } else if (request.getRequestURI().endsWith("/ws") || request.getRequestURI().endsWith("/eventbus")
-                   || request.getScheme().equals("ws") || req.getScheme().equals("wss") || request.getRequestURI().contains("/websocket/")) {
-            System.out.println("Skipping " + request.getRequestURI());
+        } else if (uri.endsWith("/ws") || uri.endsWith("/eventbus") || request.getScheme().equals("ws")
+                || req.getScheme().equals("wss") || uri.contains("/websocket/")) {
+            System.out.println("Skipping " + uri);
             chain.doFilter(req, res);
         } else {
             super.doFilter(req, res, chain);
