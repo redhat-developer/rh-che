@@ -60,6 +60,7 @@ oc create configmap che \
       --from-literal=che-server-evaluation-strategy="single-port" \
       --from-literal=che.docker.server_evaluation_strategy.custom.template="<serverName>-<if(isDevMachine)><workspaceIdWithoutPrefix><else><machineName><endif>-<externalAddress>" \
       --from-literal=che.docker.server_evaluation_strategy.custom.external.protocol="https" \
+      --from-literal=che.predefined.stacks.reload_on_start="true" \
       --from-literal=log-level=${CHE_LOG_LEVEL} \
       --from-literal=docker-connector="openshift" \
       --from-literal=port="8080" \
