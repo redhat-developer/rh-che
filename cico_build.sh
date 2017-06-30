@@ -9,8 +9,10 @@ currentDir=`pwd`
 
 if [ "$DeveloperBuild" != "true" ]
 then
+  set +x
   cat jenkins-env | grep PASS > inherit-env
   . inherit-env
+  set -x
   yum -y update
   yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker subversion
   yum -y install rh-maven33 rh-nodejs4
