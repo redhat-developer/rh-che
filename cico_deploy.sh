@@ -16,7 +16,7 @@ echo "export CHE_SERVER_DOCKER_IMAGE_TAG=$CHE_SERVER_DOCKER_IMAGE_TAG" >> $confi
 echo "export DOCKER_HUB_NAMESPACE=${DOCKER_HUB_NAMESPACE}" >> $config_file
 
 # Triggers update of tenant and execution of functional tests
-git clone git@github.com:redhat-developer/che-functional-tests.git
+git clone https://github.com/redhat-developer/che-functional-tests.git
 mv $config_file che-functional-tests/config
 cp jenkins-env che-functional-tests/jenkins-env
 cd che-functional-tests
