@@ -4,6 +4,7 @@ set +e
 
 # Prepare config files
 # CHE_SERVER_DOCKER_IMAGE_TAG has to be set in che_image_tag.env file
+. config
 . ~/che_image_tag.env
 config_file=~/tests_config
 echo "export OSO_MASTER_URL=https://api.starter-us-east-2.openshift.com:443" >> $config_file
