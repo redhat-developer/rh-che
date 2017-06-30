@@ -10,7 +10,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>5.13.0-SNAPSHOT</version>
+        <version>5.15.0-SNAPSHOT</version>
         <relativePath>@baseCheRepository@</relativePath>
     </parent>
     <groupId>com.redhat.che</groupId>
