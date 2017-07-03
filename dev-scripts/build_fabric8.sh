@@ -48,7 +48,7 @@ else
     additionalArgument="-DwithoutKeycloak -DlocalCheRepository=${UPSTREAM_CHE_PATH}"
 fi
 
-bash cico_build.sh $* $additionalArgument
+bash cico_build.sh $additionalArgument $*
 if [ $? -ne 0 ]; then
   echo 'Build Failed!'
   cd ${currentDir}
