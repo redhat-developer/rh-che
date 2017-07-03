@@ -326,7 +326,7 @@
                 <!--  These 2 properties are used for the m2e intregration 
                       and should be consistent with the 'che.version' property
                       defined in the defined in the root build ('fabric8-ide-builder/pom.xml') -->
-                <che.version.prefix>5.13.0</che.version.prefix>
+                <che.version.prefix>5.15.0</che.version.prefix>
                 <che.version.suffix>-SNAPSHOT</che.version.suffix>
 
                 <che.version>${che.version.prefix}${che.version.suffix}</che.version>
