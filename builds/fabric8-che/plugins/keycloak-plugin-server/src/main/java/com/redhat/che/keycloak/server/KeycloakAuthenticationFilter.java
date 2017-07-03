@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2017 Red Hat inc.
+
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Red Hat - Initial Contribution
+ *******************************************************************************/
 package com.redhat.che.keycloak.server;
 
 import java.io.IOException;
@@ -9,33 +20,50 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.KeycloakOIDCFilter {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
-        String auth = request.getHeader("Authorization");
-        String uri = request.getRequestURI();
+        String authHeader = request.getHeader("Authorization");
+        String requestURI = request.getRequestURI();
+        String requestScheme = req.getScheme();
 
-        if (uri.endsWith("/api/system/state")) {
-            System.out.println("Che server status endpoint should not be secured: " + uri);
-            chain.doFilter(req, res);
+        if (authHeader == null) {
+            LOG.debug("No 'Authorization' header for {}", requestURI);
         }
 
-        if (auth == null) {
-            System.out.println("No auth header for " + request.getRequestURI());
-        }
-
-        if (auth != null && auth.equals("Internal")) {
-            chain.doFilter(req, res);
-        } else if (uri.endsWith("/ws") || uri.endsWith("/eventbus") || request.getScheme().equals("ws")
-                || req.getScheme().equals("wss") || uri.contains("/websocket/")) {
-            System.out.println("Skipping " + uri);
+        if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme)
+                || isInternalRequest(authHeader)) {
+            LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
         } else {
             super.doFilter(req, res, chain);
-            System.out.println(request.getRequestURL() + " status : " + ((HttpServletResponse) res).getStatus());
+            LOG.debug("{} status : {}", request.getRequestURL(), ((HttpServletResponse) res).getStatus());
         }
+    }
+
+    /**
+     * @param requestURI
+     * @return true if request is made against system state endpoint which is
+     *         used in OpenShift liveness & readiness probes, false otherwise
+     */
+    private boolean isSystemStateRequest(String requestURI) {
+        return requestURI.endsWith("/api/system/state");
+    }
+
+    private boolean isInternalRequest(String authHeader) {
+        return "Internal".equals(authHeader);
+    }
+
+    private boolean isWebsocketRequest(String requestURI, String requestScheme) {
+        return requestURI.endsWith("/ws") || requestURI.endsWith("/eventbus") || requestScheme.equals("ws")
+                || requestScheme.equals("wss") || requestURI.contains("/websocket/");
     }
 
 }
