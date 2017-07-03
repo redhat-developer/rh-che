@@ -42,11 +42,21 @@
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-wsmaster-war</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.che.core</groupId>
+                    <artifactId>che-core-ide-stacks</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-catalina</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -100,20 +110,20 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <overlays>
-                                <overlay>
-                                    <groupId>org.eclipse.che</groupId>
-                                    <artifactId>assembly-wsmaster-war</artifactId>
-                                    <type>war</type>
-                                </overlay>
-                            </overlays>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-wsmaster-war</artifactId>
+                            <type>war</type>
+                            <excludes>
+                                <exclude>WEB-INF/lib/che-core-ide-stacks-${che.version}.jar</exclude>
+                                <exclude>WEB-INF/classes/che-in-che.json</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
+                </configuration>
+           </plugin>
         </plugins>
     </build>
 </project>
