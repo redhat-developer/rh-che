@@ -13,12 +13,13 @@ package org.eclipse.che.plugin.languageserver.bayesian;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.eclipse.che.api.languageserver.launcher.LanguageServerLauncher;
+import org.eclipse.che.api.languageserver.shared.model.LanguageDescription;
 import org.eclipse.che.inject.DynaModule;
 import org.eclipse.che.plugin.languageserver.bayesian.server.launcher.BayesianLanguageServerLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import static java.util.Arrays.asList;
 
 /**
  * 'Test' Language Server Module
@@ -26,12 +27,21 @@ import org.slf4j.LoggerFactory;
 @DynaModule
 public class BayesianLanguageServerModule extends AbstractModule {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(BayesianLanguageServerModule.class);
-	
+    private final static Logger  LOGGER      = LoggerFactory.getLogger(BayesianLanguageServerModule.class);
+
+    public static final String   LANGUAGE_ID = "bayesian";
+
+    public static final String[] FILE_NAMES  = new String[]{"package\\.json", "pom\\.xml", "requirements\\.txt"};
+
 	@Override
 	protected void configure() {
 		LOGGER.info("Configuring " + this.getClass().getName());
 		Multibinder.newSetBinder(binder(), LanguageServerLauncher.class).addBinding()
 				.to(BayesianLanguageServerLauncher.class);
-	}
+        LanguageDescription description = new LanguageDescription();
+        description.setFileNames(asList(FILE_NAMES));
+        description.setLanguageId(LANGUAGE_ID);
+        description.setMimeType("text/bayesian");
+        Multibinder.newSetBinder(binder(), LanguageDescription.class).addBinding().toInstance(description);
+    }
 }
