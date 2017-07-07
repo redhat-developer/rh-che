@@ -99,7 +99,11 @@ public class KeycloakTokenProvider {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode token = json.get(ACCESS_TOKEN);
-        return token.asText();
+        if (token != null) {
+            return token.asText();
+        } else {
+            return null;
+        }
     }
 
     private String getResponseBody(final String endpoint, final String keycloakToken) throws ServerException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException, BadRequestException, IOException {

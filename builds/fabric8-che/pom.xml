@@ -94,10 +94,16 @@
                 <version>${redhat.che.version}</version>
                 <type>jar</type>
             </dependency>
-           <dependency>
+            <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>user-auth-valve</artifactId>
+                <version>@redhat.che.version@</version>
                 <type>jar</type>
             </dependency>
             <dependency>
@@ -148,6 +154,11 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-servlet-filter-adapter</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-tomcat8-adapter</artifactId>
                 <version>${keycloak.version}</version>
             </dependency>
             <dependency>

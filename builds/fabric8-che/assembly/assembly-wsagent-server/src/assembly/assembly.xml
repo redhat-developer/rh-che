@@ -37,5 +37,9 @@
                 <exclude>**/webapps/ROOT.war</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/keycloak/</directory>
+            <outputDirectory>lib</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>

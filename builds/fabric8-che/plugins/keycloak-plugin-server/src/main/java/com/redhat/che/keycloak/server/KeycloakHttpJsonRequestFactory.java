@@ -28,13 +28,11 @@ public class KeycloakHttpJsonRequestFactory extends DefaultHttpJsonRequestFactor
 
     @Override
     public HttpJsonRequest fromUrl(@NotNull String url) {
-        System.out.println(" setAuthorizationHeader for " + url);
         return super.fromUrl(url).setAuthorizationHeader("Internal");
     }
 
     @Override
     public HttpJsonRequest fromLink(@NotNull Link link) {
-        System.out.println(" setAuthorizationHeader for " + link);       
         return super.fromLink(link).setAuthorizationHeader("Internal");
     }
 

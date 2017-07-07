@@ -27,6 +27,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
     
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
 
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
@@ -42,9 +43,13 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
                 || isInternalRequest(authHeader)) {
             LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
-        } else {
+        } else if (KeycloakUserChecker.matchesUsername(authHeader)) {
             super.doFilter(req, res, chain);
             LOG.debug("{} status : {}", request.getRequestURL(), ((HttpServletResponse) res).getStatus());
+        } else {
+            HttpServletResponse response = (HttpServletResponse) res;
+            response.sendError(403);
+            return;
         }
     }
 
@@ -63,7 +68,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
 
     private boolean isWebsocketRequest(String requestURI, String requestScheme) {
         return requestURI.endsWith("/ws") || requestURI.endsWith("/eventbus") || requestScheme.equals("ws")
-                || requestScheme.equals("wss") || requestURI.contains("/websocket/");
+                || requestScheme.equals("wss") || requestURI.contains("/websocket/")
+                || requestURI.endsWith("/token/user");
     }
-
 }

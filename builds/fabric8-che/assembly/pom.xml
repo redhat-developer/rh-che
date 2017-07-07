@@ -24,6 +24,7 @@
         <module>assembly-ide-war</module>
         <module>assembly-wsmaster-war</module>
         <module>assembly-main</module>
+        <module>user-auth-valve</module>
     </modules>
     <build>
         <pluginManagement>

@@ -38,6 +38,7 @@ import org.eclipse.che.security.oauth.OAuthAuthenticatorProvider;
 import com.redhat.che.keycloak.token.provider.exception.KeycloakException;
 import com.redhat.che.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
 import com.redhat.che.keycloak.token.provider.service.KeycloakTokenProvider;
+import com.redhat.che.keycloak.token.provider.util.KeycloakUserValidator;
 import com.redhat.che.keycloak.token.provider.validator.KeycloakTokenValidator;
 
 @Path("/token")
@@ -50,6 +51,9 @@ public class TokenController {
 
     @Inject
     private KeycloakTokenValidator validator;
+
+    @Inject
+    private KeycloakUserValidator userValidator;
 
     @Inject
     protected OAuthAuthenticatorProvider providers;
@@ -105,10 +109,20 @@ public class TokenController {
         try {
             validator.validate(keycloakToken);
             token = tokenProvider.obtainOsoToken(keycloakToken);
-        } catch (KeycloakException e) {
+        } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
         return Response.ok(token).build();
+    }
+
+    @GET
+    @Path("/user")
+    public Response getUserMatches(@HeaderParam(HttpHeaders.AUTHORIZATION) String keycloakToken) {
+        if (userValidator.matchesUsername(keycloakToken)) {
+            return Response.ok("true").build();
+        } else {
+            return Response.ok("false").build();
+        }
     }
 
 }

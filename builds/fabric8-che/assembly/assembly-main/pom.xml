@@ -33,9 +33,13 @@
             <type>war</type>
         </dependency>
         <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-stacks</artifactId>
-                <type>jar</type>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-stacks</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>user-auth-valve</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -96,6 +100,24 @@
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>package-user-auth-valve</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.redhat.che</groupId>
+                                    <artifactId>user-auth-valve</artifactId>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
+                                    <type>jar</type>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

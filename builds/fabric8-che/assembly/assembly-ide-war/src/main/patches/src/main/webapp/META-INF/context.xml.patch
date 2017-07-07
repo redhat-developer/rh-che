@@ -4,5 +4,5 @@
  -->
  <Context allowCasualMultipartParsing="true">
      <Valve className="org.apache.catalina.valves.rewrite.RewriteValve"/>
-+    <Valve className="org.keycloak.adapters.tomcat.KeycloakAuthenticatorValve"/>
++    <Valve className="com.redhat.che.valve.UserAuthValve"/>
  </Context>
