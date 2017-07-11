@@ -19,6 +19,10 @@ import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.commons.lang.Pair;
 import org.eclipse.che.inject.DynaModule;
 
+import com.google.inject.name.Names;
+import java.net.URI;
+import com.redhat.che.keycloak.server.KeycloakPropertiesProvider;
+import org.eclipse.che.UriApiEndpointProvider;
 
 import javax.inject.Named;
 
@@ -46,8 +50,8 @@ public class WsAgentModule extends AbstractModule {
         install(new org.eclipse.che.api.core.jsonrpc.impl.JsonRpcModule());
         install(new org.eclipse.che.api.core.websocket.impl.WebSocketModule());
 
+        bind(Boolean.class).annotatedWith(Names.named("che.keycloak.disabled")).toProvider(KeycloakPropertiesProvider.class);
         bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
-
     }
 
     //it's need for WSocketEventBusClient and in the future will be replaced with the property

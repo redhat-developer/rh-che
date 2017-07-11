@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.ConflictException;
 import org.eclipse.che.api.core.ForbiddenException;
@@ -29,22 +32,26 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+@Singleton
 public class KeycloakUserChecker {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakUserChecker.class);
     private static final String ENDPOINT = "http://che-host:8080/api/token/user";
 
+    @Inject
+    private KeycloakHttpJsonRequestFactory requestFactory;
+    
     /**
      * Cache that stores mappings from user to authorization status.
      */
-    private static LoadingCache<String, Boolean> cache = CacheBuilder.newBuilder()
+    private LoadingCache<String, Boolean> cache = CacheBuilder.newBuilder()
             .maximumSize(100)
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build(new CacheLoader<String, Boolean>() {
                 @Override
                 public Boolean load(String auth) throws Exception {
                     try {
-                        String response = new KeycloakHttpJsonRequestFactory().fromUrl(ENDPOINT)
+                        String response = requestFactory.fromUrl(ENDPOINT)
                                                                               .useGetMethod()
                                                                               .setAuthorizationHeader(auth)
                                                                               .request().asString();
@@ -63,7 +70,7 @@ public class KeycloakUserChecker {
      * @param auth the keycloak token
      * @return true if keycloak token is assigned to owner of namespace, false otherwise.
      */
-    public static boolean matchesUsername(String auth) {
+    public boolean matchesUsername(String auth) {
         if (auth == null) {
             return false;
         }

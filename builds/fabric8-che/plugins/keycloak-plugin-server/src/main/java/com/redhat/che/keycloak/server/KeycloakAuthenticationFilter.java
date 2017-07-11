@@ -13,6 +13,8 @@ package com.redhat.che.keycloak.server;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -27,9 +29,27 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
     
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
 
+    private boolean keycloakDisabled;
+
+    @Inject
+    private KeycloakUserChecker userChecker;
+    
+    @Inject
+    public KeycloakAuthenticationFilter(@Named("che.keycloak.disabled") boolean keycloakDisabled) {
+        this.keycloakDisabled = keycloakDisabled;
+        if (keycloakDisabled) {
+            LOG.info("Keycloak is disabled");
+        }
+    }
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
+        if (keycloakDisabled) {
+            chain.doFilter(req, res);
+            return;
+        }
+        
         HttpServletRequest request = (HttpServletRequest) req;
         String authHeader = request.getHeader("Authorization");
         String requestURI = request.getRequestURI();
@@ -40,10 +60,11 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         }
 
         if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme)
-                || isInternalRequest(authHeader)) {
+                || isInternalRequest(authHeader)
+                || request.getRequestURI().endsWith("/keycloak/settings")) {
             LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
-        } else if (KeycloakUserChecker.matchesUsername(authHeader)) {
+        } else if (userChecker.matchesUsername(authHeader)) {
             super.doFilter(req, res, chain);
             LOG.debug("{} status : {}", request.getRequestURL(), ((HttpServletResponse) res).getStatus());
         } else {

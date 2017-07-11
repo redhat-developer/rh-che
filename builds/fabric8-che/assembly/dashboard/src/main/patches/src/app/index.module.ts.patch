@@ -1,6 +1,6 @@
 --- src/app/index.module.ts
 +++ src/app/index.module.ts
-@@ -31,13 +31,36 @@ import {ProxySettingsConfig} from './proxy/proxy-settings.constant';
+@@ -31,13 +31,59 @@
  import {WorkspacesConfig} from './workspaces/workspaces-config';
  import {StacksConfig} from './stacks/stacks-config';
  import {DemoComponentsCtrl} from './demo-components/demo-components.controller';
@@ -17,27 +17,50 @@
    'angular-websocket', 'ui.bootstrap', 'ui.codemirror', 'ngMaterial', 'ngMessages', 'angularMoment', 'angular.filter',
    'ngDropdowns', 'ngLodash', 'angularCharts', 'ngClipboard', 'uuid4', 'angularFileUpload']);
  
-+angular.element(document).ready(() => {
++angular.element(document).ready(($injector) => {
++
++  let promise = $injector.get('../wsmaster/api/keycloak/settings');
++
++  function keycloakInit(keycloakDisabled) {
++      if (keycloakDisabled) {
++        window['_keycloak'] = false;
++        angular.bootstrap(document, ['userDashboard'], {strictDi:true}); // manually bootstrap Angular
++      } else {
++        window['_keycloak'] = Keycloak(keycloakConfig);
++        window['_keycloak']
++          .init({
++            onLoad: 'login-required'
++          })
++          .success(() => {
++            angular.bootstrap(document, ['userDashboard'], {strictDi:true}); // manually bootstrap Angular
++          });
++      }
++    
++  }
++
++  promise.then((resp) => {
++    console.log('resp : ' + resp.toString() );
++    if (resp['che.keycloak.disabled'] == 'true') {
++      keycloakInit(true);
++    } else {
++      keycloakInit(false);
++    }
++  }, (error) => {
++    console.log(error);
++    keycloakInit(false);
++  });
++  
 +  console.log('running keycloak init sequence');
 +
-+  window['_keycloak'] = Keycloak(keycloakConfig);
-+
-+  window['_keycloak']
-+    .init({
-+      onLoad: 'login-required'
-+    })
-+    .success(() => {
-+      angular.bootstrap(document, ['userDashboard'], {strictDi:true}); // manually bootstrap Angular
-+    });
 +});
 +
 +initModule.factory('keycloak', $window => {
-+  return $window._keycloak;
++    return $window._keycloak;
 +});
  
  // add a global resolve flag on all routes (user needs to be resolved first)
  initModule.config(['$routeProvider', ($routeProvider) => {
-@@ -165,6 +188,42 @@ initModule.run(['$rootScope', '$location', '$routeParams', 'routingRedirect', '$
+@@ -168,6 +214,44 @@
      });
    }]);
  
@@ -54,7 +77,7 @@
 +        let deferred = $q.defer();
 +        keycloak.updateToken(5).success(function () {
 +          config.headers = config.headers || {};
-+          config.headers.Authorization = 'Bearer ' + keycloak.token;
++          angular.extend(config.headers, {'Authorization': 'Bearer ' + keycloak.token});
 +          console.log('injecting token : ' + config.url);
 +          deferred.resolve(config);
 +        }).error(function () {
@@ -68,19 +91,21 @@
 +    response: (response) => {
 +      console.log('RESPONSE '+response.config.url+ ' :' + JSON.stringify(response));
 +      return response || $q.when(response);
-+    },responseError: (rejection)=>{
++    },
++    responseError: (rejection)=>{
 +        console.log('ERROR (response) : '+ JSON.stringify(rejection));
++        return $q.reject(rejection);
 +    },
 +    requestError: (rejection) =>{
-+       console.log('ERROR (request) : '+ JSON.stringify(rejection))
++       console.log('ERROR (request) : '+ JSON.stringify(rejection));
++       return $q.reject(rejection);
 +    }
-+
 +  }
 +});
  
  // add interceptors
  initModule.factory('ETagInterceptor', ($window, $cookies, $q) => {
-@@ -355,6 +414,7 @@ initModule.constant('userDashboardConfig', {
+@@ -358,6 +442,7 @@
  });
  
  initModule.config(['$routeProvider', '$locationProvider', '$httpProvider', ($routeProvider, $locationProvider, $httpProvider) => {

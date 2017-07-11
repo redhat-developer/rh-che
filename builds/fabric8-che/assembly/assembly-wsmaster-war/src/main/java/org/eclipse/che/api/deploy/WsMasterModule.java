@@ -234,5 +234,6 @@ public class WsMasterModule extends AbstractModule {
 
         Multibinder<OAuthAuthenticator> oAuthAuthenticators = Multibinder.newSetBinder(binder(), OAuthAuthenticator.class);
         oAuthAuthenticators.addBinding().to(OpenShiftGitHubOAuthAuthenticator.class);
+        bind(com.redhat.che.keycloak.server.KeycloakService.class);
     }
 }
