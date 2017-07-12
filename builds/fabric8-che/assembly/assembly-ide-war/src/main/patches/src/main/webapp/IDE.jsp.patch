@@ -16,7 +16,7 @@
 +              realm: 'fabric8',
 +              clientId: 'openshiftio-public',
 +            });
-+            window.keycloak.init({ onLoad: 'check-sso', checkLoginIframe: false, }).success(function(authenticated) {
++            window.keycloak.init({ onLoad: 'check-sso', checkLoginIframe: false, responseMode: 'query' }).success(function(authenticated) {
 +               console.log('IDE.jsp authenticated with token:'+ window.keycloak.token);
 +            }).error(function() {
 +               console.log('failed to initialize');
