@@ -29,9 +29,9 @@ public class BayesianLanguageServerModule extends AbstractModule {
 
     private final static Logger  LOGGER      = LoggerFactory.getLogger(BayesianLanguageServerModule.class);
 
-    public static final String   LANGUAGE_ID = "bayesian";
+    public static final String   TXT_LANGUAGE_ID = "text";
 
-    public static final String[] FILE_NAMES  = new String[]{"package\\.json", "pom\\.xml", "requirements\\.txt"};
+    public static final String[] FILE_EXTENSIONS  = new String[]{"txt"};
 
 	@Override
 	protected void configure() {
@@ -39,9 +39,9 @@ public class BayesianLanguageServerModule extends AbstractModule {
 		Multibinder.newSetBinder(binder(), LanguageServerLauncher.class).addBinding()
 				.to(BayesianLanguageServerLauncher.class);
         LanguageDescription description = new LanguageDescription();
-        description.setFileNames(asList(FILE_NAMES));
-        description.setLanguageId(LANGUAGE_ID);
-        description.setMimeType("text/bayesian");
+        description.setFileExtensions(asList(FILE_EXTENSIONS));
+        description.setLanguageId(TXT_LANGUAGE_ID);
+        description.setMimeType("text/plain");
         Multibinder.newSetBinder(binder(), LanguageDescription.class).addBinding().toInstance(description);
     }
 }
