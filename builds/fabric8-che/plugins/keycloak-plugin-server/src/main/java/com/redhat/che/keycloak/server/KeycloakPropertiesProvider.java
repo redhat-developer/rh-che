@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2017 Red Hat inc.
+
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Red Hat - Initial Contribution
+ *******************************************************************************/
 package com.redhat.che.keycloak.server;
 
 import java.io.IOException;
@@ -20,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Injects DNS resolvers and ensures that it is neither empty array nor single value array with null or empty string.
+ * Injects the 'che.keycloak.disabled' property retrieved from the workspace master rest endpoint.
  *
- * @author Alexander Garagatyi
+ * @author David Festal
  */
 @Singleton
 public class KeycloakPropertiesProvider implements Provider<Boolean> {
