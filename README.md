@@ -11,7 +11,7 @@
 
 The RedHat distribution of Eclipse Che is a RedHat-specific packaging of Che assemblies
 that adds some RedHat specific plugins / behaviors up to the standard upstream Che
-distribution. It is currently based on the `openshift-connector` branch of the upstream
+distribution. It is currently based on the `openshift-connector-wip` branch of the upstream
 Che repository. The RedHat distribution powers [openshift.io](https://openshift.io) developers workspaces.
 
 RedHat modifications against the upstream Che include:
@@ -24,12 +24,12 @@ RedHat modifications against the upstream Che include:
 ### Build prerequisites
 
 * Install Che development prerequisites
-* Clone the upstream Che git repository and checkout the `openshift-connector` branch:
+* Clone the upstream Che git repository and checkout the `openshift-connector-wip` branch:
 
 ```bash
 git clone https://github.com/eclipse/che
 cd che
-git checkout openshift-connector
+git checkout openshift-connector-wip
 ```
 * You should have built the upstream Che at least once. In the che git repository,
 run the following command:
@@ -78,10 +78,6 @@ Most useful parameters are:
 upstream Che repositories.
 - `-Dpl` and `-Damd` to build only some modules of the RedHat Che distribution
 - `clean` as the optional last argument of the build to run `clean` before the `install` 
-
-__Note__: The `-DwithoutKeycloak` arguments
-are added automatically to the scripts. To explicitly activate the Keycloak support, just add the
-`-DwithoutKeycloak=false` argument.
 
 ### Update Upstream Che Openshift Connector
 
@@ -182,6 +178,14 @@ You can even override the name of the docker image with the `CHE_IMAGE_REPO` var
 bash -c "export CHE_IMAGE_REPO=rhche/che-server ; export CHE_IMAGE_TAG=nightly ; dev-scripts/minishift_deploy.sh"
 ```
 
+By default, Che is deployed on minishift with the Keycloak integration *disabled*.
+
+However, to explicitly enable the Keycloak integration, you can override the `CHE_KEYCLOAK_DISABLED` variable:
+
+```bash
+bash -c "export CHE_KEYCLOAK_DISABLED=false ; dev-scripts/minishift_deploy.sh"
+```
+
 __Warning__: If you are deploying the RH distribution build, ensure that you created / tagged the Che docker images 
 *in the Minishift docker environment* (see [previous section](#in-the-minishift-docker-environment)).
 If you want to build and deploy the RH distribution to Minishift in one go, you can use the
@@ -247,7 +251,8 @@ the minishift docker daemon,
 The RedHat Che distribution maven build does the following:
 - Checks out the upstream GitHub `che-dependencies` and `che` repositories into folder
 `target/export`, based on a given fork (`eclipse` by default) and branch
-(`openshift-connector` by default),
+(by default the `master` branch for the `che-dependencies` repository,
+and the `openshift-connector-wip` for the `che` repository),
 - Builds the upstream repositories first as a pre-step,
 - Then builds the RedHat distribution maven sub-project based on this upstream build.
 
@@ -258,19 +263,19 @@ is reused, which make the RedHat Che distribution build much faster.
 
 The version of the RedHat Che distribution assembly and dashboard artifacts is derived from
 the version of the upstream Che project. For example, if upstream version is:
-`5.6.0-openshift-connector-SNAPSHOT`,
+`5.15.0-SNAPSHOT`,
 then the version of the generated RedHat Che distribution will be:
-`5.6.0-openshift-connector-fabric8-SNAPSHOT`
+`5.15.0-fabric8-SNAPSHOT`
 and the result of the RedHat Che distribution build will be available at the following location:
     
-    rh-che/target/builds/fabric8/fabric8-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-fabric8-SNAPSHOT
+    rh-che/target/builds/fabric8/fabric8-che/assembly/assembly-main/target/eclipse-che-5.15.0-fabric8-SNAPSHOT
 
 Alternatively, if the option to remove the Dashboard has been enabled then the version of the
 generated RedHat Che distribution will be:
-`5.6.0-openshift-connector-fabric8-without-dashboard-SNAPSHOT` .
+`5.15.0-fabric8-without-dashboard-SNAPSHOT` .
 and the result of the RedHat Che distribution build will be available at the following location:
     
-    rh-che/target/builds/fabric8-without-dashboard/fabric8-che/assembly/assembly-main/target/eclipse-che-5.6.0-openshift-connector-fabric8-without-dashboard-SNAPSHOT
+    rh-che/target/builds/fabric8-without-dashboard/fabric8-che/assembly/assembly-main/target/eclipse-che-5.15.0-fabric8-without-dashboard-SNAPSHOT
 
 
 The build is started by running *maven* in the root of the current git repository,
@@ -319,12 +324,6 @@ that contains your fork of Che, you can use the following options:
 
 By default the Che Dashboard is part of the RedHat Che distribution.
 Howvever it can removed by with the `-DwithoutDashboard` argument
-
-##### Enabling / Disabling the Keycloak integration
-
-By default the Keycloak integration is part of the RedHat Che distribution.
-However it can be removed with the `-DwithoutKeycloak` argument.
-
 
 ##### Enabling / Disabling the checks and tests
 

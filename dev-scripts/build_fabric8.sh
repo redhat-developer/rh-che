@@ -16,12 +16,6 @@ else
   export CHE_IMAGE_TAG=nightly-${RH_DIST_SUFFIX}
 fi
 
-if [[ "$@" =~ "-DwithoutKeycloak=false" ]]; then
-  keycloakSupport="WITH Keycloak support"
-else
-  keycloakSupport="WITHOUT Keycloak support"
-fi
-
 if [ -z ${UPSTREAM_CHE_PATH+x} ]; then 
     echo "!"
     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -29,11 +23,9 @@ if [ -z ${UPSTREAM_CHE_PATH+x} ]; then
     echo "! Using dedicated Upstream Che repo CHECKED-OUT in the following target directory : "
     echo "!     $(pwd)/target/export/che-dependencies/che "
     echo "!"
-    echo "! Building ${keycloakSupport}"
-    echo "!"
     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     echo "!"
-    additionalArgument="-DwithoutKeycloak"
+    additionalArgument=""
 else 
     echo "!"
     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -41,11 +33,9 @@ else
     echo "! Using Upstream Che repo from LOCAL directory : "
     echo "!     ${UPSTREAM_CHE_PATH} "
     echo "!"
-    echo "! Building ${keycloakSupport}"
-    echo "!"
     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     echo "!"
-    additionalArgument="-DwithoutKeycloak -DlocalCheRepository=${UPSTREAM_CHE_PATH}"
+    additionalArgument="-DlocalCheRepository=${UPSTREAM_CHE_PATH}"
 fi
 
 bash cico_build.sh $additionalArgument $*

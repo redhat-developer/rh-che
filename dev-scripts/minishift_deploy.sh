@@ -77,7 +77,7 @@ oc create configmap che \
       --from-literal=che-openshift-precreate-subpaths="true" \
       --from-literal=keycloak-oso-endpoint="https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" \
       --from-literal=keycloak-github-endpoint="https://sso.openshift.io/auth/realms/fabric8/broker/github/token" \
-      --from-literal=keycloak-disabled="true" \
+      --from-literal=keycloak-disabled="${CHE_KEYCLOAK_DISABLED}" \
       --from-literal=che-workspace-auto-snapshot="false"
 
 # Deploy PVs (gofabric8 way)

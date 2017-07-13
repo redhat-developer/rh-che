@@ -259,7 +259,6 @@
                     <filterProperties>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
-                        <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
                         <multiThread-option>${multiThread-option}</multiThread-option>
@@ -272,7 +271,6 @@
                         <startedByInvoker>true</startedByInvoker>
                         <baseCheRepository>${baseCheRepository}</baseCheRepository>
                         <withoutDashboard>${withoutDashboard}</withoutDashboard>
-                        <withoutKeycloak>${withoutKeycloak}</withoutKeycloak>
                         <redhat.che.version>${redhat.che.version}</redhat.che.version>
                         <che.version>${che.version}</che.version>
                         <skip-enforce>${skip-enforce}</skip-enforce>

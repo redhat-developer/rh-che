@@ -23,6 +23,12 @@
         <original-project-name>assembly-ide-war</original-project-name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>che-keycloak-plugin-ide</artifactId>
+        </dependency>
+    </dependencies>
     <build>
         <pluginManagement>
             <plugins>
@@ -328,60 +334,6 @@
         </plugins>
     </build>
     <profiles>
-        <profile>
-            <id>withKeycloak</id>
-            <activation>
-                <property>
-                    <name>withoutKeycloak</name>
-                    <value>!true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.redhat.che</groupId>
-                    <artifactId>che-keycloak-plugin-ide</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>withoutKeycloak</id>
-            <activation>
-                <property>
-                    <name>withoutKeycloak</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>Remove Keycloak Patches</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target name="copy all original Che files">
-                                        <delete
-                                            verbose="true">
-                                            <fileset
-                                                dir="${project.build.directory}/prepared-patches">
-                                                <include name="src.main.webapp.IDE.jsp.patch" />
-                                                <include name="src.main.webapp.META-INF.context.xml.patch" />
-                                                <include name="src.main.webapp.WEB-INF.web.xml.patch" />
-                                            </fileset>
-                                        </delete>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>withDashboard</id>
             <activation>
