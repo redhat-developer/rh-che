@@ -25,15 +25,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.che.keycloak.server.oso.service.account.ServiceAccountInfoProvider;
+
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.openshift.client.DefaultOpenShiftClient;
+import io.fabric8.openshift.client.OpenShiftClient;
+
 public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.KeycloakOIDCFilter {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
 
     private boolean keycloakDisabled;
 
     @Inject
     private KeycloakUserChecker userChecker;
-    
+
+    @Inject
+    private ServiceAccountInfoProvider serviceAccountInfoProvider;
+
     @Inject
     public KeycloakAuthenticationFilter(@Named("che.keycloak.disabled") boolean keycloakDisabled) {
         this.keycloakDisabled = keycloakDisabled;
@@ -49,7 +59,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
             chain.doFilter(req, res);
             return;
         }
-        
+
         HttpServletRequest request = (HttpServletRequest) req;
         String authHeader = request.getHeader("Authorization");
         String requestURI = request.getRequestURI();
@@ -60,8 +70,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         }
 
         if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme)
-                || isInternalRequest(authHeader)
-                || request.getRequestURI().endsWith("/keycloak/settings")) {
+                || isKeycloakSettingsRequest(requestURI) || isWorkspaceAgentRequest(authHeader)) {
             LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
         } else if (userChecker.matchesUsername(authHeader)) {
@@ -83,8 +92,27 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         return requestURI.endsWith("/api/system/state");
     }
 
-    private boolean isInternalRequest(String authHeader) {
-        return "Internal".equals(authHeader);
+    /**
+     * @param requestURI
+     * @return true if request is made against endpoint which provides keycloak
+     *         status (enabled / disabled), false otherwise
+     */
+    private boolean isKeycloakSettingsRequest(String requestURI) {
+        return requestURI.endsWith("/keycloak/settings");
+    }
+
+    /**
+     * @param authHeader
+     * @return true if "Authorization" header has valid openshift token that is
+     *         used for communication between wsagent and wsmaster, false
+     *         otherwise
+     */
+    private boolean isWorkspaceAgentRequest(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Wsagent")) {
+            String token = authHeader.replaceFirst("Wsagent ", "");
+            return isValidToken(token);
+        }
+        return false;
     }
 
     private boolean isWebsocketRequest(String requestURI, String requestScheme) {
@@ -92,4 +120,27 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
                 || requestScheme.equals("wss") || requestURI.contains("/websocket/")
                 || requestURI.endsWith("/token/user");
     }
+
+    /**
+     * OpenShift default service account token is used in "Authorization" header
+     * for communication between wsagent and wsmaster. The method checks if the
+     * token is valid by fetching namespace info and comparing it with expected 
+     * service account namespace
+     * 
+     * @param token
+     * @return true if openshift token is valid and matches service account namespace, false otherwise
+     */
+    private boolean isValidToken(final String token) {
+        LOG.debug("Validating workspace agent token");
+        Config config = new ConfigBuilder().withOauthToken(token).build();
+        try (OpenShiftClient client = new DefaultOpenShiftClient(config)) {
+            String namespace = client.getConfiguration().getNamespace();
+            LOG.debug("Validating the token against namespace '{}'", namespace);
+            return serviceAccountInfoProvider.getNamespace().equals(namespace);
+        } catch (Exception e) {
+            LOG.debug("The token is not valid {}", token);
+            return false;
+        }
+    }
+
 }

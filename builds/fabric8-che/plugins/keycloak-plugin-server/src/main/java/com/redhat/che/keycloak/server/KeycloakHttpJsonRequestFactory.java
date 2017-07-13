@@ -20,10 +20,15 @@ import org.eclipse.che.api.core.rest.DefaultHttpJsonRequestFactory;
 import org.eclipse.che.api.core.rest.HttpJsonRequest;
 import org.eclipse.che.api.core.rest.shared.dto.Link;
 
+import com.redhat.che.keycloak.server.oso.service.account.ServiceAccountInfoProvider;
+
 @Singleton
 public class KeycloakHttpJsonRequestFactory extends DefaultHttpJsonRequestFactory {
 
     private boolean keycloakDisabled;
+
+    @Inject
+    ServiceAccountInfoProvider serviceAccountInfoProvider;
 
     @Inject
     public KeycloakHttpJsonRequestFactory(@Named("che.keycloak.disabled") boolean keycloakDisabled) {
@@ -35,7 +40,8 @@ public class KeycloakHttpJsonRequestFactory extends DefaultHttpJsonRequestFactor
         if (keycloakDisabled) {
             return super.fromUrl(url);
         }
-        return super.fromUrl(url).setAuthorizationHeader("Internal");
+        String token = serviceAccountInfoProvider.getToken();
+        return super.fromUrl(url).setAuthorizationHeader("Wsagent " + token);
     }
 
     @Override
@@ -43,7 +49,8 @@ public class KeycloakHttpJsonRequestFactory extends DefaultHttpJsonRequestFactor
         if (keycloakDisabled) {
             return super.fromLink(link);
         }
-        return super.fromLink(link).setAuthorizationHeader("Internal");
+        String token = serviceAccountInfoProvider.getToken();
+        return super.fromLink(link).setAuthorizationHeader("Wsagent " + token);
     }
 
 }
