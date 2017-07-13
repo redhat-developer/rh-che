@@ -5,13 +5,13 @@
   "ssl-required" : "external",
   "enable-cors" : true,
   "bearer-only" : true,
+  "public-client" :false,
+  "connection-pool-size" : 20,
+  "disable-trust-manager": true,
   "enable-basic-auth" : false,
   "expose-token" : true,
    "credentials" : {
       "secret" : "08a8bcd1-f362-446a-9d2b-d34b8d464185"
-   },
-
-   "connection-pool-size" : 20,
-   "disable-trust-manager": true
+   }  
 }
 
