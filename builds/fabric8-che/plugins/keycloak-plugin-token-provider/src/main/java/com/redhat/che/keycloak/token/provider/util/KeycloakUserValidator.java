@@ -17,6 +17,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,9 +32,6 @@ import org.eclipse.che.api.core.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -54,10 +53,11 @@ import io.fabric8.openshift.client.OpenShiftConfigBuilder;
 public final class KeycloakUserValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakUserValidator.class);
-    private static final String ACCESS_TOKEN = "access_token";
     private static final int CACHE_TIMEOUT_MINUTES = 10;
 
     private final KeycloakTokenProvider keycloakTokenProvider;
+    /** Pattern used to obtain project name from OpenShift namespace */
+    private final Pattern nameExtractor = Pattern.compile("(\\S*)-che");
 
     /**
      * Cache that stores mappings from keycloak token to OpenShift token. Timeout is
@@ -103,10 +103,10 @@ public final class KeycloakUserValidator {
             LOG.info("Received request with null or empty auth value. Returning false");
             return false;
         }
-        
+
         LOG.debug("Keycloak token = {}", keycloakToken);
 
-        String projectOwner = getOpenShiftProjectOwner();
+        String projectOwner = getCurrentOpenShiftProjectName();
         if ("eclipse".equals(projectOwner)) {
             LOG.info("We are running in a Development Minishift environment => don't check user name.");
             return true;
@@ -121,14 +121,14 @@ public final class KeycloakUserValidator {
             if (isNullOrEmpty(openShiftToken)) {
                 return false;
             }
-            
+
             LOG.debug("Openshift token = {}", openShiftToken);
-            String openShiftUser = getOpenShiftUser(openShiftToken);
+            String openShiftUser = getOpenShiftProjectNameFromToken(openShiftToken);
             if (isNullOrEmpty(openShiftUser)) {
                 return false;
             }
             LOG.debug("Openshift user = {}", openShiftUser);
-            return openShiftUser.equals(getOpenShiftProjectOwner());
+            return openShiftUser.equals(getCurrentOpenShiftProjectName());
         }
     }
 
@@ -166,14 +166,10 @@ public final class KeycloakUserValidator {
      *
      * @see UserLoader
      */
-    private String getOpenShiftUser(String openShiftToken) {
+    private String getOpenShiftProjectNameFromToken(String openShiftToken) {
         try {
             String currentUsername = openShiftTokenToUserCache.get(openShiftToken);
-            if (currentUsername.contains("@")) {
-                // Some usernames are email addresses
-                currentUsername = currentUsername.split("@")[0];
-            }
-            return currentUsername;
+            return OpenShiftUserToProjectNameConverter.getProjectNameFromUsername(currentUsername);
         } catch (ExecutionException e) {
             LOG.error("Exception while getting user:", e);
         }
@@ -181,14 +177,22 @@ public final class KeycloakUserValidator {
     }
 
     /**
-     * Get the owner of the current OpenShift namespace. Note that usernames may, in some cases,
-     * be email addresses.
-     * @return the username, as specified by OpenShift
+     * Get the project name in the current OpenShift namespace.
+     *
+     * @return the project name, as specified by OpenShift
      */
-    private String getOpenShiftProjectOwner() {
+    private String getCurrentOpenShiftProjectName() {
         try(OpenShiftClient client = new DefaultOpenShiftClient()) {
-            String namespace = client.getNamespace().split("-")[0];
-            return namespace;
+            String namespace = client.getNamespace();
+            LOG.debug("Getting project name from namespace: {}", namespace);
+            Matcher nameMatcher = nameExtractor.matcher(namespace);
+            if (nameMatcher.matches()) {
+                LOG.debug("Got project name: {}", nameMatcher.group(1));
+                return nameMatcher.group(1);
+            } else {
+                LOG.error("Could not get project name from namespace");
+                return "";
+            }
         }
     }
 
