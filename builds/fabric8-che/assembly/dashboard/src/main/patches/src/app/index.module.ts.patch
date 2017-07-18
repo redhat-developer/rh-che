@@ -1,6 +1,6 @@
 --- src/app/index.module.ts
 +++ src/app/index.module.ts
-@@ -31,13 +31,59 @@
+@@ -31,13 +31,72 @@
  import {WorkspacesConfig} from './workspaces/workspaces-config';
  import {StacksConfig} from './stacks/stacks-config';
  import {DemoComponentsCtrl} from './demo-components/demo-components.controller';
@@ -21,7 +21,11 @@
 +
 +  let promise = $injector.get('../wsmaster/api/keycloak/settings');
 +
-+  function keycloakInit(keycloakDisabled) {
++  function bootstrapAngularManually() {
++     angular.bootstrap(document, ['userDashboard'], {strictDi:true});
++  }
++  
++  function keycloakInit(keycloakDisabled, retry) {
 +      if (keycloakDisabled) {
 +        window['_keycloak'] = false;
 +        angular.bootstrap(document, ['userDashboard'], {strictDi:true}); // manually bootstrap Angular
@@ -32,7 +36,16 @@
 +            onLoad: 'check-sso', checkLoginIframe: false, responseMode: 'query'
 +          })
 +          .success(() => {
-+            angular.bootstrap(document, ['userDashboard'], {strictDi:true}); // manually bootstrap Angular
++            console.log('Successfully initialized Keycloak');
++            bootstrapAngularManually();
++          }).error(() => {
++            console.log('Failed to initialize Keycloak');
++            if(retry) {
++              console.log('Retrying Keycloak initialization once...');
++              keycloakInit(false, false);
++            } else {
++               bootstrapAngularManually();
++            }
 +          });
 +      }
 +    
@@ -41,13 +54,13 @@
 +  promise.then((resp) => {
 +    console.log('resp : ' + resp.toString() );
 +    if (resp['che.keycloak.disabled'] == 'true') {
-+      keycloakInit(true);
++      keycloakInit(true, false);
 +    } else {
-+      keycloakInit(false);
++      keycloakInit(false, true);
 +    }
 +  }, (error) => {
 +    console.log(error);
-+    keycloakInit(false);
++    keycloakInit(false, true);
 +  });
 +  
 +  console.log('running keycloak init sequence');
@@ -60,7 +73,7 @@
  
  // add a global resolve flag on all routes (user needs to be resolved first)
  initModule.config(['$routeProvider', ($routeProvider) => {
-@@ -168,6 +214,44 @@
+@@ -168,6 +227,44 @@
      });
    }]);
  
@@ -105,7 +118,7 @@
  
  // add interceptors
  initModule.factory('ETagInterceptor', ($window, $cookies, $q) => {
-@@ -358,6 +442,7 @@
+@@ -358,6 +455,7 @@
  });
  
  initModule.config(['$routeProvider', '$locationProvider', '$httpProvider', ($routeProvider, $locationProvider, $httpProvider) => {
