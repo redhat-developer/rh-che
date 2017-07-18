@@ -174,7 +174,7 @@ public class WsMasterModule extends AbstractModule {
         launchers.addBinding().to(SshAgentLauncher.class);
 
         bindConstant().annotatedWith(Names.named("machine.ws_agent.run_command"))
-                      .to("export JPDA_ADDRESS=\"4403\" && ~/che/ws-agent/bin/catalina.sh jpda run");
+                      .to("export JPDA_ADDRESS=\"4403\" && export CHE_LOGS_DIR=\"/workspace-logs/${CHE_MACHINE_NAME}-ws-agent\" && ~/che/ws-agent/bin/catalina.sh jpda run");
         bindConstant().annotatedWith(Names.named("machine.terminal_agent.run_command"))
                       .to("$HOME/che/terminal/che-websocket-terminal " +
                           "-addr :4411 " +
@@ -183,7 +183,7 @@ public class WsMasterModule extends AbstractModule {
                       .to("$HOME/che/exec-agent/che-exec-agent " +
                           "-addr :4412 " +
                           "-cmd ${SHELL_INTERPRETER} " +
-                          "-logs-dir $HOME/che/exec-agent/logs");
+                          "-logs-dir /workspace-logs/${CHE_MACHINE_NAME}-exec-agent");
 
         bind(org.eclipse.che.api.deploy.WsMasterAnalyticsAddresser.class);
 
