@@ -20,7 +20,7 @@
         <che-fork>eclipse</che-fork>
         <che-branch>openshift-connector-wip</che-branch>
         <che-dependencies-fork>eclipse</che-dependencies-fork>
-        <che-dependencies-branch>master</che-dependencies-branch>
+        <che-dependencies-branch>openshift-connector-wip</che-dependencies-branch>
         <skipCheckoutIfExists>true</skipCheckoutIfExists>
         <che.version>5.15.0-SNAPSHOT</che.version>
         <redhat.che.without-dashboard.suffix>without-dashboard</redhat.che.without-dashboard.suffix>

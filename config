@@ -4,10 +4,10 @@ export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master
 
 export CHE_FORK=eclipse
-export CHE_BRANCH=openshift-connector
+export CHE_BRANCH=openshift-connector-wip
 
 export CHE_DEP_FORK=eclipse
-export CHE_DEP_BRANCH=openshift-connector
+export CHE_DEP_BRANCH=openshift-connector-wip
 
 export NPM_CONFIG_PREFIX=~/.che_node_modules
 export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
