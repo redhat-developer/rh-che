@@ -41,6 +41,8 @@ import com.redhat.che.keycloak.token.provider.service.KeycloakTokenProvider;
 import com.redhat.che.keycloak.token.provider.util.KeycloakUserValidator;
 import com.redhat.che.keycloak.token.provider.validator.KeycloakTokenValidator;
 
+import io.swagger.annotations.ApiOperation;
+
 @Path("/token")
 @Singleton
 public class TokenController {
@@ -87,6 +89,7 @@ public class TokenController {
 
     @GET
     @Path("/github")
+    @ApiOperation(value = "Get GitHub token from Keycloak token")
     public Response getGitHubToken(@HeaderParam(HttpHeaders.AUTHORIZATION) String keycloakToken)
             throws ForbiddenException, NotFoundException, ConflictException, BadRequestException, ServerException,
             UnauthorizedException, IOException {
@@ -102,6 +105,7 @@ public class TokenController {
 
     @GET
     @Path("/oso")
+    @ApiOperation(value = "Get OpenShift token from Keycloak Token")
     public Response getOpenShiftToken(@HeaderParam(HttpHeaders.AUTHORIZATION) String keycloakToken)
             throws ForbiddenException, NotFoundException, ConflictException, BadRequestException, ServerException,
             UnauthorizedException, IOException {
@@ -117,6 +121,7 @@ public class TokenController {
 
     @GET
     @Path("/user")
+    @ApiOperation(value = "Return true if the token provided in the authorization header corresponds to the user who owns the namespace.")
     public Response getUserMatches(@HeaderParam(HttpHeaders.AUTHORIZATION) String keycloakToken) {
         if (userValidator.matchesUsername(keycloakToken)) {
             return Response.ok("true").build();
