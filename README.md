@@ -24,6 +24,20 @@ RedHat modifications against the upstream Che include:
 ### Build prerequisites
 
 * Install Che development prerequisites
+* Clone the upstream Che dependencies git repository and checkout the `openshift-connector-wip` branch:
+
+```bash
+git clone https://github.com/eclipse/che-dependencies
+cd che-dependencies
+git checkout openshift-connector-wip
+```
+* You should have built the upstream Che dependencies at least once. In the `che-dependencies` git repository,
+run the following command:
+
+```bash
+mvn install  
+```
+
 * Clone the upstream Che git repository and checkout the `openshift-connector-wip` branch:
 
 ```bash
@@ -251,8 +265,8 @@ the minishift docker daemon,
 The RedHat Che distribution maven build does the following:
 - Checks out the upstream GitHub `che-dependencies` and `che` repositories into folder
 `target/export`, based on a given fork (`eclipse` by default) and branch
-(by default the `master` branch for the `che-dependencies` repository,
-and the `openshift-connector-wip` for the `che` repository),
+(by default the `openshift-connector-wip` branch for both `che-dependencies`
+and `openshift-connector-wip` repositories),
 - Builds the upstream repositories first as a pre-step,
 - Then builds the RedHat distribution maven sub-project based on this upstream build.
 
