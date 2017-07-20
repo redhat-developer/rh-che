@@ -12,6 +12,8 @@
 package com.redhat.che.keycloak.server;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,7 +72,8 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         }
 
         if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme)
-                || isKeycloakSettingsRequest(requestURI) || isWorkspaceAgentRequest(authHeader)) {
+                || isKeycloakSettingsRequest(requestURI) || isWorkspaceAgentRequest(authHeader)
+                || isRequestFromGwtFrame(requestURI)) {
             LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
         } else if (userChecker.matchesUsername(authHeader)) {
@@ -143,4 +146,27 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         }
     }
 
+    
+    /**
+     * @param requestURI
+     * @return true if request comes from a GWT `Frame`, and thus cannot contain
+     * the Keycloak token, false otherwise
+     * 
+     * There a currently 2 places in the Java Che support that use `Frame` objects
+     * to display documentation popups
+     * 
+     * see issue https://github.com/redhat-developer/rh-che/issues/94
+     * 
+     */
+    private boolean isRequestFromGwtFrame(String requestURI) {
+        try {
+            // We use a URI here since the expected requests that we want to filter
+            // have some parameters. The URI allows matching the URI path precisely
+            URI uri = new URI(requestURI);
+            return "/api/java/javadoc/find".equals(uri.getPath()) // Java Quick Documentation popup
+                || "/api/java/code-assist/compute/info".equals(uri.getPath()); // Java content assist Documentation popup
+        } catch (URISyntaxException e) {
+        }
+        return false;
+    }
 }
