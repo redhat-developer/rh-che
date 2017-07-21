@@ -1,9 +1,9 @@
 --- src/app/index.module.ts
 +++ src/app/index.module.ts
-@@ -31,13 +31,59 @@
- import {WorkspacesConfig} from './workspaces/workspaces-config';
- import {StacksConfig} from './stacks/stacks-config';
- import {DemoComponentsCtrl} from './demo-components/demo-components.controller';
+@@ -33,13 +33,59 @@
+ import {DemoComponentsController} from './demo-components/demo-components.controller';
+ import {CheBranding} from '../components/branding/che-branding.factory';
+ import {ChePreferences} from '../components/api/che-preferences.factory';
 +import * as Keycloak from '../components/keycloak/keycloak';
  
 +let keycloakConfig = {
@@ -59,8 +59,8 @@
 +});
  
  // add a global resolve flag on all routes (user needs to be resolved first)
- initModule.config(['$routeProvider', ($routeProvider) => {
-@@ -168,6 +214,44 @@
+ initModule.config(['$routeProvider', ($routeProvider: che.route.IRouteProvider) => {
+@@ -171,6 +217,44 @@
      });
    }]);
  
@@ -105,7 +105,7 @@
  
  // add interceptors
  initModule.factory('ETagInterceptor', ($window, $cookies, $q) => {
-@@ -358,6 +442,7 @@
+@@ -361,6 +445,7 @@
  });
  
  initModule.config(['$routeProvider', '$locationProvider', '$httpProvider', ($routeProvider, $locationProvider, $httpProvider) => {
