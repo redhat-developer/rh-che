@@ -87,8 +87,10 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
                                                                               null),//
                                                            new DocumentFilter(JsonModule.LANGUAGE_ID,//
                                                                               "package\\.json",//
-                                                                              null)//
-                                             // TODO pom.xml
+                                                                              null),
+                                                           new DocumentFilter("pom",
+                                                                              "pom\\.xml",
+                                                                              null)
                                              )//
         );
     }
