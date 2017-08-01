@@ -12,6 +12,7 @@ package org.eclipse.che.plugin.languageserver.bayesian.server.launcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
 
 import org.eclipse.che.api.languageserver.exception.LanguageServerException;
 import org.eclipse.che.api.languageserver.launcher.LanguageServerLauncherTemplate;
@@ -40,6 +41,10 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
 
     private final Path                             launchScript;
 
+
+    @Inject
+    private KeycloakTokenStore keycloakStore;
+
     @Inject
     public BayesianLanguageServerLauncher() {
         launchScript = Paths.get(System.getenv("HOME"), "che/ls-bayesian/launch.sh");
@@ -59,12 +64,17 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
     }
 
     protected Process startLanguageServerProcess(String projectPath) throws LanguageServerException {
-        ProcessBuilder processBuilder = new ProcessBuilder(launchScript.toString());
-        // dev: inject your keycloak token here: (retrieve it from openshift.io localStorage.getItem("auth_token"))
-        // ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", //
-        //                                                    "-c", //
-        //                                                    "export RECOMMENDER_API_TOKEN=xxx && " + //
-        //                                                        launchScript.toString());
+        String launchCommand = launchScript.toString();
+
+        if (keycloakStore.hasLastToken()) {
+            launchCommand = "export RECOMMENDER_API_TOKEN=" + //
+                            keycloakStore.getLastTokenWithoutBearer() + //
+                            " && " + //
+                            launchCommand;
+
+        }
+
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", launchCommand);
         processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
         processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
         processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);

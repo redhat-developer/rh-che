@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.che.keycloak.server.oso.service.account.ServiceAccountInfoProvider;
 import com.redhat.che.keycloak.shared.KeycloakConstants;
+import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -40,6 +41,9 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
 
     private boolean keycloakDisabled;
+
+    @Inject
+    private KeycloakTokenStore kcTokenStore;
 
     @Inject
     private KeycloakUserChecker userChecker;
@@ -80,6 +84,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         } else if (userChecker.matchesUsername(authHeader)) {
             super.doFilter(req, res, chain);
             LOG.debug("{} status : {}", request.getRequestURL(), ((HttpServletResponse) res).getStatus());
+            kcTokenStore.setLastToken(authHeader);
         } else {
             HttpServletResponse response = (HttpServletResponse) res;
             response.sendError(403);

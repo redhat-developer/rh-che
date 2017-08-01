@@ -25,6 +25,7 @@ import com.redhat.che.keycloak.server.KeycloakClientIdPropertyProvider;
 import com.redhat.che.keycloak.server.KeycloakDisabledPropertyProvider;
 import com.redhat.che.keycloak.server.KeycloakRealmPropertyProvider;
 import com.redhat.che.keycloak.shared.KeycloakConstants;
+import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
 
 import javax.inject.Named;
 
@@ -57,6 +58,7 @@ public class WsAgentModule extends AbstractModule {
         bind(String.class).annotatedWith(Names.named(KeycloakConstants.CLIENT_ID_SETTING)).toProvider(KeycloakClientIdPropertyProvider.class);
         bind(String.class).annotatedWith(Names.named(KeycloakConstants.REALM_SETTING)).toProvider(KeycloakRealmPropertyProvider.class);
         bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
+        bind(KeycloakTokenStore.class);
     }
 
     //it's need for WSocketEventBusClient and in the future will be replaced with the property

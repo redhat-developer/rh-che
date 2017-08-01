@@ -18,6 +18,7 @@
     <name>Fabric8 IDE plugins (parent)</name>
     <modules>
         <module>keycloak-plugin-shared</module>
+        <module>keycloak-plugin-token-store</module>
         <module>keycloak-plugin-server</module>
         <module>keycloak-plugin-ide</module>
         <module>keycloak-plugin-token-provider</module>
