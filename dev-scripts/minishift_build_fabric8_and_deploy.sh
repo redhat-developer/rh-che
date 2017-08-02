@@ -24,4 +24,4 @@ if [ $? -ne 0 ]; then
 fi
 
 bash ${commandDir}/minishift_clean.sh
-bash ${commandDir}/minishift_deploy.sh
+bash ${commandDir}/openshift_deploy.sh

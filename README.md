@@ -145,73 +145,70 @@ in the Minishift docker environment, as detailed in next section.
 dev-scripts/docker_create_images_and_tag_in_minishift.sh
 ```
 
-## How to deploy or roll-update it in Minishift
+## How to deploy or roll-update it in Minishift or OSIO
     
 ### Deployment prerequisites
 
-* Get [minishift](https://github.com/minishift/minishift#installation) (we have tested with v1.0.0beta4)
-  * Minishift v1.0.0beta4 includes the `oc` binary, and this should be added to your `$PATH`. The binary is located
-    in the `.minishift/cache/oc/<oc version>/` directory (e.g. on Linux, it is in `~/.minishift/cache/oc/v1.4.1/`).
-* Get [gofabric8](https://github.com/fabric8io/gofabric8#getting-started) (we have tested with v0.4.121)
-* Clone fabric8-online git repository:
+* [minishift](https://github.com/minishift/minishift#installation) (v1.0.0 or greater)
+* `oc` the OpenShift command line client tool. The binary is included in minishift distribution and can be found in folder `.minishift/cache/oc/<oc version>/`. You can add this folder to your `$PATH` using the following command `eval $(minishift oc-env)`.
 
-`git clone https://github.com/fabric8io/fabric8-online.git`
-
-* The scripts assume that the `fabric8-online` repository is cloned in `${HOME}/github/fabric8-online/`.
-If you cloned it in another location, you need to override the `FABRIC8_ONLINE_PATH` variable
-with the full path of the cloned `fabric8-online` git repository :
+### Deploy to Minishift 
 
 ```bash
-export FABRIC8_ONLINE_PATH="<path where you cloned it>/fabric8-online/"
+SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-scripts/openshift_deploy.sh
+curl -fsSL ${SCRIPT_URL} -o get-che.sh && sh get-che.sh
 ```
-__Important note:__ the `FABRIC8_ONLINE_PATH` should always end with a `/`.
 
-* For all the scripts that deploy or rollout to Minishift, you should have minishift running.
-This can be done with the following command:
+Of course if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rhche) you can deploy Che on minishift executing:
 
 ```bash
-minishift start
+./dev-scripts/openshift_deploy.sh
 ```
 
-#### Deploy to Minishift 
+### Deploy to openshift.io 
 
 ```bash
-dev-scripts/minishift_deploy.sh
+SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-scripts/openshift_deploy.sh
+export OPENSHIFT_FLAVOR=osio && curl -fsSL ${SCRIPT_URL} -o get-che.sh && sh get-che.sh
 ```
-By default, the docker image of the deployed to Minishift is the last built `nightly-fabric8` image.
 
-However, you can override this by providing the `CHE_IMAGE_TAG` variable:
+And if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rhche) you can deploy Che on OSIO executing:
 
 ```bash
-bash -c "export CHE_IMAGE_TAG=nightly ; dev-scripts/minishift_deploy.sh"
+export OPENSHIFT_FLAVOR=osio && ./dev-scripts/openshift_deploy.sh
 ```
 
-You can even override the name of the docker image with the `CHE_IMAGE_REPO` variable:
+### Deployment Options
 
-```bash
-bash -c "export CHE_IMAGE_REPO=rhche/che-server ; export CHE_IMAGE_TAG=nightly ; dev-scripts/minishift_deploy.sh"
-```
+You can set different deployment options using environment variables:
 
-By default, Che is deployed on minishift with the Keycloak integration *disabled*.
+* `OPENSHIFT_FLAVOR`: possible values are `minishift` and `osio` (default is `minishift`)
+* `OPENSHIFT_ENDPOINT`: url of the OpenShift API (default is `https://$(minishift ip):8443/` for minishift, `https://api.starter-us-east-2.openshift.com` for osio)
+* `OPENSHIFT_TOKEN` (default is unset)
+* `CHE_OPENSHIFT_PROJECT`: the OpenShift namespace where Che will be deployed (default is `eclipse-che` for minishift and `${OPENSHIFT_ID}-che` for osio)
+* `CHE_IMAGE_REPO`: `che-server` Docker image repository that will be used for deployment (default is `docker.io/rhchestage/che-server`)
+* `CHE_IMAGE_TAG`: `che-server` Docker image tag that will be used for deployment (default is `nightly-fabric8`)
+* `CHE_LOG_LEVEL`: Log level of che-server (default is `DEBUG`)
+* `CHE_DEBUGGING_ENABLED`: If set to `true` the script will create the OpenShift service to debug che-server (default is `true`)
+* `CHE_KEYCLOAK_DISABLED`: If this is set to true Keycloack authentication will be disabled (default is `true` for minishift, `false` for osio)
 
-However, to explicitly enable the Keycloak integration, you can override the `CHE_KEYCLOAK_DISABLED` variable:
+#### minishift only options
 
-```bash
-bash -c "export CHE_KEYCLOAK_DISABLED=false ; dev-scripts/minishift_deploy.sh"
-```
+* `OPENSHIFT_USERNAME`: username to login on the OpenShift cluster. Ignored if `OPENSHIFT_TOKEN` is set (default is `developer`)
+* `OPENSHIFT_PASSWORD`: password to login on the OpenShift cluster. Ignored if `OPENSHIFT_TOKEN` is set (default is `developer`)
 
 __Warning__: If you are deploying the RH distribution build, ensure that you created / tagged the Che docker images 
 *in the Minishift docker environment* (see [previous section](#in-the-minishift-docker-environment)).
 If you want to build and deploy the RH distribution to Minishift in one go, you can use the
 [*all-in-one scripts*](#all-in-one-scripts-for-minishift)
 
-#### Delete all resources and clean up in Minishift
+### Delete all resources and clean up in Minishift
 
 ```bash
 dev-scripts/minishift_clean.sh
 ```
 
-#### Roll-update the current Minishift deployment with the up-to-date docker image
+### Roll-update the current Minishift deployment with the up-to-date docker image
 
 ```bash
 dev-scripts/minishift_rollupdate.sh
@@ -235,7 +232,7 @@ the build scripts](#build-scripts-parameters)
 the minishift docker daemon,
     - runs `dev-scripts/build_fabric8.sh [PARAMETERS]`
     - runs `dev-scripts/minishift_clean.sh`
-    - runs `dev-scripts/minishift_deploy.sh`
+    - runs `dev-scripts/openshift_deploy.sh`
     
 - `dev-scripts/minishift_build_fabric8_and_rollupdate.sh [PARAMETERS]`:
     - changes the current docker environment to use 
@@ -250,7 +247,7 @@ the minishift docker daemon,
 the minishift docker daemon,
     - runs `dev-scripts/update_openshift_connector.sh [PARAMETERS]`
     - runs `dev-scripts/minishift_clean.sh`
-    - runs `dev-scripts/minishift_deploy.sh`
+    - runs `dev-scripts/openshift_deploy.sh`
     
 - `dev-scripts/minishift_update_openshift_connector_and_rollupdate.sh [PARAMETERS]`:
     - changes the current docker environment to use
