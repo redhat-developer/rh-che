@@ -23,5 +23,5 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-bash ${commandDir}/minishift_clean.sh
-bash ${commandDir}/openshift_deploy.sh
+bash ${commandDir}/openshift_deploy.sh --command cleanup
+bash ${commandDir}/openshift_deploy.sh --command deploy

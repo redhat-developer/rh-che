@@ -48,9 +48,29 @@ EOF
 echo
 
 # --------------------------------------------------------
+# Parse options
+# --------------------------------------------------------
+while [[ $# -gt 1 ]]
+do
+key="$1"
+case $key in
+    -c | --command)
+    COMMAND="$2"
+    shift
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift
+done
+
+# --------------------------------------------------------
 # Set configuration common to both minishift and openshift
 # --------------------------------------------------------
 
+DEFAULT_COMMAND="deploy"
+COMMAND=${COMMAND:-${DEFAULT_COMMAND}}
 DEFAULT_CHE_IMAGE_REPO="docker.io/rhchestage/che-server"
 CHE_IMAGE_REPO=${CHE_IMAGE_REPO:-${DEFAULT_CHE_IMAGE_REPO}}
 DEFAULT_CHE_IMAGE_TAG="nightly-fabric8"
@@ -131,6 +151,7 @@ echo "done!"
 echo -n "[CHE] Checking if project \"${CHE_OPENSHIFT_PROJECT}\" exists..."
 if ! oc get project "${CHE_OPENSHIFT_PROJECT}" &> /dev/null; then
 
+  if [ "${COMMAND}" == "cleanup" ] || [ "${COMMAND}" == "rollupdate" ]; then echo "**ERROR** project doesn't exist. Aborting"; exit 1; fi
   if [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then echo "**ERROR** project doesn't exist on OSIO. Aborting"; exit 1; fi
 
   echo -n "no creating it..."
@@ -142,6 +163,30 @@ echo "done!"
 echo -n "[CHE] Switching to \"${CHE_OPENSHIFT_PROJECT}\"..."
 oc project "${CHE_OPENSHIFT_PROJECT}" &> /dev/null
 echo "done!"
+
+# -------------------------------------------------------------
+# If command == clean up then delete all openshift objects
+# -------------------------------------------------------------
+if [ "${COMMAND}" == "cleanup" ]; then
+  echo "[CHE] Deleting all OpenShift objects..."
+  oc delete all --all 
+  echo "[CHE] Cleanup successfully started. Use \"oc get all\" to verify that all resources have been deleted."
+  exit 0
+# -------------------------------------------------------------
+# If command == clean up then delete all openshift objects
+# -------------------------------------------------------------
+elif [ "${COMMAND}" == "rollupdate" ]; then 
+  echo "[CHE] Rollout latest version of Che..."
+  oc rollout latest che 
+  echo "[CHE] Rollaout successfully started"
+  exit 0
+# ----------------------------------------------------------------
+# At this point command should be "deploy" otherwise it's an error 
+# ----------------------------------------------------------------
+elif [ "${COMMAND}" != "deploy" ]; then 
+  echo "[CHE] **ERROR**: Command \"${COMMAND}\" is not a valid command. Aborting."
+  exit 1
+fi
 
 # -------------------------------------------------------------
 # Verify that Che ServiceAccount has admin rights at project level

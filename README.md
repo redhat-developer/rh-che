@@ -205,13 +205,13 @@ If you want to build and deploy the RH distribution to Minishift in one go, you 
 ### Delete all resources and clean up in Minishift
 
 ```bash
-dev-scripts/minishift_clean.sh
+dev-scripts/openshift_deploy.sh --command cleanup
 ```
 
 ### Roll-update the current Minishift deployment with the up-to-date docker image
 
 ```bash
-dev-scripts/minishift_rollupdate.sh
+dev-scripts/openshift_deploy.sh --command rollupdate
 ```
 
 __Warning__: If you are deploying the RH distribution build, ensure that you created / tagged the Che docker images 
@@ -231,14 +231,14 @@ the build scripts](#build-scripts-parameters)
     - changes the current docker environment to use
 the minishift docker daemon,
     - runs `dev-scripts/build_fabric8.sh [PARAMETERS]`
-    - runs `dev-scripts/minishift_clean.sh`
+    - runs `dev-scripts/openshift_deploy.sh --command cleanup`
     - runs `dev-scripts/openshift_deploy.sh`
     
 - `dev-scripts/minishift_build_fabric8_and_rollupdate.sh [PARAMETERS]`:
     - changes the current docker environment to use 
 the minishift docker daemon,
     - runs `dev-scripts/build_fabric8.sh [PARAMETERS]`
-    - runs `dev-scripts/minishift_rollupdate.sh`
+    - runs `dev-scripts/openshift_deploy.sh --command rollupdate`
 
 ##### For updating the Upstream Che Openshift Connector
  
@@ -246,14 +246,14 @@ the minishift docker daemon,
     - changes the current docker environment to use
 the minishift docker daemon,
     - runs `dev-scripts/update_openshift_connector.sh [PARAMETERS]`
-    - runs `dev-scripts/minishift_clean.sh`
+    - runs `dev-scripts/openshift_deploy.sh --command cleanup`
     - runs `dev-scripts/openshift_deploy.sh`
     
 - `dev-scripts/minishift_update_openshift_connector_and_rollupdate.sh [PARAMETERS]`:
     - changes the current docker environment to use
 the minishift docker daemon,
     - runs `dev-scripts/update_openshift_connector.sh [PARAMETERS]`
-    - runs `dev-scripts/minishift_rollupdate.sh`
+    - runs `dev-scripts/openshift_deploy.sh --command rollupdate`
 
 ## Further details
 
