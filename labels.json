@@ -60,6 +60,10 @@
     "color": "#cccccc"
   },
   {
+    "name": "severity/low-priority",
+    "color": "#fef2c0"
+  },
+  {
     "name": "sprint/current-sprint",
     "color": "#FFFFFF"
   },
