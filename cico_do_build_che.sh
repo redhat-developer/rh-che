@@ -24,7 +24,7 @@ mvnche() {
 }
 
 mkdir $NPM_CONFIG_PREFIX 2>/dev/null
-mvnche -B $* install -U
+mvnche -B $* install
 if [ $? -ne 0 ]; then
   echo "Error building che/rh-che with dashboard"
   exit 1;
@@ -32,7 +32,7 @@ fi
 
 if [ "$DeveloperBuild" != "true" ]
   then
-    mvnche -B -P'!checkout-base-che' -DwithoutDashboard $* install -U
+    mvnche -B -P'!checkout-base-che' -DwithoutDashboard $* install
     if [ $? -ne 0 ]; then
       echo "Error building che/rh-che without dashboard"
       exit 1;
