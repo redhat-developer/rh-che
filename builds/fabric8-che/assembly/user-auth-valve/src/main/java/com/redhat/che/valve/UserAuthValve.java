@@ -12,6 +12,8 @@
 
 package com.redhat.che.valve;
 
+import static com.redhat.che.keycloak.shared.KeycloakConstants.DISABLED_SETTING;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,18 +21,21 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.tomcat.KeycloakAuthenticatorValve;
+
+import com.redhat.che.keycloak.shared.KeycloakSettings;
 
 /**
  * Performs Keycloak and OpenShift.io user validation. Prompts user to login if necessary
@@ -41,15 +46,13 @@ import org.keycloak.adapters.tomcat.KeycloakAuthenticatorValve;
  * @author amisevsk
  */
 public class UserAuthValve extends KeycloakAuthenticatorValve {
-
-    private static final Log LOG = LogFactory.getLog(UserAuthValve.class);
-    private static final String USER_VALIDATOR_ENDPOINT = "http://che-host:8080/api/token/user";
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String KEYCLOAK_SETTINGS_ENDPOINT = "http://che-host:8080/api/keycloak/settings";
-    private static final Pattern DISABLED_SETTING_PATTERN = Pattern.compile(".*\"che\\.keycloak\\.disabled\":\"([^ \"]+)\".*");
     
-    private boolean keycloakDisabledRetrieved = false;
-    private boolean keycloakDisabled = false;
+    private static final Log LOG = LogFactory.getLog(UserAuthValve.class);
+    private static final String API_ENDPOINT = "http://che-host:8080/api";
+    private static final String USER_VALIDATOR_ENDPOINT = API_ENDPOINT + "/token/user";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    
+    private Boolean keycloakDisabled = null;
     
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
@@ -70,6 +73,24 @@ public class UserAuthValve extends KeycloakAuthenticatorValve {
         return false;
     }
 
+    synchronized void retrieveKeycloakSettingsIfNecessary() {
+        if (keycloakDisabled == null) {
+            KeycloakSettings.pullFromApiEndpointIfNecessary(API_ENDPOINT);
+            Map<String, String> keycloakSettings = KeycloakSettings.get();
+            if (keycloakSettings == null) {
+                LOG.warn("KeycloakSettings = null => don't disable Keycloak");
+            } else {
+                keycloakDisabled = Boolean.parseBoolean(keycloakSettings.get(DISABLED_SETTING));
+            }
+        }
+    }
+    
+    @Override
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        retrieveKeycloakSettingsIfNecessary();
+        super.invoke(request, response);
+    }
+    
     /**
      * Verify that a logged in user has access to the current project by making a request
      * against the /api/token/user endpoing on Che server.
@@ -113,36 +134,6 @@ public class UserAuthValve extends KeycloakAuthenticatorValve {
     }
 
     public boolean isKeycloakDisabled() {
-        retrieveKeycloakDisabledSetting();
-        return keycloakDisabled;
-    }
-    
-    public void retrieveKeycloakDisabledSetting() {
-        if (! keycloakDisabledRetrieved) {
-            URL url;
-            HttpURLConnection conn;
-            try {
-                url = new URL(KEYCLOAK_SETTINGS_ENDPOINT);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = in.readLine()) != null) {
-                    response.append(line);
-                }
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("KeycloakSettings = " + response);
-                }
-                Matcher matcher = DISABLED_SETTING_PATTERN.matcher(response.toString());
-                if (matcher.matches()) {
-                    String value = matcher.group(1);
-                    keycloakDisabled = "true".equals(value);
-                    keycloakDisabledRetrieved = true;
-                }
-            } catch (IOException e) {
-                LOG.error("Exception during Keycloak settings retrieval", e);
-            }
-        }
+        return keycloakDisabled == null ? false : keycloakDisabled;
     }
 }

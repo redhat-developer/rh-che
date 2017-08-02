@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.che.keycloak.server.oso.service.account.ServiceAccountInfoProvider;
+import com.redhat.che.keycloak.shared.KeycloakConstants;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -47,7 +48,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
     private ServiceAccountInfoProvider serviceAccountInfoProvider;
 
     @Inject
-    public KeycloakAuthenticationFilter(@Named("che.keycloak.disabled") boolean keycloakDisabled) {
+    public KeycloakAuthenticationFilter(@Named(KeycloakConstants.DISABLED_SETTING) boolean keycloakDisabled) {
         this.keycloakDisabled = keycloakDisabled;
         if (keycloakDisabled) {
             LOG.info("Keycloak is disabled");
@@ -73,7 +74,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
 
         if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme)
                 || isKeycloakSettingsRequest(requestURI) || isWorkspaceAgentRequest(authHeader)
-                || isRequestFromGwtFrame(requestURI)) {
+                || isRequestFromGwtFrame(requestURI) || isStackIconRequest(requestURI)) {
             LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
         } else if (userChecker.matchesUsername(authHeader)) {
@@ -95,6 +96,15 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         return requestURI.endsWith("/api/system/state");
     }
 
+    /**
+     * @param requestURI
+     * @return true if request is retrieving a stack icon
+     */
+    private boolean isStackIconRequest(String requestURI) {
+        return requestURI.contains("/api/stack/") && requestURI.endsWith("/icon");
+    }
+    
+    
     /**
      * @param requestURI
      * @return true if request is made against endpoint which provides keycloak

@@ -1,5 +1,7 @@
 package com.redhat.che.keycloak.ide;
 
+import static com.redhat.che.keycloak.shared.KeycloakConstants.DISABLED_SETTING;
+
 import java.util.List;
 
 import org.eclipse.che.ide.MimeType;
@@ -12,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.redhat.che.keycloak.shared.KeycloakConstants;
 
 /**
  * KeycloakAuthAsyncRequestFactory
@@ -28,7 +31,7 @@ public class KeycloakAsyncRequestFactory extends AsyncRequestFactory {
         super(dtoFactory);
         this.dtoFactory = dtoFactory;
         this.appContext = appContext;
-        this.keycloakDisabled = isKeycloakDisabled(appContext.getMasterEndpoint());
+        this.keycloakDisabled = isKeycloakDisabled(KeycloakConstants.getEndpoint(appContext.getMasterEndpoint()), DISABLED_SETTING);
    }
 
    @Override
@@ -75,12 +78,12 @@ public class KeycloakAsyncRequestFactory extends AsyncRequestFactory {
       console.log(message);
     }-*/;
       
-    public static native boolean isKeycloakDisabled(String theMasterEndpoint) /*-{
+    public static native boolean isKeycloakDisabled(String keycloakSettingsEndpoint, String disabledSetting) /*-{
       var myReq = new XMLHttpRequest();
-      myReq.open('GET', '' + theMasterEndpoint + '/keycloak/settings', false);
+      myReq.open('GET', '' + keycloakSettingsEndpoint, false);
       myReq.send(null);
       var keycloakDisabled = JSON.parse(myReq.responseText);
-      if (keycloakDisabled['che.keycloak.disabled'] != "true") {
+      if (keycloakDisabled['' + disabledSetting] != "true") {
         return false;
       } else {
         return true;

@@ -30,6 +30,10 @@
             <artifactId>tomcat-catalina</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>che-keycloak-plugin-shared</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-tomcat8-adapter</artifactId>
         </dependency>

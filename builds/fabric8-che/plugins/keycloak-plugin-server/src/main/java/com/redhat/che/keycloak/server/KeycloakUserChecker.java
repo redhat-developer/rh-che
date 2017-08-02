@@ -25,6 +25,7 @@ import org.eclipse.che.api.core.ForbiddenException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.UnauthorizedException;
+import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class KeycloakUserChecker {
     private static final String ENDPOINT = "http://che-host:8080/api/token/user";
 
     @Inject
-    private KeycloakHttpJsonRequestFactory requestFactory;
+    private HttpJsonRequestFactory requestFactory;
     
     /**
      * Cache that stores mappings from user to authorization status.

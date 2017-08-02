@@ -9,12 +9,12 @@
 +    const req = new XMLHttpRequest();
 +    req.open('GET', window.IDE.config['restContext'] + '/keycloak/settings', false);
 +    req.send(null); console.log('responseText = ' + req.responseText);
-+    const keycloakDisabled = JSON.parse(req.responseText);
-+    if (keycloakDisabled['che.keycloak.disabled'] != "true") {
++    const keycloakSettings = JSON.parse(req.responseText);
++    if (keycloakSettings['che.keycloak.disabled'] != "true") {
 +          window.keycloak = Keycloak({
-+              url: 'https://sso.openshift.io/auth',
-+              realm: 'fabric8',
-+              clientId: 'openshiftio-public',
++              url: keycloakSettings['che.keycloak.auth_server_url'],
++              realm: keycloakSettings['che.keycloak.realm'],
++              clientId: keycloakSettings['che.keycloak.client_id']
 +            });
 +            window.keycloak.init({ onLoad: 'check-sso', checkLoginIframe: false, responseMode: 'query' }).success(function(authenticated) {
 +               console.log('IDE.jsp authenticated with token:'+ window.keycloak.token);

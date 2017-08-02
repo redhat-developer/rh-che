@@ -1,16 +1,20 @@
 --- src/app/index.module.ts
 +++ src/app/index.module.ts
-@@ -33,13 +33,59 @@
+@@ -33,13 +33,64 @@
  import {DemoComponentsController} from './demo-components/demo-components.controller';
  import {CheBranding} from '../components/branding/che-branding.factory';
  import {ChePreferences} from '../components/api/che-preferences.factory';
 +import * as Keycloak from '../components/keycloak/keycloak';
  
-+let keycloakConfig = {
-+  "url": "https://sso.openshift.io/auth",
-+  "realm": "fabric8",
-+  "clientId": "openshiftio-public",
-+};
++function buildKeycloakConfig(keycloakSettings) {
++    return {
++        url: keycloakSettings['che.keycloak.auth_server_url'],
++        realm: keycloakSettings['che.keycloak.realm'],
++        clientId: keycloakSettings['che.keycloak.client_id']
++    };
++}
++
++let keycloakConfig;
  
  // init module
  let initModule = angular.module('userDashboard', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngResource', 'ngRoute',
@@ -21,11 +25,12 @@
 +
 +  let promise = $injector.get('../wsmaster/api/keycloak/settings');
 +
-+  function keycloakInit(keycloakDisabled) {
++  function keycloakInit(keycloakDisabled, keycloakSettings) {
 +      if (keycloakDisabled) {
 +        window['_keycloak'] = false;
 +        angular.bootstrap(document, ['userDashboard'], {strictDi:true}); // manually bootstrap Angular
 +      } else {
++        keycloakConfig = buildKeycloakConfig(keycloakSettings);
 +        window['_keycloak'] = Keycloak(keycloakConfig);
 +        window['_keycloak']
 +          .init({
@@ -38,19 +43,19 @@
 +    
 +  }
 +
-+  promise.then((resp) => {
-+    console.log('resp : ' + resp.toString() );
-+    if (resp['che.keycloak.disabled'] == 'true') {
-+      keycloakInit(true);
++  promise.then((keycloakSettings) => {
++    console.log('keycloakSettings : ', keycloakSettings);
++    if (keycloakSettings['che.keycloak.disabled'] == 'true') {
++      keycloakInit(true, keycloakSettings);
 +    } else {
-+      keycloakInit(false);
++      keycloakInit(false, keycloakSettings);
 +    }
 +  }, (error) => {
-+    console.log(error);
++    console.log('Error when retrieving Keycloak settings:', error);
 +    keycloakInit(false);
 +  });
 +  
-+  console.log('running keycloak init sequence');
++  console.log('Running Keycloak init sequence');
 +
 +});
 +
@@ -60,7 +65,7 @@
  
  // add a global resolve flag on all routes (user needs to be resolved first)
  initModule.config(['$routeProvider', ($routeProvider: che.route.IRouteProvider) => {
-@@ -171,6 +217,44 @@
+@@ -171,6 +222,44 @@
      });
    }]);
  
@@ -68,7 +73,7 @@
 +  return {
 +    request: (config) => {
 +      console.log('keycloak token interceptor request for ' + config.url);
-+      if (config.url.indexOf(keycloakConfig.url) > -1) {
++      if (keycloak && config.url.indexOf(keycloakConfig.url) > -1) {
 +        console.log('skipped token injection for ' + config.url);
 +        return config;
 +      }
@@ -105,7 +110,7 @@
  
  // add interceptors
  initModule.factory('ETagInterceptor', ($window, $cookies, $q) => {
-@@ -361,6 +445,7 @@
+@@ -361,6 +450,7 @@
  });
  
  initModule.config(['$routeProvider', '$locationProvider', '$httpProvider', ($routeProvider, $locationProvider, $httpProvider) => {

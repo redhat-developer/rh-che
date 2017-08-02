@@ -111,12 +111,18 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.redhat.che</groupId>
                                     <artifactId>user-auth-valve</artifactId>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.redhat.che</groupId>
+                                    <artifactId>che-keycloak-plugin-shared</artifactId>
+                                    <overWrite>true</overWrite>
                                     <type>jar</type>
                                 </artifactItem>
                             </artifactItems>
