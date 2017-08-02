@@ -46,14 +46,29 @@ import com.redhat.che.keycloak.shared.KeycloakSettings;
  * @author amisevsk
  */
 public class UserAuthValve extends KeycloakAuthenticatorValve {
-    
+
     private static final Log LOG = LogFactory.getLog(UserAuthValve.class);
-    private static final String API_ENDPOINT = "http://che-host:8080/api";
-    private static final String USER_VALIDATOR_ENDPOINT = API_ENDPOINT + "/token/user";
+
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    
+
+    /** Name of env var that holds address of Che Host on the cluster */
+    private static final String CHE_API_ENV_VAR = "CHE_API";
+    private static final String USER_VALIDATOR_API_PATH = "/token/user";
+
+    private static final String CHE_API_ENDPOINT;
+    private static final String USER_VALIDATOR_ENDPOINT;
+    static {
+        String cheApiEndpoint = System.getenv(CHE_API_ENV_VAR);
+        if (cheApiEndpoint != null) {
+            CHE_API_ENDPOINT = cheApiEndpoint.replaceAll("/wsmaster/api", "/api");
+        } else {
+            CHE_API_ENDPOINT = "http://che-host:8080/api";
+        }
+        USER_VALIDATOR_ENDPOINT = CHE_API_ENDPOINT + USER_VALIDATOR_API_PATH;
+    }
+
     private Boolean keycloakDisabled = null;
-    
+
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
         if (isKeycloakDisabled()) {
@@ -75,7 +90,7 @@ public class UserAuthValve extends KeycloakAuthenticatorValve {
 
     synchronized void retrieveKeycloakSettingsIfNecessary() {
         if (keycloakDisabled == null) {
-            KeycloakSettings.pullFromApiEndpointIfNecessary(API_ENDPOINT);
+            KeycloakSettings.pullFromApiEndpointIfNecessary(CHE_API_ENDPOINT);
             Map<String, String> keycloakSettings = KeycloakSettings.get();
             if (keycloakSettings == null) {
                 LOG.warn("KeycloakSettings = null => don't disable Keycloak");
@@ -84,13 +99,13 @@ public class UserAuthValve extends KeycloakAuthenticatorValve {
             }
         }
     }
-    
+
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         retrieveKeycloakSettingsIfNecessary();
         super.invoke(request, response);
     }
-    
+
     /**
      * Verify that a logged in user has access to the current project by making a request
      * against the /api/token/user endpoing on Che server.

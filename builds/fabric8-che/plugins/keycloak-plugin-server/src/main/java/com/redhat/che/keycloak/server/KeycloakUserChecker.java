@@ -37,11 +37,23 @@ import com.google.common.cache.LoadingCache;
 public class KeycloakUserChecker {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakUserChecker.class);
-    private static final String ENDPOINT = "http://che-host:8080/api/token/user";
+    private static final String CHE_API_ENV_VAR = "CHE_API";
+    private static final String USER_VALIDATOR_API_PATH = "/token/user";
 
+    private static final String CHE_API_ENDPOINT;
+    private static final String USER_VALIDATOR_ENDPOINT;
+    static {
+        String cheApiEndpoint = System.getenv(CHE_API_ENV_VAR);
+        if (cheApiEndpoint != null) {
+            CHE_API_ENDPOINT = cheApiEndpoint.replaceAll("/wsmaster/api", "/api");
+        } else {
+            CHE_API_ENDPOINT = "http://che-host:8080/api";
+        }
+        USER_VALIDATOR_ENDPOINT = CHE_API_ENDPOINT + USER_VALIDATOR_API_PATH;
+    }
     @Inject
     private HttpJsonRequestFactory requestFactory;
-    
+
     /**
      * Cache that stores mappings from user to authorization status.
      */
@@ -52,7 +64,7 @@ public class KeycloakUserChecker {
                 @Override
                 public Boolean load(String auth) throws Exception {
                     try {
-                        String response = requestFactory.fromUrl(ENDPOINT)
+                        String response = requestFactory.fromUrl(USER_VALIDATOR_ENDPOINT)
                                                                               .useGetMethod()
                                                                               .setAuthorizationHeader(auth)
                                                                               .request().asString();
