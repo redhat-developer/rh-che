@@ -191,6 +191,8 @@ public class WsMasterModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), org.eclipse.che.api.machine.server.spi.InstanceProvider.class);
         machineImageProviderMultibinder.addBinding().to(org.eclipse.che.plugin.docker.machine.DockerInstanceProvider.class);
 
+        install(new org.eclipse.che.api.workspace.server.activity.inject.WorkspaceActivityModule());
+
         bind(org.eclipse.che.api.environment.server.MachineInstanceProvider.class)
                 .to(org.eclipse.che.plugin.docker.machine.MachineProviderImpl.class);
 
@@ -226,6 +228,8 @@ public class WsMasterModule extends AbstractModule {
 
         bind(org.eclipse.che.api.agent.server.filters.AddExecAgentInWorkspaceFilter.class);
         bind(org.eclipse.che.api.agent.server.filters.AddExecAgentInStackFilter.class);
+
+        bind(org.eclipse.che.api.workspace.server.idle.ServerIdleDetector.class);
 
         //rh-che
         bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
