@@ -142,7 +142,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
     private boolean isWebsocketRequest(String requestURI, String requestScheme, String upgradeHeader) {
         return "websocket".equals(upgradeHeader) && //
                (requestURI.endsWith("/ws") || requestURI.endsWith("/eventbus") || requestScheme.equals("ws") || requestScheme.equals("wss")
-                || requestURI.contains("/websocket") || requestURI.contains("/wsagent"));
+                || requestURI.contains("/websocket") || requestURI.endsWith("/wsagent"));
     }
 
     /**
