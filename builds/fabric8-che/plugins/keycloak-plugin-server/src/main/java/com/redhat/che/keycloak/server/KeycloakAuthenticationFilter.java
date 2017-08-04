@@ -69,6 +69,7 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
 
         HttpServletRequest request = (HttpServletRequest) req;
         String authHeader = request.getHeader("Authorization");
+        String upgradeHeader = request.getHeader("Upgrade");
         String requestURI = request.getRequestURI();
         String requestScheme = req.getScheme();
 
@@ -76,9 +77,10 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
             LOG.debug("No 'Authorization' header for {}", requestURI);
         }
 
-        if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme)
+        if (isSystemStateRequest(requestURI) || isWebsocketRequest(requestURI, requestScheme, upgradeHeader)
                 || isKeycloakSettingsRequest(requestURI) || isWorkspaceAgentRequest(authHeader)
-                || isRequestFromGwtFrame(requestURI) || isStackIconRequest(requestURI)) {
+                || isRequestFromGwtFrame(requestURI) || isStackIconRequest(requestURI)
+                || isWsAgentUserTokenRequest(requestURI)) {
             LOG.debug("Skipping {}", requestURI);
             chain.doFilter(req, res);
         } else if (userChecker.matchesUsername(authHeader)) {
@@ -133,10 +135,14 @@ public class KeycloakAuthenticationFilter extends org.keycloak.adapters.servlet.
         return false;
     }
 
-    private boolean isWebsocketRequest(String requestURI, String requestScheme) {
-        return requestURI.endsWith("/ws") || requestURI.endsWith("/eventbus") || requestScheme.equals("ws")
-                || requestScheme.equals("wss") || requestURI.contains("/websocket/")
-                || requestURI.endsWith("/token/user");
+    private boolean isWsAgentUserTokenRequest(String requestURI) {
+        return requestURI.endsWith("/token/user");
+    }
+
+    private boolean isWebsocketRequest(String requestURI, String requestScheme, String upgradeHeader) {
+        return "websocket".equals(upgradeHeader) && //
+               (requestURI.endsWith("/ws") || requestURI.endsWith("/eventbus") || requestScheme.equals("ws") || requestScheme.equals("wss")
+                || requestURI.contains("/websocket") || requestURI.contains("/wsagent"));
     }
 
     /**
