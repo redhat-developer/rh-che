@@ -77,8 +77,6 @@ DEFAULT_CHE_IMAGE_TAG="nightly-fabric8"
 CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
 DEFAULT_CHE_LOG_LEVEL="INFO"
 CHE_LOG_LEVEL=${CHE_LOG_LEVEL:-${DEFAULT_CHE_LOG_LEVEL}}
-DEFAULT_CHE_DEBUGGING_ENABLED="true"
-CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
 
 # Keycloak production endpoints are used by default
 DEFAULT_KEYCLOAK_OSO_ENDPOINT="https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token"
@@ -112,6 +110,8 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
   OPENSHIFT_NAMESPACE_URL=${OPENSHIFT_NAMESPACE_URL:-${DEFAULT_OPENSHIFT_NAMESPACE_URL}}
   DEFAULT_CHE_KEYCLOAK_DISABLED="true"
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
+  DEFAULT_CHE_DEBUGGING_ENABLED="true"
+  CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
 
 elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
   # ----------------------
@@ -127,7 +127,22 @@ elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
   OPENSHIFT_NAMESPACE_URL=${OPENSHIFT_NAMESPACE_URL:-${DEFAULT_OPENSHIFT_NAMESPACE_URL}}
   DEFAULT_CHE_KEYCLOAK_DISABLED="false"
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
+  DEFAULT_CHE_DEBUGGING_ENABLED="false"
+  CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
+
+elif [ "${OPENSHIFT_FLAVOR}" == "ocp" ]; then
+  # ----------------------
+  # Set ocp configuration
+  # ----------------------
+  DEFAULT_CHE_OPENSHIFT_PROJECT="eclipse-che"
+  CHE_OPENSHIFT_PROJECT=${CHE_OPENSHIFT_PROJECT:-${DEFAULT_CHE_OPENSHIFT_PROJECT}}
+  DEFAULT_CHE_KEYCLOAK_DISABLED="true"
+  CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
+  DEFAULT_CHE_DEBUGGING_ENABLED="false"
+  CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
+
 fi
+
 
 # ---------------------------------------
 # Verify that we have all env var are set
@@ -144,10 +159,10 @@ if [ -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then echo "[CHE] **ERROR**Env var OPEN
 # -----------------------------------
 echo -n "[CHE] Logging on using OpenShift endpoint \"${OPENSHIFT_ENDPOINT}\"..."
 if [ -z "${OPENSHIFT_TOKEN+x}" ]; then
-  oc login "${OPENSHIFT_ENDPOINT}" -u "${OPENSHIFT_USERNAME}" -p "${OPENSHIFT_PASSWORD}" > /dev/null
+  oc login "${OPENSHIFT_ENDPOINT}" --insecure-skip-tls-verify=false -u "${OPENSHIFT_USERNAME}" -p "${OPENSHIFT_PASSWORD}" > /dev/null
   OPENSHIFT_TOKEN=$(oc whoami -t)
 else
-  oc login "${OPENSHIFT_ENDPOINT}" --token="${OPENSHIFT_TOKEN}"  > /dev/null
+  oc login "${OPENSHIFT_ENDPOINT}" --insecure-skip-tls-verify=false --token="${OPENSHIFT_TOKEN}"  > /dev/null
 fi
 echo "done!"
 
@@ -161,7 +176,7 @@ if ! oc get project "${CHE_OPENSHIFT_PROJECT}" &> /dev/null; then
   if [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then echo "**ERROR** project doesn't exist on OSIO. Aborting"; exit 1; fi
 
   echo -n "no creating it..."
-  oc new-project "${CHE_OPENSHIFT_PROJECT}"
+  oc new-project "${CHE_OPENSHIFT_PROJECT}" &> /dev/null
   ## TODO we should consider oc apply the latest http://central.maven.org/maven2/io/fabric8/online/packages/fabric8-online-che-quotas-oso/
 fi
 echo "done!"
@@ -200,9 +215,8 @@ fi
 ## TODO we should create Che SA if it doesn't exist
 ## TODO we should check if che has admin rights before creating the role biding
 ## TODO if we are not in minishift we should fail if che SA doesn't have admin rights
-if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
+if [[ "${OPENSHIFT_FLAVOR}" =~ ^(minishift|ocp)$ ]]; then
   echo -n "[CHE] Setting admin role to \"che\" service account..."
-  oc login "${OPENSHIFT_ENDPOINT}" -u system:admin &> /dev/null
   echo "apiVersion: v1
 kind: RoleBinding
 metadata:
@@ -212,7 +226,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: che" | oc apply -f -
-  oc login "${OPENSHIFT_ENDPOINT}" --token="${OPENSHIFT_TOKEN}"  &> /dev/null
 fi
 
 # ----------------------------------------------
@@ -249,7 +262,7 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
     grep -v -e "tls:" -e "insecureEdgeTerminationPolicy: Redirect" -e "termination: edge" | \
     if [ "${CHE_KEYCLOAK_DISABLED}" == "true" ]; then sed "s/    keycloak-disabled: \"false\"/    keycloak-disabled: \"true\"/" ; else cat -; fi | \
     oc apply --force=true -f -
-else
+elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
   echo "[CHE] Deploying Che on OSIO (image ${CHE_IMAGE})"
   curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
     if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
@@ -257,6 +270,16 @@ else
     sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
     sed "s/          image:.*/          image: \"${CHE_IMAGE_SANITIZED}\"/" | \
     if [ "${CHE_KEYCLOAK_DISABLED}" == "true" ]; then sed "s/    keycloak-disabled: \"false\"/    keycloak-disabled: \"true\"/" ; else cat -; fi | \
+    oc apply --force=true -f -
+else
+  echo "[CHE] Deploying Che on OpenShift Container Platform (image ${CHE_IMAGE})"
+  curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
+    if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
+    sed "s/          image:.*/          image: \"${CHE_IMAGE_SANITIZED}\"/" | \
+    sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
+    sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
+    sed "s/    keycloak-disabled:.*/    keycloak-disabled: \"${CHE_KEYCLOAK_DISABLED}\"/" | \
+    if [ "${CHE_LOG_LEVEL}" == "DEBUG" ]; then sed "s/    log-level: \"INFO\"/    log-level: \"DEBUG\"/" ; else cat -; fi | \
     oc apply --force=true -f -
 fi
 echo
