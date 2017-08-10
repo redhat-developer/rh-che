@@ -145,7 +145,7 @@
                                 <!-- Change base HREF of the application 
                                     that will be hosted on /dashboard -->
                                 <replace
-                                    file="${npm-build-root}/dist/index.html">
+                                    file="${npm-build-root}/target/dist/index.html">
                                     <replacetoken><![CDATA[<base href="/">]]></replacetoken>
                                     <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
                                 </replace>
@@ -160,7 +160,7 @@
                 <configuration>
                     <webResources>
                         <resource>
-                            <directory>${npm-build-root}/dist</directory>
+                            <directory>${npm-build-root}/target/dist</directory>
                         </resource>
                     </webResources>
                     <webXml>${npm-build-root}/src/webapp/WEB-INF/web.xml</webXml>

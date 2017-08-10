@@ -16,10 +16,8 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.redhat.bayesian.agent.BayesianAgent;
 import com.redhat.che.keycloak.server.KeycloakHttpJsonRequestFactory;
-import com.redhat.che.keycloak.token.provider.contoller.TokenController;
 import com.redhat.che.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
 
-import org.eclipse.che.security.oauth.OAuthAuthenticator;
 import org.eclipse.che.api.agent.GitCredentialsAgent;
 import org.eclipse.che.api.agent.LSCSharpAgent;
 import org.eclipse.che.api.agent.LSJsonAgent;
@@ -51,6 +49,7 @@ import org.eclipse.che.api.workspace.server.stack.StackMessageBodyAdapter;
 import org.eclipse.che.core.db.schema.SchemaInitializer;
 import org.eclipse.che.inject.DynaModule;
 import org.eclipse.che.plugin.github.factory.resolver.GithubFactoryParametersResolver;
+import org.eclipse.che.security.oauth.OAuthAuthenticator;
 import org.flywaydb.core.internal.util.PlaceholderReplacer;
 
 import javax.sql.DataSource;
@@ -178,7 +177,8 @@ public class WsMasterModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("machine.terminal_agent.run_command"))
                       .to("$HOME/che/terminal/che-websocket-terminal " +
                           "-addr :4411 " +
-                          "-cmd ${SHELL_INTERPRETER}");
+                          "-cmd ${SHELL_INTERPRETER} " +
+                          "-enable-activity-tracking");
         bindConstant().annotatedWith(Names.named("machine.exec_agent.run_command"))
                       .to("$HOME/che/exec-agent/che-exec-agent " +
                           "-addr :4412 " +
@@ -191,7 +191,7 @@ public class WsMasterModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), org.eclipse.che.api.machine.server.spi.InstanceProvider.class);
         machineImageProviderMultibinder.addBinding().to(org.eclipse.che.plugin.docker.machine.DockerInstanceProvider.class);
 
-        install(new org.eclipse.che.api.workspace.server.activity.inject.WorkspaceActivityModule());
+        install(new org.eclipse.che.plugin.activity.inject.WorkspaceActivityModule());
 
         bind(org.eclipse.che.api.environment.server.MachineInstanceProvider.class)
                 .to(org.eclipse.che.plugin.docker.machine.MachineProviderImpl.class);
