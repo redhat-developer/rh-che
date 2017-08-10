@@ -19,40 +19,9 @@ NOTE: working on item *3* could start before *2* is completed.
 
 NOTE: Epic Jira - https://issues.jboss.org/browse/CHE-26[OpenShift Integration to Che]
 
-## Workflow
-
-First thing, make sure that you can build `openshift-connector` branch:
-
-```
-cd che/
-
-git fetch origin openshift-connector:openshift-connector
-git checkout openshift-connector
-
-mvn -Dskip-enforce -Dskip-validate-sources -DskipTests -Dfindbugs.skip -Dgwt.compiler.localWorkers=2 -T 1C clean install
-```
-
-NOTE: For now PRs are expected to be provided against `openshift-connector` branch
-
-
-== How to deploy Eclipse Che (`openshift-connector` branch) on Minishift?
-
-Pre-requirements:
-
-- OpenShift CLI (`oc`) - `v1.3.1` and above
-- Minishift (`minishift`) - `v1.0.0` and above
-
-Detailed instructions can be found in the https://github.com/redhat-developer/rh-che/tree/master/os-templates#deployment-che-on-minishift[Deployment Che on Minishift] document.
-
 == Debugging Che on Minishift
 
-In order to debug Che running on Minishift `che_debug.json` template should be used. Just change `DEFAULT_CHE_TEMPLATE` value in `openche.sh`:
-
-```
-DEFAULT_CHE_TEMPLATE="./che_debug.json"
-```
-
-Other steps are identical to the ones described in the previous section. Once Che is deployed you can see that the port for debugging is exposed by `che-host` service: 
+Once Che is deployed you can see that the port for debugging is exposed by `che-host` service: 
 
 image::images/che-on-openshift/debug_port.png[width="700", height="300",aption="Debugging Port"]
 
@@ -60,6 +29,6 @@ Now you can use it for remote debugging in your IDE:
 
 image::images/che-on-openshift/debug_conf.png[width="700", height="500",aption="Debug Configuration"]
 
-NOTE: Hot swap debugging feature does not work for Eclipse IDE. In order to make changes in the code rebuilding / redeploying `codenvy/che-server:local` image is required
+NOTE: Hot swap debugging feature does not work for Eclipse IDE. In order to make changes in the code rebuilding / redeploying image is required
 
 NOTE: More info about Che remote debugging can be found in the document https://github.com/ibuziuk/docs/blob/master/che_remote_debugging.adoc[Eclipse Che - remote debugging setup] 
