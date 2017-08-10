@@ -223,7 +223,6 @@ echo -n "[CHE] Retrieving latest version of fabric8 online Che template..."
 OSIO_VERSION=$(curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/maven-metadata.xml | grep latest | sed -e 's,.*<latest>\([^<]*\)</latest>.*,\1,g')
 echo "done! (v.${OSIO_VERSION})"
 
-
 # ----------------------------------------------
 # Start the deployment
 # ----------------------------------------------
