@@ -24,5 +24,6 @@
         <module>keycloak-plugin-token-provider</module>
         <module>ls-bayesian-agent</module>
         <module>che-plugin-bayesian-lang-server</module>
+        <module>plugin-product-info</module>
     </modules>
 </project>

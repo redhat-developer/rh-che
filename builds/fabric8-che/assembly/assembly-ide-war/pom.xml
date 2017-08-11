@@ -28,6 +28,10 @@
             <groupId>com.redhat.che</groupId>
             <artifactId>che-keycloak-plugin-ide</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>che-plugin-product-info</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <pluginManagement>
@@ -352,6 +356,10 @@
                             <artifactId>che-plugin-svn-ext-ide</artifactId>
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
+                        <exclusion>
+                            <artifactId>che-plugin-product-info</artifactId>
+                            <groupId>org.eclipse.che.plugin</groupId>
+                        </exclusion>
                     </exclusions>
                     
                 </dependency>
@@ -405,6 +413,10 @@
                         </exclusion>
                         <exclusion>
                             <artifactId>che-plugin-svn-ext-ide</artifactId>
+                            <groupId>org.eclipse.che.plugin</groupId>
+                        </exclusion>
+                        <exclusion>
+                            <artifactId>che-plugin-product-info</artifactId>
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
                     </exclusions>
