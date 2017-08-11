@@ -26,8 +26,6 @@
     <properties>
         <generated.sources.directory>${project.build.directory}/generated-sources/gen</generated.sources.directory>
         <gwt.log.enable>false</gwt.log.enable>
-        <original-project-basedir>assembly/${original-project-name}</original-project-basedir>
-        <original-project-name>assembly-ide-war</original-project-name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -231,30 +229,57 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-ide-war</artifactId>
+                            <classifier>sources</classifier>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/patched/src/main/webapp</outputDirectory>
+                            <includes>IDE.jsp,_app/**,WEB-INF/**,META-INF/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-ide-war</artifactId>
+                            <classifier>sources</classifier>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/patched/src/main/java</outputDirectory>
+                            <includes>**/*.java</includes>
+                            <excludes>org/eclipse/che/providers/**/*.java,org/eclipse/che/ide/**/*.java</excludes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-ide-war</artifactId>
+                            <classifier>sources</classifier>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/patched/src/main/resources</outputDirectory>
+                            <includes>org/**/*</includes>
+                            <excludes>org/**/*.java,**/IDE.gwt.xml</excludes>
+                        </artifactItem>
+                    </artifactItems>
+                    <outputDirectory>${project.build.directory}/wars</outputDirectory>
+                    <overWriteReleases>false</overWriteReleases>
+                    <overWriteSnapshots>true</overWriteSnapshots>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>prepare-patch-files</id>
                         <phase>generate-sources</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-all-files</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target name="copy all original Che files">
-                                <copy
-                                    todir="${project.build.directory}/patched"
-                                    verbose="true">
-                                    <fileset
-                                        dir="${baseCheRepository}/${original-project-basedir}">
-                                        <include name="src/**" />
-                                    </fileset>
-                                </copy>
-                            </target>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>buildnumber</id>
