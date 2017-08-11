@@ -253,8 +253,8 @@ else
   echo "[CHE] Deploying Che on OSIO (image ${CHE_IMAGE})"
   curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
     if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
-    sed "s/    keycloak-oso-endpoint:.*/    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}/" | \
-    sed "s/    keycloak-github-endpoint:.*/    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}/" | \
+    sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
+    sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
     sed "s/          image:.*/          image: \"${CHE_IMAGE_SANITIZED}\"/" | \
     if [ "${CHE_KEYCLOAK_DISABLED}" == "true" ]; then sed "s/    keycloak-disabled: \"false\"/    keycloak-disabled: \"true\"/" ; else cat -; fi | \
     oc apply --force=true -f -
