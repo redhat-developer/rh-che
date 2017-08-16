@@ -69,48 +69,11 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-patch-files</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-patched-files</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source-for-patched-files</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                    <execution>
-                        <id>add-resource-for-patched-files</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-web-resources</id>
                         <phase>process-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-patch-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>patch-sources</id>
                     </execution>
                 </executions>
             </plugin>

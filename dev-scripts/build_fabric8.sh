@@ -16,29 +16,7 @@ else
   export CHE_IMAGE_TAG=nightly-${RH_DIST_SUFFIX}
 fi
 
-if [ -z ${UPSTREAM_CHE_PATH+x} ]; then 
-    echo "!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "!"
-    echo "! Using dedicated Upstream Che repo CHECKED-OUT in the following target directory : "
-    echo "!     $(pwd)/target/export/che-dependencies/che "
-    echo "!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "!"
-    additionalArgument=""
-else 
-    echo "!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "!"
-    echo "! Using Upstream Che repo from LOCAL directory : "
-    echo "!     ${UPSTREAM_CHE_PATH} "
-    echo "!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "!"
-    additionalArgument="-DlocalCheRepository=${UPSTREAM_CHE_PATH}"
-fi
-
-bash cico_build.sh $additionalArgument $*
+bash cico_build.sh $*
 if [ $? -ne 0 ]; then
   echo 'Build Failed!'
   cd ${currentDir}
