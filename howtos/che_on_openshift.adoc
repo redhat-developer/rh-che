@@ -1,4 +1,4 @@
-= Openshift Connector for Eclipse Che
+= Openshift integration to Che via SPI
 
 Current plan for OpenShift integration to Che project:
 
