@@ -341,7 +341,6 @@ Howvever it can removed by with the `-DwithoutDashboard` argument
 By default the build conyains various validation checks and tests, which make it slow.
 You can disable all these checks as well as skip tests with the `-Dfast` argument
 
-
 ##### Enabling / Disabling multi-thread builds
 
 By default the build is single-threaded, to ensure robustness. However, multi-thread builds
