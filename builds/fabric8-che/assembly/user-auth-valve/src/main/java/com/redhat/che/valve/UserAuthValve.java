@@ -62,7 +62,7 @@ public class UserAuthValve extends KeycloakAuthenticatorValve {
         if (cheApiEndpoint != null) {
             CHE_API_ENDPOINT = cheApiEndpoint.replaceAll("/wsmaster/api", "/api");
         } else {
-            CHE_API_ENDPOINT = "http://che-host:8080/api";
+            CHE_API_ENDPOINT = "http://localhost:8080/api";
         }
         USER_VALIDATOR_ENDPOINT = CHE_API_ENDPOINT + USER_VALIDATOR_API_PATH;
     }
