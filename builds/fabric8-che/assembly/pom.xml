@@ -21,7 +21,7 @@
         <relativePath>..</relativePath>
     </parent>
     <artifactId>fabric8-ide-assembly-parent</artifactId>
-    <version>@redhat.che.version@</version>
+    <version>5.18.0-fabric8-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Fabric8 IDE assembly (parent)</name>
     <modules>

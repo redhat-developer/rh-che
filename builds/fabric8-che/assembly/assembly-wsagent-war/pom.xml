@@ -17,7 +17,7 @@
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>@redhat.che.version@</version>
+        <version>5.18.0-fabric8-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>fabric8-ide-assembly-wsagent-war</artifactId>

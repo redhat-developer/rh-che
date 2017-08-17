@@ -129,7 +129,7 @@
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>user-auth-valve</artifactId>
-                <version>@redhat.che.version@</version>
+                <version>${redhat.che.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
