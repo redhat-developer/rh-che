@@ -109,7 +109,7 @@ To start the workspace open the IDE using the following URL http://${CHE_HOST}:8
 
 image::images/spi/start_workspace.png[width="700", height="400",aption="Starting workspace"]
 
-NOTE: To start workspace aftomatically after creation set `start-after-create` to `true` in swagger
+NOTE: To start workspace aftomatically after creation set `start-after-create` to `true` in swagger.
 
 Once workspace is started you can open minishift in browser (`minishift console`) and find newly created workspace project:
 
