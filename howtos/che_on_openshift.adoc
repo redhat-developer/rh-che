@@ -15,7 +15,7 @@ image::images/che-on-openshift/spi.png[width="500", height="300",aption="SPI"]
 
 image::images/che-on-openshift/spi-imp.png[width="500", height="300",aption="SPI Implementation"]
 
-NOTE: working on item *3* could start before *2* is completed.
+NOTE: working on item *3* could start before *2* is completed
 
 NOTE: Epic GitHub issue - https://github.com/eclipse/che/issues/5098
 
