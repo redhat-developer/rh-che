@@ -1,19 +1,22 @@
-/*******************************************************************************
- * Copyright (c) 2012-2017 Codenvy, S.A.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * ***************************************************************************** Copyright (c)
+ * 2012-2017 Codenvy, S.A. All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *   Codenvy, S.A. - initial API and implementation
- *******************************************************************************/
+ * <p>Contributors: Codenvy, S.A. - initial API and implementation
+ * *****************************************************************************
+ */
 package org.eclipse.che.plugin.languageserver.bayesian.server.launcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import org.eclipse.che.api.languageserver.exception.LanguageServerException;
 import org.eclipse.che.api.languageserver.launcher.LanguageServerLauncherTemplate;
 import org.eclipse.che.api.languageserver.registry.DocumentFilter;
@@ -24,12 +27,6 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-
 /**
  * @author Evgen Vidolob
  * @author Anatolii Bazko
@@ -37,72 +34,77 @@ import java.util.Arrays;
 @Singleton
 public class BayesianLanguageServerLauncher extends LanguageServerLauncherTemplate {
 
-    private static final LanguageServerDescription DESCRIPTION = createServerDescription();
+  private static final LanguageServerDescription DESCRIPTION = createServerDescription();
 
-    private final Path                             launchScript;
+  private final Path launchScript;
 
+  @Inject private KeycloakTokenStore keycloakStore;
 
-    @Inject
-    private KeycloakTokenStore keycloakStore;
+  @Inject
+  public BayesianLanguageServerLauncher() {
+    launchScript = Paths.get(System.getenv("HOME"), "che/ls-bayesian/launch.sh");
+  }
 
-    @Inject
-    public BayesianLanguageServerLauncher() {
-        launchScript = Paths.get(System.getenv("HOME"), "che/ls-bayesian/launch.sh");
+  @Override
+  public boolean isAbleToLaunch() {
+    return Files.exists(launchScript);
+  }
+
+  protected LanguageServer connectToLanguageServer(
+      final Process languageServerProcess, LanguageClient client) {
+    Launcher<LanguageServer> launcher =
+        Launcher.createLauncher(
+            client,
+            LanguageServer.class,
+            languageServerProcess.getInputStream(),
+            languageServerProcess.getOutputStream());
+    launcher.startListening();
+    return launcher.getRemoteProxy();
+  }
+
+  protected Process startLanguageServerProcess(String projectPath) throws LanguageServerException {
+    String launchCommand = launchScript.toString();
+
+    if (keycloakStore.hasLastToken()) {
+      launchCommand =
+          "export RECOMMENDER_API_TOKEN="
+              + //
+              keycloakStore.getLastTokenWithoutBearer()
+              + //
+              " && "
+              + //
+              launchCommand;
     }
 
-    @Override
-    public boolean isAbleToLaunch() {
-        return Files.exists(launchScript);
+    ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", launchCommand);
+    processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
+    processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+    processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+    try {
+      return processBuilder.start();
+    } catch (IOException e) {
+      throw new LanguageServerException("Can't start Bayesian language server", e);
     }
+  }
 
-    protected LanguageServer connectToLanguageServer(final Process languageServerProcess, LanguageClient client) {
-        Launcher<LanguageServer> launcher = Launcher.createLauncher(client, LanguageServer.class,
-                                                                    languageServerProcess.getInputStream(),
-                                                                    languageServerProcess.getOutputStream());
-        launcher.startListening();
-        return launcher.getRemoteProxy();
-    }
+  public LanguageServerDescription getDescription() {
+    return DESCRIPTION;
+  }
 
-    protected Process startLanguageServerProcess(String projectPath) throws LanguageServerException {
-        String launchCommand = launchScript.toString();
-
-        if (keycloakStore.hasLastToken()) {
-            launchCommand = "export RECOMMENDER_API_TOKEN=" + //
-                            keycloakStore.getLastTokenWithoutBearer() + //
-                            " && " + //
-                            launchCommand;
-
-        }
-
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", launchCommand);
-        processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        try {
-            return processBuilder.start();
-        } catch (IOException e) {
-            throw new LanguageServerException("Can't start Bayesian language server", e);
-        }
-    }
-
-    public LanguageServerDescription getDescription() {
-        return DESCRIPTION;
-    }
-
-    private static LanguageServerDescription createServerDescription() {
-        return new LanguageServerDescription("org.eclipse.che.plugin.bayesian.languageserver",//
-                                             null,//
-                                             Arrays.asList(new DocumentFilter(BayesianLanguageServerModule.TXT_LANGUAGE_ID,//
-                                                                              "requirements\\.txt",//
-                                                                              null),//
-                                                           new DocumentFilter(JsonModule.LANGUAGE_ID,//
-                                                                              "package\\.json",//
-                                                                              null),
-                                                           new DocumentFilter("pom",
-                                                                              "pom\\.xml",
-                                                                              null)
-                                             )//
+  private static LanguageServerDescription createServerDescription() {
+    return new LanguageServerDescription(
+        "org.eclipse.che.plugin.bayesian.languageserver", //
+        null, //
+        Arrays.asList(
+            new DocumentFilter(
+                BayesianLanguageServerModule.TXT_LANGUAGE_ID, //
+                "requirements\\.txt", //
+                null), //
+            new DocumentFilter(
+                JsonModule.LANGUAGE_ID, //
+                "package\\.json", //
+                null),
+            new DocumentFilter("pom", "pom\\.xml", null)) //
         );
-    }
-
+  }
 }
