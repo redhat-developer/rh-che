@@ -1,4 +1,4 @@
-= Remote debugging setup for Eclipse Che
+= Remote Debugging setup for Eclipse Che
 
 https://eclipse-che.readme.io/docs/[Eclipse Che] has a really huge codebase which consists of a dozen of individual https://github.com/eclipse/che/wiki/Development-Workflow#modules[modules]. Basically, if you work on a separate module it is utterly convenient to have only this particular module imported to the IDE and setup the remote debugging in order to avoid long-running builds and issues like `java.lang.OutOfMemoryError: GC overhead limit exceeded`. In this article we are going to setup the remote debugging in Eclipse IDE for https://github.com/eclipse/che/tree/master/wsmaster[wsmaster] component. + 
 First thing you need to do is to build the component:
