@@ -431,6 +431,14 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!-- add classifier without-dashboard -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <classifier>without-dashboard</classifier>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
             <dependencies>

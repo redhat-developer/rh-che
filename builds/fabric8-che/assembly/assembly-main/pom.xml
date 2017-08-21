@@ -26,11 +26,6 @@
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-assembly-ide-war</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
             <type>tar.gz</type>
         </dependency>
@@ -151,10 +146,44 @@
             <dependencies>
                 <dependency>
                     <groupId>com.redhat.che</groupId>
+                    <artifactId>fabric8-ide-assembly-ide-war</artifactId>
+                    <type>war</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.redhat.che</groupId>
                     <artifactId>fabric8-ide-che-dashboard-war</artifactId>
                     <type>war</type>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>withoutDashboard</id>
+            <activation>
+                <property>
+                    <name>withoutDashboard</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.redhat.che</groupId>
+                    <artifactId>fabric8-ide-assembly-ide-war</artifactId>
+                    <type>war</type>
+                    <classifier>without-dashboard</classifier>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <appendAssemblyId>true</appendAssemblyId>
+                            <descriptor>${project.basedir}/src/assembly/assembly-wo-dashboard.xml</descriptor>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

@@ -33,6 +33,7 @@
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>5.18.0-fabric8-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
+        <withoutDashboard>false</withoutDashboard>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -83,6 +84,13 @@
                 <artifactId>fabric8-ide-assembly-ide-war</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-ide-assembly-ide-war</artifactId>
+                <version>${redhat.che.version}</version>
+                <type>war</type>
+                <classifier>without-dashboard</classifier>
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
