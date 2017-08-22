@@ -1,10 +1,10 @@
 --- plugins/plugin-svn/che-plugin-svn-ext-server/src/test/java/org/eclipse/che/plugin/svn/server/SubversionApiITest.java
 +++ plugins/plugin-svn/che-plugin-svn-ext-server/src/test/java/org/eclipse/che/plugin/svn/server/SubversionApiITest.java
-@@ -339,6 +340,7 @@ public class SubversionApiITest {
-         assertTrue(coRevision <= response.getRevision());
-     }
-
-+    @org.junit.Ignore
-     @Test
-     public void testInfo() throws Exception {
-         subversionApi.checkout(DtoFactory.getInstance()
+@@ -390,6 +390,7 @@ public class SubversionApiITest {
+     assertTrue(coRevision <= response.getRevision());
+   }
+ 
++  @org.junit.Ignore
+   @Test
+   public void testInfo() throws Exception {
+     subversionApi.checkout(
