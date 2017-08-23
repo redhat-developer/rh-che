@@ -274,19 +274,19 @@ is reused, which make the RedHat Che distribution build much faster.
 
 The version of the RedHat Che distribution assembly and dashboard artifacts is derived from
 the version of the upstream Che project. For example, if upstream version is:
-`5.17.0-SNAPSHOT`,
+`5.18.0-SNAPSHOT`,
 then the version of the generated RedHat Che distribution will be:
-`5.17.0-fabric8-SNAPSHOT`
+`5.18.0-fabric8-SNAPSHOT`
 and the result of the RedHat Che distribution build will be available at the following location:
     
     rh-che/target/builds/fabric8/fabric8-che/assembly/assembly-main/target/eclipse-che-5.17.0-fabric8-SNAPSHOT
 
 Alternatively, if the option to remove the Dashboard has been enabled then the version of the
 generated RedHat Che distribution will be:
-`5.17.0-fabric8-without-dashboard-SNAPSHOT` .
+`5.18.0-fabric8-without-dashboard-SNAPSHOT` .
 and the result of the RedHat Che distribution build will be available at the following location:
     
-    rh-che/target/builds/fabric8-without-dashboard/fabric8-che/assembly/assembly-main/target/eclipse-che-5.17.0-fabric8-without-dashboard-SNAPSHOT
+    rh-che/target/builds/fabric8-without-dashboard/fabric8-che/assembly/assembly-main/target/eclipse-che-5.18.0-fabric8-without-dashboard-SNAPSHOT
 
 
 The build is started by running *maven* in the root of the current git repository,
