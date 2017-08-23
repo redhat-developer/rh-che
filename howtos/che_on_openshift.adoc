@@ -23,7 +23,7 @@ Once Che is deployed you can see that the port for debugging is exposed by `che-
 
 image::images/che-on-openshift/debug_port.png[width="700", height="300",aption="Debugging Port"]
 
-Now you can use it for remote debugging in your IDE:
+Now you can use it for remote debugging from IDE:
 
 image::images/che-on-openshift/debug_conf.png[width="700", height="500",aption="Debug Configuration"]
 
