@@ -13,11 +13,11 @@ distPath='assembly/assembly-main/target/eclipse-che-*.tar.gz'
 for distribution in `ls -1 ${currentDir}/builds/fabric8-che/${distPath};`
 do
   case "$distribution" in
-    ${currentDir}/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-*-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
+    ${currentDir}/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
       TAG=${RH_DIST_SUFFIX}-no-dashboard-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}-no-dashboard
       ;;
-    ${currentDir}/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-*-${RH_DIST_SUFFIX}*)
+    ${currentDir}/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}*)
       TAG=${RH_DIST_SUFFIX}-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}
       # File che_image_tag.env will be used by the verification script to

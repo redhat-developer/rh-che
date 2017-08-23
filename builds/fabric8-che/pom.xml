@@ -31,7 +31,7 @@
     </modules>
     <properties>
         <keycloak.version>2.5.0.Final</keycloak.version>
-        <redhat.che.version>5.18.0-fabric8-SNAPSHOT</redhat.che.version>
+        <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
         <withoutDashboard>false</withoutDashboard>
     </properties>

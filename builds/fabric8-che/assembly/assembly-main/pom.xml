@@ -17,7 +17,7 @@
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>5.18.0-fabric8-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>fabric8-ide-assembly-main</artifactId>
@@ -62,7 +62,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <updateOnly>false</updateOnly>
                     <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
-                    <finalName>eclipse-che-${project.version}</finalName>
+                    <finalName>eclipse-che-fabric8-${project.version}</finalName>
                     <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
             </plugin>
