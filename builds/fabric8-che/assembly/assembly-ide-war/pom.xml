@@ -39,46 +39,6 @@
         </dependency>
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                  <groupId>org.eclipse.m2e</groupId>
-                  <artifactId>lifecycle-mapping</artifactId>
-                  <configuration>
-                    <lifecycleMappingMetadata>
-                      <pluginExecutions>
-                        <pluginExecution>
-                          <pluginExecutionFilter>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>exec-maven-plugin</artifactId>
-                            <versionRange>[1.4.0,)</versionRange>
-                            <goals>
-                              <goal>java</goal>
-                            </goals>
-                          </pluginExecutionFilter>
-                          <action>
-                            <ignore />
-                          </action>
-                        </pluginExecution>
-                        <pluginExecution>
-                          <pluginExecutionFilter>
-                            <groupId>org.eclipse.che.core</groupId>
-                            <artifactId>che-core-api-dto-maven-plugin</artifactId>
-                            <versionRange>[4,)</versionRange>
-                            <goals>
-                              <goal>generate</goal>
-                            </goals>
-                          </pluginExecutionFilter>
-                          <action>
-                            <ignore />
-                          </action>
-                        </pluginExecution>
-                      </pluginExecutions>
-                    </lifecycleMappingMetadata>
-                  </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
