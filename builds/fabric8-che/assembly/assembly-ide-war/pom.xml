@@ -371,6 +371,14 @@
     </build>
     <profiles>
         <profile>
+            <id>fast</id>
+            <properties>
+                <!-- for some unknown reason the same argument works well in upstream che but not here-->
+                <!-- gwt.compiler.localWorkers>2 -T 1C</gwt.compiler.localWorkers -->
+                <gwt.compiler.localWorkers>2</gwt.compiler.localWorkers>
+            </properties>
+        </profile>
+        <profile>
             <id>withDashboard</id>
             <activation>
                 <property>
