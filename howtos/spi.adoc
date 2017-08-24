@@ -44,7 +44,7 @@ docker run -it --rm -e "CHE_DEBUG_SERVER=true" \
                     -v /var/run/docker.sock:/var/run/docker.sock \
                     -v /home/user/.che:/data \
                     -v /home/user/code/che:/repo \
-                    eclipse/che:nightly start --fast
+                    eclipse/che:nightly start --fast --debug
 ```
 NOTE: `CHE_HOST` can be obtained by running `ifconfig` command. It is IP of machine inside the virtual network for `vbox` which is required for making Che accessible from pods.
 
