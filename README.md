@@ -136,7 +136,7 @@ dev-scripts/update_openshift_connector.sh -Dfast -Dche.branch="myFixBranch" clea
 dev-scripts/docker_create_images_and_tag.sh
 ```
 __Note:__ This step is already included in the build scripts.
-However, if you plan to deploy or rollupdate to Minishift, you should also create / tag docker images
+However, if you plan to deploy or rollupdate to Minishift, you should also create/tag docker images
 in the Minishift docker environment, as detailed in next section. 
 
 ##### In the Minishift docker environment
