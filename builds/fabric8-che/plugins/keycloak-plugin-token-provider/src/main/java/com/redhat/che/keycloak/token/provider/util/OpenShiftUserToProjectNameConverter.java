@@ -32,8 +32,7 @@ public class OpenShiftUserToProjectNameConverter {
       // Username is an email address
       projectName = projectName.split("@")[0];
     }
-    projectName = projectName.replaceAll("\\.", "-");
-    projectName = projectName.replaceAll("\\+", "-");
+    projectName = projectName.replaceAll("[^a-z0-9]", "-");
 
     LOG.debug("Got project name: {}", projectName);
     return projectName;
