@@ -53,7 +53,8 @@ public class OpenShiftUserToProjectNameConverterTest {
     String expected = "test-user";
 
     // When
-    String actual = OpenShiftUserToProjectNameConverter.getProjectNameFromUsername(usernameWithUnderscore);
+    String actual =
+        OpenShiftUserToProjectNameConverter.getProjectNameFromUsername(usernameWithUnderscore);
 
     // Then
     assertEquals("Should convert '_' to '-' in username", expected, actual);
@@ -69,8 +70,10 @@ public class OpenShiftUserToProjectNameConverterTest {
     String actual = OpenShiftUserToProjectNameConverter.getProjectNameFromUsername(username);
 
     // Then
-    assertEquals("Should convert all characters not matching regex [a-z0-9]"
-               + " to '-' in username", expected, actual);
+    assertEquals(
+        "Should convert all characters not matching regex [a-z0-9]" + " to '-' in username",
+        expected,
+        actual);
   }
 
   @Test
