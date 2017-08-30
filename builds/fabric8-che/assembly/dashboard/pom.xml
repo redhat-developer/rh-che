@@ -11,8 +11,7 @@
       Red Hat, Inc. - initial API and implementation
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
@@ -145,11 +144,8 @@
                         </goals>
                         <configuration>
                             <target name="copy all original Che files">
-                                <copy
-                                    todir="${project.build.directory}/patched"
-                                    verbose="true">
-                                    <fileset
-                                        dir="${project.build.directory}/che-dashboard">
+                                <copy todir="${project.build.directory}/patched" verbose="true">
+                                    <fileset dir="${project.build.directory}/che-dashboard">
                                         <include name="e2e/**" />
                                         <include name="gulp/**" />
                                         <include name="src/**" />
@@ -170,14 +166,12 @@
                         <configuration>
                             <target>
                                 <!-- Download NPM dependencies -->
-                                <exec dir="${npm-build-root}"
-                                    executable="npm" failonerror="true">
+                                <exec dir="${npm-build-root}" executable="npm" failonerror="true">
                                     <arg value="install" />
                                 </exec>
                                 <!-- Change base HREF of the application 
                                     that will be hosted on /dashboard -->
-                                <replace
-                                    file="${npm-build-root}/target/dist/index.html">
+                                <replace file="${npm-build-root}/target/dist/index.html">
                                     <replacetoken><![CDATA[<base href="/">]]></replacetoken>
                                     <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
                                 </replace>

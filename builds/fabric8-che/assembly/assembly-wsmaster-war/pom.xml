@@ -11,8 +11,7 @@
       Red Hat, Inc. - initial API and implementation
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
@@ -38,6 +37,10 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-stacks</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
@@ -51,8 +54,8 @@
             <type>pom</type>
             <exclusions>
                 <exclusion>
-                    <groupId>org.eclipse.che.core</groupId>
                     <artifactId>che-core-ide-stacks</artifactId>
+                    <groupId>org.eclipse.che.core</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -60,10 +63,6 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-catalina</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -93,7 +92,7 @@
                         </overlay>
                     </overlays>
                 </configuration>
-           </plugin>
+            </plugin>
         </plugins>
     </build>
 </project>

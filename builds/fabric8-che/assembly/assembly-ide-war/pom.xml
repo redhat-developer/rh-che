@@ -11,8 +11,7 @@
       Red Hat, Inc. - initial API and implementation
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
@@ -249,8 +248,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <echo append="false"
-                                    file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
+                                <echo append="false" file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
                                     buildTime = ${timestamp}
                                     version =
                                     ${project.version}</echo>
@@ -267,8 +265,7 @@
                             <target>
                                 <!-- To bypass a problem in the build when 
                                     rebuilding without the clean option. -->
-                                <delete verbose="true"
-                                    dir="${project.build.directory}/generated-sources" />
+                                <delete dir="${project.build.directory}/generated-sources" verbose="true" />
                             </target>
                         </configuration>
                     </execution>
@@ -361,7 +358,6 @@
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
                     </exclusions>
-                    
                 </dependency>
             </dependencies>
         </profile>
