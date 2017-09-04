@@ -6,6 +6,8 @@ currentDir=`pwd`
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
 
+UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${currentDir}/builds/fabric8-che/assembly/assembly-build-info/target/dependency/WEB-INF/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties)
+
 # Now lets build the local docker images
 cd ${currentDir}/dockerfiles/che-fabric8
 
@@ -14,11 +16,11 @@ for distribution in `ls -1 ${currentDir}/builds/fabric8-che/${distPath};`
 do
   case "$distribution" in
     ${currentDir}/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
-      TAG=${RH_DIST_SUFFIX}-no-dashboard-${RH_CHE_TAG}
+      TAG=${UPSTREAM_TAG}-${RH_DIST_SUFFIX}-no-dashboard-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}-no-dashboard
       ;;
     ${currentDir}/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}*)
-      TAG=${RH_DIST_SUFFIX}-${RH_CHE_TAG}
+      TAG=${UPSTREAM_TAG}-${RH_DIST_SUFFIX}-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}
       # File che_image_tag.env will be used by the verification script to
       # retrieve the image tag to promote to production. That's the only
