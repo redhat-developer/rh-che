@@ -65,6 +65,7 @@ do
     
     if [ "${DOCKER_HUB_USER}" == "${RHCHEBOT_DOCKER_HUB_USER}" ]; then
     # lets also push it to push.registry.devshift.net
+      docker login -u $DEVSHIFT_USERNAME -p $DEVSHIFT_PASSWORD push.registry.devshift.net
       docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${NIGHTLY}
       docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${TAG}
       docker push push.registry.devshift.net/che/che:${NIGHTLY}

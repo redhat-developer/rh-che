@@ -10,7 +10,7 @@ currentDir=`pwd`
 if [ "$DeveloperBuild" != "true" ]
 then
   set +x
-  cat jenkins-env | grep PASS > inherit-env
+  cat jenkins-env | grep -e PASS -e DEVSHIFT > inherit-env
   . inherit-env
   set -x
   yum -y update
