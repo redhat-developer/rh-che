@@ -65,11 +65,13 @@ do
     
     if [ "${DOCKER_HUB_USER}" == "${RHCHEBOT_DOCKER_HUB_USER}" ]; then
     # lets also push it to push.registry.devshift.net
-      docker login -u $DEVSHIFT_USERNAME -p $DEVSHIFT_PASSWORD push.registry.devshift.net
-      docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${NIGHTLY}
-      docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${TAG}
-      docker push push.registry.devshift.net/che/che:${NIGHTLY}
-      docker push push.registry.devshift.net/che/che:${TAG}
+      if [ -z "${DEVSHIFT_USERNAME+x}" ]; then echo "DEVSHIFT_USERNAME is unset."; fi
+      if [ -z "${DEVSHIFT_PASSWORD+x}" ]; then echo "DEVSHIFT_PASSWORD is unset."; fi
+      # docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} -e noreply@redhat.com push.registry.devshift.net
+      # docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${NIGHTLY}
+      # docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${TAG}
+      # docker push push.registry.devshift.net/che/che:${NIGHTLY}
+      # docker push push.registry.devshift.net/che/che:${TAG}
     fi
   fi
 done
