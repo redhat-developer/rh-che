@@ -33,6 +33,20 @@ do
   docker pull ${CHE_DOCKER_BASE_IMAGE}
   docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
 
+  DIR=$(cd "$(dirname "$0")"; pwd)
+
+  # Use of folder
+  LOCAL_ASSEMBLY_ZIP="${DIR}"/eclipse-che.tar.gz
+
+  if [ -f "${LOCAL_ASSEMBLY_ZIP}" ]; then
+    rm "${LOCAL_ASSEMBLY_ZIP}"
+  fi
+
+  echo "Linking assembly ${distribution} --> ${LOCAL_ASSEMBLY_ZIP}"
+  ln "${distribution}" "${LOCAL_ASSEMBLY_ZIP}"
+
+
+
   bash ./build.sh --organization:${DOCKER_HUB_NAMESPACE} --tag:${NIGHTLY}
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
