@@ -243,19 +243,17 @@
                             </tasks>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
                     <execution>
-                        <id>clean generated sources in assembly-ide-war</id>
+                        <id>auto-clean</id>
                         <phase>initialize</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>clean</goal>
                         </goals>
-                        <configuration>
-                            <target>
-                                <!-- To bypass a problem in the build when 
-                                    rebuilding without the clean option. -->
-                                <delete dir="${project.build.directory}/generated-sources" verbose="true" />
-                            </target>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

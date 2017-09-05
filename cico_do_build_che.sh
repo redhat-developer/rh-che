@@ -24,7 +24,7 @@ mvnche() {
 }
 
 mkdir $NPM_CONFIG_PREFIX 2>/dev/null
-mvnche -B $* install
+mvnche -B $* clean install
 if [ $? -ne 0 ]; then
   echo "Error building che/rh-che with dashboard"
   exit 1;
@@ -32,10 +32,9 @@ fi
 
 if [ "$DeveloperBuild" != "true" ]
   then
-    echo "Build without dashboard is currently skipped because the CI fails (c.f. https://github.com/redhat-developer/rh-che/issues/318). And by the way it's not used in OSIO yet."
-    # mvnche -B -DwithoutDashboard $* install
-    # if [ $? -ne 0 ]; then
-    #   echo "Error building che/rh-che without dashboard"
-    #   exit 1;
-    # fi
+    mvnche -B -DwithoutDashboard -pl=:fabric8-ide-assembly-ide-war,:fabric8-ide-assembly-main $* install
+    if [ $? -ne 0 ]; then
+      echo "Error building che/rh-che without dashboard"
+      exit 1;
+    fi
 fi
