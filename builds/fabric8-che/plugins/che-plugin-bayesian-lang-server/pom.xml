@@ -22,15 +22,6 @@
     <artifactId>che-plugin-bayesian-lang-server</artifactId>
     <packaging>jar</packaging>
     <name>Che :: Bayesian Language Server Integration</name>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.6</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -99,6 +90,18 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
- </project>
+</project>

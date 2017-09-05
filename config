@@ -3,12 +3,6 @@
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master
 
-export CHE_FORK=eclipse
-export CHE_BRANCH=openshift-connector-wip
-
-export CHE_DEP_FORK=eclipse
-export CHE_DEP_BRANCH=openshift-connector-wip
-
 export NPM_CONFIG_PREFIX=~/.che_node_modules
 export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
 
@@ -25,3 +19,5 @@ export RH_CHE_DOCKER_IMAGE_VERSION=${RH_CHE_DOCKER_IMAGE_VERSION:-${DEFAULT_RH_C
 export DOCKER_HUB_USER=${DOCKER_HUB_USER:-${RHCHEBOT_DOCKER_HUB_USER}}
 export DOCKER_HUB_PASSWORD=${DOCKER_HUB_PASSWORD:-${RHCHEBOT_DOCKER_HUB_PASSWORD}}
 export DOCKER_HUB_NAMESPACE=${DOCKER_HUB_NAMESPACE:-${RH_CHE_DOCKER_HUB_NAMESPACE}}
+
+export CHE_DOCKER_BASE_IMAGE=eclipse/che-server:5.17.0-centos

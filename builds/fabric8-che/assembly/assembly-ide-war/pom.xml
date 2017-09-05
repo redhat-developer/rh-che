@@ -11,13 +11,12 @@
       Red Hat, Inc. - initial API and implementation
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>fabric8-ide-assembly-parent</artifactId>
         <groupId>com.redhat.che</groupId>
-        <version>@redhat.che.version@</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>fabric8-ide-assembly-ide-war</artifactId>
@@ -26,8 +25,6 @@
     <properties>
         <generated.sources.directory>${project.build.directory}/generated-sources/gen</generated.sources.directory>
         <gwt.log.enable>false</gwt.log.enable>
-        <original-project-basedir>assembly/${original-project-name}</original-project-basedir>
-        <original-project-name>assembly-ide-war</original-project-name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -41,46 +38,6 @@
         </dependency>
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                  <groupId>org.eclipse.m2e</groupId>
-                  <artifactId>lifecycle-mapping</artifactId>
-                  <configuration>
-                    <lifecycleMappingMetadata>
-                      <pluginExecutions>
-                        <pluginExecution>
-                          <pluginExecutionFilter>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>exec-maven-plugin</artifactId>
-                            <versionRange>[1.4.0,)</versionRange>
-                            <goals>
-                              <goal>java</goal>
-                            </goals>
-                          </pluginExecutionFilter>
-                          <action>
-                            <ignore />
-                          </action>
-                        </pluginExecution>
-                        <pluginExecution>
-                          <pluginExecutionFilter>
-                            <groupId>org.eclipse.che.core</groupId>
-                            <artifactId>che-core-api-dto-maven-plugin</artifactId>
-                            <versionRange>[4,)</versionRange>
-                            <goals>
-                              <goal>generate</goal>
-                            </goals>
-                          </pluginExecutionFilter>
-                          <action>
-                            <ignore />
-                          </action>
-                        </pluginExecution>
-                      </pluginExecutions>
-                    </lifecycleMappingMetadata>
-                  </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -97,18 +54,6 @@
                 <executions>
                     <execution>
                         <id>patch-sources</id>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>analyze</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -231,30 +176,57 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-ide-war</artifactId>
+                            <classifier>sources</classifier>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/patched/src/main/webapp</outputDirectory>
+                            <includes>IDE.jsp,_app/**,WEB-INF/**,META-INF/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-ide-war</artifactId>
+                            <classifier>sources</classifier>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/patched/src/main/java</outputDirectory>
+                            <includes>**/*.java</includes>
+                            <excludes>org/eclipse/che/providers/**/*.java,org/eclipse/che/ide/**/*.java</excludes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>org.eclipse.che</groupId>
+                            <artifactId>assembly-ide-war</artifactId>
+                            <classifier>sources</classifier>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/patched/src/main/resources</outputDirectory>
+                            <includes>org/**/*</includes>
+                            <excludes>org/**/*.java,**/IDE.gwt.xml</excludes>
+                        </artifactItem>
+                    </artifactItems>
+                    <outputDirectory>${project.build.directory}/wars</outputDirectory>
+                    <overWriteReleases>false</overWriteReleases>
+                    <overWriteSnapshots>true</overWriteSnapshots>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>prepare-patch-files</id>
                         <phase>generate-sources</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-all-files</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target name="copy all original Che files">
-                                <copy
-                                    todir="${project.build.directory}/patched"
-                                    verbose="true">
-                                    <fileset
-                                        dir="${baseCheRepository}/${original-project-basedir}">
-                                        <include name="src/**" />
-                                    </fileset>
-                                </copy>
-                            </target>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>buildnumber</id>
@@ -264,8 +236,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <echo append="false"
-                                    file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
+                                <echo append="false" file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
                                     buildTime = ${timestamp}
                                     version =
                                     ${project.version}</echo>
@@ -282,8 +253,7 @@
                             <target>
                                 <!-- To bypass a problem in the build when 
                                     rebuilding without the clean option. -->
-                                <delete verbose="true"
-                                    dir="${project.build.directory}/generated-sources" />
+                                <delete dir="${project.build.directory}/generated-sources" verbose="true" />
                             </target>
                         </configuration>
                     </execution>
@@ -346,6 +316,14 @@
     </build>
     <profiles>
         <profile>
+            <id>fast</id>
+            <properties>
+                <!-- for some unknown reason the same argument works well in upstream che but not here-->
+                <!-- gwt.compiler.localWorkers>2 -T 1C</gwt.compiler.localWorkers -->
+                <gwt.compiler.localWorkers>2</gwt.compiler.localWorkers>
+            </properties>
+        </profile>
+        <profile>
             <id>withDashboard</id>
             <activation>
                 <property>
@@ -368,7 +346,6 @@
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
                     </exclusions>
-                    
                 </dependency>
             </dependencies>
         </profile>
@@ -405,6 +382,14 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                    <!-- add classifier without-dashboard -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <classifier>without-dashboard</classifier>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

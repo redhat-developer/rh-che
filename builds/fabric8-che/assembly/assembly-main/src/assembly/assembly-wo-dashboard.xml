@@ -15,7 +15,7 @@
     xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>tomcat-zip</id>
+    <id>without-dashboard</id>
     <formats>
         <format>dir</format>
         <format>zip</format>
@@ -31,16 +31,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>ROOT.war</outputFileNameMapping>
             <includes>
-                <include>com.redhat.che:fabric8-ide-assembly-ide-war</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <unpack>false</unpack>
-            <outputDirectory>tomcat/webapps</outputDirectory>
-            <outputFileNameMapping>dashboard.war</outputFileNameMapping>
-            <includes>
-                <include>com.redhat.che:fabric8-ide-che-dashboard-war</include>
+                <include>com.redhat.che:fabric8-ide-assembly-ide-war:without-dashboard</include>
             </includes>
         </dependencySet>
     </dependencySets>
