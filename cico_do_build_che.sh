@@ -32,7 +32,7 @@ fi
 
 if [ "$DeveloperBuild" != "true" ]
   then
-    mvnche -B -DwithoutDashboard $* install
+    mvnche -B -DwithoutDashboard $* clean install
     if [ $? -ne 0 ]; then
       echo "Error building che/rh-che without dashboard"
       exit 1;
