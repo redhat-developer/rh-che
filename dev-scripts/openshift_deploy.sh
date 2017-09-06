@@ -177,7 +177,7 @@ if ! oc get project "${CHE_OPENSHIFT_PROJECT}" &> /dev/null; then
 
   echo -n "no creating it..."
   oc new-project "${CHE_OPENSHIFT_PROJECT}" &> /dev/null
-  ## TODO we should consider oc apply the latest http://central.maven.org/maven2/io/fabric8/online/packages/fabric8-online-che-quotas-oso/
+  ## TODO we should consider oc apply the latest http://central.maven.org/maven2/io/fabric8/tenant/packages/fabric8-tenant-che-quotas-oso/
 fi
 echo "done!"
 
@@ -229,11 +229,11 @@ subjects:
 fi
 
 # ----------------------------------------------
-# Get latest version of fabric8-online templates
+# Get latest version of fabric8 tenant templates
 # ----------------------------------------------
 # TODO make it possible to use a local Che template instead of always downloading it from maven central
-echo -n "[CHE] Retrieving latest version of fabric8 online Che template..."
-OSIO_VERSION=$(curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/maven-metadata.xml | grep latest | sed -e 's,.*<latest>\([^<]*\)</latest>.*,\1,g')
+echo -n "[CHE] Retrieving latest version of fabric8 tenant Che template..."
+OSIO_VERSION=$(curl -sSL http://central.maven.org/maven2/io/fabric8/tenant/apps/che/maven-metadata.xml | grep latest | sed -e 's,.*<latest>\([^<]*\)</latest>.*,\1,g')
 echo "done! (v.${OSIO_VERSION})"
 
 # ----------------------------------------------
@@ -247,7 +247,7 @@ CHE_IMAGE_SANITIZED=$(echo "${CHE_IMAGE}" | sed 's/\//\\\//g')
 echo
 if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
   echo "[CHE] Deploying Che on minishift (image ${CHE_IMAGE})"
-  curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
+  curl -sSL http://central.maven.org/maven2/io/fabric8/tenant/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
     if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
     sed "s/          image:.*/          image: \"${CHE_IMAGE_SANITIZED}\"/" | \
     sed "s/    workspaces-memory-limit: 2300Mi/    workspaces-memory-limit: 1300Mi/" | \
@@ -264,7 +264,7 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
     oc apply --force=true -f -
 elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
   echo "[CHE] Deploying Che on OSIO (image ${CHE_IMAGE})"
-  curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
+  curl -sSL http://central.maven.org/maven2/io/fabric8/tenant/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
     if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
     sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
     sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
@@ -273,7 +273,7 @@ elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
     oc apply --force=true -f -
 else
   echo "[CHE] Deploying Che on OpenShift Container Platform (image ${CHE_IMAGE})"
-  curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
+  curl -sSL http://central.maven.org/maven2/io/fabric8/tenant/apps/che/"${OSIO_VERSION}"/che-"${OSIO_VERSION}"-openshift.yml | \
     if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
     sed "s/          image:.*/          image: \"${CHE_IMAGE_SANITIZED}\"/" | \
     sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
