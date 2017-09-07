@@ -44,9 +44,7 @@ do
 
   echo "Linking assembly ${distribution} --> ${LOCAL_ASSEMBLY_ZIP}"
   ln "${distribution}" "${LOCAL_ASSEMBLY_ZIP}"
-
-
-
+  
   bash ./build.sh --organization:${DOCKER_HUB_NAMESPACE} --tag:${NIGHTLY}
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
@@ -64,22 +62,8 @@ do
   if [ "$DeveloperBuild" != "true" ]
   then
     docker login -u ${DOCKER_HUB_USER} -p $DOCKER_HUB_PASSWORD -e noreply@redhat.com 
-    
     docker push ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
     docker push ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
-    
-    if [ "${DOCKER_HUB_USER}" == "${RHCHEBOT_DOCKER_HUB_USER}" ]; then
-      # lets also push it to push.registry.devshift.net
-      if ([ -z "${DEVSHIFT_USERNAME+x}" ] || [ -z "${DEVSHIFT_PASSWORD+x}" ]); then
-        echo "WARNING: Cannot push to registry.devshift.net: credentials are not set"
-      else
-        docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} -e noreply@redhat.com push.registry.devshift.net
-        docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${NIGHTLY}
-        docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} push.registry.devshift.net/che/che:${TAG}
-        docker push push.registry.devshift.net/che/che:${NIGHTLY}
-        docker push push.registry.devshift.net/che/che:${TAG}
-      fi
-    fi
   fi
 done
 
