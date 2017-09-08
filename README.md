@@ -85,7 +85,7 @@ SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-
 export OPENSHIFT_FLAVOR=ocp && curl -fsSL ${SCRIPT_URL} -o get-che.sh && bash get-che.sh
 ```
 
-And if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rhche) you can deploy Che on OSIO executing:
+And if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rh-che) you can deploy Che on OSIO executing:
 
 ```bash
 export OPENSHIFT_FLAVOR=ocp && ./dev-scripts/openshift_deploy.sh
@@ -98,7 +98,7 @@ SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-
 curl -fsSL ${SCRIPT_URL} -o get-che.sh && bash get-che.sh
 ```
 
-Of course if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rhche) you can deploy Che on minishift executing:
+Of course if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rh-che) you can deploy Che on minishift executing:
 
 ```bash
 ./dev-scripts/openshift_deploy.sh
@@ -111,7 +111,7 @@ SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-
 export OPENSHIFT_FLAVOR=osio && curl -fsSL ${SCRIPT_URL} -o get-che.sh && bash get-che.sh
 ```
 
-And if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rhche) you can deploy Che on OSIO executing:
+And if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rh-che) you can deploy Che on OSIO executing:
 
 ```bash
 export OPENSHIFT_FLAVOR=osio && ./dev-scripts/openshift_deploy.sh
