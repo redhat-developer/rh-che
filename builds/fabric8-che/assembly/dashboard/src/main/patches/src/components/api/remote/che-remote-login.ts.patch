@@ -1,7 +1,7 @@
 --- src/components/api/remote/che-remote-login.ts
 +++ src/components/api/remote/che-remote-login.ts
 @@ -9,6 +9,7 @@
-  *   Codenvy, S.A. - initial API and implementation
+  *   Red Hat, Inc. - initial API and implementation
   */
  'use strict';
 +import * as Keycloak from '../../keycloak/keycloak';

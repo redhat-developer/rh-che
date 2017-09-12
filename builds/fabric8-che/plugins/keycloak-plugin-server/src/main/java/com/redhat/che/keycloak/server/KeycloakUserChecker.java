@@ -8,7 +8,6 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-
 package com.redhat.che.keycloak.server;
 
 import com.google.common.cache.CacheBuilder;
