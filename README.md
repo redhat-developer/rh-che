@@ -180,21 +180,6 @@ the minishift docker daemon,
     - runs `dev-scripts/build_fabric8.sh [PARAMETERS]`
     - runs `dev-scripts/openshift_deploy.sh --command rollupdate`
 
-##### For updating the Upstream Che Openshift Connector
- 
-- `dev-scripts/minishift_update_openshift_connector_and_deploy.sh [PARAMETERS]`:
-    - changes the current docker environment to use
-the minishift docker daemon,
-    - runs `dev-scripts/update_openshift_connector.sh [PARAMETERS]`
-    - runs `dev-scripts/openshift_deploy.sh --command cleanup`
-    - runs `dev-scripts/openshift_deploy.sh`
-    
-- `dev-scripts/minishift_update_openshift_connector_and_rollupdate.sh [PARAMETERS]`:
-    - changes the current docker environment to use
-the minishift docker daemon,
-    - runs `dev-scripts/update_openshift_connector.sh [PARAMETERS]`
-    - runs `dev-scripts/openshift_deploy.sh --command rollupdate`
-
 ## Further details
 
 ### Maven build details
