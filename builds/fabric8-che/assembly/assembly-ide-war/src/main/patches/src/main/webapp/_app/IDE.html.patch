@@ -1,5 +1,5 @@
---- src/main/webapp/IDE.jsp
-+++ src/main/webapp/IDE.jsp
+--- src/main/webapp/_app/IDE.html
++++ src/main/webapp/_app/IDE.html
 @@ -55,7 +55,37 @@
          };
 
