@@ -91,14 +91,17 @@ OPENSHIFT_FLAVOR=${OPENSHIFT_FLAVOR:-${DEFAULT_OPENSHIFT_FLAVOR}}
 
 
 if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
-  # ---------------------------
-  # Set minishift configuration
-  # ---------------------------
-  echo -n "[CHE] Checking if minishift is running..."
-  minishift status | grep -q "Running" ||(echo "Minishift is not running. Aborting"; exit 1)
-  echo "done!"  
+  if [ -z "${MINISHIFT_IP}" ]; then
+    # ---------------------------
+    # Set minishift configuration
+    # ---------------------------
+    echo -n "[CHE] Checking if minishift is running..."
+    minishift status | grep -q "Running" ||(echo "Minishift is not running. Aborting"; exit 1)
+    echo "done!"
+    MINISHIFT_IP="$(minishift ip)"
+  fi
 
-  DEFAULT_OPENSHIFT_ENDPOINT="https://$(minishift ip):8443/"
+  DEFAULT_OPENSHIFT_ENDPOINT="https://${MINISHIFT_IP}:8443/"
   OPENSHIFT_ENDPOINT=${OPENSHIFT_ENDPOINT:-${DEFAULT_OPENSHIFT_ENDPOINT}}
   DEFAULT_OPENSHIFT_USERNAME="developer"
   OPENSHIFT_USERNAME=${OPENSHIFT_USERNAME:-${DEFAULT_OPENSHIFT_USERNAME}}
@@ -106,7 +109,7 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
   OPENSHIFT_PASSWORD=${OPENSHIFT_PASSWORD:-${DEFAULT_OPENSHIFT_PASSWORD}}
   DEFAULT_CHE_OPENSHIFT_PROJECT="eclipse-che"
   CHE_OPENSHIFT_PROJECT=${CHE_OPENSHIFT_PROJECT:-${DEFAULT_CHE_OPENSHIFT_PROJECT}}
-  DEFAULT_OPENSHIFT_NAMESPACE_URL="${CHE_OPENSHIFT_PROJECT}.$(minishift ip).nip.io"
+  DEFAULT_OPENSHIFT_NAMESPACE_URL="${CHE_OPENSHIFT_PROJECT}.${MINISHIFT_IP}.nip.io"
   OPENSHIFT_NAMESPACE_URL=${OPENSHIFT_NAMESPACE_URL:-${DEFAULT_OPENSHIFT_NAMESPACE_URL}}
   DEFAULT_CHE_KEYCLOAK_DISABLED="true"
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
@@ -312,7 +315,7 @@ if [ "${CHE_DEBUGGING_ENABLED}" == "true" ]; then
   echo -n "[CHE] Creating an OS route to debug Che wsmaster..."
   oc expose dc che --name=che-debug --target-port=http-debug --port=8000 --type=NodePort
   NodePort=$(oc get service che-debug -o jsonpath='{.spec.ports[0].nodePort}')
-  echo "[CHE] Remote wsmaster debugging URL: $(minishift ip):${NodePort}"
+  echo "[CHE] Remote wsmaster debugging URL: ${MINISHIFT_IP}:${NodePort}"
 fi
 
 che_route=$(oc get route che -o jsonpath='{.spec.host}')
