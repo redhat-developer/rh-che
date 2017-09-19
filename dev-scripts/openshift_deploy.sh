@@ -115,6 +115,8 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
   DEFAULT_CHE_DEBUGGING_ENABLED="true"
   CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
+  DEFAULT_OC_SKIP_TLS="true"
+  OC_SKIP_TLS=${OC_SKIP_TLS:-${DEFAULT_OC_SKIP_TLS}}
   DEFAULT_CHE_APPLY_RESOURCE_QUOTAS="false"
   CHE_APPLY_RESOURCE_QUOTAS=${CHE_APPLY_RESOURCE_QUOTAS:-${DEFAULT_CHE_APPLY_RESOURCE_QUOTAS}}
 
@@ -134,6 +136,8 @@ elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
   DEFAULT_CHE_DEBUGGING_ENABLED="false"
   CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
+  DEFAULT_OC_SKIP_TLS="false"
+  OC_SKIP_TLS=${OC_SKIP_TLS:-${DEFAULT_OC_SKIP_TLS}}
 
 elif [ "${OPENSHIFT_FLAVOR}" == "ocp" ]; then
   # ----------------------
@@ -145,6 +149,8 @@ elif [ "${OPENSHIFT_FLAVOR}" == "ocp" ]; then
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
   DEFAULT_CHE_DEBUGGING_ENABLED="false"
   CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
+  DEFAULT_OC_SKIP_TLS="false"
+  OC_SKIP_TLS=${OC_SKIP_TLS:-${DEFAULT_OC_SKIP_TLS}}
 
 fi
 
@@ -164,10 +170,10 @@ if [ -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then echo "[CHE] **ERROR**Env var OPEN
 # -----------------------------------
 echo -n "[CHE] Logging on using OpenShift endpoint \"${OPENSHIFT_ENDPOINT}\"..."
 if [ -z "${OPENSHIFT_TOKEN+x}" ]; then
-  oc login "${OPENSHIFT_ENDPOINT}" --insecure-skip-tls-verify=false -u "${OPENSHIFT_USERNAME}" -p "${OPENSHIFT_PASSWORD}" > /dev/null
+  oc login "${OPENSHIFT_ENDPOINT}" --insecure-skip-tls-verify="${OC_SKIP_TLS}" -u "${OPENSHIFT_USERNAME}" -p "${OPENSHIFT_PASSWORD}" > /dev/null
   OPENSHIFT_TOKEN=$(oc whoami -t)
 else
-  oc login "${OPENSHIFT_ENDPOINT}" --insecure-skip-tls-verify=false --token="${OPENSHIFT_TOKEN}"  > /dev/null
+  oc login "${OPENSHIFT_ENDPOINT}" --insecure-skip-tls-verify="${OC_SKIP_TLS}" --token="${OPENSHIFT_TOKEN}"  > /dev/null
 fi
 echo "done!"
 
