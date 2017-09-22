@@ -186,12 +186,12 @@ the minishift docker daemon,
 
 The result of the RedHat Che distribution build will be available at the following location:
     
-    rh-che/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-fabric8-1.0.0-SNAPSHOT
+    rh-che/assembly/assembly-main/target/eclipse-che-fabric8-1.0.0-SNAPSHOT
 
 Alternatively, if the option to remove the Dashboard has been enabled then the classifier `without-dashboard`
 will be used and the result of the RedHat Che distribution build will be available at the following location:
     
-    rh-che/builds/fabric8-che/assembly/assembly-main/target/eclipse-che-fabric8-1.0.0-SNAPSHOT-without-dashboard
+    rh-che/assembly/assembly-main/target/eclipse-che-fabric8-1.0.0-SNAPSHOT-without-dashboard
 
 
 The build is started by running *maven* in the root of the current git repository,
