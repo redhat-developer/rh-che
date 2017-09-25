@@ -200,7 +200,7 @@ which is :`rh-che`
 
 #### Maven build parameters
 
-The build relies on the upstream Eclipse Che maven configuration. All the maven options available in Che can be used here.
+The build relies on the upstream Eclipse Che maven configuration. All the maven options available in Eclipse Che can be used here.
 For instance, the profile `fast` will skip all the tests and checks as describe [in the Eclipse Che development documentation](https://github.com/eclipse/che/wiki/Development-Workflow#build-and-run):
 
     mvn clean install -Pfast
