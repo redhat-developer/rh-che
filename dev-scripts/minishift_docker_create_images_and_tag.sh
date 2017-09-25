@@ -18,7 +18,7 @@ commandDir=$(dirname "$0")
 
 source ${commandDir}/env-for-minishift
 
-cd ${commandDir}/..
+cd ${commandDir}/../.ci
 bash ./cico_do_docker_build_tag_push.sh
 if [ $? -ne 0 ]; then
   echo 'Build Failed!'

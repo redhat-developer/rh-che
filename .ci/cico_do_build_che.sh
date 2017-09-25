@@ -8,7 +8,9 @@
 # this script downloads runs the build
 # to create the che binaries
 
-. config 
+scriptDir=$(dirname "$0")
+
+source ${scriptDir}/../config
 
 mvnche() {
   which scl 2>/dev/null
@@ -28,6 +30,7 @@ mvnche() {
 
 }
 
+cd ${scriptDir}/../
 mkdir $NPM_CONFIG_PREFIX 2>/dev/null
 mvnche -B $* clean install
 if [ $? -ne 0 ]; then

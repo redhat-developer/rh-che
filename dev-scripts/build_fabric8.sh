@@ -9,11 +9,13 @@ export BuildUser=$USER
 export DeveloperBuild="true"
 
 currentDir=$(pwd)
+scriptDir=$(dirname "$0")
 
-cd $(dirname "$0")/..
 
+cd ${scriptDir}/..
 source config
 export CHE_IMAGE_REPO=${DOCKER_HUB_NAMESPACE}/che-server
+cd ${scriptDir}/../.ci
 
 if [[ "$@" =~ "-DwithoutDashboard" ]]; then
   export CHE_IMAGE_TAG=nightly-${RH_DIST_SUFFIX}-no-dashboard

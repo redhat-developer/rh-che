@@ -46,7 +46,7 @@ else
   }
 fi
 
-. config 
+. ../config 
 
 runBuild "cd ${currentDir} && bash ./cico_do_build_che.sh $*"
 if [ $? -eq 0 ]; then
