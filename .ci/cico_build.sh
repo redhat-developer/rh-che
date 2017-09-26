@@ -13,6 +13,7 @@
 
 currentDir=`pwd`
 ciDir=$(dirname "$0")
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ "$DeveloperBuild" != "true" ]
 then
@@ -47,11 +48,11 @@ else
   }
 fi
 
-source ${ciDir}/../config 
+source ${ABSOLUTE_PATH}/../config 
 
-runBuild "bash ./cico_do_build_che.sh $*"
+runBuild "cd ${ABSOLUTE_PATH} && bash ./cico_do_build_che.sh $*"
 if [ $? -eq 0 ]; then
-  bash cico_do_docker_build_tag_push.sh
+  bash ${ABSOLUTE_PATH}/cico_do_docker_build_tag_push.sh
 else
   echo 'Build Failed!'
   exit 1
