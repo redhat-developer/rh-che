@@ -6,25 +6,26 @@
 # http://www.eclipse.org/legal/epl-v10.html
 
 currentDir=`pwd`
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-. ../config 
+. ${ABSOLUTE_PATH}/../config 
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
 
-UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${currentDir}/../assembly/assembly-build-info/target/dependency/WEB-INF/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties)
+UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../assembly/assembly-build-info/target/dependency/WEB-INF/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties)
 
 # Now lets build the local docker images
-cd ${currentDir}/../dockerfiles/che-fabric8
+cd ${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 
 distPath='assembly/assembly-main/target/eclipse-che-*.tar.gz'
-for distribution in `ls -1 ${currentDir}/../${distPath};`
+for distribution in `ls -1 ${ABSOLUTE_PATH}/../${distPath};`
 do
   case "$distribution" in
-    ${currentDir}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
+    ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
       TAG=${UPSTREAM_TAG}-${RH_DIST_SUFFIX}-no-dashboard-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}-no-dashboard
       ;;
-    ${currentDir}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}*)
+    ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}*)
       TAG=${UPSTREAM_TAG}-${RH_DIST_SUFFIX}-${RH_CHE_TAG}
       NIGHTLY=nightly-${RH_DIST_SUFFIX}
       # File che_image_tag.env will be used by the verification script to
