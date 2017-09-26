@@ -12,6 +12,7 @@
 # this script assumes its being run on CentOS Linux 7/x86_64
 
 currentDir=`pwd`
+ciDir=$(dirname "$0")
 
 if [ "$DeveloperBuild" != "true" ]
 then
@@ -46,9 +47,9 @@ else
   }
 fi
 
-. ../config 
+source ${ciDir}/../config 
 
-runBuild "cd ${currentDir} && bash ./cico_do_build_che.sh $*"
+runBuild "cd ${ciDir} && bash ./cico_do_build_che.sh $*"
 if [ $? -eq 0 ]; then
   bash cico_do_docker_build_tag_push.sh
 else
