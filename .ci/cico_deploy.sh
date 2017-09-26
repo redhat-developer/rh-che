@@ -8,10 +8,12 @@
 set -u
 set +e
 
+ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Retrieve credentials to push the image to the docker hub
 cat jenkins-env | grep -e PASS -e DEVSHIFT > inherit-env
 . inherit-env
-. config
+. ${ABSOLUTE_PATH}/config
 
 # CHE_SERVER_DOCKER_IMAGE_TAG has to be set in che_image_tag.env file
 . ~/che_image_tag.env
