@@ -49,7 +49,7 @@ fi
 
 source ${ciDir}/../config 
 
-runBuild "cd ${ciDir} && bash ./cico_do_build_che.sh $*"
+runBuild "bash ./cico_do_build_che.sh $*"
 if [ $? -eq 0 ]; then
   bash cico_do_docker_build_tag_push.sh
 else
