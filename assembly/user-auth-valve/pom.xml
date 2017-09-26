@@ -19,8 +19,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>user-auth-valve</artifactId>
-    <name>user-auth-valve</name>
-    <url>http://maven.apache.org</url>
+    <name>Fabric8 :: IDE :: User Auth Valve</name>
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
