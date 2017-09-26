@@ -27,7 +27,6 @@ mvnche() {
   else
     mvn $*
   fi
-
 }
 
 cd ${scriptDir}/../
