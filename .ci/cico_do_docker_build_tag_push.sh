@@ -15,7 +15,8 @@ RH_CHE_TAG=$(git rev-parse --short HEAD)
 UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../assembly/assembly-build-info/target/dependency/WEB-INF/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties)
 
 # Now lets build the local docker images
-cd ${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
+DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
+cd ${DIR}
 
 distPath='assembly/assembly-main/target/eclipse-che-*.tar.gz'
 for distribution in `ls -1 ${ABSOLUTE_PATH}/../${distPath};`
@@ -38,8 +39,6 @@ do
   # fetch the right upstream based che-server image to build from
   docker pull ${CHE_DOCKER_BASE_IMAGE}
   docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
-
-  DIR=$(cd "$(dirname "$0")"; pwd)
 
   # Use of folder
   LOCAL_ASSEMBLY_ZIP="${DIR}"/eclipse-che.tar.gz
