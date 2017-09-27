@@ -21,7 +21,7 @@
     </parent>
     <artifactId>che-plugin-bayesian-lang-server</artifactId>
     <packaging>jar</packaging>
-    <name>Che :: Bayesian Language Server Integration</name>
+    <name>Fabric8 IDE :: Plugins :: Bayesian LSP Integration</name>
     <dependencies>
         <dependency>
             <groupId>com.google.inject</groupId>

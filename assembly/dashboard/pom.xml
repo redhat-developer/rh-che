@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-che-dashboard-war</artifactId>
     <packaging>war</packaging>
-    <name>Fabric8 IDE :: Che Dashboard WAR</name>
+    <name>Fabric8 IDE :: Assemblies :: Dashboard</name>
     <properties>
         <npm-build-root>${project.build.directory}/patched</npm-build-root>
         <original-project-basedir>${original-project-name}</original-project-basedir>

@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-assembly-wsagent-war</artifactId>
     <packaging>war</packaging>
-    <name>Fabric8 IDE Workspace Agent War Packaging</name>
+    <name>Fabric8 IDE :: Assemblies :: Workspace Agent</name>
     <properties>
         <original-project-basedir>assembly/${original-project-name}</original-project-basedir>
         <original-project-name>assembly-wsagent-war</original-project-name>

@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-stacks</artifactId>
     <packaging>jar</packaging>
-    <name>Fabric8 :: IDE :: STACKS</name>
+    <name>Fabric8 IDE :: Assemblies :: Stacks</name>
     <build>
         <plugins>
             <plugin>

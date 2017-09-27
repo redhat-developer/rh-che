@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-plugins-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Fabric8 IDE plugins (parent)</name>
+    <name>Fabric8 IDE :: Plugins</name>
     <modules>
         <module>keycloak-plugin-shared</module>
         <module>keycloak-plugin-token-store</module>

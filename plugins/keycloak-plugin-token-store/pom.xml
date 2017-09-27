@@ -21,7 +21,7 @@
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>che-keycloak-plugin-token-store</artifactId>
-    <name>Che Keycloak Token Store plugin</name>
+    <name>Fabric8 IDE :: Plugins :: Keycloak Token Store</name>
     <dependencies>
         <dependency>
             <groupId>javax.inject</groupId>

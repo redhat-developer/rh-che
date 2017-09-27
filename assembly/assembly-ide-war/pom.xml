@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-assembly-ide-war</artifactId>
     <packaging>war</packaging>
-    <name>Fabric8 IDE :: Compiling GWT Application</name>
+    <name>Fabric8 IDE :: Assemblies :: IDE</name>
     <properties>
         <generated.sources.directory>${project.build.directory}/generated-sources/gen</generated.sources.directory>
         <gwt.log.enable>false</gwt.log.enable>

@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-assembly-build-info</artifactId>
     <packaging>pom</packaging>
-    <name>Fabric8 IDE :: Build Info</name>
+    <name>Fabric8 IDE :: Assemblies :: Build Info</name>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.che</groupId>

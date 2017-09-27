@@ -21,7 +21,7 @@
     </parent>
     <artifactId>che-plugin-product-info</artifactId>
     <packaging>jar</packaging>
-    <name>Che OSIO Product Info</name>
+    <name>Fabric8 IDE :: Plugins :: OSIO Product Info</name>
     <dependencies>
         <dependency>
             <groupId>com.google.gwt</groupId>

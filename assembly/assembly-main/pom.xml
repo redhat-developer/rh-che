@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-assembly-main</artifactId>
     <packaging>pom</packaging>
-    <name>Fabric8 IDE :: Assemblies Tomcat</name>
+    <name>Fabric8 IDE :: Assemblies :: Main/Tomcat</name>
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>

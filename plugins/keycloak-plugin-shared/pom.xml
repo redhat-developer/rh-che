@@ -22,7 +22,7 @@
     <groupId>com.redhat.che</groupId>
     <artifactId>che-keycloak-plugin-shared</artifactId>
     <packaging>jar</packaging>
-    <name>Che Keycloak Shared plugin</name>
+    <name>Fabric8 IDE :: Plugins :: Keycloak Shared plugin</name>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

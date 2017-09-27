@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-assembly-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Fabric8 IDE assembly (parent)</name>
+    <name>Fabric8 IDE :: Assemblies</name>
     <modules>
         <module>assembly-build-info</module>
         <module>fabric8-stacks</module>

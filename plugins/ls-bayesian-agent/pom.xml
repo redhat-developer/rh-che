@@ -20,7 +20,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>ls-bayesian-agent</artifactId>
-    <name>Bayesian Language Server Agent</name>
+    <name>Fabric8 IDE :: Plugins :: Bayesian LSP Agent</name>
     <dependencies>
         <dependency>
             <groupId>com.google.inject</groupId>

@@ -21,7 +21,7 @@
     </parent>
     <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
     <packaging>pom</packaging>
-    <name>Fabric8 IDE Assembly Workspace Agent Server</name>
+    <name>Fabric8 IDE :: Assemblies :: Workspace Agent Server</name>
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>

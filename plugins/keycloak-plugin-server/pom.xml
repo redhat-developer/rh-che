@@ -22,7 +22,7 @@
     <groupId>com.redhat.che</groupId>
     <artifactId>che-keycloak-plugin-server</artifactId>
     <packaging>jar</packaging>
-    <name>Che Keycloak Server plugin</name>
+    <name>Fabric8 IDE :: Plugins :: Keycloak Server plugin</name>
     <properties>
         <src.java.dir>src/main/java</src.java.dir>
     </properties>
