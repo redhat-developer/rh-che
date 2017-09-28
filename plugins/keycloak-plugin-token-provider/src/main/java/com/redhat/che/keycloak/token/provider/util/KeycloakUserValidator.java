@@ -117,7 +117,11 @@ public final class KeycloakUserValidator {
           | ConflictException
           | BadRequestException
           | IOException e) {
-        LOG.error("Could not get OpenShift token due to exception:", e);
+        LOG.error(
+            "Could not get OpenShift token. projectOwner: {}, keycloakToken: {}, Exception: {}",
+            projectOwner,
+            keycloakToken,
+            e);
       }
       if (isNullOrEmpty(openShiftToken)) {
         return false;
@@ -156,7 +160,10 @@ public final class KeycloakUserValidator {
       String openShiftToken = keycloakToOpenshiftTokenCache.get(auth);
       return openShiftToken;
     } catch (ExecutionException e) {
-      LOG.error("Exception while getting OpenShift token:", e);
+      LOG.error(
+          "Exception while getting OpenShift token. keycloakToken: {}, ExecutionException: {}",
+          keycloakToken,
+          e);
     }
     return null;
   }
@@ -217,7 +224,10 @@ public final class KeycloakUserValidator {
           | ConflictException
           | BadRequestException
           | IOException e) {
-        LOG.error("Exception while obtaining OSO token:", e);
+        LOG.error(
+            "Exception while getting OpenShift token. keycloakToken: {}, Exception: {}",
+            keycloakToken,
+            e);
       }
       return osoToken != null ? osoToken : "";
     }
