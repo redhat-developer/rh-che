@@ -25,7 +25,7 @@
     }],
     "source": {
         "type": "image",
-        "origin": "rhche/vertx"
+        "origin": "registry.devshift.net/che/vertx"
     },
     "workspaceConfig": {
         "environments": {
@@ -44,7 +44,7 @@
                     }
                 },
                 "recipe": {
-                    "location": "rhche/vertx",
+                    "location": "registry.devshift.net/che/vertx",
                     "type": "dockerimage"
                 }
             }
@@ -115,7 +115,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "rhche/spring-boot"
+      "origin": "registry.devshift.net/che/spring-boot"
     },
     "workspaceConfig": {
       "name": "default",
@@ -123,7 +123,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "location": "rhche/spring-boot",
+            "location": "registry.devshift.net/che/spring-boot",
             "type": "dockerimage"
           },
           "machines": {
@@ -192,7 +192,7 @@
   "scope": "general",
   "source": {
     "type": "image",
-    "origin": "rhche/wildfly-swarm"
+    "origin": "registry.devshift.net/che/wildfly-swarm"
   },
   "tags": [
     "Java",
@@ -207,7 +207,7 @@
     "environments": {
       "default": {
         "recipe": {
-          "location": "rhche/wildfly-swarm",
+          "location": "registry.devshift.net/che/wildfly-swarm",
           "type": "dockerimage"
         },
         "machines": {
@@ -306,7 +306,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "rhche/centos-nodejs"
+      "origin": "registry.devshift.net/che/centos-nodejs"
     },
     "workspaceConfig": {
       "environments": {
@@ -325,7 +325,7 @@
             }
           },
           "recipe": {
-            "location": "rhche/centos-nodejs",
+            "location": "registry.devshift.net/che/centos-nodejs",
             "type": "dockerimage"
           }
         }
@@ -384,7 +384,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "rhche/centos_jdk8"
+      "origin": "registry.devshift.net/che/centos_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -401,7 +401,7 @@
             }
           },
           "recipe": {
-            "location": "rhche/centos_jdk8",
+            "location": "registry.devshift.net/che/centos_jdk8",
             "type": "dockerimage"
           }
         }
@@ -451,7 +451,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "rhche/centos_jdk8"
+      "origin": "registry.devshift.net/che/centos_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -473,7 +473,7 @@
             }
           },
           "recipe": {
-            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: rhche/centos_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
+            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/centos_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
             "contentType": "application/x-yaml",
             "type": "compose"
           }
@@ -525,7 +525,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "rhche/ubuntu_jdk8"
+      "origin": "registry.devshift.net/che/ubuntu_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -547,7 +547,7 @@
             }
           },
           "recipe": {
-            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: rhche/ubuntu_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
+            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/ubuntu_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
             "contentType": "application/x-yaml",
             "type": "compose"
           }
@@ -600,7 +600,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "rhche/ubuntu_jdk8"
+      "origin": "registry.devshift.net/che/ubuntu_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -617,7 +617,7 @@
             }
           },
           "recipe": {
-            "location": "rhche/ubuntu_jdk8",
+            "location": "registry.devshift.net/che/ubuntu_jdk8",
             "type": "dockerimage"
           }
         }
@@ -657,7 +657,7 @@
     "components": [],
     "source": {
       "type": "image",
-      "origin": "rhche/ubuntu_jdk8"
+      "origin": "registry.devshift.net/che/ubuntu_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -674,7 +674,7 @@
             }
           },
           "recipe": {
-            "location": "rhche/ubuntu_jdk8",
+            "location": "registry.devshift.net/che/ubuntu_jdk8",
             "type": "dockerimage"
           }
         }
