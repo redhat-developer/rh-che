@@ -12,17 +12,9 @@ package org.eclipse.che.wsagent.server;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.name.Names;
-import com.redhat.che.keycloak.server.KeycloakAuthServerUrlPropertyProvider;
-import com.redhat.che.keycloak.server.KeycloakClientIdPropertyProvider;
-import com.redhat.che.keycloak.server.KeycloakDisabledPropertyProvider;
-import com.redhat.che.keycloak.server.KeycloakHttpJsonRequestFactory;
-import com.redhat.che.keycloak.server.KeycloakRealmPropertyProvider;
-import com.redhat.che.keycloak.shared.KeycloakConstants;
 import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
 import javax.inject.Named;
 import org.eclipse.che.api.core.rest.ApiInfoService;
-import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.commons.lang.Pair;
 import org.eclipse.che.inject.DynaModule;
 
@@ -50,19 +42,6 @@ public class WsAgentModule extends AbstractModule {
     install(new org.eclipse.che.api.core.jsonrpc.impl.JsonRpcModule());
     install(new org.eclipse.che.api.core.websocket.impl.WebSocketModule());
 
-    bind(Boolean.class)
-        .annotatedWith(Names.named(KeycloakConstants.DISABLED_SETTING))
-        .toProvider(KeycloakDisabledPropertyProvider.class);
-    bind(String.class)
-        .annotatedWith(Names.named(KeycloakConstants.AUTH_SERVER_URL_SETTING))
-        .toProvider(KeycloakAuthServerUrlPropertyProvider.class);
-    bind(String.class)
-        .annotatedWith(Names.named(KeycloakConstants.CLIENT_ID_SETTING))
-        .toProvider(KeycloakClientIdPropertyProvider.class);
-    bind(String.class)
-        .annotatedWith(Names.named(KeycloakConstants.REALM_SETTING))
-        .toProvider(KeycloakRealmPropertyProvider.class);
-    bind(HttpJsonRequestFactory.class).to(KeycloakHttpJsonRequestFactory.class);
     bind(KeycloakTokenStore.class);
   }
 

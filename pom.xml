@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>5.18.0</version>
+        <version>5.19.0-SNAPSHOT</version>
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>fabric8-ide-parent</artifactId>
@@ -36,30 +36,6 @@
     </properties>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-keycloak-plugin-ide</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-keycloak-plugin-server</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-keycloak-plugin-shared</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-keycloak-plugin-token-provider</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>che-keycloak-plugin-token-store</artifactId>
@@ -117,12 +93,6 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-che-dashboard-war</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-ide-stacks</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>jar</type>
@@ -134,61 +104,73 @@
                 <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>user-auth-valve</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-servlet-api</artifactId>
                 <version>${org.apache.tomcat.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che</groupId>
+                <artifactId>assembly-wsmaster-war</artifactId>
+                <version>${che.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-ide-war</artifactId>
                 <version>${che.version}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che</groupId>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-ide-war</artifactId>
                 <version>${che.version}</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che</groupId>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-ide-war</artifactId>
                 <version>${che.version}</version>
                 <type>jar</type>
                 <classifier>sources</classifier>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che</groupId>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-wsagent-war</artifactId>
                 <version>${che.version}</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che</groupId>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-wsagent-war</artifactId>
                 <version>${che.version}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che</groupId>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
+                <artifactId>assembly-wsagent-war</artifactId>
+                <version>${che.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-wsmaster-war</artifactId>
                 <version>${che.version}</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.che</groupId>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
                 <artifactId>assembly-wsmaster-war</artifactId>
                 <version>${che.version}</version>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.assembly-multiuser</groupId>
+                <artifactId>assembly-wsmaster-war</artifactId>
+                <version>${che.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che.core</groupId>
@@ -200,44 +182,37 @@
                 <groupId>org.eclipse.che.dashboard</groupId>
                 <artifactId>che-dashboard-war</artifactId>
                 <version>${che.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.multiuser</groupId>
+                <artifactId>che-multiuser-keycloak-ide</artifactId>
+                <version>${che.version}</version>
                 <type>jar</type>
-                <classifier>sources</classifier>
             </dependency>
             <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-adapter-core</artifactId>
-                <version>${keycloak.version}</version>
+                <groupId>org.eclipse.che.multiuser</groupId>
+                <artifactId>che-multiuser-keycloak-server</artifactId>
+                <version>${che.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-adapter-spi</artifactId>
-                <version>${keycloak.version}</version>
+                <groupId>org.eclipse.che.multiuser</groupId>
+                <artifactId>che-multiuser-keycloak-shared</artifactId>
+                <version>${che.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-common</artifactId>
-                <version>${keycloak.version}</version>
+                <groupId>org.eclipse.che.multiuser</groupId>
+                <artifactId>che-multiuser-keycloak-token-provider</artifactId>
+                <version>${che.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-core</artifactId>
-                <version>${keycloak.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-servlet-filter-adapter</artifactId>
-                <version>${keycloak.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-tomcat8-adapter</artifactId>
-                <version>${keycloak.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
-                <version>${keycloak.version}</version>
-                <type>zip</type>
+                <groupId>org.eclipse.che.multiuser</groupId>
+                <artifactId>che-multiuser-personal-account</artifactId>
+                <version>${che.version}</version>
+                <type>jar</type>
             </dependency>
         </dependencies>
     </dependencyManagement>

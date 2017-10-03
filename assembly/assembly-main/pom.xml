@@ -38,10 +38,6 @@
             <artifactId>fabric8-ide-stacks</artifactId>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>user-auth-valve</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -87,48 +83,6 @@
                             </artifactItems>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>package-keycloak-adapter</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.keycloak</groupId>
-                                    <artifactId>keycloak-tomcat8-adapter-dist</artifactId>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>package-user-auth-valve</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/keycloak</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.redhat.che</groupId>
-                                    <artifactId>user-auth-valve</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.redhat.che</groupId>
-                                    <artifactId>che-keycloak-plugin-shared</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <type>jar</type>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
@@ -149,8 +103,8 @@
                     <type>war</type>
                 </dependency>
                 <dependency>
-                    <groupId>com.redhat.che</groupId>
-                    <artifactId>fabric8-ide-che-dashboard-war</artifactId>
+                    <groupId>org.eclipse.che.dashboard</groupId>
+                    <artifactId>che-dashboard-war</artifactId>
                     <type>war</type>
                 </dependency>
             </dependencies>
