@@ -36,6 +36,17 @@
             <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.che</groupId>
+            <artifactId>assembly-wsmaster-war</artifactId>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>che-core-ide-stacks</artifactId>
+                    <groupId>org.eclipse.che.core</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.che.assembly-multiuser</groupId>
             <artifactId>assembly-wsmaster-war</artifactId>
             <type>pom</type>
