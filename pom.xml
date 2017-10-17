@@ -99,6 +99,18 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-multi-tenant-manager</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-workspace-logging-override</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
                 <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
@@ -216,6 +228,12 @@
             <dependency>
                 <groupId>org.eclipse.che.multiuser</groupId>
                 <artifactId>che-multiuser-personal-account</artifactId>
+                <version>${che.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.plugin</groupId>
+                <artifactId>che-plugin-docker-machine</artifactId>
                 <version>${che.version}</version>
                 <type>jar</type>
             </dependency>

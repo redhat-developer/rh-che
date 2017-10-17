@@ -33,6 +33,14 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-multi-tenant-manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-workspace-logging-override</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
@@ -105,6 +113,7 @@
                     <packagingExcludes>WEB-INF/lib/wsmaster-local*.jar,
                         WEB-INF/lib/che-core-db-vendor-h2-*.jar,
                         WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class,
+                        WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.class,
                         WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterServletModule.class</packagingExcludes>
                 </configuration>
             </plugin>

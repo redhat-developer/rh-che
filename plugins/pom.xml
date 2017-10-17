@@ -27,5 +27,7 @@
         <module>ls-bayesian-agent</module>
         <module>che-plugin-bayesian-lang-server</module>
         <module>plugin-product-info</module>
+        <module>fabric8-multi-tenant-manager</module>
+        <module>fabric8-workspace-logging-override</module>
     </modules>
 </project>
