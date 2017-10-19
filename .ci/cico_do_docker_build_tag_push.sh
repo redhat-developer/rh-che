@@ -67,8 +67,8 @@ do
   if [ "$DeveloperBuild" != "true" ]
   then
     docker login -u ${DOCKER_HUB_USER} -p $DOCKER_HUB_PASSWORD -e noreply@redhat.com 
-    docker push ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY}
-    docker push ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
+    docker push ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${NIGHTLY}
+    docker push ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${TAG}
   fi
 done
 

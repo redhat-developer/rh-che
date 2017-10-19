@@ -37,8 +37,8 @@ echo "CHE VALIDATION: Verification skipped until job devtools-che-functional-tes
 # . cico_run_EE_tests.sh
 # echo "CHE VALIDATION: Verification passed. Pushing Che server image to prod registry."
 
-STAGE_IMAGE_TO_PROMOTE="${DOCKER_HUB_NAMESPACE}/che-server:${CHE_SERVER_DOCKER_IMAGE_TAG}"
-PROD_IMAGE_DEVSHIFT="push.registry.devshift.net/che/che:${CHE_SERVER_DOCKER_IMAGE_TAG}"
+STAGE_IMAGE_TO_PROMOTE="${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${CHE_SERVER_DOCKER_IMAGE_TAG}"
+PROD_IMAGE_DEVSHIFT="push.registry.devshift.net/che/che-multiuser:${CHE_SERVER_DOCKER_IMAGE_TAG}"
 
 echo "CHE VALIDATION: Pushing image ${PROD_IMAGE_DEVSHIFT} to devshift"
 
@@ -57,7 +57,7 @@ echo "CHE VALIDATION: Image pushed to devshift registry"
 # repository che/che on devshift. The webhook should trigger
 # https://jenkins.cd.test.fabric8.io/che-version-updater/notify 
 # every time a new version of Che is available 
-PROD_IMAGE_DOCKER_HUB="rhche/che-server:${CHE_SERVER_DOCKER_IMAGE_TAG}"
+PROD_IMAGE_DOCKER_HUB="rhche/che-server-multiuser:${CHE_SERVER_DOCKER_IMAGE_TAG}"
 
 echo "CHE VALIDATION: Pushing ${PROD_IMAGE_DOCKER_HUB} image Docker Hub"
 
