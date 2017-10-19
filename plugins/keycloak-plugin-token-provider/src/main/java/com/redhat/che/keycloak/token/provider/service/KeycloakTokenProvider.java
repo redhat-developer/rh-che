@@ -10,6 +10,7 @@
  */
 package com.redhat.che.keycloak.token.provider.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.che.keycloak.token.provider.util.UrlHelper;
@@ -50,6 +51,8 @@ public class KeycloakTokenProvider {
    * Return GitHub access token based on Keycloak token
    *
    * <p>Note: valid response from keycloak endpoint:
+   * {"access_token":"token","scope":"admin:repo_hook,gist,read:org,repo,user","token_type":"bearer"}
+   * However, old version of API which produces name/value pairs is also supported e.g.
    * access_token=token&scope=scope&token_type=bearer
    *
    * @param keycloakToken
@@ -66,9 +69,17 @@ public class KeycloakTokenProvider {
       throws ServerException, UnauthorizedException, ForbiddenException, NotFoundException,
           ConflictException, BadRequestException, IOException {
     String responseBody = getResponseBody(gitHubEndpoint, keycloakToken);
-    Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
-    String token = parameter.get(ACCESS_TOKEN);
-    return token;
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode json = mapper.readTree(responseBody);
+      JsonNode accessToken = json.get(ACCESS_TOKEN);
+      return accessToken.asText();
+    } catch (JsonProcessingException e) {
+      // Supporting old version of API which returns name/value pairs
+      Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
+      String token = parameter.get(ACCESS_TOKEN);
+      return token;
+    }
   }
 
   /**
@@ -89,15 +100,17 @@ public class KeycloakTokenProvider {
   public String obtainOsoToken(String keycloakToken)
       throws IOException, ServerException, UnauthorizedException, ForbiddenException,
           NotFoundException, ConflictException, BadRequestException {
-    String responseBody = getResponseBody(openShiftEndpoint, keycloakToken);
+    return getAccessToken(openShiftEndpoint, keycloakToken);
+  }
+
+  private String getAccessToken(final String endpoint, final String keycloakToken)
+      throws JsonProcessingException, IOException, ServerException, UnauthorizedException,
+          ForbiddenException, NotFoundException, ConflictException, BadRequestException {
+    String responseBody = getResponseBody(endpoint, keycloakToken);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode json = mapper.readTree(responseBody);
-    JsonNode token = json.get(ACCESS_TOKEN);
-    if (token != null) {
-      return token.asText();
-    } else {
-      return null;
-    }
+    JsonNode accessToken = json.get(ACCESS_TOKEN);
+    return accessToken.asText();
   }
 
   private String getResponseBody(final String endpoint, final String keycloakToken)

@@ -9,4 +9,4 @@ export CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-"true"}
 export FABRIC8_ONLINE_PATH=${FABRIC8_ONLINE_PATH:-"${HOME}/github/fabric8-online/"}
 export CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-"true"}
 export KEYCLOAK_OSO_ENDPOINT=${KEYCLOAK_OSO_ENDPOINT:-"https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token"}
-export KEYCLOAK_GITHUB_ENDPOINT=${KEYCLOAK_GITHUB_ENDPOINT:-"https://sso.openshift.io/auth/realms/fabric8/broker/github/token"}
+export KEYCLOAK_GITHUB_ENDPOINT=${KEYCLOAK_GITHUB_ENDPOINT:-"https://auth.openshift.io/api/token?for=https://github.com"}
