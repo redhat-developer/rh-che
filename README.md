@@ -140,7 +140,7 @@ You can set different deployment options using environment variables:
 __Warning__: If you are deploying the RH distribution build, ensure that you created / tagged the Che docker images 
 *in the Minishift docker environment* (see [previous section](#in-the-minishift-docker-environment)).
 If you want to build and deploy the RH distribution to Minishift in one go, you can use the
-[*all-in-one scripts*](#all-in-one-scripts-for-minishift)
+[*all-in-one scripts*](#all-in-one-scripts-for-minishift).
 
 ### Delete all resources and clean up in Minishift
 
