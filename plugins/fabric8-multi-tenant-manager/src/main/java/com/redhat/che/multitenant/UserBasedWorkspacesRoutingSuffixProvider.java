@@ -19,6 +19,8 @@ import org.eclipse.che.plugin.openshift.client.exception.OpenShiftException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.che.multitenant.Fabric8WorkspaceEnvironmentProvider.UserCheTenantData;
+
 /**
  * Retrieves a routing suffix that can be used when building workspace agents external address with
  * a custom server evaluation strategy. This is similar to the 'che.docker.ip.external' property,
@@ -52,15 +54,24 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
   @Override
   @Nullable
   public String get() {
-    String suffix = null;
-    try {
-      suffix = workspaceEnvironmentProvider.getUserCheTenantData().getRoutePrefix();
+      UserCheTenantData userCheTenantData;
+      try {
+       userCheTenantData = workspaceEnvironmentProvider.getUserCheTenantData();
     } catch (OpenShiftException e) {
       LOG.warn("Exception when trying to retrieve routing suffix from user tenant data", e);
+      return null;
     }
-    if (suffix != null) {
-      return suffix;
+    String suffix = userCheTenantData.getRouteBaseSuffix();
+    if (suffix == null) {
+      suffix = cheWorkspacesRoutingSuffix;
     }
-    return cheWorkspacesRoutingSuffix;
+    if (suffix == null) {
+        return null;
+    }
+    
+    return new StringBuilder(userCheTenantData.getNamespace())
+        .append('.')
+        .append(suffix)
+        .toString();
   }
 }
