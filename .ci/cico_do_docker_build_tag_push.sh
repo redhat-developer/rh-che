@@ -60,9 +60,10 @@ do
   docker rmi eclipse/che-server:local
 
   # lets change the tag and push it to the registry
-  docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}
-  
-  dockerTags="${dockerTags} ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server:${TAG}"
+  docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${TAG}
+  docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${NIGHTLY}
+    
+  dockerTags="${dockerTags} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${TAG}"
     
   if [ "$DeveloperBuild" != "true" ]
   then
