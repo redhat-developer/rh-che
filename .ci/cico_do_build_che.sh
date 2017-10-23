@@ -39,7 +39,7 @@ fi
 
 if [ "$DeveloperBuild" != "true" ]
   then
-    mvnche -B -DwithoutDashboard -pl=:fabric8-ide-assembly-ide-war,:fabric8-ide-assembly-main $* install
+    mvnche -B -DwithoutDashboard -pl=:fabric8-ide-assembly-ide-war,:fabric8-ide-assembly-main $* clean install
     if [ $? -ne 0 ]; then
       echo "Error building che/rh-che without dashboard"
       exit 1;
