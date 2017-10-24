@@ -41,14 +41,14 @@ do
   docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
 
   # Use of folder
-  LOCAL_ASSEMBLY_ZIP="${DIR}"/eclipse-che.tar.gz
+  LOCAL_ASSEMBLY_DIR="${DIR}"/eclipse-che
 
-  if [ -f "${LOCAL_ASSEMBLY_ZIP}" ]; then
-    rm "${LOCAL_ASSEMBLY_ZIP}"
+  if [ -d "${LOCAL_ASSEMBLY_DIR}" ]; then
+    rm -r "${LOCAL_ASSEMBLY_DIR}"
   fi
 
-  echo "Linking assembly ${distribution} --> ${LOCAL_ASSEMBLY_ZIP}"
-  ln "${distribution}" "${LOCAL_ASSEMBLY_ZIP}"
+  echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
+  cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
   
   bash ./build.sh --organization:${DOCKER_HUB_NAMESPACE} --tag:${NIGHTLY}
   if [ $? -ne 0 ]; then

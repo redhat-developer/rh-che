@@ -20,5 +20,5 @@ COPY entrypoint.patch /entrypoint.patch
 RUN patch -p0 < entrypoint.patch
 
 RUN rm -rf /home/user/eclipse-che*
-ADD eclipse-che.tar.gz /home/user/
-RUN chmod -R 0777 /home/user/
+ADD eclipse-che /home/user/eclipse-che
+RUN find /home/user -type d -exec chmod 777 {} \;
