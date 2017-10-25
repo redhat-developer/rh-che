@@ -707,7 +707,7 @@
                 "memoryLimitBytes": "2147483648"
               },
               "agents": [
-	        "org.eclipse.che.exec"
+                "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
                 "org.eclipse.che.ws-agent",
                 "com.redhat.bayesian.lsp"
