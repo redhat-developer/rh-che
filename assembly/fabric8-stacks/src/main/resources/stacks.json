@@ -725,7 +725,7 @@
             "goal": "Run",
             "previewUrl": "http://${server.port.8080}"
           },
-          "commandLine": "cd ${current.project.path} && scl enable rh-nodejs4 'node app/app.js'",
+          "commandLine": "cd ${current.project.path} && scl enable rh-nodejs4 'node app/app.js'"
         }
       ],
       "defaultEnv": "default",
