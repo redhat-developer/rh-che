@@ -18,7 +18,7 @@ UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../asse
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 cd ${DIR}
 
-distPath='assembly/assembly-main/target/eclipse-che-*.tar.gz'
+distPath='assembly/assembly-main/target/eclipse-che-*/eclipse-che-*'
 for distribution in `ls -1 ${ABSOLUTE_PATH}/../${distPath};`
 do
   case "$distribution" in
