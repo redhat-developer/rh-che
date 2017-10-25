@@ -1,5 +1,343 @@
 [
   {
+    "id": "java-centos-mysql",
+    "creator": "ide",
+    "name": "Java-MySQL CentOS",
+    "description": "Multi-machine environment with Java CentOS Stack and MySQL database",
+    "scope": "general",
+    "tags": [
+      "Java 1.8, Tomcat 8, MySQL 5.7"
+    ],
+    "components": [
+      {
+        "name": "JDK",
+        "version": "1.8.0_45"
+      },
+      {
+        "name": "Maven",
+        "version": "3.2.2"
+      },
+      {
+        "name": "Tomcat",
+        "version": "8.0.24"
+      }
+    ],
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/centos_jdk8"
+    },
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+              ],
+              "servers": {},
+              "attributes" : {}
+            },
+            "db": {
+              "agents": [
+                "org.eclipse.che.terminal"
+              ],
+              "servers": {},
+              "attributes" : {}
+            }
+          },
+          "recipe": {
+            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/centos_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
+            "contentType": "application/x-yaml",
+            "type": "compose"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "commandLine": "mvn clean install -f ${current.project.path}",
+          "name": "build",
+          "type": "mvn"
+        },
+        {
+          "commandLine": "mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'show databases;'",
+          "name": "show databases",
+          "type": "custom"
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-java-mysql.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "java-mysql",
+    "creator": "ide",
+    "name": "Java-MySQL",
+    "description": "Multi-machine environment with Default Java Stack and MySQL database",
+    "scope": "advanced",
+    "tags": [
+      "Java 1.8, Tomcat 8, MySQL 5.7"
+    ],
+    "components": [
+      {
+        "name": "JDK",
+        "version": "1.8.0_45"
+      },
+      {
+        "name": "Maven",
+        "version": "3.2.2"
+      },
+      {
+        "name": "Tomcat",
+        "version": "8.0.24"
+      }
+    ],
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/ubuntu_jdk8"
+    },
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+              ],
+              "servers": {},
+              "attributes" : {}
+            },
+            "db": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal"
+              ],
+              "servers": {},
+              "attributes" : {}
+            }
+          },
+          "recipe": {
+            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/ubuntu_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
+            "contentType": "application/x-yaml",
+            "type": "compose"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "commandLine": "mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'show databases;'",
+          "name": "show databases",
+          "type": "custom"
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-java-mysql.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "java-default",
+    "creator": "ide",
+    "name": "Java",
+    "description": "Default Java Stack with JDK 8, Maven and Tomcat.",
+    "scope": "advanced",
+    "tags": [
+      "Java",
+      "JDK",
+      "Maven",
+      "Tomcat",
+      "Subversion",
+      "Ubuntu",
+      "Git"
+    ],
+    "components": [
+      {
+        "name": "JDK",
+        "version": "1.8.0_45"
+      },
+      {
+        "name": "Maven",
+        "version": "3.2.2"
+      },
+      {
+        "name": "Tomcat",
+        "version": "8.0.24"
+      }
+    ],
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/ubuntu_jdk8"
+    },
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+              ],
+              "servers": {},
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "location": "registry.devshift.net/che/ubuntu_jdk8",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "commandLine": "mvn clean install -f ${current.project.path}",
+          "name": "build",
+          "type": "mvn",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-java.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "blank-default",
+    "creator": "ide",
+    "name": "Blank",
+    "description": "Default Blank Stack.",
+    "scope": "advanced",
+    "tags": [
+      "Blank",
+      "Ubuntu",
+      "Git",
+      "Subversion"
+    ],
+    "components": [],
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/ubuntu_jdk8"
+    },
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+              ],
+              "servers": {},
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "location": "registry.devshift.net/che/ubuntu_jdk8",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null
+    },
+    "stackIcon": {
+      "name": "type-blank.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "java-centos",
+    "creator": "ide",
+    "name": "Java CentOS",
+    "description": "Java JDK Stack on CentOS.",
+    "scope": "general",
+    "tags": [
+      "Java",
+      "JDK",
+      "Maven",
+      "Tomcat",
+      "CentOS",
+      "Git"
+    ],
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "---"
+      },
+      {
+        "name": "JDK",
+        "version": "1.8.0_45"
+      },
+      {
+        "name": "Maven",
+        "version": "3.2.2"
+      },
+      {
+        "name": "Tomcat",
+        "version": "8.0.24"
+      }
+    ],
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/centos_jdk8"
+    },
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+              ],
+              "servers": {},
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "location": "registry.devshift.net/che/centos_jdk8",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "commandLine": "mvn clean install -f ${current.project.path}",
+          "name": "build",
+          "type": "mvn",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-java.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
     "id": "vert.x",
     "creator": "Clement Escoffier",
     "name": "Eclipse Vert.x",
@@ -60,8 +398,7 @@
                 "previewUrl": "",
                 "goal": "Build"
             }
-        },
-        {
+      }, {
             "commandLine": "scl enable rh-maven33 'mvn compile vertx:run -f ${current.project.path}'",
             "name": "run",
             "type": "custom",
@@ -69,8 +406,7 @@
                 "previewUrl": "http://${server.port.8080}",
                 "goal": "Run"
             }
-        },
-        {
+      }, {
             "commandLine": "scl enable rh-maven33 'mvn compile vertx:debug -f ${current.project.path}'",
             "name": "debug",
             "type": "custom",
@@ -129,6 +465,7 @@
           "machines": {
             "dev-machine": {
               "agents": [
+                "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
                 "org.eclipse.che.ws-agent",
                 "com.redhat.bayesian.lsp"
@@ -259,13 +596,17 @@
       "version": "3.3.9"
     }
   ]
-  },
-  {
-    "id": "nodejs4",
-    "creator": "Dharmit Shah",
-    "name": "CentOS nodejs",
+},
+{
+  "name": "CentOS nodejs",
+  "id": "nodejs4",
+  "creator": "Dharmit Shah",
+  "scope": "general",
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/centos-nodejs"
+    },
     "description": "CentOS Node Stack",
-    "scope": "general",
     "tags": [
       "CentOS",
       "Git",
@@ -278,6 +619,45 @@
       "Angular",
       "Karma"
     ],
+    "workspaceConfig": {
+      "name": "default",
+      "environments": {
+        "default": {
+          "recipe": {
+            "location": "registry.devshift.net/che/centos-nodejs",
+            "type": "dockerimage"
+          },
+          "machines": {
+            "dev-machine": {
+              "attributes": {
+                "memoryLimitBytes": "2147483648"
+              },
+              "agents": [
+	        "org.eclipse.che.exec"
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp"
+              ],
+              "servers": {}
+            }
+          }
+        }
+      },
+      "commands": [
+        {
+          "name": "run",
+          "type": "custom",
+          "attributes": {
+            "goal": "Run",
+            "previewUrl": "http://${server.port.8080}"
+          },
+          "commandLine": "cd ${current.project.path} && scl enable rh-nodejs4 'node app/app.js'",
+        }
+      ],
+      "defaultEnv": "default",
+      "description": null
+      
+    },
     "components": [
       {
         "name": "Node.JS",
@@ -304,387 +684,8 @@
         "version": "---"
       }
     ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/centos-nodejs"
-    },
-    "workspaceConfig": {
-      "environments": {
-        "default": {
-          "machines": {
-            "dev-machine": {
-              "agents": [
-                "org.eclipse.che.terminal",
-                "org.eclipse.che.ws-agent",
-                "com.redhat.bayesian.lsp"
-              ],
-              "servers": {},
-              "attributes": {
-                "memoryLimitBytes": "2147483648"
-              }
-            }
-          },
-          "recipe": {
-            "location": "registry.devshift.net/che/centos-nodejs",
-            "type": "dockerimage"
-          }
-        }
-      },
-      "name": "default",
-      "defaultEnv": "default",
-      "description": null,
-      "commands": [
-        {
-          "commandLine": "cd ${current.project.path} && scl enable rh-nodejs4 'node app/app.js'",
-          "name": "run",
-          "type": "custom",
-          "attributes": {
-            "previewUrl": "http://${server.port.8080}",
-            "goal": "Run"
-          }
-        }
-      ]
-    },
     "stackIcon": {
       "name": "type-node.svg",
-      "mediaType": "image/svg+xml"
-    }
-  },
-  {
-    "id": "java-centos",
-    "creator": "ide",
-    "name": "Java CentOS",
-    "description": "Java JDK Stack on CentOS.",
-    "scope": "general",
-    "tags": [
-      "Java",
-      "JDK",
-      "Maven",
-      "Tomcat",
-      "CentOS",
-      "Git"
-    ],
-    "components": [
-      {
-        "name": "CentOS",
-        "version": "---"
-      },
-      {
-        "name": "JDK",
-        "version": "1.8.0_45"
-      },
-      {
-        "name": "Maven",
-        "version": "3.2.2"
-      },
-      {
-        "name": "Tomcat",
-        "version": "8.0.24"
-      }
-    ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/centos_jdk8"
-    },
-    "workspaceConfig": {
-      "environments": {
-        "default": {
-          "machines": {
-            "dev-machine": {
-              "agents": [
-                "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
-              ],
-              "servers": {},
-              "attributes" : {
-                "memoryLimitBytes": "2147483648"
-              }
-            }
-          },
-          "recipe": {
-            "location": "registry.devshift.net/che/centos_jdk8",
-            "type": "dockerimage"
-          }
-        }
-      },
-      "name": "default",
-      "defaultEnv": "default",
-      "description": null,
-      "commands": [
-        {
-          "commandLine": "mvn clean install -f ${current.project.path}",
-          "name": "build",
-          "type": "mvn",
-          "attributes": {
-            "previewUrl": "",
-            "goal": "Build"
-          }
-        }
-      ]
-    },
-    "stackIcon": {
-      "name": "type-java.svg",
-      "mediaType": "image/svg+xml"
-    }
-  },
-  {
-    "id": "java-centos-mysql",
-    "creator": "ide",
-    "name": "Java-MySQL CentOS",
-    "description": "Multi-machine environment with Java CentOS Stack and MySQL database",
-    "scope": "general",
-    "tags": [
-      "Java 1.8, Tomcat 8, MySQL 5.7"
-    ],
-    "components": [
-      {
-        "name": "JDK",
-        "version": "1.8.0_45"
-      },
-      {
-        "name": "Maven",
-        "version": "3.2.2"
-      },
-      {
-        "name": "Tomcat",
-        "version": "8.0.24"
-      }
-    ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/centos_jdk8"
-    },
-    "workspaceConfig": {
-      "environments": {
-        "default": {
-          "machines": {
-            "dev-machine": {
-              "agents": [
-                "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
-              ],
-              "servers": {},
-              "attributes" : {}
-            },
-            "db": {
-              "agents": [
-                "org.eclipse.che.terminal"
-              ],
-              "servers": {},
-              "attributes" : {}
-            }
-          },
-          "recipe": {
-            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/centos_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
-            "contentType": "application/x-yaml",
-            "type": "compose"
-          }
-        }
-      },
-      "name": "default",
-      "defaultEnv": "default",
-      "description": null,
-      "commands": [
-        {
-          "commandLine": "mvn clean install -f ${current.project.path}",
-          "name": "build",
-          "type": "mvn"
-        },
-        {
-          "commandLine": "mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'show databases;'",
-          "name": "show databases",
-          "type": "custom"
-        }
-      ]
-    },
-    "stackIcon": {
-      "name": "type-java-mysql.svg",
-      "mediaType": "image/svg+xml"
-    }
-  },
-  {
-    "id": "java-mysql",
-    "creator": "ide",
-    "name": "Java-MySQL",
-    "description": "Multi-machine environment with Default Java Stack and MySQL database",
-    "scope": "advanced",
-    "tags": [
-      "Java 1.8, Tomcat 8, MySQL 5.7"
-    ],
-    "components": [
-      {
-        "name": "JDK",
-        "version": "1.8.0_45"
-      },
-      {
-        "name": "Maven",
-        "version": "3.2.2"
-      },
-      {
-        "name": "Tomcat",
-        "version": "8.0.24"
-      }
-    ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/ubuntu_jdk8"
-    },
-    "workspaceConfig": {
-      "environments": {
-        "default": {
-          "machines": {
-            "dev-machine": {
-              "agents": [
-                "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
-              ],
-              "servers": {},
-              "attributes" : {}
-            },
-            "db": {
-              "agents": [
-                "org.eclipse.che.terminal"
-              ],
-              "servers": {},
-              "attributes" : {}
-            }
-          },
-          "recipe": {
-            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/ubuntu_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
-            "contentType": "application/x-yaml",
-            "type": "compose"
-          }
-        }
-      },
-      "name": "default",
-      "defaultEnv": "default",
-      "description": null,
-      "commands": [
-        {
-          "commandLine": "mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'show databases;'",
-          "name": "show databases",
-          "type": "custom"
-        }
-      ]
-    },
-    "stackIcon": {
-      "name": "type-java-mysql.svg",
-      "mediaType": "image/svg+xml"
-    }
-  },
-  {
-    "id": "java-default",
-    "creator": "ide",
-    "name": "Java",
-    "description": "Default Java Stack with JDK 8, Maven and Tomcat.",
-    "scope": "advanced",
-    "tags": [
-      "Java",
-      "JDK",
-      "Maven",
-      "Tomcat",
-      "Subversion",
-      "Ubuntu",
-      "Git"
-    ],
-    "components": [
-      {
-        "name": "JDK",
-        "version": "1.8.0_45"
-      },
-      {
-        "name": "Maven",
-        "version": "3.2.2"
-      },
-      {
-        "name": "Tomcat",
-        "version": "8.0.24"
-      }
-    ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/ubuntu_jdk8"
-    },
-    "workspaceConfig": {
-      "environments": {
-        "default": {
-          "machines": {
-            "dev-machine": {
-              "agents": [
-                "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
-              ],
-              "servers": {},
-              "attributes" : {
-                "memoryLimitBytes": "2147483648"
-              }
-            }
-          },
-          "recipe": {
-            "location": "registry.devshift.net/che/ubuntu_jdk8",
-            "type": "dockerimage"
-          }
-        }
-      },
-      "name": "default",
-      "defaultEnv": "default",
-      "description": null,
-      "commands": [
-        {
-          "commandLine": "mvn clean install -f ${current.project.path}",
-          "name": "build",
-          "type": "mvn",
-          "attributes": {
-            "previewUrl": "",
-            "goal": "Build"
-          }
-        }
-      ]
-    },
-    "stackIcon": {
-      "name": "type-java.svg",
-      "mediaType": "image/svg+xml"
-    }
-  },
-  {
-    "id": "blank-default",
-    "creator": "ide",
-    "name": "Blank",
-    "description": "Default Blank Stack.",
-    "scope": "advanced",
-    "tags": [
-      "Blank",
-      "Ubuntu",
-      "Git",
-      "Subversion"
-    ],
-    "components": [],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/ubuntu_jdk8"
-    },
-    "workspaceConfig": {
-      "environments": {
-        "default": {
-          "machines": {
-            "dev-machine": {
-              "agents": [
-                "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
-              ],
-              "servers": {},
-              "attributes" : {
-                "memoryLimitBytes": "2147483648"
-              }
-            }
-          },
-          "recipe": {
-            "location": "registry.devshift.net/che/ubuntu_jdk8",
-            "type": "dockerimage"
-          }
-        }
-      },
-      "name": "default",
-      "defaultEnv": "default",
-      "description": null
-    },
-    "stackIcon": {
-      "name": "type-blank.svg",
       "mediaType": "image/svg+xml"
     }
   }
