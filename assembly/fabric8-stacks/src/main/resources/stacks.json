@@ -262,6 +262,80 @@
     }
   },
   {
+    "id": "dotnet-centos",
+    "creator": "ide",
+    "name": ".NET CentOS",
+    "description": "CentOS .NET 2.0 Stack with .NET Core SDK",
+    "scope": "general",
+    "tags": [
+      "CentOS",
+      "dotnet",
+      "Git"
+    ],
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "---"
+      },
+      {
+        "name": ".NET Core SDK",
+        "version": "rh-dotnet20"
+      }
+    ],
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/centos_dotnet20"
+    },
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "agents": [
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "org.eclipse.che.ls.csharp"
+              ],
+              "servers": {},
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "location": "registry.devshift.net/che/centos_dotnet20",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "name": "update dependencies",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && dotnet restore",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
+        },
+        {
+          "name": "run",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && dotnet run",
+          "attributes": {
+            "previewUrl": "http://${server.port.5000}",
+            "goal": "Run"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-dotnet.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
     "id": "java-centos",
     "creator": "ide",
     "name": "Java CentOS",
