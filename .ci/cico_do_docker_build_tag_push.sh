@@ -19,7 +19,7 @@ DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 cd ${DIR}
 
 distPath='assembly/assembly-main/target/eclipse-che-*/eclipse-che-*'
-for distribution in `ls -1 ${ABSOLUTE_PATH}/../${distPath};`
+for distribution in `echo ${ABSOLUTE_PATH}/../${distPath};`
 do
   case "$distribution" in
     ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
