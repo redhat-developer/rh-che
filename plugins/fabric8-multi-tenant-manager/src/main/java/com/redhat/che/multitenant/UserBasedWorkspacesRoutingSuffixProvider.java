@@ -10,6 +10,7 @@
  */
 package com.redhat.che.multitenant;
 
+import com.redhat.che.multitenant.Fabric8WorkspaceEnvironmentProvider.UserCheTenantData;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -18,8 +19,6 @@ import org.eclipse.che.plugin.docker.client.WorkspacesRoutingSuffixProvider;
 import org.eclipse.che.plugin.openshift.client.exception.OpenShiftException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.redhat.che.multitenant.Fabric8WorkspaceEnvironmentProvider.UserCheTenantData;
 
 /**
  * Retrieves a routing suffix that can be used when building workspace agents external address with
@@ -54,9 +53,9 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
   @Override
   @Nullable
   public String get() {
-      UserCheTenantData userCheTenantData;
-      try {
-       userCheTenantData = workspaceEnvironmentProvider.getUserCheTenantData();
+    UserCheTenantData userCheTenantData;
+    try {
+      userCheTenantData = workspaceEnvironmentProvider.getUserCheTenantData();
     } catch (OpenShiftException e) {
       LOG.warn("Exception when trying to retrieve routing suffix from user tenant data", e);
       return null;
@@ -66,9 +65,9 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
       suffix = cheWorkspacesRoutingSuffix;
     }
     if (suffix == null) {
-        return null;
+      return null;
     }
-    
+
     return new StringBuilder(userCheTenantData.getNamespace())
         .append('.')
         .append(suffix)
