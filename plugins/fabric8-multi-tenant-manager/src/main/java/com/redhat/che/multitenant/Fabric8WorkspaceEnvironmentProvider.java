@@ -79,7 +79,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
       return clusterUrl;
     }
 
-    public String getRoutePrefix() {
+    public String getRouteBaseSuffix() {
       return routePrefix;
     }
 

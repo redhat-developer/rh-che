@@ -10,6 +10,7 @@
  */
 package com.redhat.che.multitenant;
 
+import com.redhat.che.multitenant.Fabric8WorkspaceEnvironmentProvider.UserCheTenantData;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -52,15 +53,24 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
   @Override
   @Nullable
   public String get() {
-    String suffix = null;
+    UserCheTenantData userCheTenantData;
     try {
-      suffix = workspaceEnvironmentProvider.getUserCheTenantData().getRoutePrefix();
+      userCheTenantData = workspaceEnvironmentProvider.getUserCheTenantData();
     } catch (OpenShiftException e) {
       LOG.warn("Exception when trying to retrieve routing suffix from user tenant data", e);
+      return null;
     }
-    if (suffix != null) {
-      return suffix;
+    String suffix = userCheTenantData.getRouteBaseSuffix();
+    if (suffix == null) {
+      suffix = cheWorkspacesRoutingSuffix;
     }
-    return cheWorkspacesRoutingSuffix;
+    if (suffix == null) {
+      return null;
+    }
+
+    return new StringBuilder(userCheTenantData.getNamespace())
+        .append('.')
+        .append(suffix)
+        .toString();
   }
 }
