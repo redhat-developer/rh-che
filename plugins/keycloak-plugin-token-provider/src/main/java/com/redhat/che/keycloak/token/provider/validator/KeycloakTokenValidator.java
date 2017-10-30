@@ -16,15 +16,22 @@ import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class KeycloakTokenValidator {
-  private static final String BEARER_PREFIX = "Bearer ";
+  private static final String BEARER_PREFIX = "Bearer";
 
   public void validate(final String keycloakToken) throws KeycloakException {
-    if (!isValid(keycloakToken)) {
+    if (!hasBearerPrefix(keycloakToken)) {
       throw new KeycloakException("Keycloak token must have '" + BEARER_PREFIX + "' prefix");
+    } else if (isTokenBlank(keycloakToken)) {
+      throw new KeycloakException("Keycloak token is blank: '" + keycloakToken + "'");
     }
   }
 
-  private boolean isValid(final String keycloakToken) {
-    return (StringUtils.isNotBlank(keycloakToken) && keycloakToken.startsWith(BEARER_PREFIX));
+  private boolean hasBearerPrefix(final String keycloakToken) {
+    return (StringUtils.isNotBlank(keycloakToken) && keycloakToken.startsWith(BEARER_PREFIX + " "));
+  }
+
+  private boolean isTokenBlank(final String keycloakToken) {
+    String token = StringUtils.replaceOnce(keycloakToken, BEARER_PREFIX, "");
+    return StringUtils.isBlank(token);
   }
 }
