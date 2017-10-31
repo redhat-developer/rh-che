@@ -15,7 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class KeycloakTokenValidatorTest {
-  private static final String BLANK_TOKEN = "Bearer ";
   private static final String VALID_TOKEN = "Bearer token";
   private static final String INVALID_TOKEN = "token";
   private static KeycloakTokenValidator keycloakTokenValidator;
@@ -33,10 +32,5 @@ public class KeycloakTokenValidatorTest {
   @Test(expected = KeycloakException.class)
   public void processInvalidToken() throws KeycloakException {
     keycloakTokenValidator.validate(INVALID_TOKEN);
-  }
-
-  @Test(expected = KeycloakException.class)
-  public void processBlankToken() throws KeycloakException {
-    keycloakTokenValidator.validate(BLANK_TOKEN);
   }
 }

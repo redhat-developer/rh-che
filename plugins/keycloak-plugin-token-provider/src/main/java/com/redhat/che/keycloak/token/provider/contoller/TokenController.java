@@ -104,7 +104,7 @@ public class TokenController {
     try {
       validator.validate(keycloakToken);
       token = tokenProvider.obtainOsoToken(keycloakToken);
-    } catch (KeycloakException e) {
+    } catch (Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
     return Response.ok(token).build();
@@ -117,17 +117,10 @@ public class TokenController {
         "Return true if the token provided in the authorization header corresponds to the user who owns the namespace."
   )
   public Response getUserMatches(@HeaderParam(HttpHeaders.AUTHORIZATION) String keycloakToken) {
-    try {
-      validator.validate(keycloakToken);
-      Response response;
-      if (userValidator.matchesUsername(keycloakToken)) {
-        response = Response.ok("true").build();
-      } else {
-        response = Response.ok("false").build();
-      }
-      return response;
-    } catch (KeycloakException e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+    if (userValidator.matchesUsername(keycloakToken)) {
+      return Response.ok("true").build();
+    } else {
+      return Response.ok("false").build();
     }
   }
 }
