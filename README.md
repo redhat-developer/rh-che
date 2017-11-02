@@ -1,4 +1,4 @@
-[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-build-run-che-build-multi-tenant-rh-che](https://ci.centos.org/view/Devtools/job/devtools-build-run-che-build-multi-tenant-rh-che)
+[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-build-run-che-build-multi-tenant-rh-che)](https://ci.centos.org/view/Devtools/job/devtools-build-run-che-build-multi-tenant-rh-che)
 
 # Eclipse Che on OpenShift 
 
