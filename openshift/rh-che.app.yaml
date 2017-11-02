@@ -1,0 +1,341 @@
+kind: Template
+apiVersion: v1
+metadata:
+  labels:
+    app: che
+  name: che
+objects:
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    labels:
+      app: che
+    name: che-recommender-api-token
+  data:
+    token: ${RECOMMENDER_API_TOKEN}
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    labels:
+      app: che
+    name: che
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: che
+    name: che-host
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: che
+- apiVersion: v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app: che
+    name: che
+  roleRef:
+    name: admin
+  subjects:
+  - kind: ServiceAccount
+    name: che
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    labels:
+      app: che
+    name: che-data-volume
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: che
+    name: che
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 2
+    selector:
+      app: che
+    strategy:
+      recreateParams:
+        timeoutSeconds: 10000
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: che
+      spec:
+        containers:
+        - env:
+          - name: CHE_DOCKER_IP_EXTERNAL
+            valueFrom:
+              configMapKeyRef:
+                key: hostname-http
+                name: che
+          - name: CHE_WORKSPACE_STORAGE
+            valueFrom:
+              configMapKeyRef:
+                key: workspace-storage
+                name: che
+          - name: CHE_LOGS_DIR
+            valueFrom:
+              configMapKeyRef:
+                key: che.logs.dir
+                name: che
+          - name: CHE_WORKSPACE_STORAGE_CREATE_FOLDERS
+            valueFrom:
+              configMapKeyRef:
+                key: workspace-storage-create-folders
+                name: che
+          - name: CHE_LOCAL_CONF_DIR
+            valueFrom:
+              configMapKeyRef:
+                key: local-conf-dir
+                name: che
+          - name: CHE_OPENSHIFT_PROJECT
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: CHE_OPENSHIFT_SERVICEACCOUNTNAME
+            valueFrom:
+              configMapKeyRef:
+                key: openshift-serviceaccountname
+                name: che
+          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY
+            valueFrom:
+              configMapKeyRef:
+                key: che-server-evaluation-strategy
+                name: che
+          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_TEMPLATE
+            valueFrom:
+              configMapKeyRef:
+                key: che.docker.server_evaluation_strategy.custom.template
+                name: che
+          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_EXTERNAL_PROTOCOL
+            valueFrom:
+              configMapKeyRef:
+                key: che.docker.server_evaluation_strategy.custom.external.protocol
+                name: che
+          - name: CHE_PREDEFINED_STACKS_RELOAD__ON__START
+            valueFrom:
+              configMapKeyRef:
+                key: che.predefined.stacks.reload_on_start
+                name: che
+          - name: CHE_LOG_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: log-level
+                name: che
+          - name: CHE_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: port
+                name: che
+          - name: CHE_DOCKER_CONNECTOR
+            valueFrom:
+              configMapKeyRef:
+                key: docker-connector
+                name: che
+          - name: CHE_DEBUG_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: remote-debugging-enabled
+                name: che
+          - name: CHE_OAUTH_GITHUB_FORCEACTIVATION
+            valueFrom:
+              configMapKeyRef:
+                key: che-oauth-github-forceactivation
+                name: che
+          - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_OVERRIDE
+            valueFrom:
+              configMapKeyRef:
+                key: workspaces-memory-limit
+                name: che
+          - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_REQUEST
+            valueFrom:
+              configMapKeyRef:
+                key: workspaces-memory-request
+                name: che
+          - name: CHE_WORKSPACE_AUTO__START
+            valueFrom:
+              configMapKeyRef:
+                key: enable-workspaces-autostart
+                name: che
+          - name: JAVA_OPTS
+            valueFrom:
+              configMapKeyRef:
+                key: che-server-java-opts
+                name: che
+          - name: CHE_WORKSPACE_JAVA_OPTIONS
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspaces-java-opts
+                name: che
+          - name: CHE_OPENSHIFT_SECURE_ROUTES
+            valueFrom:
+              configMapKeyRef:
+                key: che-openshift-secure-routes
+                name: che
+          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_SECURE_EXTERNAL_URLS
+            valueFrom:
+              configMapKeyRef:
+                key: che-secure-external-urls
+                name: che
+          - name: CHE_OPENSHIFT_SERVER_INACTIVE_STOP_TIMEOUT_MS
+            valueFrom:
+              configMapKeyRef:
+                key: che-server-timeout-ms
+                name: che
+          - name: CHE_OPENSHIFT_PRECREATE_WORKSPACE_DIRS
+            valueFrom:
+              configMapKeyRef:
+                key: che-openshift-precreate-subpaths
+                name: che
+          - name: CHE_KEYCLOAK_OSO_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: keycloak-oso-endpoint
+                name: che
+          - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: keycloak-github-endpoint
+                name: che
+          - name: CHE_KEYCLOAK_DISABLED
+            valueFrom:
+              configMapKeyRef:
+                key: keycloak-disabled
+                name: che
+          - name: CHE_WORKSPACE_AUTO__SNAPSHOT
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspace-auto-snapshot
+                name: che
+          - name: CHE_FABRIC8_MULTITENANT
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-multitenant
+                name: che
+          - name: CHE_FABRIC8_USER__SERVICE_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-user-service-endpoint
+                name: che
+          - name: CHE_FABRIC8_WORKSPACES_ROUTING__SUFFIX
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-workspace-routing-suffix
+                name: che
+          - name: CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR
+            valueFrom:
+              configMapKeyRef:
+                key: che-docker-enable-container-stop-detector
+                name: che
+          - name: CHE_WORKSPACE_CHE__SERVER__ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspace-che-server-endpoint
+                name: che
+          - name: CHE_WORKSPACE_CHE_LOGS
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspace-logs
+                name: che
+          - name: CHE_KEYCLOAK_AUTH__SERVER__URL
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-auth-server-url
+                name: che
+          - name: CHE_KEYCLOAK_REALM
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-realm
+                name: che
+          - name: CHE_KEYCLOAK_CLIENT__ID
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-client-id
+                name: che
+          - name: CHE_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: che-host
+                name: che
+          image: ${IMAGE}:${IMAGE_TAG}
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /api
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 120
+            timeoutSeconds: 10
+          name: che
+          ports:
+          - containerPort: 8080
+            name: http
+          - containerPort: 8000
+            name: http-debug
+          readinessProbe:
+            httpGet:
+              path: /api
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 60
+          resources:
+            limits:
+              memory: 600Mi
+            requests:
+              memory: 256Mi
+          volumeMounts:
+          - mountPath: /data
+            name: che-data-volume
+        serviceAccountName: che
+        volumes:
+        - name: che-data-volume
+          persistentVolumeClaim:
+            claimName: che-data-volume
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: che
+    name: che
+  spec:
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: che-host
+parameters:
+- name: IMAGE
+  value: rhche/che-server-multiuser
+- name: IMAGE_TAG
+  value: latest
+- name: PROJECT_USER
+  value: developer
+- name: PROJECT_NAMESPACE
+- name: RECOMMENDER_EXTERNAL_NAME
+  value: recommender.api.prod-preview.openshift.io
+- name: RECOMMENDER_API_TOKEN
+- name: DOMAIN
+  value: d800.free-int.openshiftapps.com
+- name: KEYCLOAK_OSO_ENDPOINT
+  value: https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token
+- name: KEYCLOAK_GITHUB_ENDPOINT
+  value: https://auth.prod-preview.openshift.io/api/token?for=https://github.com
