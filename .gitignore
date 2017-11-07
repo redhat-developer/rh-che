@@ -69,3 +69,4 @@ Thumbs.db
 
 
 overlays
+dockerfiles/che-fabric8/eclipse-che/

@@ -60,7 +60,9 @@
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <updateOnly>false</updateOnly>
-                    <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
+                    <descriptors>
+                        <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
+                    </descriptors>
                     <finalName>eclipse-che-fabric8-${project.version}</finalName>
                     <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
@@ -170,7 +172,9 @@
                         <artifactId>maven-assembly-plugin</artifactId>
                         <configuration>
                             <appendAssemblyId>true</appendAssemblyId>
-                            <descriptor>${project.basedir}/src/assembly/assembly-wo-dashboard.xml</descriptor>
+                            <descriptors>
+                                <descriptor>${project.basedir}/src/assembly/assembly-wo-dashboard.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </plugin>
                 </plugins>
