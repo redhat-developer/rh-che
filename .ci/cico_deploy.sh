@@ -37,22 +37,22 @@ echo "CHE VALIDATION: Verification skipped until job devtools-che-functional-tes
 # . cico_run_EE_tests.sh
 # echo "CHE VALIDATION: Verification passed. Pushing Che server image to prod registry."
 
-echo "CHE VALIDATION: Verification is disabled. Pushing Che server images to prod registry without verification."
+echo "CHE VALIDATION: Pushing Che server image to prod registry."
 
 STAGE_IMAGE_TO_PROMOTE="${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${CHE_SERVER_DOCKER_IMAGE_TAG}"
 
-if [ -n "${GIT_COMMIT}" ]; then
-  DEVSHIFT_TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
+if [ -n "${GIT_COMMIT}" -a -n "${DEVSHIFT_TAG_LEN}" ]; then
+  TAG_SHORT_COMMIT_HASH=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
 else
-  echo "ERROR: GIT_COMMIT env var is not set. Aborting"
+  echo "ERROR: GIT_COMMIT / DEVSHIFT_TAG_LEN env vars are not set. Aborting"
   exit 1
 fi
 
-PROD_IMAGE_DEVSHIFT="push.registry.devshift.net/che/che-multiuser:${DEVSHIFT_TAG}"
+PROD_IMAGE_DEVSHIFT="push.registry.devshift.net/che/che-multiuser:${TAG_SHORT_COMMIT_HASH}"
 PROD_IMAGE_DEVSHIFT_LATEST="push.registry.devshift.net/che/che-multiuser:latest"
 
 if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-  docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${DEVSHIFT_REGISTRY}
+  docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" push.registry.devshift.net
 else
   echo "ERROR: Can not push to registry.devshift.net: credentials are not set. Aborting"
   exit 1
