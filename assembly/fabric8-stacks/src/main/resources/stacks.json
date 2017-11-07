@@ -673,7 +673,7 @@
 },
 {
   "name": "CentOS nodejs",
-  "id": "nodejs6",
+  "id": "nodejs-centos",
   "creator": "Dharmit Shah",
   "scope": "general",
     "source": {
