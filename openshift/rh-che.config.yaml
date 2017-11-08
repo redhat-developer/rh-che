@@ -4,7 +4,7 @@ metadata:
   name: che
 type: Opaque
 data:
-  hostname-http: "glusterpoc37aws.devshift.net"
+  che-host: "glusterpoc37aws.devshift.net"
   workspace-storage: "/home/user/che/workspaces"
   workspace-storage-create-folders: "false"
   local-conf-dir: "/etc/conf"
@@ -41,4 +41,3 @@ data:
   che-keycloak-auth-server-url: "https://sso.openshift.io/auth"
   che-keycloak-realm: "fabric8"
   che-keycloak-client-id: "openshiftio-public"
-  che-host: "glusterpoc37aws.devshift.net"

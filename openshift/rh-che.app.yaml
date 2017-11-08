@@ -6,14 +6,6 @@ metadata:
   name: che
 objects:
 - apiVersion: v1
-  kind: Secret
-  metadata:
-    labels:
-      app: che
-    name: che-recommender-api-token
-  data:
-    token: ${RECOMMENDER_API_TOKEN}
-- apiVersion: v1
   kind: ServiceAccount
   metadata:
     labels:
@@ -81,7 +73,7 @@ objects:
           - name: CHE_DOCKER_IP_EXTERNAL
             valueFrom:
               configMapKeyRef:
-                key: hostname-http
+                key: che-host
                 name: che
           - name: CHE_WORKSPACE_STORAGE
             valueFrom:
@@ -327,15 +319,3 @@ parameters:
   value: rhche/che-server-multiuser
 - name: IMAGE_TAG
   value: latest
-- name: PROJECT_USER
-  value: developer
-- name: PROJECT_NAMESPACE
-- name: RECOMMENDER_EXTERNAL_NAME
-  value: recommender.api.prod-preview.openshift.io
-- name: RECOMMENDER_API_TOKEN
-- name: DOMAIN
-  value: d800.free-int.openshiftapps.com
-- name: KEYCLOAK_OSO_ENDPOINT
-  value: https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token
-- name: KEYCLOAK_GITHUB_ENDPOINT
-  value: https://auth.prod-preview.openshift.io/api/token?for=https://github.com
