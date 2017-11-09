@@ -32,7 +32,7 @@ objects:
       app: che
     name: che
   roleRef:
-    name: admin
+    name: edit
   subjects:
   - kind: ServiceAccount
     name: che
