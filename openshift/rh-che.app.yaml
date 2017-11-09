@@ -26,17 +26,6 @@ objects:
     selector:
       app: che
 - apiVersion: v1
-  kind: RoleBinding
-  metadata:
-    labels:
-      app: che
-    name: che
-  roleRef:
-    name: edit
-  subjects:
-  - kind: ServiceAccount
-    name: che
-- apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     labels:
