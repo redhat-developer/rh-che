@@ -15,6 +15,24 @@ currentDir=`pwd`
 ciDir=$(dirname "$0")
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Fetch PR and rebase on master, if job runs from PR
+cat jenkins-env \
+    | grep -E "(ghprbSourceBranch|ghprbPullId)=" \
+    | sed 's/^/export /g' \
+    > /tmp/jenkins-env
+source /tmp/jenkins-env
+if [[ ! -z "${ghprbPullId:-}" ]] && [[ ! -z "${ghprbSourceBranch:-}" ]]; then
+  set +x
+  echo 'Checking out to Github PR branch.'
+  git fetch origin pull/${ghprbPullId}/head:${ghprbSourceBranch}
+  git checkout ${ghprbSourceBranch}
+  git fetch origin master
+  git rebase FETCH_HEAD
+  set -x
+else
+  echo 'Working on current branch of EE tests repo'
+fi
+
 if [ "$DeveloperBuild" != "true" ]
 then
   set +x
