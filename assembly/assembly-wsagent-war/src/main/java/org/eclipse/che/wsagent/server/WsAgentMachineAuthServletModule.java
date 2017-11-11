@@ -28,7 +28,7 @@ import org.everrest.guice.servlet.GuiceEverrestServlet;
 
 /** @author andrew00x */
 @DynaModule
-public class RedHatCheWsAgentServletModule extends ServletModule {
+public class WsAgentMachineAuthServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     filter("/*").through(CheCorsFilter.class);

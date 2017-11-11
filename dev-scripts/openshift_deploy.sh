@@ -102,15 +102,15 @@ CHE_FABRIC8_USER__SERVICE_ENDPOINT=${CHE_FABRIC8_USER__SERVICE_ENDPOINT:-"https:
 CHE_FABRIC8_WORKSPACES_ROUTING__SUFFIX=${CHE_FABRIC8_WORKSPACES_ROUTING__SUFFIX:-"8a09.starter-us-east-2.openshiftapps.com"}
 if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then
   CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR=false
-  DEFAULT_CHE_MULTI_USER=true
+  DEFAULT_CHE_MULTIUSER=true
 else
   CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR=true
-  DEFAULT_CHE_MULTI_USER=false
+  DEFAULT_CHE_MULTIUSER=false
 fi
 
-CHE_MULTI_USER=${CHE_MULTI_USER:-${DEFAULT_CHE_MULTI_USER}}
+CHE_MULTIUSER=${CHE_MULTIUSER:-${DEFAULT_CHE_MULTIUSER}}
 
-if [ "${CHE_MULTI_USER}" == "true" ]; then
+if [ "${CHE_MULTIUSER}" == "true" ]; then
   DEFAULT_CHE_KEYCLOAK_DISABLED="false"
   
   if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then
@@ -128,7 +128,8 @@ else
   DEFAULT_CHE_IMAGE_REPO="docker.io/rhchestage/che-server"
   DEFAULT_CHE_IMAGE_TAG="nightly-fabric8"
 fi
-
+CHE_OAUTH_GITHUB_CLIENTID=${CHE_OAUTH_GITHUB_CLIENTID:-}
+CHE_OAUTH_GITHUB_CLIENTSECRET=${CHE_OAUTH_GITHUB_CLIENTSECRET:-}
 CHE_IMAGE_REPO=${CHE_IMAGE_REPO:-${DEFAULT_CHE_IMAGE_REPO}}
 CHE_IMAGE_TAG=${CHE_IMAGE_TAG:-${DEFAULT_CHE_IMAGE_TAG}}
 DEFAULT_CHE_LOG_LEVEL="INFO"
@@ -175,7 +176,6 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
   CHE_OPENSHIFT_PROJECT=${CHE_OPENSHIFT_PROJECT:-${DEFAULT_CHE_OPENSHIFT_PROJECT}}
   DEFAULT_OPENSHIFT_NAMESPACE_URL="${CHE_OPENSHIFT_PROJECT}.${MINISHIFT_IP}.nip.io"
   OPENSHIFT_NAMESPACE_URL=${OPENSHIFT_NAMESPACE_URL:-${DEFAULT_OPENSHIFT_NAMESPACE_URL}}
-  DEFAULT_CHE_KEYCLOAK_DISABLED="true"
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
   DEFAULT_CHE_DEBUGGING_ENABLED="true"
   CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
@@ -211,7 +211,6 @@ elif [ "${OPENSHIFT_FLAVOR}" == "ocp" ]; then
   # ----------------------
   DEFAULT_CHE_OPENSHIFT_PROJECT="eclipse-che"
   CHE_OPENSHIFT_PROJECT=${CHE_OPENSHIFT_PROJECT:-${DEFAULT_CHE_OPENSHIFT_PROJECT}}
-  DEFAULT_CHE_KEYCLOAK_DISABLED="true"
   CHE_KEYCLOAK_DISABLED=${CHE_KEYCLOAK_DISABLED:-${DEFAULT_CHE_KEYCLOAK_DISABLED}}
   DEFAULT_CHE_DEBUGGING_ENABLED="false"
   CHE_DEBUGGING_ENABLED=${CHE_DEBUGGING_ENABLED:-${DEFAULT_CHE_DEBUGGING_ENABLED}}
@@ -265,6 +264,8 @@ echo "done!"
 # If command == clean up then delete all openshift objects
 # -------------------------------------------------------------
 if [ "${COMMAND}" == "cleanup" ]; then
+  echo "[CHE] Stopping the Che server..."
+  oc scale --replicas=0 --timeout=3m dc che
   echo "[CHE] Deleting all OpenShift objects..."
   oc delete all --all 
   echo "[CHE] Cleanup successfully started. Use \"oc get all\" to verify that all resources have been deleted."
@@ -292,7 +293,7 @@ fi
 
 COMMAND_DIR=$(dirname "$0")
 
-if [ "${CHE_MULTI_USER}" == "true" ]; then
+if [ "${CHE_MULTIUSER}" == "true" ]; then
     if [ "${CHE_DEDICATED_KEYCLOAK}" == "true" ]; then
         "${COMMAND_DIR}"/multi-user/deploy_postgres_and_keycloak.sh
     else
@@ -381,19 +382,19 @@ CHE_IMAGE="${CHE_IMAGE_REPO}:${CHE_IMAGE_TAG}"
 # e.g. docker.io/rhchestage => docker.io\/rhchestage
 CHE_IMAGE_SANITIZED=$(echo "${CHE_IMAGE}" | sed 's/\//\\\//g')
 
-MULTI_USER_REPLACEMENT_STRING="          - name: \"CHE_WORKSPACE_LOGS\"
+CHE_SERVER_CONFIGURATION="          - name: \"CHE_WORKSPACE_LOGS\"
             value: \"${CHE_WORKSPACE_LOGS}\"
-          - name: \"CHE_KEYCLOAK_AUTH__SERVER__URL\"
-            value: \"${CHE_KEYCLOAK_AUTH__SERVER__URL}\"
-          - name: \"CHE_KEYCLOAK_REALM\"
-            value: \"${CHE_KEYCLOAK_REALM}\"
-          - name: \"CHE_KEYCLOAK_CLIENT__ID\"
-            value: \"${CHE_KEYCLOAK_CLIENT__ID}\"
           - name: \"CHE_HOST\"
-            value: \"${CHE_HOST}\""
+            value: \"${CHE_HOST}\"
+          - name: \"CHE_MULTIUSER\"
+            value: \"${CHE_MULTIUSER}\"
+          - name: \"CHE_OAUTH_GITHUB_CLIENTID\"
+            value: \"${CHE_OAUTH_GITHUB_CLIENTID}\"
+          - name: \"CHE_OAUTH_GITHUB_CLIENTSECRET\"
+            value: \"${CHE_OAUTH_GITHUB_CLIENTSECRET}\""
 
 if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then
-  MULTI_USER_REPLACEMENT_STRING="          - name: \"CHE_FABRIC8_MULTITENANT\"
+  CHE_SERVER_CONFIGURATION="          - name: \"CHE_FABRIC8_MULTITENANT\"
             value: \"${CHE_FABRIC8_MULTITENANT}\"
           - name: \"CHE_FABRIC8_USER__SERVICE_ENDPOINT\"
             value: \"${CHE_FABRIC8_USER__SERVICE_ENDPOINT}\"
@@ -403,9 +404,10 @@ if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then
             value: \"${CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR}\"
           - name: \"CHE_WORKSPACE_CHE__SERVER__ENDPOINT\"
             value: \"\"
-$MULTI_USER_REPLACEMENT_STRING"
-  
-  MULTITENANT_CUSTOM_TEMPLATE_REPLACEMENT="s/    che.docker.server_evaluation_strategy.custom.template: .*/    che.docker.server_evaluation_strategy.custom.template: <serverName>-<if(isDevMachine)><workspaceIdWithoutPrefix><else><machineName><endif>-<if(workspacesRoutingSuffix)><user>-che.<workspacesRoutingSuffix><else><externalAddress><endif>/"
+$CHE_SERVER_CONFIGURATION"
+
+  MULTITENANT_CUSTOM_STRATEGY_REPLACEMENT="s/    che-server-evaluation-strategy: .*/    che-server-evaluation-strategy: always-external-custom/"
+  MULTITENANT_CUSTOM_TEMPLATE_REPLACEMENT="s/    che.docker.server_evaluation_strategy.custom.template: .*/    che.docker.server_evaluation_strategy.custom.template: <serverName>-<if(isDevMachine)><workspaceIdWithoutPrefix><else><machineName><endif>-<if(workspacesRoutingSuffix)><workspacesRoutingSuffix><else><externalAddress><endif>/"
   MULTITENANT_IDLING_REPLACEMENT="s/    che-server-timeout-ms: .*/    che-server-timeout-ms: '0'/"
 fi
 
@@ -427,17 +429,21 @@ if [ "${OPENSHIFT_FLAVOR}" == "minishift" ]; then
     sed "s/    che-openshift-secure-routes: \"true\"/    che-openshift-secure-routes: \"false\"/" | \
     sed "s/    che-secure-external-urls: \"true\"/    che-secure-external-urls: \"false\"/" | \
     sed "s/    che.docker.server_evaluation_strategy.custom.external.protocol: https/    che.docker.server_evaluation_strategy.custom.external.protocol: http/" | \
-    sed "s/    che-openshift-precreate-subpaths: \"false\"/    che-openshift-precreate-subpaths: \"true\"/" | \
     sed "s/    che.predefined.stacks.reload_on_start: \"true\"/    che.predefined.stacks.reload_on_start: \"false\"/" | \
     sed "s/    remote-debugging-enabled: \"false\"/    remote-debugging-enabled: \"${CHE_DEBUGGING_ENABLED}\"/" | \
     sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
     sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
+    sed "s|    che-keycloak-auth-server-url:.*|    che-keycloak-auth-server-url: ${CHE_KEYCLOAK_AUTH__SERVER__URL}|" | \
+    sed "s|    che-keycloak-realm:.*|    che-keycloak-realm: ${CHE_KEYCLOAK_REALM}|" | \
+    sed "s|    che-keycloak-client-id:.*|    che-keycloak-client-id: ${CHE_KEYCLOAK_CLIENT__ID}|" | \
     grep -v -e "tls:" -e "insecureEdgeTerminationPolicy: Redirect" -e "termination: edge" | \
     if [ "${CHE_KEYCLOAK_DISABLED}" == "true" ]; then sed "s/    keycloak-disabled: \"false\"/    keycloak-disabled: \"true\"/" ; else cat -; fi | \
     sed "$MULTI_USER_HEALTH_CHECK_REPLACEMENT_STRING" | \
-    append_after_match "env:" "${MULTI_USER_REPLACEMENT_STRING}" | \
+    append_after_match "env:" "${CHE_SERVER_CONFIGURATION}" | \
+    if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_CUSTOM_STRATEGY_REPLACEMENT" ; else cat -; fi | \
     if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_CUSTOM_TEMPLATE_REPLACEMENT" ; else cat -; fi | \
     if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_IDLING_REPLACEMENT" ; else cat -; fi | \
+    sed "s|- apiVersion: apps.openshift.io/v1|- apiVersion: v1|" | \
     oc apply --force=true -f -
 elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
   echo "[CHE] Deploying Che on OSIO (image ${CHE_IMAGE})"
@@ -445,11 +451,15 @@ elif [ "${OPENSHIFT_FLAVOR}" == "osio" ]; then
     if [ ! -z "${OPENSHIFT_NAMESPACE_URL+x}" ]; then sed "s/    hostname-http:.*/    hostname-http: ${OPENSHIFT_NAMESPACE_URL}/" ; else cat -; fi | \
     sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
     sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
+    sed "s|    che-keycloak-auth-server-url:.*|    che-keycloak-auth-server-url: ${CHE_KEYCLOAK_AUTH__SERVER__URL}|" | \
+    sed "s|    che-keycloak-realm:.*|    che-keycloak-realm: ${CHE_KEYCLOAK_REALM}|" | \
+    sed "s|    che-keycloak-client-id:.*|    che-keycloak-client-id: ${CHE_KEYCLOAK_CLIENT__ID}|" | \
     sed "s/          image:.*/          image: \"${CHE_IMAGE_SANITIZED}\"/" | \
     sed "s/          imagePullPolicy:.*/          imagePullPolicy: \"${IMAGE_PULL_POLICY}\"/" | \
     if [ "${CHE_KEYCLOAK_DISABLED}" == "true" ]; then sed "s/    keycloak-disabled: \"false\"/    keycloak-disabled: \"true\"/" ; else cat -; fi | \
     sed "$MULTI_USER_HEALTH_CHECK_REPLACEMENT_STRING" | \
-    append_after_match "env:" "${MULTI_USER_REPLACEMENT_STRING}" | \
+    append_after_match "env:" "${CHE_SERVER_CONFIGURATION}" | \
+    if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_CUSTOM_STRATEGY_REPLACEMENT" ; else cat -; fi | \
     if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_CUSTOM_TEMPLATE_REPLACEMENT" ; else cat -; fi | \
     if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_IDLING_REPLACEMENT" ; else cat -; fi | \
     oc apply --force=true -f -
@@ -462,6 +472,9 @@ else
     sed "s|    keycloak-oso-endpoint:.*|    keycloak-oso-endpoint: ${KEYCLOAK_OSO_ENDPOINT}|" | \
     sed "s|    keycloak-github-endpoint:.*|    keycloak-github-endpoint: ${KEYCLOAK_GITHUB_ENDPOINT}|" | \
     sed "s/    keycloak-disabled:.*/    keycloak-disabled: \"${CHE_KEYCLOAK_DISABLED}\"/" | \
+    sed "s|    che-keycloak-auth-server-url:.*|    che-keycloak-auth-server-url: ${CHE_KEYCLOAK_AUTH__SERVER__URL}|" | \
+    sed "s|    che-keycloak-realm:.*|    che-keycloak-realm: ${CHE_KEYCLOAK_REALM}|" | \
+    sed "s|    che-keycloak-client-id:.*|    che-keycloak-client-id: ${CHE_KEYCLOAK_CLIENT__ID}|" | \
     if [ "${CHE_LOG_LEVEL}" == "DEBUG" ]; then sed "s/    log-level: \"INFO\"/    log-level: \"DEBUG\"/" ; else cat -; fi | \
     if [ "${ENABLE_SSL}" == "false" ]; then sed "s/    che-openshift-secure-routes: \"true\"/    che-openshift-secure-routes: \"false\"/" ; else cat -; fi | \
     if [ "${ENABLE_SSL}" == "false" ]; then sed "s/    che-secure-external-urls: \"true\"/    che-secure-external-urls: \"false\"/" ; else cat -; fi | \
@@ -469,7 +482,8 @@ else
     if [ "${ENABLE_SSL}" == "false" ]; then sed "s/    che.docker.server_evaluation_strategy.custom.external.protocol: https/    che.docker.server_evaluation_strategy.custom.external.protocol: http/" ; else cat -; fi | \
     if [ "${K8S_VERSION_PRIOR_TO_1_6}" == "true" ]; then sed "s/    che-openshift-precreate-subpaths: \"false\"/    che-openshift-precreate-subpaths: \"true\"/"  ; else cat -; fi | \
     sed "$MULTI_USER_HEALTH_CHECK_REPLACEMENT_STRING" | \
-    append_after_match "env:" "${MULTI_USER_REPLACEMENT_STRING}" | \
+    append_after_match "env:" "${CHE_SERVER_CONFIGURATION}" | \
+    if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_CUSTOM_STRATEGY_REPLACEMENT" ; else cat -; fi | \
     if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_CUSTOM_TEMPLATE_REPLACEMENT" ; else cat -; fi | \
     if [ "${CHE_FABRIC8_MULTITENANT}" == "true" ]; then sed "$MULTITENANT_IDLING_REPLACEMENT" ; else cat -; fi | \
     oc apply --force=true -f -

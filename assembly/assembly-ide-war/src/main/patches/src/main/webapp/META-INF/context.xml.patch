@@ -6,4 +6,5 @@
      <Valve className="org.apache.catalina.valves.rewrite.RewriteValve"/>
 +    <Valve className="com.redhat.che.valve.UserAuthValve"/>
 +    <Parameter name="keycloak.config.resolver" value="com.redhat.che.keycloak.shared.ApplicationKeycloakConfigResolver"/>
- </Context>
+
+     <JarScanner>

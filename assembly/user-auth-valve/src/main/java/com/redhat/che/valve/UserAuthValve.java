@@ -68,7 +68,7 @@ public class UserAuthValve extends KeycloakAuthenticatorValve {
   @Override
   public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
     if (isKeycloakDisabled()) {
-      LOG.info("Keycloak is disabled => Bypassing authentification");
+      LOG.debug("Keycloak is disabled => Bypassing authentification");
       GenericPrincipal genericPrincipal =
           new GenericPrincipal("developer", "developer", Arrays.asList("developer"));
       request.setUserPrincipal(genericPrincipal);
