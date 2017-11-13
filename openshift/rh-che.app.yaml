@@ -236,6 +236,21 @@ objects:
               configMapKeyRef:
                 key: che-host
                 name: che
+          - name: CHE_JDBC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                  key: che.jdbc.password
+                  name: che
+          - name: CHE_JDBC_URL
+            valueFrom:
+              secretKeyRef:
+                  key: che.jdbc.url
+                  name: che
+          - name: CHE_JDBC_USERNAME
+            valueFrom:
+              secretKeyRef:
+                  key: che.jdbc.username
+                  name: che
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
