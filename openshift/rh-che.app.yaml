@@ -26,6 +26,18 @@ objects:
     selector:
       app: che
 - apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    labels:
+      app: che
+    name: che-data-volume
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
@@ -278,7 +290,14 @@ objects:
               memory: 600Mi
             requests:
               memory: 256Mi
+          volumeMounts:
+          - mountPath: /data
+            name: che-data-volume
         serviceAccountName: che
+        volumes:
+        - name: che-data-volume
+          persistentVolumeClaim:
+            claimName: che-data-volume
     triggers:
     - type: ConfigChange
 - apiVersion: v1
