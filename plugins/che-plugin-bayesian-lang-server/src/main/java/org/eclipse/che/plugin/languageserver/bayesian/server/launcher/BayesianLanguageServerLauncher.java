@@ -10,14 +10,17 @@
  */
 package org.eclipse.che.plugin.languageserver.bayesian.server.launcher;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import javax.inject.Named;
+import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.languageserver.exception.LanguageServerException;
 import org.eclipse.che.api.languageserver.launcher.LanguageServerLauncherTemplate;
 import org.eclipse.che.api.languageserver.registry.DocumentFilter;
@@ -27,6 +30,7 @@ import org.eclipse.che.plugin.languageserver.bayesian.BayesianLanguageServerModu
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.slf4j.Logger;
 
 /**
  * @author Evgen Vidolob
@@ -34,15 +38,19 @@ import org.eclipse.lsp4j.services.LanguageServer;
  */
 @Singleton
 public class BayesianLanguageServerLauncher extends LanguageServerLauncherTemplate {
+  private static final Logger LOG = getLogger(BayesianLanguageServerLauncher.class);
 
   private static final LanguageServerDescription DESCRIPTION = createServerDescription();
 
   private final Path launchScript;
-
-  @Inject private KeycloakTokenStore keycloakStore;
+  private final HttpJsonRequestFactory httpJsonFactory;
+  private final String apiEndpoint;
 
   @Inject
-  public BayesianLanguageServerLauncher() {
+  public BayesianLanguageServerLauncher(
+      HttpJsonRequestFactory httpJsonFactory, @Named("che.api") String apiEndpoint) {
+    this.httpJsonFactory = httpJsonFactory;
+    this.apiEndpoint = apiEndpoint;
     launchScript = Paths.get(System.getenv("HOME"), "che/ls-bayesian/launch.sh");
   }
 
@@ -64,18 +72,18 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
   }
 
   protected Process startLanguageServerProcess(String projectPath) throws LanguageServerException {
-    String launchCommand = launchScript.toString();
+    String recommenderToken = null;
 
-    if (keycloakStore.hasLastToken()) {
-      launchCommand =
-          "export RECOMMENDER_API_TOKEN="
-              + //
-              keycloakStore.getLastTokenWithoutBearer()
-              + //
-              " && "
-              + //
-              launchCommand;
+    try {
+      String endpoint = apiEndpoint + "/bayesian/token";
+      LOG.debug("Retrieving the Bayesian recommender token from API : {}", endpoint);
+      recommenderToken = httpJsonFactory.fromUrl(endpoint).request().asString();
+    } catch (Exception e) {
+      throw new LanguageServerException("Can't start Bayesian language server", e);
     }
+
+    String launchCommand =
+        "export RECOMMENDER_API_TOKEN=\"" + recommenderToken + "\" && " + launchScript.toString();
 
     ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", launchCommand);
     processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);

@@ -12,8 +12,6 @@ package com.redhat.che.wsmaster.deploy;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import com.redhat.bayesian.agent.BayesianAgent;
-import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.inject.DynaModule;
 import org.eclipse.che.multiuser.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
 import org.eclipse.che.security.oauth.OAuthAuthenticator;
@@ -23,8 +21,6 @@ import org.eclipse.che.security.oauth.OAuthAuthenticator;
 public class Fabric8WsMasterModule extends AbstractModule {
   @Override
   protected void configure() {
-    Multibinder<Agent> agents = Multibinder.newSetBinder(binder(), Agent.class);
-    agents.addBinding().to(BayesianAgent.class);
     bind(org.eclipse.che.api.workspace.server.WorkspaceFilesCleaner.class)
         .to(org.eclipse.che.plugin.openshift.client.OpenShiftWorkspaceFilesCleaner.class);
     Multibinder<OAuthAuthenticator> oAuthAuthenticators =

@@ -35,6 +35,7 @@ import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.rest.HttpJsonResponse;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
+import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.multiuser.keycloak.token.provider.service.KeycloakTokenProvider;
 import org.eclipse.che.plugin.openshift.client.OpenshiftWorkspaceEnvironmentProvider;
 import org.eclipse.che.plugin.openshift.client.exception.OpenShiftException;
@@ -116,28 +117,39 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
             .build(CacheLoader.from(this::loadUserCheTenantData));
   }
 
+  private void checkSubject(Subject subject) throws OpenShiftException {
+    if (subject == null) {
+      throw new OpenShiftException("No Subject is found to perform this action");
+    }
+    if (subject == Subject.ANONYMOUS) {
+      throw new OpenShiftException(
+          "The anonymous subject is used, and won't be able to perform this action");
+    }
+  }
+
   @Override
-  public Config getWorkspacesOpenshiftConfig() throws OpenShiftException {
+  public Config getWorkspacesOpenshiftConfig(Subject subject) throws OpenShiftException {
     if (!fabric8CheMultitenant) {
-      return super.getWorkspacesOpenshiftConfig();
+      return super.getWorkspacesOpenshiftConfig(subject);
     }
 
-    String osoToken = getOpenShiftTokenForUser();
+    checkSubject(subject);
+
+    String osoToken = getOpenShiftTokenForUser(subject);
     if (osoToken == null) {
-      throw new OpenShiftException(
-          "OSO token is null => Connecting to Openshift with default config");
+      throw new OpenShiftException("OSO token not found for user: " + getUserDescription(subject));
     }
 
     UserCheTenantData cheTenantData;
-    cheTenantData = getUserCheTenantData();
+    cheTenantData = getUserCheTenantData(subject);
     if (cheTenantData == null) {
       throw new OpenShiftException(
-          "User tenant data not found => Connecting to Openshift with default config");
+          "User tenant data not found for user: " + getUserDescription(subject));
     }
 
     return new ConfigBuilder()
         .withMasterUrl(cheTenantData.getClusterUrl())
-        .withOauthToken(getOpenShiftTokenForUser())
+        .withOauthToken(osoToken)
         .withNamespace(cheTenantData.getNamespace())
         .withTrustCerts(true)
         .build();
@@ -153,21 +165,31 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
         | ConflictException
         | BadRequestException
         | IOException e) {
-      throw new RuntimeException(
-          "Cound not retrieve OSO token from Keycloak token: " + keycloakToken, e);
+      throw new RuntimeException("Cound not retrieve OSO token from Keycloak token", e);
     }
   }
 
-  public String getOpenShiftTokenForUser() throws OpenShiftException {
-    String keycloakToken = EnvironmentContext.getCurrent().getSubject().getToken();
+  private String getUserDescription(Subject subject) {
+    return subject.getUserName() + "(" + subject.getUserId() + ")";
+  }
+
+  public String getOpenShiftTokenForUser(Subject subject) throws OpenShiftException {
+
+    checkSubject(subject);
+
+    String keycloakToken = subject.getToken();
     if (keycloakToken == null) {
-      throw new OpenShiftException("User Openshift token is needed but there is no current user");
+      throw new OpenShiftException(
+          "User Openshift token is needed but cannot be retrieved since there is no Keycloak token for user: "
+              + getUserDescription(subject));
     }
     try {
       return tokenCache.get(keycloakToken);
     } catch (ExecutionException e) {
       throw new OpenShiftException(
-          "Cound not retrieve OSO token from Keycloak token: " + keycloakToken, e.getCause());
+          "Could not retrieve OSO token from Keycloak token for user: "
+              + getUserDescription(subject),
+          e.getCause());
     }
   }
 
@@ -215,8 +237,10 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
     throw new RuntimeException("No che namespace was found in the user tenant");
   }
 
-  public UserCheTenantData getUserCheTenantData() throws OpenShiftException {
-    String keycloakToken = EnvironmentContext.getCurrent().getSubject().getToken();
+  public UserCheTenantData getUserCheTenantData(Subject subject) throws OpenShiftException {
+    checkSubject(subject);
+
+    String keycloakToken = subject.getToken();
     if (keycloakToken == null) {
       throw new OpenShiftException("User tenant data is needed but there is no current user");
     }
@@ -226,6 +250,10 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
       throw new OpenShiftException(
           "Exception during the user tenant data retrieval or parsing", e.getCause());
     }
+  }
+
+  public UserCheTenantData getUserCheTenantData() throws OpenShiftException {
+    return getUserCheTenantData(EnvironmentContext.getCurrent().getSubject());
   }
 
   private String getResponseBody(final String endpoint, final String keycloakToken)
@@ -241,14 +269,17 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
   }
 
   @Override
-  public String getWorkspacesOpenshiftNamespace() throws OpenShiftException {
+  public String getWorkspacesOpenshiftNamespace(Subject subject) throws OpenShiftException {
     if (!fabric8CheMultitenant) {
-      return super.getWorkspacesOpenshiftNamespace();
+      return super.getWorkspacesOpenshiftNamespace(subject);
     }
 
-    UserCheTenantData cheTenantData = getUserCheTenantData();
+    checkSubject(subject);
+
+    UserCheTenantData cheTenantData = getUserCheTenantData(subject);
     if (cheTenantData == null) {
-      throw new OpenShiftException("User tenant data not found !");
+      throw new OpenShiftException(
+          "User tenant data not found for user: " + getUserDescription(subject));
     }
     return cheTenantData.getNamespace();
   }
