@@ -31,6 +31,14 @@
                 <include>com.redhat.che:fabric8-ide-assembly-wsagent-server</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <outputDirectory>tomcat/lib</outputDirectory>
+            <includes>
+                <include>org.postgresql:postgresql</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
