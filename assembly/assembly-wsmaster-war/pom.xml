@@ -126,13 +126,11 @@
                             <groupId>org.eclipse.che.assembly-multiuser</groupId>
                             <artifactId>assembly-wsmaster-war</artifactId>
                             <type>war</type>
-                            <excludes>
-                                <exclude>WEB-INF/lib/che-core-ide-stacks-${che.version}.jar</exclude>
-                                <exclude>WEB-INF/classes/che-in-che.json</exclude>
-                            </excludes>
                         </overlay>
                     </overlays>
                     <packagingExcludes>WEB-INF/lib/wsmaster-local*.jar,
+                        WEB-INF/lib/che-core-ide-stacks-${che.version}.jar,
+                        WEB-INF/classes/che-in-che.json,
                         WEB-INF/lib/che-core-db-vendor-h2-*.jar,
                         WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class,
                         WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.class,
