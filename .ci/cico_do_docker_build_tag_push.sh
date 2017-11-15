@@ -18,8 +18,8 @@ UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../asse
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 cd ${DIR}
 
-distPath='assembly/assembly-main/target/eclipse-che-*.tar.gz'
-for distribution in `ls -1 ${ABSOLUTE_PATH}/../${distPath};`
+distPath='assembly/assembly-main/target/eclipse-che-*/eclipse-che-*'
+for distribution in `echo ${ABSOLUTE_PATH}/../${distPath};`
 do
   case "$distribution" in
     ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
@@ -41,14 +41,14 @@ do
   docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
 
   # Use of folder
-  LOCAL_ASSEMBLY_ZIP="${DIR}"/eclipse-che.tar.gz
+  LOCAL_ASSEMBLY_DIR="${DIR}"/eclipse-che
 
-  if [ -f "${LOCAL_ASSEMBLY_ZIP}" ]; then
-    rm "${LOCAL_ASSEMBLY_ZIP}"
+  if [ -d "${LOCAL_ASSEMBLY_DIR}" ]; then
+    rm -r "${LOCAL_ASSEMBLY_DIR}"
   fi
 
-  echo "Linking assembly ${distribution} --> ${LOCAL_ASSEMBLY_ZIP}"
-  ln "${distribution}" "${LOCAL_ASSEMBLY_ZIP}"
+  echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
+  cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
   
   bash ./build.sh --organization:${DOCKER_HUB_NAMESPACE} --tag:${NIGHTLY}
   if [ $? -ne 0 ]; then
