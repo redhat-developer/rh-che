@@ -19,7 +19,7 @@ data:
   port: "8080"
   remote-debugging-enabled: "false"
   che-oauth-github-forceactivation: "true"
-  workspaces-memory-limit: "2.5Gi"
+  workspaces-memory-limit: "2.4Gi"
   workspaces-memory-request: "1100Mi"
   enable-workspaces-autostart: "false"
   keycloak-oso-endpoint: "https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token"
