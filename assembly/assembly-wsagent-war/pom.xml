@@ -25,10 +25,6 @@
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>che-keycloak-plugin-token-store</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>che-plugin-bayesian-lang-server</artifactId>
         </dependency>
         <dependency>

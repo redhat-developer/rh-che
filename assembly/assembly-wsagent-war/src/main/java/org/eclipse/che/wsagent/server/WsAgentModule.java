@@ -12,7 +12,6 @@ package org.eclipse.che.wsagent.server;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.redhat.che.keycloak.token.store.service.KeycloakTokenStore;
 import javax.inject.Named;
 import org.eclipse.che.api.core.rest.ApiInfoService;
 import org.eclipse.che.commons.lang.Pair;
@@ -41,8 +40,6 @@ public class WsAgentModule extends AbstractModule {
     install(new org.eclipse.che.git.impl.jgit.JGitModule());
     install(new org.eclipse.che.api.core.jsonrpc.impl.JsonRpcModule());
     install(new org.eclipse.che.api.core.websocket.impl.WebSocketModule());
-
-    bind(KeycloakTokenStore.class);
   }
 
   // it's need for WSocketEventBusClient and in the future will be replaced with the property

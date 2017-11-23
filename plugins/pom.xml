@@ -23,7 +23,6 @@
     <packaging>pom</packaging>
     <name>Fabric8 IDE :: Plugins</name>
     <modules>
-        <module>keycloak-plugin-token-store</module>
         <module>ls-bayesian-agent</module>
         <module>che-plugin-bayesian-lang-server</module>
         <module>plugin-product-info</module>
