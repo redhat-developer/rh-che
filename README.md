@@ -1,4 +1,4 @@
-# Eclipse Che on OpenShift 
+# Eclipse Che on OpenShift - TEST
 
 ## Table Of Content
 
