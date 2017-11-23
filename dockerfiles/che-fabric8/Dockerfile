@@ -6,6 +6,11 @@
 
 FROM eclipse/che-server:local
 
+# Install 32bit OpenJDK, remove 64bit version.
+RUN yum install -y java-1.8.0-openjdk.i686 && \
+    yum erase -y java-1.8.0-openjdk-headless.x86_64 && \
+    yum clean all
+
 # Install pcp - collection basics
 # would prefer only pmcd, and not the /bin/pm*tools etc.
 COPY pcp.repo /etc/yum.repos.d/pcp.repo
