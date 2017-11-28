@@ -12,7 +12,7 @@ ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
 
-UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../assembly/assembly-build-info/target/dependency/WEB-INF/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties)
+UPSTREAM_TAG=$(cat ${ABSOLUTE_PATH}/../assembly/assembly-main/target/build-info/revision)
 
 # Now lets build the local docker images
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8

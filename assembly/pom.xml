@@ -23,7 +23,6 @@
     <packaging>pom</packaging>
     <name>Fabric8 IDE :: Assemblies</name>
     <modules>
-        <module>assembly-build-info</module>
         <module>fabric8-stacks</module>
         <module>assembly-wsagent-war</module>
         <module>assembly-wsagent-server</module>
