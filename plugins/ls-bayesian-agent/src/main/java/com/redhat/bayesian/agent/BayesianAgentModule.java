@@ -11,8 +11,6 @@
 package com.redhat.bayesian.agent;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-import org.eclipse.che.api.agent.shared.model.Agent;
 import org.eclipse.che.inject.DynaModule;
 
 /** @author David Festal */
@@ -20,8 +18,6 @@ import org.eclipse.che.inject.DynaModule;
 public class BayesianAgentModule extends AbstractModule {
   @Override
   protected void configure() {
-    Multibinder<Agent> agents = Multibinder.newSetBinder(binder(), Agent.class);
-    agents.addBinding().to(BayesianAgent.class);
     bind(BayesianTokenProvider.class);
   }
 }
