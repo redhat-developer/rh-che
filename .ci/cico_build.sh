@@ -25,7 +25,7 @@ then
   if [ -z "${RHCHEBOT_DOCKER_HUB_PASSWORD+x}" ]; then echo "WARNING: failed to get RHCHEBOT_DOCKER_HUB_PASSWORD from jenkins-env file in centos-ci job."; else export RHCHEBOT_DOCKER_HUB_PASSWORD; fi
   set -x
   yum -y update
-  yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker subversion
+  yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker
   yum -y install rh-maven33 rh-nodejs4
   
   BuildUser="chebuilder"

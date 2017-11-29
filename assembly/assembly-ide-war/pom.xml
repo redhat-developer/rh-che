@@ -293,10 +293,6 @@
                     <classifier>classes</classifier>
                     <exclusions>
                         <exclusion>
-                            <artifactId>che-plugin-svn-ext-ide</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                        <exclusion>
                             <artifactId>che-plugin-product-info</artifactId>
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
@@ -358,10 +354,6 @@
                     <exclusions>
                         <exclusion>
                             <artifactId>che-plugin-ext-dashboard-client</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>che-plugin-svn-ext-ide</artifactId>
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
                         <exclusion>

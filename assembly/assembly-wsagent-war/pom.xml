@@ -83,7 +83,6 @@
                     <scanWarDependencies>true</scanWarDependencies>
                     <skipResources>
                         <skipResource>.*CheWsAgentServletModule.class</skipResource>
-                        <skipResource>.*che-plugin-svn-ext-.*</skipResource>
                     </skipResources>
                 </configuration>
             </plugin>
@@ -94,7 +93,7 @@
                     <warSourceDirectory>${project.build.directory}/patched/src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <dependentWarIncludes>**,META-INF/context.xml,WEB-INF/**</dependentWarIncludes>
-                    <dependentWarExcludes>META-INF/MANIFEST.MF,META-INF/maven/**,WEB-INF/lib/che-plugin-svn-ext-*,WEB-INF/classes/org/eclipse/che/wsagent/server/CheWsAgentServletModule.class</dependentWarExcludes>
+                    <dependentWarExcludes>META-INF/MANIFEST.MF,META-INF/maven/**,WEB-INF/classes/org/eclipse/che/wsagent/server/CheWsAgentServletModule.class</dependentWarExcludes>
                 </configuration>
             </plugin>
             <plugin>

@@ -164,7 +164,7 @@
                         <warSourceDirectory>${project.build.directory}/patched/src/main/webapp</warSourceDirectory>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                         <dependentWarIncludes>**,META-INF/context.xml,WEB-INF/**</dependentWarIncludes>
-                        <dependentWarExcludes>META-INF/MANIFEST.MF,META-INF/maven/**,WEB-INF/lib/che-plugin-svn-ext-*</dependentWarExcludes>
+                        <dependentWarExcludes>META-INF/MANIFEST.MF,META-INF/maven/**</dependentWarExcludes>
                     </configuration>
                 </plugin>
                 <plugin>
