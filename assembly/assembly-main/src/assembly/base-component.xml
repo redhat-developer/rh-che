@@ -43,7 +43,6 @@
                 <exclude>**/tomcat/webapps/dashboard.war</exclude>
                 <exclude>**/tomcat/webapps/swagger.war</exclude>
                 <exclude>**/tomcat/webapps/docs.war</exclude>
-                <exclude>**/stacks/stacks.json</exclude>
                 <exclude>**/tomcat/conf/tomcat-logger.xml</exclude>
             </excludes>
         </fileSet>

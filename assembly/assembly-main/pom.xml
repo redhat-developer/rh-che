@@ -33,11 +33,6 @@
             <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
             <type>war</type>
         </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-stacks</artifactId>
-            <type>jar</type>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
