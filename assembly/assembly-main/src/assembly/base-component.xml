@@ -44,11 +44,16 @@
                 <exclude>**/tomcat/webapps/swagger.war</exclude>
                 <exclude>**/tomcat/webapps/docs.war</exclude>
                 <exclude>**/stacks/stacks.json</exclude>
+                <exclude>**/tomcat/conf/tomcat-logger.xml</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/stacks/</directory>
             <outputDirectory>stacks/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/assembly/conf</directory>
+            <outputDirectory>tomcat/conf/</outputDirectory>
         </fileSet>
     </fileSets>
 </component>
