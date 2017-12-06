@@ -82,6 +82,12 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-ide-gwt-app</artifactId>
+                <version>${redhat.che.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-ide-stacks</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>jar</type>
