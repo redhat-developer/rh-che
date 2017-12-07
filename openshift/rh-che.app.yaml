@@ -263,6 +263,11 @@ objects:
               secretKeyRef:
                   key: che.jdbc.username
                   name: che
+          - name: CHE_WORKSPACE_AGENT_DEV_PING__SUCCESS__THRESHOLD
+            valueFrom:
+              configMapKeyRef:
+                key: che-wsagent-ping-success-threshold
+                name: che
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
