@@ -40,4 +40,4 @@ data:
   che-keycloak-auth-server-url: "https://sso.openshift.io/auth"
   che-keycloak-realm: "fabric8"
   che-keycloak-client-id: "openshiftio-public"
-  che-wsagent-ping-success-threshold: "10"
+  che-wsagent-ping-success-threshold: "25"
