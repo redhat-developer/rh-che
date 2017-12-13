@@ -42,29 +42,13 @@
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-wsmaster-war</artifactId>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>che-core-ide-stacks</artifactId>
-                    <groupId>org.eclipse.che.core</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.assembly-multiuser</groupId>
-            <artifactId>assembly-wsmaster-war</artifactId>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>che-core-ide-stacks</artifactId>
-                    <groupId>org.eclipse.che.core</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.assembly-multiuser</groupId>
-            <artifactId>assembly-wsmaster-war</artifactId>
             <type>war</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>che-core-ide-stacks</artifactId>
+                    <groupId>org.eclipse.che.core</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.multiuser</groupId>
@@ -104,13 +88,6 @@
                 </executions>
                 <configuration>
                     <scanWarDependencies>true</scanWarDependencies>
-                    <skipResources>
-                        <skipResource>.*WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class</skipResource>
-                        <skipResource>.*WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterServletModule.*</skipResource>
-                        <skipResource>.*WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.*</skipResource>
-                        <skipResource>.*LocalModule.class</skipResource>
-                        <skipResource>.*LocalServletModule.class</skipResource>
-                    </skipResources>
                 </configuration>
             </plugin>
             <plugin>
@@ -119,18 +96,14 @@
                 <configuration>
                     <overlays>
                         <overlay>
-                            <groupId>org.eclipse.che.assembly-multiuser</groupId>
+                            <groupId>org.eclipse.che</groupId>
                             <artifactId>assembly-wsmaster-war</artifactId>
                             <type>war</type>
                         </overlay>
                     </overlays>
-                    <packagingExcludes>WEB-INF/lib/wsmaster-local*.jar,
+                    <packagingExcludes>WEB-INF/lib/che-core-ide-stacks-${che.version}.jar,
                         WEB-INF/lib/che-core-ide-stacks-${che.version}.jar,
-                        WEB-INF/classes/che-in-che.json,
-                        WEB-INF/lib/che-core-db-vendor-h2-*.jar,
-                        WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class,
-                        WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.class,
-                        WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterServletModule.class</packagingExcludes>
+                        WEB-INF/classes/che-in-che.json</packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
