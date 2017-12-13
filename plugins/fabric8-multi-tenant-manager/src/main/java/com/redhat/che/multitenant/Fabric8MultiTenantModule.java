@@ -1,4 +1,3 @@
-package com.redhat.che.multitenant;
 /*
  * Copyright (c) 2016-2017 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
@@ -9,11 +8,12 @@ package com.redhat.che.multitenant;
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
+package com.redhat.che.multitenant;
 
 import com.google.inject.AbstractModule;
 import org.eclipse.che.inject.DynaModule;
-import org.eclipse.che.plugin.docker.client.WorkspacesRoutingSuffixProvider;
-import org.eclipse.che.plugin.openshift.client.OpenshiftWorkspaceEnvironmentProvider;
+import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
+import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +26,7 @@ public class Fabric8MultiTenantModule extends AbstractModule {
   protected void configure() {
     LOGGER.info("Configuring {}", this.getClass().getName());
 
-    bind(WorkspacesRoutingSuffixProvider.class)
-        .to(UserBasedWorkspacesRoutingSuffixProvider.class)
-        .asEagerSingleton();
-    bind(OpenshiftWorkspaceEnvironmentProvider.class)
-        .to(Fabric8WorkspaceEnvironmentProvider.class)
-        .asEagerSingleton();
+    bind(OpenShiftClientFactory.class).to(Fabric8OpenShiftClientFactory.class);
+    bind(OpenShiftProjectFactory.class).to(Fabric8OpenShiftProjectFactory.class);
   }
 }
