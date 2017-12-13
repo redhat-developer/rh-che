@@ -100,18 +100,6 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-workspace-logging-override</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-plugin-product-info</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>gwt-lib</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
                 <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>

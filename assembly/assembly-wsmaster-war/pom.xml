@@ -37,10 +37,6 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-workspace-logging-override</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
