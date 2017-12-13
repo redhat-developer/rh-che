@@ -28,46 +28,13 @@
             <artifactId>che-plugin-bayesian-lang-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.che.assembly-multiuser</groupId>
+            <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-wsagent-war</artifactId>
             <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.assembly-multiuser</groupId>
-            <artifactId>assembly-wsagent-war</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-wsagent-core</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.multiuser</groupId>
-            <artifactId>che-multiuser-keycloak-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-catalina</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-web-resources</id>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.eclipse.che.core</groupId>
                 <artifactId>che-core-dynamodule-maven-plugin</artifactId>
@@ -81,20 +48,11 @@
                 </executions>
                 <configuration>
                     <scanWarDependencies>true</scanWarDependencies>
-                    <skipResources>
-                        <skipResource>.*CheWsAgentServletModule.class</skipResource>
-                    </skipResources>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <warSourceDirectory>${project.build.directory}/patched/src/main/webapp</warSourceDirectory>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <dependentWarIncludes>**,META-INF/context.xml,WEB-INF/**</dependentWarIncludes>
-                    <dependentWarExcludes>META-INF/MANIFEST.MF,META-INF/maven/**,WEB-INF/classes/org/eclipse/che/wsagent/server/CheWsAgentServletModule.class</dependentWarExcludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
