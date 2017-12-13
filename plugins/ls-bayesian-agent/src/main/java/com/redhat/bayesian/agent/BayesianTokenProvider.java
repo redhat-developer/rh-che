@@ -22,38 +22,46 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.eclipse.che.api.core.NotFoundException;
-import org.eclipse.che.api.workspace.server.WorkspaceSubjectRegistry;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.multiuser.machine.authentication.server.MachineTokenRegistry;
 import org.slf4j.Logger;
 
+/** @author David Festal */
 @Path("/bayesian")
 @Singleton
 public class BayesianTokenProvider {
+
   private static final Logger LOG = getLogger(BayesianTokenProvider.class);
 
-  @Inject private MachineTokenRegistry machineTokenRegistry;
-  @Inject private WorkspaceSubjectRegistry workspaceSubjectRegistry;
+  private final MachineTokenRegistry machineTokenRegistry;
+  private final WorkspaceSubjectsRegistry workspaceSubjectsRegistry;
+
+  @Inject
+  public BayesianTokenProvider(
+      MachineTokenRegistry machineTokenRegistry,
+      WorkspaceSubjectsRegistry workspaceSubjectsRegistry) {
+    this.machineTokenRegistry = machineTokenRegistry;
+    this.workspaceSubjectsRegistry = workspaceSubjectsRegistry;
+  }
 
   @GET
   @Path("/token")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getBayesianToken(@HeaderParam(HttpHeaders.AUTHORIZATION) String machineToken)
       throws NotFoundException {
-    String workspaceId = machineTokenRegistry.getWorkspaceId(machineToken);
-    LOG.debug("workspaceId for Bayesian recommender token retrieval: {}", workspaceId);
-    Subject workspaceStarter = workspaceSubjectRegistry.getWorkspaceStarter(workspaceId);
+    String userId = machineTokenRegistry.getUserId(machineToken);
+    Subject workspaceStarter = workspaceSubjectsRegistry.getSubject(userId);
     if (workspaceStarter == null) {
       LOG.error(
           "Subject that started workspace '{}' was not found during Bayesian recommender token retrieval.",
-          workspaceId);
+          userId);
       throw new NotFoundException("Bayesian token not found");
     }
     String keycloakToken = workspaceStarter.getToken();
     if (keycloakToken == null) {
       LOG.error(
           "Keycloak token of the subject that started workspace '{}' (user name = '{}' )was not found during Bayesian recommender token retrieval.",
-          workspaceId,
+          userId,
           workspaceStarter.getUserName());
       throw new NotFoundException("Bayesian token not found");
     }
