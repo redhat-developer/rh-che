@@ -12,7 +12,7 @@ ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
 
-UPSTREAM_TAG=$(cat ${ABSOLUTE_PATH}/../assembly/assembly-main/target/build-info/revision)
+UPSTREAM_TAG=$(sed -n 's/^SCM-Revision: \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../assembly/assembly-wsmaster-war/target/war/work/org.eclipse.che/assembly-wsmaster-war/META-INF/MANIFEST.MF)
 
 # Now lets build the local docker images
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
