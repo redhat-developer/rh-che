@@ -292,7 +292,7 @@ objects:
             timeoutSeconds: 60
           resources:
             limits:
-              memory: 512Mi
+              memory: 750Mi
             requests:
               memory: 256Mi
           volumeMounts:
