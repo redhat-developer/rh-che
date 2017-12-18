@@ -128,6 +128,11 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
   }
 
   @Override
+  public Config getDefaultOpenshiftConfig() {
+    return new ConfigBuilder().withTrustCerts(true).build();
+  }
+
+  @Override
   public Config getWorkspacesOpenshiftConfig(Subject subject) throws OpenShiftException {
     if (!fabric8CheMultitenant) {
       return super.getWorkspacesOpenshiftConfig(subject);
