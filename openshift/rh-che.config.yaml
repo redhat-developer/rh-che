@@ -41,3 +41,4 @@ data:
   che-keycloak-realm: "fabric8"
   che-keycloak-client-id: "openshiftio-public"
   che-wsagent-ping-success-threshold: "2"
+  che-limits-user-workspaces-run-count: "1"
