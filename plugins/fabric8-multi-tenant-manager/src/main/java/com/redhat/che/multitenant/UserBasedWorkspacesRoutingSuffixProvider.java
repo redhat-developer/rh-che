@@ -38,21 +38,28 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
       LoggerFactory.getLogger(UserBasedWorkspacesRoutingSuffixProvider.class);
 
   private String cheWorkspacesRoutingSuffix;
+  private boolean fabric8CheMultitenant;
 
   @Inject private Fabric8WorkspaceEnvironmentProvider workspaceEnvironmentProvider;
 
   @Inject
   public UserBasedWorkspacesRoutingSuffixProvider(
+      @Named("che.fabric8.multitenant") boolean fabric8CheMultitenant,
       @Nullable @Named("che.fabric8.workspaces.routing_suffix") String cheWorkspacesRoutingSuffix) {
 
     LOG.info("Workspaces Routing Suffix = {}", cheWorkspacesRoutingSuffix);
     this.cheWorkspacesRoutingSuffix =
         "NULL".equals(cheWorkspacesRoutingSuffix) ? null : cheWorkspacesRoutingSuffix;
+    this.fabric8CheMultitenant = fabric8CheMultitenant;
   }
 
   @Override
   @Nullable
   public String get() {
+    if (!fabric8CheMultitenant) {
+      return super.get();
+    }
+
     UserCheTenantData userCheTenantData;
     try {
       userCheTenantData = workspaceEnvironmentProvider.getUserCheTenantData();
