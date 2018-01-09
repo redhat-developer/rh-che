@@ -37,7 +37,7 @@ do
   esac
 
   # fetch the right upstream based che-server image to build from
-  docker pull ${CHE_DOCKER_BASE_IMAGE}
+  #docker pull ${CHE_DOCKER_BASE_IMAGE}
   docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
 
   # Use of folder
