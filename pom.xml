@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>5.22.0</version>
+        <version>5.22.1</version>
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>fabric8-ide-parent</artifactId>
