@@ -10,7 +10,6 @@
  */
 package com.redhat.che.multitenant;
 
-import com.redhat.che.multitenant.Fabric8WorkspaceEnvironmentProvider.UserCheTenantData;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -37,19 +36,13 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
   private static final Logger LOG =
       LoggerFactory.getLogger(UserBasedWorkspacesRoutingSuffixProvider.class);
 
-  private String cheWorkspacesRoutingSuffix;
   private boolean fabric8CheMultitenant;
 
   @Inject private Fabric8WorkspaceEnvironmentProvider workspaceEnvironmentProvider;
 
   @Inject
   public UserBasedWorkspacesRoutingSuffixProvider(
-      @Named("che.fabric8.multitenant") boolean fabric8CheMultitenant,
-      @Nullable @Named("che.fabric8.workspaces.routing_suffix") String cheWorkspacesRoutingSuffix) {
-
-    LOG.info("Workspaces Routing Suffix = {}", cheWorkspacesRoutingSuffix);
-    this.cheWorkspacesRoutingSuffix =
-        "NULL".equals(cheWorkspacesRoutingSuffix) ? null : cheWorkspacesRoutingSuffix;
+      @Named("che.fabric8.multitenant") boolean fabric8CheMultitenant) {
     this.fabric8CheMultitenant = fabric8CheMultitenant;
   }
 
@@ -67,10 +60,9 @@ public class UserBasedWorkspacesRoutingSuffixProvider extends WorkspacesRoutingS
       LOG.warn("Exception when trying to retrieve routing suffix from user tenant data", e);
       return null;
     }
+
     String suffix = userCheTenantData.getRouteBaseSuffix();
-    if (suffix == null) {
-      suffix = cheWorkspacesRoutingSuffix;
-    }
+
     if (suffix == null) {
       return null;
     }

@@ -17,6 +17,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.redhat.che.multitenant.multicluster.ClusterToRoutingSuffixMapping;
+import com.redhat.che.multitenant.multicluster.MultiClusterOpenShiftProxy;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import java.io.IOException;
@@ -33,10 +35,8 @@ import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.rest.HttpJsonResponse;
-import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
-import org.eclipse.che.multiuser.keycloak.token.provider.service.KeycloakTokenProvider;
 import org.eclipse.che.plugin.openshift.client.OpenshiftWorkspaceEnvironmentProvider;
 import org.eclipse.che.plugin.openshift.client.exception.OpenShiftException;
 import org.slf4j.Logger;
@@ -51,65 +51,30 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
   private static final int CACHE_TIMEOUT_MINUTES = 10;
   private static final int CONCURRENT_USERS = 500;
 
-  private KeycloakTokenProvider keycloakTokenProvider;
+  private MultiClusterOpenShiftProxy multiClusterOpenShiftProxy;
   private HttpJsonRequestFactory httpJsonRequestFactory;
 
-  LoadingCache<String, String> tokenCache;
   LoadingCache<String, UserCheTenantData> tenantDataCache;
 
   private boolean fabric8CheMultitenant;
 
   private String fabric8UserServiceEndpoint;
 
-  public static class UserCheTenantData {
-    private String namespace;
-    private String clusterUrl;
-    private String routePrefix;
-
-    public UserCheTenantData(String namespace, String clusterUrl, String routePrefix) {
-      this.namespace = namespace;
-      this.clusterUrl = clusterUrl;
-      this.routePrefix = routePrefix;
-    }
-
-    public String getNamespace() {
-      return namespace;
-    }
-
-    public String getClusterUrl() {
-      return clusterUrl;
-    }
-
-    public String getRouteBaseSuffix() {
-      return routePrefix;
-    }
-
-    @Override
-    public String toString() {
-      return "{" + namespace + "," + clusterUrl + "," + routePrefix + "}";
-    }
-  }
-
   @Inject
   public Fabric8WorkspaceEnvironmentProvider(
       @Named("che.openshift.project") String openShiftCheProjectName,
       @Named("che.fabric8.multitenant") boolean fabric8CheMultitenant,
       @Named("che.fabric8.user_service.endpoint") String fabric8UserServiceEndpoint,
-      KeycloakTokenProvider keycloakTokenProvider,
+      MultiClusterOpenShiftProxy multiClusterOpenShiftProxy,
       HttpJsonRequestFactory httpJsonRequestFactory) {
     super(openShiftCheProjectName);
     LOG.info("fabric8CheMultitenant = {}", fabric8CheMultitenant);
     LOG.info("fabric8UserServiceEndpoint = {}", fabric8UserServiceEndpoint);
     this.fabric8CheMultitenant = fabric8CheMultitenant;
     this.fabric8UserServiceEndpoint = fabric8UserServiceEndpoint;
-    this.keycloakTokenProvider = keycloakTokenProvider;
+    this.multiClusterOpenShiftProxy = multiClusterOpenShiftProxy;
     this.httpJsonRequestFactory = httpJsonRequestFactory;
 
-    this.tokenCache =
-        CacheBuilder.newBuilder()
-            .maximumSize(CONCURRENT_USERS)
-            .expireAfterWrite(CACHE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
-            .build(CacheLoader.from(this::loadOpenShiftTokenForUser));
     this.tenantDataCache =
         CacheBuilder.newBuilder()
             .maximumSize(CONCURRENT_USERS)
@@ -140,10 +105,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
 
     checkSubject(subject);
 
-    String osoToken = getOpenShiftTokenForUser(subject);
-    if (osoToken == null) {
-      throw new OpenShiftException("OSO token not found for user: " + getUserDescription(subject));
-    }
+    String keycloakToken = subject.getToken();
 
     UserCheTenantData cheTenantData;
     cheTenantData = getUserCheTenantData(subject);
@@ -152,50 +114,19 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
           "User tenant data not found for user: " + getUserDescription(subject));
     }
 
+    String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
+    LOG.info("OSO proxy URL - {}", osoProxyUrl);
+
     return new ConfigBuilder()
-        .withMasterUrl(cheTenantData.getClusterUrl())
-        .withOauthToken(osoToken)
+        .withMasterUrl(osoProxyUrl)
+        .withOauthToken(keycloakToken)
         .withNamespace(cheTenantData.getNamespace())
         .withTrustCerts(true)
         .build();
   }
 
-  private @Nullable String loadOpenShiftTokenForUser(String keycloakToken) {
-    try {
-      return keycloakTokenProvider.obtainOsoToken("Bearer " + keycloakToken);
-    } catch (ServerException
-        | UnauthorizedException
-        | ForbiddenException
-        | NotFoundException
-        | ConflictException
-        | BadRequestException
-        | IOException e) {
-      throw new RuntimeException("Cound not retrieve OSO token from Keycloak token", e);
-    }
-  }
-
   private String getUserDescription(Subject subject) {
     return subject.getUserName() + "(" + subject.getUserId() + ")";
-  }
-
-  public String getOpenShiftTokenForUser(Subject subject) throws OpenShiftException {
-
-    checkSubject(subject);
-
-    String keycloakToken = subject.getToken();
-    if (keycloakToken == null) {
-      throw new OpenShiftException(
-          "User Openshift token is needed but cannot be retrieved since there is no Keycloak token for user: "
-              + getUserDescription(subject));
-    }
-    try {
-      return tokenCache.get(keycloakToken);
-    } catch (ExecutionException e) {
-      throw new OpenShiftException(
-          "Could not retrieve OSO token from Keycloak token for user: "
-              + getUserDescription(subject),
-          e.getCause());
-    }
   }
 
   private UserCheTenantData loadUserCheTenantData(String keycloakToken) {
@@ -227,11 +158,15 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
       for (JsonElement e : namespaces) {
         JsonObject namespace = e.getAsJsonObject();
         if ("che".equals(namespace.get("type").getAsString())) {
-          String clusterUrl = namespace.get("cluster-url").getAsString();
           String name = namespace.get("name").getAsString();
+          String clusterUrl = namespace.get("cluster-url").getAsString();
+          String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
+          // TODO: When the routing suffix will be added in 'api/user/services' it will be retrieved
+          // directly from payload
+          String suffix = ClusterToRoutingSuffixMapping.get().get(clusterUrl);
 
-          // TODO: When the routing prefix will be added in the userServices, we will set it here.
-          UserCheTenantData cheTenantData = new UserCheTenantData(name, clusterUrl, null);
+          UserCheTenantData cheTenantData = new UserCheTenantData(name, osoProxyUrl, suffix);
+
           LOG.info("cheTenantData = {}", cheTenantData);
           return cheTenantData;
         }

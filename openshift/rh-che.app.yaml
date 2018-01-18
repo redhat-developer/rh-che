@@ -183,11 +183,6 @@ objects:
               configMapKeyRef:
                 key: che-openshift-precreate-subpaths
                 name: che
-          - name: CHE_KEYCLOAK_OSO_ENDPOINT
-            valueFrom:
-              configMapKeyRef:
-                key: keycloak-oso-endpoint
-                name: che
           - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
             valueFrom:
               configMapKeyRef:
@@ -208,10 +203,10 @@ objects:
               configMapKeyRef:
                 key: che-fabric8-user-service-endpoint
                 name: che
-          - name: CHE_FABRIC8_WORKSPACES_ROUTING__SUFFIX
+          - name: CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL
             valueFrom:
               configMapKeyRef:
-                key: che-fabric8-workspace-routing-suffix
+                key: che-fabric8-multicluster-oso-proxy-url
                 name: che
           - name: CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR
             valueFrom:
