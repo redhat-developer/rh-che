@@ -16,7 +16,6 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0"
          metadata-complete="true">
-    <display-name>Che Machine API</display-name>
 
     <absolute-ordering></absolute-ordering>
 
@@ -30,8 +29,9 @@
     </context-param>
     <context-param>
         <param-name>org.eclipse.che.eventbus.endpoint</param-name>
-        <param-value>/eventbus</param-value>
+        <param-value>/eventbus/</param-value>
     </context-param>
+
     <listener>
         <listener-class>org.eclipse.che.inject.CheBootstrap</listener-class>
     </listener>
@@ -51,7 +51,6 @@
         <filter-name>guiceFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
 
     <session-config>
         <session-timeout>180</session-timeout>

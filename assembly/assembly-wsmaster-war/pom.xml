@@ -29,24 +29,19 @@
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>che-keycloak-plugin-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>che-keycloak-plugin-token-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>ls-bayesian-agent</artifactId>
+            <artifactId>fabric8-multi-tenant-manager</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.che</groupId>
-            <artifactId>assembly-wsmaster-war</artifactId>
-            <type>war</type>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-workspace-logging-override</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
@@ -60,9 +55,28 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <scope>provided</scope>
+            <groupId>org.eclipse.che.assembly-multiuser</groupId>
+            <artifactId>assembly-wsmaster-war</artifactId>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>che-core-ide-stacks</artifactId>
+                    <groupId>org.eclipse.che.core</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.assembly-multiuser</groupId>
+            <artifactId>assembly-wsmaster-war</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.multiuser</groupId>
+            <artifactId>che-multiuser-keycloak-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.multiuser</groupId>
+            <artifactId>che-multiuser-keycloak-token-provider</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -109,15 +123,18 @@
                 <configuration>
                     <overlays>
                         <overlay>
-                            <groupId>org.eclipse.che</groupId>
+                            <groupId>org.eclipse.che.assembly-multiuser</groupId>
                             <artifactId>assembly-wsmaster-war</artifactId>
                             <type>war</type>
-                            <excludes>
-                                <exclude>WEB-INF/lib/che-core-ide-stacks-${che.version}.jar</exclude>
-                                <exclude>WEB-INF/classes/che-in-che.json</exclude>
-                            </excludes>
                         </overlay>
                     </overlays>
+                    <packagingExcludes>WEB-INF/lib/wsmaster-local*.jar,
+                        WEB-INF/lib/che-core-ide-stacks-${che.version}.jar,
+                        WEB-INF/classes/che-in-che.json,
+                        WEB-INF/lib/che-core-db-vendor-h2-*.jar,
+                        WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class,
+                        WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.class,
+                        WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterServletModule.class</packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
