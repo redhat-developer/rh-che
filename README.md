@@ -4,18 +4,18 @@
 
 ## Table Of Content
 
-* [What is the RedHat Che distribution](#what-is-the-redhat-che-distribution)
+* [What is the Red Hat Che distribution](#what-is-the-redhat-che-distribution)
 * [How to build it](#how-to-build-it)
 * [How to deploy or roll-update on OpenShift](#how-to-deploy-or-roll-update-che-on-openshift-container-platform-minishift-or-osio)
 * [Further details](#further-details)
 
-## What is the RedHat Che distribution
+## What is the Red Hat Che distribution
 
-The RedHat distribution of Eclipse Che is a RedHat-specific packaging of Che assemblies
-that adds some RedHat specific plugins / behaviors up to the standard upstream Che
-distribution. The RedHat distribution powers [openshift.io](https://openshift.io) developers workspaces.
+The Red Hat distribution of Eclipse Che is a Red Hat specific packaging of Che assemblies
+that adds some Red Hat specific plugins / behaviors up to the standard upstream Che
+distribution. The Red Hat distribution powers [openshift.io](https://openshift.io) developers workspaces.
 
-RedHat modifications against the upstream Che include:
+Red Hat modifications against the upstream Che include:
 - The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
 - Keycloak integration
 - [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server) 
@@ -35,7 +35,7 @@ RedHat modifications against the upstream Che include:
 
     The docker namespace used by default is `docker.io/rhchestage`
     
-### Build RedHat distribution
+### Build Red Hat distribution
 
 ```bash
 dev-scripts/build_fabric8.sh [PARAMETERS]
