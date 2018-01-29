@@ -17,7 +17,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.redhat.che.multitenant.multicluster.ClusterToRoutingSuffixMapping;
 import com.redhat.che.multitenant.multicluster.MultiClusterOpenShiftProxy;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -159,14 +158,10 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
         JsonObject namespace = e.getAsJsonObject();
         if ("che".equals(namespace.get("type").getAsString())) {
           String name = namespace.get("name").getAsString();
-          String clusterUrl = namespace.get("cluster-url").getAsString();
+          String suffix = namespace.get("cluster-app-domain").getAsString();
           String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
-          // TODO: When the routing suffix will be added in 'api/user/services' it will be retrieved
-          // directly from payload
-          String suffix = ClusterToRoutingSuffixMapping.get().get(clusterUrl);
 
           UserCheTenantData cheTenantData = new UserCheTenantData(name, osoProxyUrl, suffix);
-
           LOG.info("cheTenantData = {}", cheTenantData);
           return cheTenantData;
         }
