@@ -162,6 +162,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
           String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
 
           UserCheTenantData cheTenantData = new UserCheTenantData(name, osoProxyUrl, suffix);
+          UserCheTenantDataValidator.validate(cheTenantData);
           LOG.info("cheTenantData = {}", cheTenantData);
           return cheTenantData;
         }

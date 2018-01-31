@@ -35,6 +35,10 @@
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
         </dependency>
