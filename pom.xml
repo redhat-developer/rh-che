@@ -32,6 +32,7 @@
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
+        <unleash.client.java.version>3.0.0</unleash.client.java.version>
         <withoutDashboard>false</withoutDashboard>
     </properties>
     <dependencyManagement>
@@ -107,6 +108,12 @@
                 <groupId>com.redhat.che</groupId>
                 <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>no.finn.unleash</groupId>
+                <artifactId>unleash-client-java</artifactId>
+                <version>${unleash.client.java.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
