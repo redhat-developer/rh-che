@@ -203,6 +203,11 @@ objects:
               configMapKeyRef:
                 key: che-fabric8-user-service-endpoint
                 name: che
+          - name: CHE_FABRIC8_AUTH_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-auth-endpoint
+                name: che
           - name: CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL
             valueFrom:
               configMapKeyRef:

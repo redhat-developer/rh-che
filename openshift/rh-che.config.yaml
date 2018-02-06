@@ -32,6 +32,7 @@ data:
   che-workspace-auto-snapshot: "false"
   che-fabric8-multitenant: "true"
   che-fabric8-user-service-endpoint: "https://api.openshift.io/api/user/services"
+  che-fabric8-auth-endpoint: "https://auth.openshift.io"
   che-fabric8-multicluster-oso-proxy-url: "https://f8osoproxy-test-dsaas-preview.b6ff.rh-idev.openshiftapps.com"
   che-docker-enable-container-stop-detector: "false"
   che-workspace-che-server-endpoint: ""
