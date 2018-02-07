@@ -18,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.redhat.che.multitenant.multicluster.MultiClusterOpenShiftProxy;
+import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
   private static final int CONCURRENT_USERS = 500;
 
   private MultiClusterOpenShiftProxy multiClusterOpenShiftProxy;
+  private CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
   private HttpJsonRequestFactory httpJsonRequestFactory;
 
   LoadingCache<String, UserCheTenantData> tenantDataCache;
@@ -65,6 +67,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
       @Named("che.fabric8.multitenant") boolean fabric8CheMultitenant,
       @Named("che.fabric8.user_service.endpoint") String fabric8UserServiceEndpoint,
       MultiClusterOpenShiftProxy multiClusterOpenShiftProxy,
+      CheServiceAccountTokenToggle cheServiceAccountTokenToggle,
       HttpJsonRequestFactory httpJsonRequestFactory) {
     super(openShiftCheProjectName);
     LOG.info("fabric8CheMultitenant = {}", fabric8CheMultitenant);
@@ -72,6 +75,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
     this.fabric8CheMultitenant = fabric8CheMultitenant;
     this.fabric8UserServiceEndpoint = fabric8UserServiceEndpoint;
     this.multiClusterOpenShiftProxy = multiClusterOpenShiftProxy;
+    this.cheServiceAccountTokenToggle = cheServiceAccountTokenToggle;
     this.httpJsonRequestFactory = httpJsonRequestFactory;
 
     this.tenantDataCache =
@@ -115,6 +119,13 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
 
     String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
     LOG.info("OSO proxy URL - {}", osoProxyUrl);
+    String userId = subject.getUserId();
+
+    if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
+      LOG.info("Using Che SA token for '{}'", userId);
+      // TODO provide Config to oso proxy which will use Che SA token obtained from fabric-auth and
+      // userId as username
+    }
 
     return new ConfigBuilder()
         .withMasterUrl(osoProxyUrl)
