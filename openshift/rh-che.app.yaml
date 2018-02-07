@@ -263,6 +263,16 @@ objects:
               secretKeyRef:
                   key: che.jdbc.username
                   name: che
+          - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_SECRET
+            valueFrom:
+              secretKeyRef:
+                  key: service.account.secret
+                  name: che
+          - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_ID
+            valueFrom:
+              secretKeyRef:
+                  key: service.account.id
+                  name: che
           - name: CHE_WORKSPACE_AGENT_DEV_PING__SUCCESS__THRESHOLD
             valueFrom:
               configMapKeyRef:
