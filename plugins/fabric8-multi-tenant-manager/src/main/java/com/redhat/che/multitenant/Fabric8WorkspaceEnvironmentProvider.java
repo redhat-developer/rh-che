@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import okhttp3.MultipartBody;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -104,11 +104,10 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
     }
     OkHttpClient client = new OkHttpClient();
     RequestBody requestBody =
-        new MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("grant_type", "client_credentials")
-            .addFormDataPart("client_id", serviceAccId)
-            .addFormDataPart("client_secret", serviceAccSecret)
+        new FormBody.Builder()
+            .add("grant_type", "client_credentials")
+            .add("client_id", serviceAccId)
+            .add("client_secret", serviceAccSecret)
             .build();
 
     Request request =
@@ -121,6 +120,8 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
               .getAsJsonObject()
               .get("access_token")
               .getAsString();
+
+      LOG.info("Che Service account token has been successfully retrieved");
     } catch (IOException e) {
       throw new RuntimeException(
           "Service account token retrieving failed. Error: " + e.getMessage(), e);
