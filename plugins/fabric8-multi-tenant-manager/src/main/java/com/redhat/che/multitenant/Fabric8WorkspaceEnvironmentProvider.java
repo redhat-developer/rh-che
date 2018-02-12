@@ -27,6 +27,11 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.ConflictException;
 import org.eclipse.che.api.core.ForbiddenException;
@@ -35,6 +40,7 @@ import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.rest.HttpJsonResponse;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.plugin.openshift.client.OpenshiftWorkspaceEnvironmentProvider;
@@ -55,11 +61,13 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
   private CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
   private HttpJsonRequestFactory httpJsonRequestFactory;
 
-  LoadingCache<String, UserCheTenantData> tenantDataCache;
+  private LoadingCache<String, UserCheTenantData> tenantDataCache;
 
   private boolean fabric8CheMultitenant;
 
   private String fabric8UserServiceEndpoint;
+
+  private String cheToken;
 
   @Inject
   public Fabric8WorkspaceEnvironmentProvider(
@@ -85,6 +93,40 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
             .build(CacheLoader.from(this::loadUserCheTenantData));
   }
 
+  @Inject
+  private void setServiceAccountToken(
+      @Nullable @Named("che.openshift.service_account.id") String serviceAccId,
+      @Nullable @Named("che.openshift.service_account.secret") String serviceAccSecret,
+      @Nullable @Named("che.fabric8.auth.endpoint") String authEndpoint) {
+
+    if (serviceAccId == null || serviceAccId.isEmpty()) {
+      return;
+    }
+    OkHttpClient client = new OkHttpClient();
+    RequestBody requestBody =
+        new MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("grant_type", "client_credentials")
+            .addFormDataPart("client_id", serviceAccId)
+            .addFormDataPart("client_secret", serviceAccSecret)
+            .build();
+
+    Request request =
+        new Request.Builder().url(authEndpoint + "/api/token").post(requestBody).build();
+    try {
+      Response response = client.newCall(request).execute();
+      cheToken =
+          new JsonParser()
+              .parse(response.body().string())
+              .getAsJsonObject()
+              .get("access_token")
+              .getAsString();
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Service account token retrieving failed. Error: " + e.getMessage(), e);
+    }
+  }
+
   private void checkSubject(Subject subject) throws OpenShiftException {
     if (subject == null) {
       throw new OpenShiftException("No Subject is found to perform this action");
@@ -108,8 +150,6 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
 
     checkSubject(subject);
 
-    String keycloakToken = subject.getToken();
-
     UserCheTenantData cheTenantData;
     cheTenantData = getUserCheTenantData(subject);
     if (cheTenantData == null) {
@@ -129,7 +169,7 @@ public class Fabric8WorkspaceEnvironmentProvider extends OpenshiftWorkspaceEnvir
 
     return new ConfigBuilder()
         .withMasterUrl(osoProxyUrl)
-        .withOauthToken(keycloakToken)
+        .withOauthToken(subject.getToken())
         .withNamespace(cheTenantData.getNamespace())
         .withTrustCerts(true)
         .build();
