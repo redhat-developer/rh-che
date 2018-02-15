@@ -29,15 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.eclipse.che.api.core.ApiException;
-import org.eclipse.che.api.core.BadRequestException;
-import org.eclipse.che.api.core.ConflictException;
-import org.eclipse.che.api.core.ForbiddenException;
-import org.eclipse.che.api.core.NotFoundException;
-import org.eclipse.che.api.core.ServerException;
-import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.rest.HttpJsonResponse;
-import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.subject.Subject;
@@ -60,7 +53,6 @@ public class Fabric8WorkspaceEnvironmentProvider {
   private final KeycloakTokenProvider keycloakTokenProvider;
   private final HttpJsonRequestFactory httpJsonRequestFactory;
 
-  private final LoadingCache<String, String> tokenCache;
   private final LoadingCache<String, UserCheTenantData> tenantDataCache;
 
   private final String fabric8UserServiceEndpoint;
@@ -118,11 +110,11 @@ public class Fabric8WorkspaceEnvironmentProvider {
     }
 
     String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
-    LOG.info("OSO proxy URL - {}", osoProxyUrl);
+    LOG.debug("OSO proxy URL - {}", osoProxyUrl);
     String userId = subject.getUserId();
 
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
-      LOG.info("Using Che SA token for '{}'", userId);
+      LOG.debug("Using Che SA token for '{}'", userId);
       // TODO provide Config to oso proxy which will use Che SA token obtained from fabric-auth and
       // userId as username
     }
@@ -147,25 +139,6 @@ public class Fabric8WorkspaceEnvironmentProvider {
           "User tenant data not found for user: " + getUserDescription(subject));
     }
     return cheTenantData.getNamespace();
-  }
-
-  private String getOpenShiftTokenForUser(Subject subject) throws InfrastructureException {
-    checkSubject(subject);
-
-    String keycloakToken = subject.getToken();
-    if (keycloakToken == null) {
-      throw new InfrastructureException(
-          "User Openshift token is needed but cannot be retrieved since there is no Keycloak token for user: "
-              + getUserDescription(subject));
-    }
-    try {
-      return tokenCache.get(keycloakToken);
-    } catch (ExecutionException e) {
-      throw new InfrastructureException(
-          "Could not retrieve OSO token from Keycloak token for user: "
-              + getUserDescription(subject),
-          e.getCause());
-    }
   }
 
   private UserCheTenantData loadUserCheTenantData(String keycloakToken) {
@@ -244,29 +217,6 @@ public class Fabric8WorkspaceEnvironmentProvider {
     if (subject == Subject.ANONYMOUS) {
       throw new InfrastructureException(
           "The anonymous subject is used, and won't be able to perform this action");
-    }
-  }
-
-  private static class UserCheTenantData {
-    private String namespace;
-    private String clusterUrl;
-
-    UserCheTenantData(String namespace, String clusterUrl) {
-      this.namespace = namespace;
-      this.clusterUrl = clusterUrl;
-    }
-
-    String getNamespace() {
-      return namespace;
-    }
-
-    String getClusterUrl() {
-      return clusterUrl;
-    }
-
-    @Override
-    public String toString() {
-      return "{" + namespace + "," + clusterUrl + "}";
     }
   }
 }
