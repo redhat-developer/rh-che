@@ -14,6 +14,7 @@ import com.google.inject.Provider;
 import io.fabric8.kubernetes.client.Config;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
@@ -37,8 +38,23 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
   @Inject
   public Fabric8OpenShiftClientFactory(
       Fabric8WorkspaceEnvironmentProvider envProvider,
-      Provider<WorkspaceRuntimes> workspaceRuntimeProvider) {
-    super(null, null, null, null, false);
+      Provider<WorkspaceRuntimes> workspaceRuntimeProvider,
+      @Named("che.infra.kubernetes.client.http.async_requests.max") int maxConcurrentRequests,
+      @Named("che.infra.kubernetes.client.http.async_requests.max_per_host")
+          int maxConcurrentRequestsPerHost,
+      @Named("che.infra.kubernetes.client.http.connection_pool.max_idle") int maxIdleConnections,
+      @Named("che.infra.kubernetes.client.http.connection_pool.keep_alive.mins")
+          int connectionPoolKeepAlive) {
+    super(
+        null,
+        null,
+        null,
+        null,
+        false,
+        maxConcurrentRequests,
+        maxConcurrentRequestsPerHost,
+        maxIdleConnections,
+        connectionPoolKeepAlive);
     this.envProvider = envProvider;
     this.workspaceRuntimeProvider = workspaceRuntimeProvider;
   }
