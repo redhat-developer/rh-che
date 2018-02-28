@@ -90,10 +90,6 @@ public class Fabric8WorkspaceEnvironmentProvider {
             .build(CacheLoader.from(this::loadUserCheTenantData));
   }
 
-  public Config getDefaultOpenshiftConfig() {
-    return new ConfigBuilder().withTrustCerts(true).build();
-  }
-
   public Config getWorkspacesOpenshiftConfig(Subject subject) throws InfrastructureException {
     if (!fabric8CheMultitenant) {
       return new OpenShiftConfigBuilder().build();
