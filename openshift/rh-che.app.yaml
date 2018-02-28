@@ -59,7 +59,7 @@ objects:
       spec:
         containers:
         - env:
-          - name: CHE_DOCKER_IP_EXTERNAL
+          - name: CHE_HOST
             valueFrom:
               configMapKeyRef:
                 key: che-host
@@ -74,40 +74,15 @@ objects:
               configMapKeyRef:
                 key: che.logs.dir
                 name: che
-          - name: CHE_WORKSPACE_STORAGE_CREATE_FOLDERS
-            valueFrom:
-              configMapKeyRef:
-                key: workspace-storage-create-folders
-                name: che
           - name: CHE_LOCAL_CONF_DIR
             valueFrom:
               configMapKeyRef:
                 key: local-conf-dir
                 name: che
-          - name: CHE_OPENSHIFT_PROJECT
+          - name: CHE_INFRA_OPENSHIFT_PROJECT
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-          - name: CHE_OPENSHIFT_SERVICEACCOUNTNAME
-            valueFrom:
-              configMapKeyRef:
-                key: openshift-serviceaccountname
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY
-            valueFrom:
-              configMapKeyRef:
-                key: che-server-evaluation-strategy
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_TEMPLATE
-            valueFrom:
-              configMapKeyRef:
-                key: che.docker.server_evaluation_strategy.custom.template
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_EXTERNAL_PROTOCOL
-            valueFrom:
-              configMapKeyRef:
-                key: che.docker.server_evaluation_strategy.custom.external.protocol
-                name: che
           - name: CHE_PREDEFINED_STACKS_RELOAD__ON__START
             valueFrom:
               configMapKeyRef:
@@ -123,30 +98,20 @@ objects:
               configMapKeyRef:
                 key: port
                 name: che
-          - name: CHE_DOCKER_CONNECTOR
-            valueFrom:
-              configMapKeyRef:
-                key: docker-connector
-                name: che
           - name: CHE_DEBUG_SERVER
             valueFrom:
               configMapKeyRef:
                 key: remote-debugging-enabled
                 name: che
-          - name: CHE_OAUTH_GITHUB_FORCEACTIVATION
+          - name: CHE_LIMITS_WORKSPACE_ENV_RAM
             valueFrom:
               configMapKeyRef:
-                key: che-oauth-github-forceactivation
+                key: workspaces-memory-limit-max
                 name: che
-          - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_OVERRIDE
+          - name: CHE_WORKSPACE_DEFAULT__MEMORY__MB
             valueFrom:
               configMapKeyRef:
                 key: workspaces-memory-limit
-                name: che
-          - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_REQUEST
-            valueFrom:
-              configMapKeyRef:
-                key: workspaces-memory-request
                 name: che
           - name: CHE_WORKSPACE_AUTO__START
             valueFrom:
@@ -158,27 +123,17 @@ objects:
               configMapKeyRef:
                 key: che-server-java-opts
                 name: che
-          - name: CHE_WORKSPACE_JAVA_OPTIONS
+          - name: CHE_WORKSPACE_JAVA__OPTIONS
             valueFrom:
               configMapKeyRef:
                 key: che-workspaces-java-opts
                 name: che
-          - name: CHE_OPENSHIFT_SECURE_ROUTES
+          - name: CHE_INFRA_OPENSHIFT_TLS__ENABLED
             valueFrom:
               configMapKeyRef:
                 key: che-openshift-secure-routes
                 name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_SECURE_EXTERNAL_URLS
-            valueFrom:
-              configMapKeyRef:
-                key: che-secure-external-urls
-                name: che
-          - name: CHE_OPENSHIFT_SERVER_INACTIVE_STOP_TIMEOUT_MS
-            valueFrom:
-              configMapKeyRef:
-                key: che-server-timeout-ms
-                name: che
-          - name: CHE_OPENSHIFT_PRECREATE_WORKSPACE_DIRS
+          - name: CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS
             valueFrom:
               configMapKeyRef:
                 key: che-openshift-precreate-subpaths
@@ -187,11 +142,6 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: keycloak-github-endpoint
-                name: che
-          - name: CHE_WORKSPACE_AUTO__SNAPSHOT
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-auto-snapshot
                 name: che
           - name: CHE_FABRIC8_MULTITENANT
             valueFrom:
@@ -218,12 +168,17 @@ objects:
               configMapKeyRef:
                 key: che-docker-enable-container-stop-detector
                 name: che
-          - name: CHE_WORKSPACE_CHE__SERVER__ENDPOINT
+          - name: CHE_API
             valueFrom:
               configMapKeyRef:
-                key: che-workspace-che-server-endpoint
+                key: che-api
                 name: che
-          - name: CHE_WORKSPACE_CHE_LOGS
+          - name: CHE_WEBSOCKET_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-websocket-endpoint
+                name: che
+          - name: CHE_WORKSPACE_LOGS_ROOT__DIR
             valueFrom:
               configMapKeyRef:
                 key: che-workspace-logs
@@ -273,21 +228,51 @@ objects:
               secretKeyRef:
                   key: service.account.id
                   name: che
-          - name: CHE_WORKSPACE_AGENT_DEV_PING__SUCCESS__THRESHOLD
+          - name: CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD
             valueFrom:
               configMapKeyRef:
-                key: che-wsagent-ping-success-threshold
+                key: che-workspace-server-ping-success-threshold
                 name: che
           - name: CHE_LIMITS_USER_WORKSPACES_RUN_COUNT
             valueFrom:
               configMapKeyRef:
                 key: che-limits-user-workspaces-run-count
                 name: che
+          - name: CHE_INFRASTRUCTURE_ACTIVE
+            valueFrom:
+              configMapKeyRef:
+                key: infrastructure
+                name: che
+          - name: CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL
+            valueFrom:
+              configMapKeyRef:
+                key: infra-bootstrapper-binary-url
+                name: che
+          - name: CHE_INFRA_KUBERNETES_MACHINE__START__TIMEOUT__MIN
+            valueFrom:
+              configMapKeyRef:
+                key: infra-machine-start-timeout
+                name: che
+          - name: CHE_INFRA_KUBERNETES_PVC_STRATEGY
+            valueFrom:
+              configMapKeyRef:
+                key: infra-pvc-strategy
+                name: che
+          - name: CHE_INFRA_KUBERNETES_TRUST__CERTS
+            valueFrom:
+              configMapKeyRef:
+                key: infra-trust-certs
+                name: che
+          - name: CHE_MULTIUSER
+            valueFrom:
+              configMapKeyRef:
+                key: multi-user
+                name: che
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
-              path: /api
+              path: /api/system/state
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 120
@@ -300,7 +285,7 @@ objects:
             name: http-debug
           readinessProbe:
             httpGet:
-              path: /api
+              path: /api/system/state
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 15
@@ -335,6 +320,6 @@ objects:
       name: che-host
 parameters:
 - name: IMAGE
-  value: rhche/che-server-multiuser
+  value: rhche/che-server
 - name: IMAGE_TAG
   value: latest
