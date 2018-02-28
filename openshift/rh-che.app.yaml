@@ -239,10 +239,7 @@ objects:
                 key: che-limits-user-workspaces-run-count
                 name: che
           - name: CHE_INFRASTRUCTURE_ACTIVE
-            valueFrom:
-              configMapKeyRef:
-                key: infrastructure
-                name: che
+            value: "openshift"
           - name: CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL
             valueFrom:
               configMapKeyRef:

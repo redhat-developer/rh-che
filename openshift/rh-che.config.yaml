@@ -4,7 +4,6 @@ metadata:
   name: che
 type: Opaque
 data:
-  infrastructure: "openshift"
   infra-bootstrapper-binary-url: "https://che.prod-preview.openshift.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
   infra-machine-start-timeout: "5"
   infra-pvc-strategy: "common"
