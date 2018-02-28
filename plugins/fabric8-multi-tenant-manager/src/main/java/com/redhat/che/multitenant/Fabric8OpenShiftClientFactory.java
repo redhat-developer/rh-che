@@ -39,6 +39,7 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
   public Fabric8OpenShiftClientFactory(
       Fabric8WorkspaceEnvironmentProvider envProvider,
       Provider<WorkspaceRuntimes> workspaceRuntimeProvider,
+      @Nullable @Named("che.infra.kubernetes.trust_certs") Boolean doTrustCerts,
       @Named("che.infra.kubernetes.client.http.async_requests.max") int maxConcurrentRequests,
       @Named("che.infra.kubernetes.client.http.async_requests.max_per_host")
           int maxConcurrentRequestsPerHost,
@@ -50,7 +51,7 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
         null,
         null,
         null,
-        false,
+        doTrustCerts != null ? doTrustCerts.booleanValue() : false,
         maxConcurrentRequests,
         maxConcurrentRequestsPerHost,
         maxIdleConnections,
