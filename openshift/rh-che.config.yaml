@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: che
+  name: rhche
 type: Opaque
 data:
   infra-bootstrapper-binary-url: "https://che.prod-preview.openshift.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
