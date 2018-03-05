@@ -210,5 +210,5 @@ For instance, the profile `fast` will skip all the tests and checks as describe 
 
 ##### Enabling / Disabling the Dashboard
 
-By default the Che Dashboard is part of the RedHat Che distribution.
+By default the Che Dashboard is part of the Red Hat Che distribution.
 Howvever it can removed by with the `-DwithoutDashboard` argument
