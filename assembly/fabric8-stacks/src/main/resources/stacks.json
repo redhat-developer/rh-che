@@ -32,17 +32,22 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {}
+              "attributes": {}
             },
             "db": {
               "installers": [
-                "org.eclipse.che.terminal", "com.redhat.oc-login"
+                "org.eclipse.che.terminal",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {}
+              "attributes": {}
             }
           },
           "recipe": {
@@ -106,17 +111,23 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {}
+              "attributes": {}
             },
             "db": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {}
+              "attributes": {}
             }
           },
           "recipe": {
@@ -181,10 +192,14 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {
+              "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
             }
@@ -238,10 +253,14 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {
+              "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
             }
@@ -292,10 +311,15 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "org.eclipse.che.ls.csharp", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "org.eclipse.che.ls.csharp",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {
+              "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
             }
@@ -377,10 +401,14 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "servers": {},
-              "attributes" : {
+              "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
             }
@@ -418,82 +446,90 @@
     "description": "Eclipse Vert.x Stack on CentOS.",
     "scope": "general",
     "tags": [
-        "Java",
-        "JDK",
-        "Maven",
-        "Vert.x",
-        "CentOS",
-        "Git"
+      "Java",
+      "JDK",
+      "Maven",
+      "Vert.x",
+      "CentOS",
+      "Git"
     ],
-    "components": [{
+    "components": [
+      {
         "name": "CentOS",
         "version": "---"
-    }, {
+      },
+      {
         "name": "JDK",
         "version": "1.8.0_45"
-    }, {
+      },
+      {
         "name": "Maven",
         "version": "3.2.2"
-    }],
+      }
+    ],
     "source": {
-        "type": "image",
-        "origin": "registry.devshift.net/che/vertx"
+      "type": "image",
+      "origin": "registry.devshift.net/che/vertx"
     },
     "workspaceConfig": {
-        "environments": {
-            "default": {
-                "machines": {
-                    "dev-machine": {
-                        "installers": [
-                            "org.eclipse.che.terminal",
-                            "org.eclipse.che.ws-agent",
-                            "com.redhat.bayesian.lsp",
-                            "com.redhat.oc-login"
-                        ],
-                        "servers": {},
-                        "attributes": {
-                            "memoryLimitBytes": "2147483648"
-                        }
-                    }
-                },
-                "recipe": {
-                    "location": "registry.devshift.net/che/vertx",
-                    "type": "dockerimage"
-                }
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "installers": [
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
+              ],
+              "servers": {},
+              "attributes": {
+                "memoryLimitBytes": "2147483648"
+              }
             }
+          },
+          "recipe": {
+            "location": "registry.devshift.net/che/vertx",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "commandLine": "scl enable rh-maven33 'mvn clean install -f ${current.project.path}'",
+          "name": "build",
+          "type": "mvn",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
         },
-        "name": "default",
-        "defaultEnv": "default",
-        "description": null,
-        "commands": [{
-            "commandLine": "scl enable rh-maven33 'mvn clean install -f ${current.project.path}'",
-            "name": "build",
-            "type": "mvn",
-            "attributes": {
-                "previewUrl": "",
-                "goal": "Build"
-            }
-      }, {
-            "commandLine": "scl enable rh-maven33 'mvn compile vertx:run -f ${current.project.path}'",
-            "name": "run",
-            "type": "custom",
-            "attributes": {
-                "previewUrl": "http://${server.port.8080}",
-                "goal": "Run"
-            }
-      }, {
-            "commandLine": "scl enable rh-maven33 'mvn compile vertx:debug -f ${current.project.path}'",
-            "name": "debug",
-            "type": "custom",
-            "attributes": {
-              "previewUrl": "http://${server.port.8080}",
-              "goal": "Debug"
-            }
-        }]
+        {
+          "commandLine": "scl enable rh-maven33 'mvn compile vertx:run -f ${current.project.path}'",
+          "name": "run",
+          "type": "custom",
+          "attributes": {
+            "previewUrl": "http://${server.port.8080}",
+            "goal": "Run"
+          }
+        },
+        {
+          "commandLine": "scl enable rh-maven33 'mvn compile vertx:debug -f ${current.project.path}'",
+          "name": "debug",
+          "type": "custom",
+          "attributes": {
+            "previewUrl": "http://${server.port.8080}",
+            "goal": "Debug"
+          }
+        }
+      ]
     },
     "stackIcon": {
-        "name": "type-vertx.svg",
-        "mediaType": "image/svg+xml"
+      "name": "type-vertx.svg",
+      "mediaType": "image/svg+xml"
     }
   },
   {
@@ -598,91 +634,91 @@
     }
   },
   {
-  "name": "CentOS WildFly Swarm",
-  "id": "wildfly-swarm",
-  "creator": "Dharmit Shah",
-  "description": "Eclipse WildFly Swarm Stack on CentOS.",
-  "scope": "general",
-  "source": {
-    "type": "image",
-    "origin": "registry.devshift.net/che/wildfly-swarm"
-  },
-  "tags": [
-    "Java",
-    "JDK",
-    "Maven",
-    "WildFly Swarm",
-    "CentOS",
-    "Git"
-  ],
-  "workspaceConfig": {
-    "name": "default",
-    "environments": {
-      "default": {
-        "recipe": {
-          "location": "registry.devshift.net/che/wildfly-swarm",
-          "type": "dockerimage"
-        },
-        "machines": {
-          "dev-machine": {
-            "attributes": {
-              "memoryLimitBytes": "2147483648"
-            },
-            "installers": [
-              "org.eclipse.che.terminal",
-              "org.eclipse.che.ws-agent",
-              "com.redhat.bayesian.lsp",
-              "com.redhat.oc-login"
-            ],
-            "servers": {}
+    "name": "CentOS WildFly Swarm",
+    "id": "wildfly-swarm",
+    "creator": "Dharmit Shah",
+    "description": "Eclipse WildFly Swarm Stack on CentOS.",
+    "scope": "general",
+    "source": {
+      "type": "image",
+      "origin": "registry.devshift.net/che/wildfly-swarm"
+    },
+    "tags": [
+      "Java",
+      "JDK",
+      "Maven",
+      "WildFly Swarm",
+      "CentOS",
+      "Git"
+    ],
+    "workspaceConfig": {
+      "name": "default",
+      "environments": {
+        "default": {
+          "recipe": {
+            "location": "registry.devshift.net/che/wildfly-swarm",
+            "type": "dockerimage"
+          },
+          "machines": {
+            "dev-machine": {
+              "attributes": {
+                "memoryLimitBytes": "2147483648"
+              },
+              "installers": [
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
+              ],
+              "servers": {}
+            }
           }
         }
-      }
-    },
-    "commands": [
-      {
-        "name": "build",
-        "type": "mvn",
-        "attributes": {
-          "previewUrl": "",
-          "goal": "Build"
+      },
+      "commands": [
+        {
+          "name": "build",
+          "type": "mvn",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          },
+          "commandLine": "scl enable rh-maven33 'mvn clean install -f ${current.project.path}'"
         },
-        "commandLine": "scl enable rh-maven33 'mvn clean install -f ${current.project.path}'"
+        {
+          "name": "run",
+          "type": "custom",
+          "attributes": {
+            "previewUrl": "http://${server.port.8080}",
+            "goal": "Run"
+          },
+          "commandLine": "cd ${current.project.path} && scl enable rh-maven33 'java -jar target/*-swarm.jar'"
+        }
+      ],
+      "projects": [],
+      "defaultEnv": "default",
+      "links": []
+    },
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "---"
       },
       {
-        "name": "run",
-        "type": "custom",
-        "attributes": {
-          "previewUrl": "http://${server.port.8080}",
-          "goal": "Run"
-        },
-        "commandLine": "cd ${current.project.path} && scl enable rh-maven33 'java -jar target/*-swarm.jar'"
+        "name": "JDK",
+        "version": "1.8.0_45"
+      },
+      {
+        "name": "Maven",
+        "version": "3.3.9"
       }
-    ],
-    "projects": [],
-    "defaultEnv": "default",
-    "links": []
+    ]
   },
-  "components": [
-    {
-      "name": "CentOS",
-      "version": "---"
-    },
-    {
-      "name": "JDK",
-      "version": "1.8.0_45"
-    },
-    {
-      "name": "Maven",
-      "version": "3.3.9"
-    }
-  ]
-},
-{
-  "name": "CentOS nodejs",
-  "id": "nodejs-centos",
-  "creator": "Dharmit Shah",
-  "scope": "general",
+  {
+    "name": "CentOS nodejs",
+    "id": "nodejs-centos",
+    "creator": "Dharmit Shah",
+    "scope": "general",
     "source": {
       "type": "image",
       "origin": "registry.devshift.net/che/centos-nodejs"
@@ -738,7 +774,6 @@
       ],
       "defaultEnv": "default",
       "description": null
-      
     },
     "components": [
       {
