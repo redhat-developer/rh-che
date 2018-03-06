@@ -12,6 +12,7 @@ package com.redhat.bayesian.agent;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.redhat.che.multitenant.WorkspaceSubjectsRegistry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;

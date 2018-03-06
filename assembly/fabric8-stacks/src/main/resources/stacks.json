@@ -32,14 +32,14 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {}
             },
             "db": {
               "installers": [
-                "org.eclipse.che.terminal"
+                "org.eclipse.che.terminal", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {}
@@ -106,14 +106,14 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {}
             },
             "db": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {}
@@ -181,7 +181,7 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {
@@ -238,7 +238,7 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {
@@ -292,7 +292,7 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "org.eclipse.che.ls.csharp"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "org.eclipse.che.ls.csharp", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {
@@ -377,7 +377,7 @@
           "machines": {
             "dev-machine": {
               "installers": [
-                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp"
+                "org.eclipse.che.exec", "org.eclipse.che.terminal", "org.eclipse.che.ws-agent", "com.redhat.bayesian.lsp", "com.redhat.oc-login"
               ],
               "servers": {},
               "attributes" : {
@@ -447,7 +447,8 @@
                         "installers": [
                             "org.eclipse.che.terminal",
                             "org.eclipse.che.ws-agent",
-                            "com.redhat.bayesian.lsp"
+                            "com.redhat.bayesian.lsp",
+                            "com.redhat.oc-login"
                         ],
                         "servers": {},
                         "attributes": {
@@ -542,7 +543,8 @@
                 "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
                 "org.eclipse.che.ws-agent",
-                "com.redhat.bayesian.lsp"
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "attributes": {
                 "memoryLimitBytes": "2147483648"
@@ -629,7 +631,8 @@
             "installers": [
               "org.eclipse.che.terminal",
               "org.eclipse.che.ws-agent",
-              "com.redhat.bayesian.lsp"
+              "com.redhat.bayesian.lsp",
+              "com.redhat.oc-login"
             ],
             "servers": {}
           }
@@ -714,7 +717,8 @@
                 "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
                 "org.eclipse.che.ws-agent",
-                "com.redhat.bayesian.lsp"
+                "com.redhat.bayesian.lsp",
+                "com.redhat.oc-login"
               ],
               "servers": {}
             }

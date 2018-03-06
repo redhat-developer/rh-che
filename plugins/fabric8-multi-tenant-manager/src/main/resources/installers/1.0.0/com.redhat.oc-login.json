@@ -1,0 +1,6 @@
+{
+  "id": "com.redhat.oc-login",
+  "version": "1.0.0",
+  "name": "Login to OSO",
+  "description": "Login with oc to user project on OSO"
+}
