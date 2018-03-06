@@ -318,7 +318,12 @@
                 "org.eclipse.che.ls.csharp",
                 "com.redhat.oc-login"
               ],
-              "servers": {},
+              "servers": {
+                "5000/tcp" : {
+                  "port" : "5000",
+                  "protocol" : "http"
+                }
+              },
               "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
@@ -348,7 +353,7 @@
           "type": "custom",
           "commandLine": "cd ${current.project.path} && dotnet run",
           "attributes": {
-            "previewUrl": "http://${server.port.5000}",
+            "previewUrl": "${server.5000/tcp}",
             "goal": "Run"
           }
         }
@@ -482,7 +487,12 @@
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
-              "servers": {},
+              "servers": {
+                "8080/tcp" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                }
+              },
               "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
@@ -512,7 +522,7 @@
           "name": "run",
           "type": "custom",
           "attributes": {
-            "previewUrl": "http://${server.port.8080}",
+            "previewUrl": "${server.8080/tcp}",
             "goal": "Run"
           }
         },
@@ -521,7 +531,7 @@
           "name": "debug",
           "type": "custom",
           "attributes": {
-            "previewUrl": "http://${server.port.8080}",
+            "previewUrl": "${server.8080/tcp}",
             "goal": "Debug"
           }
         }
@@ -582,6 +592,12 @@
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
+              "servers": {
+                "8080/tcp" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                }
+              },
               "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
@@ -613,7 +629,7 @@
           "name": "run",
           "type": "custom",
           "attributes": {
-            "previewUrl": "http://${server.port.8080}",
+            "previewUrl": "${server.8080/tcp}",
             "goal": "Run"
           }
         },
@@ -622,7 +638,7 @@
           "name": "debug",
           "type": "custom",
           "attributes": {
-            "previewUrl": "http://${server.port.8080}",
+            "previewUrl": "${server.8080/tcp}",
             "goal": "Debug"
           }
         }
@@ -670,7 +686,12 @@
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
-              "servers": {}
+              "servers": {
+                "8080/tcp" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                }
+              }
             }
           }
         }
@@ -689,7 +710,7 @@
           "name": "run",
           "type": "custom",
           "attributes": {
-            "previewUrl": "http://${server.port.8080}",
+            "previewUrl": "${server.8080/tcp}",
             "goal": "Run"
           },
           "commandLine": "cd ${current.project.path} && scl enable rh-maven33 'java -jar target/*-swarm.jar'"
@@ -756,7 +777,12 @@
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
-              "servers": {}
+              "servers": {
+                "8080/tcp" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                }
+              }
             }
           }
         }
@@ -767,7 +793,7 @@
           "type": "custom",
           "attributes": {
             "goal": "Run",
-            "previewUrl": "http://${server.port.8080}"
+            "previewUrl": "${server.8080/tcp}"
           },
           "commandLine": "cd ${current.project.path} && node app/app.js"
         }
