@@ -88,6 +88,11 @@ objects:
               configMapKeyRef:
                 key: che.predefined.stacks.reload_on_start
                 name: rhche
+          - name: CHE_WORKSPACE_AGENT_DEV_INACTIVE__STOP__TIMEOUT__MS
+            valueFrom:
+              configMapKeyRef:
+                key: che.workspace.agent.dev.inactive_stop_timeout_ms
+                name: rhche
           - name: CHE_LOG_LEVEL
             valueFrom:
               configMapKeyRef:

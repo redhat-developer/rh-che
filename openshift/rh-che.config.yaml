@@ -39,3 +39,4 @@ data:
   che-keycloak-client-id: "openshiftio-public"
   che-workspace-server-ping-success-threshold: "2"
   che-limits-user-workspaces-run-count: "1"
+  che.workspace.agent.dev.inactive_stop_timeout_ms: "1800000"
