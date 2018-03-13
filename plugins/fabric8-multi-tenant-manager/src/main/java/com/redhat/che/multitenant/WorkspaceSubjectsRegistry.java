@@ -85,6 +85,11 @@ public class WorkspaceSubjectsRegistry implements EventSubscriber<WorkspaceStatu
     }
   }
 
+  /**
+   * Returns cached subject for a user with the specified ID.
+   *
+   * @throws NotFoundException if subject for a user with specified ID not found in cache
+   */
   public Subject getSubject(String userId) throws NotFoundException {
     Optional<Subject> subjectOpt =
         workspaceStarters.values().stream().filter(s -> s.getUserId().equals(userId)).findAny();
