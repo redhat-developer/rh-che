@@ -10,14 +10,22 @@
  */
 package com.redhat.che.multitenant;
 
+import com.google.gson.JsonParser;
 import com.redhat.che.multitenant.multicluster.MultiClusterOpenShiftProxy;
 import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
+import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.inject.ConfigurationException;
 import org.slf4j.Logger;
@@ -32,6 +40,8 @@ public class Fabric8WorkspaceEnvironmentProvider {
   private final MultiClusterOpenShiftProxy multiClusterOpenShiftProxy;
   private final CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
   private final TenantDataProvider tenantDataProvider;
+
+  private String cheServiceAccountToken;
 
   @Inject
   public Fabric8WorkspaceEnvironmentProvider(
@@ -49,10 +59,44 @@ public class Fabric8WorkspaceEnvironmentProvider {
     this.tenantDataProvider = tenantDataProvider;
   }
 
+  @Inject
+  private void setServiceAccountToken(
+      @Nullable @Named("che.openshift.service_account.id") String serviceAccId,
+      @Nullable @Named("che.openshift.service_account.secret") String serviceAccSecret,
+      @Named("che.fabric8.auth.endpoint") String authEndpoint) {
+
+    if (serviceAccId == null || serviceAccId.isEmpty()) {
+      return;
+    }
+    OkHttpClient client = new OkHttpClient();
+    RequestBody requestBody =
+        new FormBody.Builder()
+            .add("grant_type", "client_credentials")
+            .add("client_id", serviceAccId)
+            .add("client_secret", serviceAccSecret)
+            .build();
+
+    Request request =
+        new Request.Builder().url(authEndpoint + "/api/token").post(requestBody).build();
+    try (Response response = client.newCall(request).execute()) {
+      // Ignore IDE warning:
+      // body is not null after call of execute() according to javadocs of method body()
+      cheServiceAccountToken =
+          new JsonParser()
+              .parse(response.body().string())
+              .getAsJsonObject()
+              .get("access_token")
+              .getAsString();
+
+      LOG.info("Che Service account token has been successfully retrieved");
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Service account token retrieving failed. Error: " + e.getMessage(), e);
+    }
+  }
+
   public Config getWorkspacesOpenshiftConfig(Subject subject) throws InfrastructureException {
     checkSubject(subject);
-
-    String keycloakToken = subject.getToken();
 
     UserCheTenantData cheTenantData = getUserCheTenantData(subject);
 
@@ -60,18 +104,22 @@ public class Fabric8WorkspaceEnvironmentProvider {
     LOG.debug("OSO proxy URL - {}", osoProxyUrl);
     String userId = subject.getUserId();
 
+    ConfigBuilder configBuilder =
+        new ConfigBuilder()
+            .withMasterUrl(osoProxyUrl)
+            .withNamespace(cheTenantData.getNamespace())
+            .withTrustCerts(true);
+
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
       LOG.debug("Using Che SA token for '{}'", userId);
       // TODO provide Config to oso proxy which will use Che SA token obtained from fabric-auth and
       // userId as username
+      configBuilder.withOauthToken(cheServiceAccountToken);
+    } else {
+      configBuilder.withOauthToken(subject.getToken());
     }
 
-    return new ConfigBuilder()
-        .withMasterUrl(osoProxyUrl)
-        .withOauthToken(keycloakToken)
-        .withNamespace(cheTenantData.getNamespace())
-        .withTrustCerts(true)
-        .build();
+    return configBuilder.build();
   }
 
   public String getWorkspacesOpenshiftNamespace(Subject subject) throws InfrastructureException {

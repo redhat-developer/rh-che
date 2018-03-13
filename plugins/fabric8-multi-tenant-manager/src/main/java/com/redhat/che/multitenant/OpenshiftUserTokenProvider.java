@@ -102,12 +102,10 @@ public class OpenshiftUserTokenProvider {
             .get()
             .header("Authorization", "Bearer " + keycloakToken)
             .build();
-    try {
-      Response response = httpClient.newCall(request).execute();
+    try (Response response = httpClient.newCall(request).execute()) {
       // Ignore IDE warning:
       // body is not null after call of execute() according to javadocs of method body()
       String body = response.body().string();
-      response.body().close();
 
       if (!response.isSuccessful()) {
         throw new RuntimeException(
