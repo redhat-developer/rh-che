@@ -203,11 +203,6 @@ objects:
               configMapKeyRef:
                 key: che-keycloak-client-id
                 name: rhche
-          - name: CHE_HOST
-            valueFrom:
-              configMapKeyRef:
-                key: che-host
-                name: rhche
           - name: CHE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:
