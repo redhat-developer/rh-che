@@ -59,11 +59,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: CHE_TEST
-            valueFrom:
-              configMapKeyRef:
-                key: multi-user
-                name: rhche
           - name: CHE_HOST
             valueFrom:
               configMapKeyRef:
