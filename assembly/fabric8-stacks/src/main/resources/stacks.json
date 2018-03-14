@@ -205,7 +205,7 @@
             }
           },
           "recipe": {
-            "location": "registry.devshift.net/che/ubuntu_jdk8",
+            "content": "registry.devshift.net/che/ubuntu_jdk8",
             "type": "dockerimage"
           }
         }
@@ -266,7 +266,7 @@
             }
           },
           "recipe": {
-            "location": "registry.devshift.net/che/ubuntu_jdk8",
+            "content": "registry.devshift.net/che/ubuntu_jdk8",
             "type": "dockerimage"
           }
         }
@@ -330,7 +330,7 @@
             }
           },
           "recipe": {
-            "location": "registry.devshift.net/che/centos_dotnet20",
+            "content": "registry.devshift.net/che/centos_dotnet20",
             "type": "dockerimage"
           }
         }
@@ -419,7 +419,7 @@
             }
           },
           "recipe": {
-            "location": "registry.devshift.net/che/centos_jdk8",
+            "content": "registry.devshift.net/che/centos_jdk8",
             "type": "dockerimage"
           }
         }
@@ -499,7 +499,7 @@
             }
           },
           "recipe": {
-            "location": "registry.devshift.net/che/vertx",
+            "content": "registry.devshift.net/che/vertx",
             "type": "dockerimage"
           }
         }
@@ -580,7 +580,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "location": "registry.devshift.net/che/spring-boot",
+            "content": "registry.devshift.net/che/spring-boot",
             "type": "dockerimage"
           },
           "machines": {
@@ -672,7 +672,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "location": "registry.devshift.net/che/wildfly-swarm",
+            "content": "registry.devshift.net/che/wildfly-swarm",
             "type": "dockerimage"
           },
           "machines": {
@@ -762,7 +762,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "location": "registry.devshift.net/che/centos-nodejs",
+            "content": "registry.devshift.net/che/centos-nodejs",
             "type": "dockerimage"
           },
           "machines": {
