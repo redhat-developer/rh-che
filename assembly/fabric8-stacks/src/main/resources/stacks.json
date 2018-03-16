@@ -44,6 +44,7 @@
             "db": {
               "installers": [
                 "org.eclipse.che.terminal",
+                "org.eclipse.che.exec",
                 "com.redhat.oc-login"
               ],
               "servers": {},
@@ -483,6 +484,7 @@
             "dev-machine": {
               "installers": [
                 "org.eclipse.che.terminal",
+                "org.eclipse.che.exec",
                 "org.eclipse.che.ws-agent",
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
@@ -682,6 +684,7 @@
               },
               "installers": [
                 "org.eclipse.che.terminal",
+                "org.eclipse.che.exec",
                 "org.eclipse.che.ws-agent",
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
