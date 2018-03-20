@@ -187,9 +187,9 @@ fi
 
 # GET DEPLOYMENT SCRIPTS
 echo -e "\033[0;1mGetting deployment scripts...\033[0m"
-WAIT_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/dockerfiles/init/modules/openshift/files/scripts/multi-user/wait_until_postgres_is_available.sh
-DEPLOY_POSTGRES_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/dockerfiles/init/modules/openshift/files/scripts/multi-user/deploy_postgres_only.sh
-DEPLOY_POSTGRES_CONFIG_URL=https://raw.githubusercontent.com/eclipse/che/master/dockerfiles/init/modules/openshift/files/scripts/multi-user/che-init-image-stream.yaml
+WAIT_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/wait_until_postgres_is_available.sh
+DEPLOY_POSTGRES_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/deploy_postgres_only.sh
+DEPLOY_POSTGRES_CONFIG_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/che-init-image-stream.yaml
 curl -L0fs $WAIT_SCRIPT_URL -o wait_until_postgres_is_available.sh 2>1 > /dev/null
 curl -L0fs $DEPLOY_POSTGRES_SCRIPT_URL -o deploy_postgres_only.sh 2>1 > /dev/null
 curl -L0fs $DEPLOY_POSTGRES_CONFIG_URL -o che-init-image-stream.yaml 2>1 > /dev/null
@@ -198,15 +198,15 @@ curl -L0fs $DEPLOY_POSTGRES_CONFIG_URL -o che-init-image-stream.yaml 2>1 > /dev/
 mkdir postgres 2>1 > /dev/null
 cd postgres || exit 1
 export IMAGE_POSTGRES="centos/postgresql-96-centos7"
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/dockerfiles/init/modules/openshift/files/scripts/multi-user/postgres/deployment-config.yaml -o deployment-config.yaml 2>1 > /dev/null); then
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/deployment-config.yaml -o deployment-config.yaml 2>1 > /dev/null); then
   echo -e "\033[93;1mFile postgres-data-claim.yaml is missing.\033[0m"
   rm deployment-config.yaml
 fi
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/dockerfiles/init/modules/openshift/files/scripts/multi-user/postgres/postgres-data-claim.yaml -o postgres-data-claim.yaml 2>1 > /dev/null); then
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/postgres-data-claim.yaml -o postgres-data-claim.yaml 2>1 > /dev/null); then
   echo -e "\033[93;1mFile postgres-data-claim.yaml is missing.\033[0m"
   rm postgres-data-claim.yaml
 fi
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/dockerfiles/init/modules/openshift/files/scripts/multi-user/postgres/service.yaml -o service.yaml 2>1 > /dev/null); then
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/service.yaml -o service.yaml 2>1 > /dev/null); then
   echo -e "\033[93;1mFile service.yaml is missing.\033[0m"
   rm service.yaml
 fi
