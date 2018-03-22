@@ -107,13 +107,13 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
         Arrays.asList(
             new DocumentFilter(
                 BayesianLanguageServerModule.TXT_LANGUAGE_ID, //
-                "requirements\\.txt", //
+                ".*/requirements\\.txt", //
                 null), //
             new DocumentFilter(
                 JsonModule.LANGUAGE_ID, //
-                "package\\.json", //
+                "./*package\\.json", //
                 null),
-            new DocumentFilter("pom", "pom\\.xml", null)) //
+            new DocumentFilter("pom", ".*/pom\\.xml", null)) //
         );
   }
 }
