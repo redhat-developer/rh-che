@@ -5,13 +5,14 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
-usage="\033[93;1m$(basename "$0") \033[0;1m{-5} [-u <username>] [-p <passwd>] [-o <token>] \033[90m{-t <tag>} {-r <registry>} {-n} {-s} {-h} \033[0m-- Login to dev cluster and deploy che with specific build tag
+usage="\033[93;1m$(basename "$0") \033[0;1m{-5} [-u <username>] [-p <passwd>] [-o <token>] \033[90m{-t <tag>} {-r <registry>} {-e <namespace>} {-n} {-s} {-h} \033[0m-- Login to dev cluster and deploy che with specific build tag
 
 \033[32;1mwhere:\033[0m
     \033[1m-5\033[0m  \033[93muse che-server V5 \033[31;1m!!MUST COME AS FIRST FLAG!!\033[0m
     \033[1m-u\033[0m  \033[93musername for openshift account\033[0m
     \033[1m-p\033[0m  \033[93mpassword for openshift account\033[0m
     \033[1m-o\033[0m  \033[93mopenshift token - \033[31;1meither token or username and password must be provided\033[0m
+    \033[1m-e\033[0m  use specified namespace instead of the default one
     \033[1m-h\033[0m  show this help text
     \033[1m-n\033[0m  do not delete files after script finishes
     \033[1m-s\033[0m  wipe sql database (postgres)
@@ -41,7 +42,7 @@ function setVars() {
   else
 #    export RH_CHE_PROJECT_ID="nightly-fabric8";
 #    export RH_CHE_DOCKER_IMAGE_REGISTRY="dfestal/che-server";
-    export RH_CHE_PROJECT_ID="67da9ee-fabric8-ce16ce1";
+    export RH_CHE_PROJECT_ID="3e14772-fabric8-e228731";
     export RH_CHE_DOCKER_IMAGE_REGISTRY="rhche/rh-che-server";
     export RH_CHE_PROJECT_NAMESPACE=che6-automated;
     export RH_CHE_GITHUB_BRANCH=rh-che6;
@@ -99,18 +100,18 @@ function deployPostgres() {
 # PREPARE VARIABLES FOR V6
 setVars
 
-while getopts ':5hnsu:p:r:t:o:' option; do
+while getopts ':5hnsu:p:r:t:o:e:' option; do
   case "$option" in
     5) # SET VARIABLES FOR V5 !!MUST COME AS FIRST FLAG!!
-       export RH_CHE_IS_V_FIVE="true";
+       export RH_CHE_IS_V_FIVE="true"
        setVars
        ;;
     h) echo -e "$usage"
        exit 0
        ;;
-    n) export RH_CHE_DEPLOY_SCRIPT_CLEANUP="false";
+    n) export RH_CHE_DEPLOY_SCRIPT_CLEANUP="false"
        ;;
-    s) export RH_CHE_WIPE_SQL="true";
+    s) export RH_CHE_WIPE_SQL="true"
        ;;
     t) export RH_CHE_PROJECT_ID=$OPTARG
        ;;
@@ -119,9 +120,11 @@ while getopts ':5hnsu:p:r:t:o:' option; do
     p) export RH_CHE_OPENSHIFT_PASSWORD=$OPTARG
        ;;
     o) export RH_CHE_OPENSHIFT_TOKEN=$OPTARG
-       export RH_CHE_OPENSHIFT_USE_TOKEN="true";
+       export RH_CHE_OPENSHIFT_USE_TOKEN="true"
        ;;
     r) export RH_CHE_DOCKER_IMAGE_REGISTRY=$OPTARG
+       ;;
+    e) export RH_CHE_PROJECT_NAMESPACE=$OPTARG
        ;;
     :) echo -e "\033[91;1mMissing argument for -$OPTARG\033[0m" >&2
        echo -e "$usage" >&2
@@ -197,7 +200,7 @@ curl -L0fs $DEPLOY_POSTGRES_CONFIG_URL -o che-init-image-stream.yaml 2>1 > /dev/
 # GET POSTGRES CONFIGS
 mkdir postgres 2>1 > /dev/null
 cd postgres || exit 1
-export IMAGE_POSTGRES="centos/postgresql-96-centos7"
+export IMAGE_POSTGRES="eclipse/che-postgres"
 if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/deployment-config.yaml -o deployment-config.yaml 2>1 > /dev/null); then
   echo -e "\033[93;1mFile postgres-data-claim.yaml is missing.\033[0m"
   rm deployment-config.yaml
@@ -254,15 +257,14 @@ if [ "$RH_CHE_IS_V_FIVE" == "true" ]; then
                     yq ".\"data\".\"che-workspace-che-server-endpoint\" = \"https://che-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/wsmaster/api\" | 
                         .\"data\".\"che-host\" = \"che-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io\" | 
                         .\"data\".\"infra-bootstrapper-binary-url\" = \"https://che-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" | 
-                        .\"data\".\"che-api\" = \"https://che-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/\" | 
+                        .\"data\".\"che-api\" = \"https://che-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api\" | 
                         .\"data\".\"che-websocket-endpoint\" = \"wss://che-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/websocket\" | 
                         .\"metadata\".\"name\" = \"che\" ")
 else
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                    yq ".\"data\".\"che-workspace-che-server-endpoint\" = \"https://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/wsmaster/api\" | 
-                        .\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io\" | 
+                    yq ".\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io\" | 
                         .\"data\".\"infra-bootstrapper-binary-url\" = \"https://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" | 
-                        .\"data\".\"che-api\" = \"https://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/\" | 
+                        .\"data\".\"che-api\" = \"https://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api\" | 
                         .\"data\".\"che-websocket-endpoint\" = \"wss://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/websocket\" | 
                         .\"metadata\".\"name\" = \"rhche\" ")
 fi
