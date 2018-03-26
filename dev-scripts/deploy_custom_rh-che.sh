@@ -5,7 +5,7 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
-usage="\033[93;1m$(basename "$0") \033[0;1m{-5} [-u <username>] [-p <passwd>] [-o <token>] \033[90m{-t <tag>} {-r <registry>} {-e <namespace>} {-n} {-s} {-h} \033[0m-- Login to dev cluster and deploy che with specific build tag
+usage="\033[93;1m$(basename "$0") \033[0;1m{-5} [-u <username>] [-p <passwd>] [-o <token>] \033[90m{-t <tag>} {-r <registry>} {-e <namespace>} {-b <rh-che branch>} {-n} {-s} {-h} \033[0m-- Login to dev cluster and deploy che with specific build tag
 
 \033[32;1mwhere:\033[0m
     \033[1m-5\033[0m  \033[93muse che-server V5 \033[31;1m!!MUST COME AS FIRST FLAG!!\033[0m
@@ -13,6 +13,7 @@ usage="\033[93;1m$(basename "$0") \033[0;1m{-5} [-u <username>] [-p <passwd>] [-
     \033[1m-p\033[0m  \033[93mpassword for openshift account\033[0m
     \033[1m-o\033[0m  \033[93mopenshift token - \033[31;1meither token or username and password must be provided\033[0m
     \033[1m-e\033[0m  use specified namespace instead of the default one
+    \003[1m-b\033[0m  use specified rh-che github branch
     \033[1m-h\033[0m  show this help text
     \033[1m-n\033[0m  do not delete files after script finishes
     \033[1m-s\033[0m  wipe sql database (postgres)
@@ -100,7 +101,7 @@ function deployPostgres() {
 # PREPARE VARIABLES FOR V6
 setVars
 
-while getopts ':5hnsu:p:r:t:o:e:' option; do
+while getopts ':5hnsu:p:r:t:o:e:b:' option; do
   case "$option" in
     5) # SET VARIABLES FOR V5 !!MUST COME AS FIRST FLAG!!
        export RH_CHE_IS_V_FIVE="true"
@@ -125,6 +126,8 @@ while getopts ':5hnsu:p:r:t:o:e:' option; do
     r) export RH_CHE_DOCKER_IMAGE_REGISTRY=$OPTARG
        ;;
     e) export RH_CHE_PROJECT_NAMESPACE=$OPTARG
+       ;;
+    b) export RH_CHE_GITHUB_BRANCH=$OPTARG
        ;;
     :) echo -e "\033[91;1mMissing argument for -$OPTARG\033[0m" >&2
        echo -e "$usage" >&2
@@ -274,11 +277,14 @@ if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - 2>1 > /dev/null); then
   echo -e "\033[91;1mFailed to apply configmap.\033[0m"
   exit 1
 fi
-echo -e "\033[92;1mChe config deployed on \033[34m$RH_CHE_PROJECT_ID\033[0m"
+echo -e "\033[92;1mChe config deployed on \033[34m${RH_CHE_PROJECT_ID}\033[0m"
 
 # PROCESS CHE APP CONFIG
-CHE_APP_CONFIG_YAML=$(yq "(.parameters[] | select(.name == \"IMAGE\").value) |= \"$RH_CHE_DOCKER_IMAGE_REGISTRY\" | 
-                          (.parameters[] | select(.name == \"IMAGE_TAG\").value) |= \"$RH_CHE_PROJECT_ID\"" ./rh-che.app.yaml)
+CHE_APP_CONFIG_YAML=$(yq "" ./rh-che.app.yaml)
+CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
+                      yq "(.parameters[] | select(.name == \"IMAGE\").value) |= \"$RH_CHE_DOCKER_IMAGE_REGISTRY\" | 
+                          (.parameters[] | select(.name == \"IMAGE_TAG\").value) |= \"$RH_CHE_PROJECT_ID\" | 
+                          (.objects[] | select(.kind == \"DeploymentConfig\").spec.template.spec.containers[0].imagePullPolicy) |= \"Always\"")
 if [ "$RH_CHE_IS_V_FIVE" == "true" ]; then
   CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
                         yq "(.objects[] | select(.kind == \"DeploymentConfig\").spec.template.spec.containers[0].env[] | 
