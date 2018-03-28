@@ -11,13 +11,13 @@ set +o nounset
 
 /usr/sbin/setenforce 0
 
-export RH_CHE_AUTOMATION_BUILD_TAG=rh-che-automated-build-$(git rev-parse --short HEAD)
 export CHE_DOCKER_BASE_IMAGE=eclipse/che-server:nightly-centos
 export ORIGIN_CLIENTS_URL=http://mirror.centos.org/centos/7/paas/x86_64/openshift-origin/origin-clients-3.7.1-2.el7.x86_64.rpm
 export OPENSHIFT_RDU2C_URL=https://dev.rdu2c.fabric8.io:8443/
 export OC_VERSION=3.9.19
 
 function tagAndPushDocker() {
+  export RH_CHE_AUTOMATION_BUILD_TAG=rh-che-automated-build-$(git rev-parse --short HEAD)
   echo "che-docker-base-image:${CHE_DOCKER_BASE_IMAGE}"
   docker pull ${CHE_DOCKER_BASE_IMAGE}
   docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
