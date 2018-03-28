@@ -43,7 +43,7 @@ function setVars() {
   else
 #    export RH_CHE_PROJECT_ID="nightly-fabric8";
 #    export RH_CHE_DOCKER_IMAGE_REGISTRY="dfestal/che-server";
-    export RH_CHE_PROJECT_ID="3e14772-fabric8-e228731";
+    export RH_CHE_PROJECT_ID="36bb93b-fabric8-6aee1f9";
     export RH_CHE_DOCKER_IMAGE_REGISTRY="rhche/rh-che-server";
     export RH_CHE_PROJECT_NAMESPACE=che6-automated;
     export RH_CHE_GITHUB_BRANCH=rh-che6;
