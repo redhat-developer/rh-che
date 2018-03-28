@@ -203,6 +203,16 @@ objects:
               configMapKeyRef:
                 key: che-keycloak-client-id
                 name: rhche
+          - name: CHE_KEYCLOAK_OIDC__PROVIDER
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-oidc-provider
+                name: rhche
+          - name: CHE_KEYCLOAK_USE__NONCE
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-use-nonce
+                name: rhche
           - name: CHE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:

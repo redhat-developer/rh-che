@@ -29,6 +29,7 @@ import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerServersPortProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.RamLimitProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
@@ -71,7 +72,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       InstallerServersPortProvisioner installerServersPortProvisioner,
       LogsVolumeMachineProvisioner logsVolumeMachineProvisioner,
       OpenshiftUserTokenProvider openshiftUserTokenProvider,
-      TenantDataProvider tenantDataProvider) {
+      TenantDataProvider tenantDataProvider,
+      PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner) {
     super(
         pvcEnabled,
         uniqueNamesProvisioner,
@@ -82,7 +84,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         volumesStrategy,
         ramLimitProvisioner,
         installerServersPortProvisioner,
-        logsVolumeMachineProvisioner);
+        logsVolumeMachineProvisioner,
+        podTerminationGracePeriodProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;

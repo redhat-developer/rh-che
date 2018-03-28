@@ -246,7 +246,11 @@ fi
 
 # APPLY CHE CONFIGMAP
 #yq '' ./rh-che.config.yaml | cat
-CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-auth-server-url\" = \"https://sso.prod-preview.openshift.io/auth\" | 
+CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" | 
+                      .\"data\".\"che-keycloak-auth-server-url\" = \"NULL\" | 
+                      .\"data\".\"che-keycloak-use-nonce\" = \"false\" | 
+                      .\"data\".\"che-keycloak-client-id\" = \"740650a2-9c44-4db5-b067-a3d1b2cd2d01\" | 
+                      .\"data\".\"che-keycloak-oidc-provider\" = \"https://auth.prod-preview.openshift.io/api\" | 
                       .\"data\".\"keycloak-github-endpoint\" = \"https://auth.prod-preview.openshift.io/api/token?for=https://github.com\" | 
                       .\"data\".\"keycloak-oso-endpoint\" = \"https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token\" | 
                       .\"data\".\"service.account.secret\" = \"\" | 
