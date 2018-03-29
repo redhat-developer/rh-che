@@ -270,6 +270,11 @@ objects:
               configMapKeyRef:
                 key: multi-user
                 name: rhche
+          - name: CHE_LOGS_APPENDERS_IMPL
+            valueFrom:
+              configMapKeyRef:
+                key: logs-encoding
+                name: rhche
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
