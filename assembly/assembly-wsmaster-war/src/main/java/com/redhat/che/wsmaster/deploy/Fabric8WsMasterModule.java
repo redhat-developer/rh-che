@@ -21,6 +21,9 @@ import org.eclipse.che.security.oauth.OAuthAuthenticator;
 public class Fabric8WsMasterModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(org.eclipse.che.security.oauth.shared.OAuthTokenProvider.class)
+        .to(org.eclipse.che.security.oauth.OAuthAuthenticatorTokenProvider.class);
+    bind(org.eclipse.che.security.oauth.OAuthAuthenticationService.class);
     Multibinder<OAuthAuthenticator> oAuthAuthenticators =
         Multibinder.newSetBinder(binder(), OAuthAuthenticator.class);
     oAuthAuthenticators.addBinding().to(OpenShiftGitHubOAuthAuthenticator.class);
