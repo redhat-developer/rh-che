@@ -32,6 +32,7 @@
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
+        <sentry.version>1.7.2</sentry.version>
         <unleash.client.java.version>3.0.0</unleash.client.java.version>
         <withoutDashboard>false</withoutDashboard>
     </properties>
@@ -109,6 +110,16 @@
                 <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry</artifactId>
+                <version>${sentry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry-logback</artifactId>
+                <version>${sentry.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.finn.unleash</groupId>

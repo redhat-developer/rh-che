@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2016-2018 Red Hat, Inc.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<included>
+    <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CHE_LOGS_SENTRY_LEVEL:-WARN}</level>
+        </filter>
+    </appender>
+
+    <root>
+        <appender-ref ref="Sentry"/>
+    </root>
+</included>

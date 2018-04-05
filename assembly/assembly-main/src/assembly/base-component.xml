@@ -49,5 +49,9 @@
             <directory>${project.build.directory}/stacks/</directory>
             <outputDirectory>stacks/</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>src/assembly/conf</directory>
+            <outputDirectory>tomcat/conf/</outputDirectory>
+        </fileSet>
     </fileSets>
 </component>

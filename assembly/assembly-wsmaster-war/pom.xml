@@ -28,6 +28,14 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
@@ -38,6 +46,14 @@
         <dependency>
             <groupId>com.redhat.che</groupId>
             <artifactId>ls-bayesian-agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry-logback</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
@@ -51,12 +67,36 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-auth-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-user</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-commons-inject</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.che.multiuser</groupId>
             <artifactId>che-multiuser-keycloak-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.multiuser</groupId>
             <artifactId>che-multiuser-keycloak-token-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.plugin</groupId>
+            <artifactId>che-plugin-github-oauth2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -97,7 +137,8 @@
                     </configuration>
                   </execution>
                 </executions>
-              </plugin>            <plugin>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.che.core</groupId>
                 <artifactId>che-core-dynamodule-maven-plugin</artifactId>
                 <executions>
@@ -135,7 +176,12 @@
                     <execution>
                         <id>analyze</id>
                         <configuration>
-                            <skip>true</skip>
+                            <ignoredUnusedDeclaredDependencies>
+                                <dep>io.sentry:sentry</dep>
+                                <dep>io.sentry:sentry-logback</dep>
+                                <dep>com.redhat.che:fabric8-ide-stacks</dep>
+                                <dep>org.eclipse.che.multiuser:che-multiuser-keycloak-server</dep>
+                            </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>
