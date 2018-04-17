@@ -2,9 +2,9 @@
 
 TARGET=${TARGET:-"centos"}
 
-export NAMESPACE=${DOCKER_NAMESPACE:-"rhchestage"}
+export NAMESPACE="rhchestage"
 
-if [ $TARGET == "rhel" ]; then
+if [ "$TARGET" == "rhel" ] || [ "$TARGET" == "rh-integration-test" ]; then
   export DOCKERFILE="Dockerfile.rhel"
   export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
 else
@@ -12,7 +12,11 @@ else
   export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net"}
 fi
 
-export DOCKER_IMAGE="rh-che-server"
+if [ "$TARGET" == "rh-integration-test" ]; then
+  export DOCKER_IMAGE="rh-che-automation"
+else
+  export DOCKER_IMAGE="rh-che-server"
+fi
 
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master
@@ -21,7 +25,10 @@ export NPM_CONFIG_PREFIX=~/.che_node_modules
 export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
 
 export RH_DIST_SUFFIX=fabric8
-export RH_NO_DASHBOARD_SUFFIX=without-dashboard
+if [ "$TARGET" == "rh-integration-test" ]; then
+  export RH_TAG_DIST_SUFFIX=rhcheautomation
+else
+  export RH_TAG_DIST_SUFFIX=fabric8
+fi
 
-DEFAULT_RH_CHE_DOCKER_IMAGE_VERSION=nightly-fabric8-no-dashboard
-export RH_CHE_DOCKER_IMAGE_VERSION=${RH_CHE_DOCKER_IMAGE_VERSION:-${DEFAULT_RH_CHE_DOCKER_IMAGE_VERSION}}
+export RH_NO_DASHBOARD_SUFFIX=without-dashboard

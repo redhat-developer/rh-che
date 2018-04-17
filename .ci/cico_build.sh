@@ -11,7 +11,7 @@
 # update machine, get required deps in place
 # this script assumes its being run on CentOS Linux 7/x86_64
 
-currentDir=`pwd`
+currentDir=$(pwd)
 ciDir=$(dirname "$0")
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -52,6 +52,9 @@ source ${ABSOLUTE_PATH}/../config
 
 runBuild "cd ${ABSOLUTE_PATH} && bash ./cico_do_build_che.sh $*"
 if [ $? -eq 0 ]; then
+  if [ "$TARGET" == "rh-integration-test" ]; then
+    DeveloperBuild="false"
+  fi
   bash ${ABSOLUTE_PATH}/cico_do_docker_build_tag_push.sh
 else
   echo 'Build Failed!'
