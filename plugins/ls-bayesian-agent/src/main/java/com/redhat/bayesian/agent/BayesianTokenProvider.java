@@ -16,13 +16,12 @@ import com.redhat.che.multitenant.WorkspaceSubjectsRegistry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.eclipse.che.api.core.NotFoundException;
+import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.multiuser.machine.authentication.server.MachineTokenRegistry;
 import org.slf4j.Logger;
@@ -34,23 +33,22 @@ public class BayesianTokenProvider {
 
   private static final Logger LOG = getLogger(BayesianTokenProvider.class);
 
-  private final MachineTokenRegistry machineTokenRegistry;
   private final WorkspaceSubjectsRegistry workspaceSubjectsRegistry;
 
   @Inject
   public BayesianTokenProvider(
       MachineTokenRegistry machineTokenRegistry,
       WorkspaceSubjectsRegistry workspaceSubjectsRegistry) {
-    this.machineTokenRegistry = machineTokenRegistry;
     this.workspaceSubjectsRegistry = workspaceSubjectsRegistry;
   }
 
   @GET
   @Path("/token")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getBayesianToken(@HeaderParam(HttpHeaders.AUTHORIZATION) String machineToken)
-      throws NotFoundException {
-    String userId = machineTokenRegistry.getUserId(machineToken);
+  public Response getBayesianToken() throws NotFoundException {
+
+    String userId = EnvironmentContext.getCurrent().getSubject().getUserId();
+
     Subject workspaceStarter = workspaceSubjectsRegistry.getSubject(userId);
     if (workspaceStarter == null) {
       LOG.error(

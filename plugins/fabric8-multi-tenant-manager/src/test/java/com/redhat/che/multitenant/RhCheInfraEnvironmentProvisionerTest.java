@@ -38,8 +38,8 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminat
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.RamLimitProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.ServersConverter;
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
-import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftServersConverter;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
 import org.mockito.Mock;
@@ -58,7 +58,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
   @Mock private OpenShiftUniqueNamesProvisioner uniqueNamesProvisioner;
   @Mock private RouteTlsProvisioner routeTlsProvisioner;
-  @Mock private OpenShiftServersConverter openShiftServersConverter;
+  @Mock private ServersConverter<?> openShiftServersConverter;
   @Mock private EnvVarsConverter envVarsConverter;
   @Mock private RestartPolicyRewriter restartPolicyRewriter;
   @Mock private WorkspaceVolumesStrategy volumesStrategy;
