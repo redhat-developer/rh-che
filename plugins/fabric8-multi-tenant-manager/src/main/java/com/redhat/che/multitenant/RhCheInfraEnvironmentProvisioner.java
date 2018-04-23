@@ -64,7 +64,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       @Named("che.infra.kubernetes.pvc.enabled") boolean pvcEnabled,
       OpenShiftUniqueNamesProvisioner uniqueNamesProvisioner,
       RouteTlsProvisioner routeTlsProvisioner,
-      ServersConverter openShiftServersConverter,
+      ServersConverter<OpenShiftEnvironment> openShiftServersConverter,
       EnvVarsConverter envVarsConverter,
       RestartPolicyRewriter restartPolicyRewriter,
       WorkspaceVolumesStrategy volumesStrategy,
