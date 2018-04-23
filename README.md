@@ -16,9 +16,9 @@ that adds some Red Hat specific plugins / behaviors up to the standard upstream 
 distribution. The Red Hat distribution powers [openshift.io](https://openshift.io) developers workspaces.
 
 Red Hat modifications against the upstream Che include:
-- The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
-- Keycloak integration
-- [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server) 
+
+* The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
+* [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server)
 
 ## How to build it
 
@@ -26,7 +26,7 @@ Red Hat modifications against the upstream Che include:
 
 * Set some environment variables:
 
-    * `DOCKER_HUB_NAMESPACE` can be overridden to point
+  * `DOCKER_HUB_NAMESPACE` can be overridden to point
     to your own Docker Hub account
 
     ```bash
@@ -95,15 +95,34 @@ export OPENSHIFT_FLAVOR=ocp && ./dev-scripts/openshift_deploy.sh
 
 ### Deploy to Minishift
 
-```bash
-SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-scripts/openshift_deploy.sh
-curl -fsSL ${SCRIPT_URL} -o get-che.sh && bash get-che.sh
-```
+The easiest way to deploy Che on minishift is to use the minishift addon:
 
-Of course if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rh-che) you can deploy Che on minishift executing:
+* Clone this repository
+
+    ```bash
+    git clone https://github.com/redhat-developer/rh-che
+    cd rh-che
+    ```
+
+* Install rhche-prerequisites minishift addon
+
+    ```bash
+    minishift addons install openshift/minishift-addons/rhche-prerequisites
+    minishift addons apply rhche-prerequisites
+    ```
+
+* Install rhche minishift addon
+
+    ```bash
+    minishift addons install openshift/minishift-addons/rhche
+    minishift addons apply rhche
+    ```
+
+To remove the addon:
 
 ```bash
-./dev-scripts/openshift_deploy.sh
+minishift addons remove rhche && minishift addons uninstall rhche
+minishift addons remove rhche-prerequisites && minishift addons uninstall rhche-prerequisites
 ```
 
 ### Deploy to openshift.io

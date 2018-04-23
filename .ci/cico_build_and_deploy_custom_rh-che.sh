@@ -43,6 +43,10 @@ if [ ! -f "./jenkins-env" ]; then
 fi
 
 set +x
+echo "***IMPORT jenkins-env NAMES DEBUG***"
+cat ./jenkins-env | sed 's;=.*;;' | sort
+echo "***==============================***"
+
 grep -E "(KEYCLOAK|BUILD_NUMBER|JOB_NAME|RH_CHE)" ./jenkins-env | sed 's/^/export /g' | sed 's/= /=/g' > ./export_env_variables
 if [ ! -f "./export_env_variables" ]; then
   echo "CRITICAL ERROR: sed edit of ./jeninks_env failed"
@@ -50,6 +54,10 @@ if [ ! -f "./export_env_variables" ]; then
 fi
 
 source export_env_variables
+
+echo "***DEBUG FOR VARIABLE NAMES [POST-IMPORT]***"
+env | sed 's;=.*;;' | sort
+echo "***======================================***"
 
 echo "Running ${JOB_NAME} build number #${BUILD_NUMBER}, testing creds:"
 

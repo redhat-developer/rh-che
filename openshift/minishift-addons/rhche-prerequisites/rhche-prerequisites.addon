@@ -1,0 +1,16 @@
+# Name: rhche-prerequisites
+# Description: Setup and Configure Prerequisites to run Eclipse Che (rh-che distribution)
+# Url: https://github.com/redhat-developer/rh-che
+# Required-Vars: NAMESPACE, KEYCLOAK_DOCKER_IMAGE
+# Var-Defaults: NAMESPACE=rhche, KEYCLOAK_DOCKER_IMAGE=eclipse/che-keycloak
+# OpenShift-Version: >=3.5.0
+
+echo [CHE] Creating #{NAMESPACE} project as developer
+oc adm new-project #{NAMESPACE} --description="Red Hat Che on minishift"
+oc adm policy add-role-to-user admin developer -n #{NAMESPACE}
+
+echo [CHE] Deploying Postgres
+oc new-app -f templates/postgres-template.yaml -n #{NAMESPACE}
+
+echo [CHE] Deploying Keycloak
+oc new-app -f templates/keycloak-template.yaml -p IMAGE_KEYCLOAK=#{KEYCLOAK_DOCKER_IMAGE} -p ROUTING_SUFFIX=#{routing-suffix} -n #{NAMESPACE}

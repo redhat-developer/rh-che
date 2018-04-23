@@ -168,11 +168,6 @@ objects:
               configMapKeyRef:
                 key: che-fabric8-multicluster-oso-proxy-url
                 name: rhche
-          - name: CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR
-            valueFrom:
-              configMapKeyRef:
-                key: che-docker-enable-container-stop-detector
-                name: rhche
           - name: CHE_API
             valueFrom:
               configMapKeyRef:
