@@ -13,16 +13,17 @@ usage="\033[93;1m$(basename "$0") \033[0;1m{-5} [-u <username>] [-p <passwd>] [-
     \033[1m-p\033[0m  \033[93mpassword for openshift account\033[0m
     \033[1m-o\033[0m  \033[93mopenshift token - \033[31;1meither token or username and password must be provided\033[0m
     \033[1m-e\033[0m  use specified namespace instead of the default one
-    \003[1m-b\033[0m  use specified rh-che github branch
+    \033[1m-b\033[0m  use specified rh-che github branch
     \033[1m-h\033[0m  show this help text
     \033[1m-n\033[0m  do not delete files after script finishes
     \033[1m-s\033[0m  wipe sql database (postgres)
     \033[1m-t\033[0m  [\033[1mdefault=latest\033[0m] tag for specific build (first 7 characters of commit hash)
     \033[1m-r\033[0m  docker image registry from where to pull
+    \033[1m-z\033[0m  run this script as a standalone self-contained application
 
 \033[32;1mrequirements\033[0m:
     \033[1moc\033[0m  openshift origin CLI admin (dnf install origin-clients)
-    \033[1mjq\033[0m  json CLI processor (dnf install jq)
+    \033[1mjq\033[0m  json CLI processor (dnf install jq (fedora) or brew install jq (macos))
     \033[1myq\033[0m  yaml CLI processor based on jq (pip install yq)"
 
 export RH_CHE_DEPLOY_SCRIPT_CLEANUP="true";
@@ -33,19 +34,20 @@ export RH_CHE_OPENSHIFT_URL=https://dev.rdu2c.fabric8.io:8443;
 export RH_CHE_JDBC_USERNAME=pgche;
 export RH_CHE_JDBC_PASSWORD=pgchepassword;
 export RH_CHE_JDBC_URL=jdbc:postgresql://postgres:5432/dbche;
+export RH_CHE_RUNNING_STANDALONE_SCRIPT="false";
 
 function setVars() {
   if [ "$RH_CHE_IS_V_FIVE" == "true" ]; then
-    export RH_CHE_PROJECT_ID="c82f44b-fabric8-9cc154c";
-    export RH_CHE_DOCKER_IMAGE_REGISTRY="rhche/che-server-multiuser";
-    export RH_CHE_PROJECT_NAMESPACE=che5-automated;
+    export RH_CHE_DOCKER_IMAGE_TAG="c82f44b-fabric8-9cc154c";
+    export RH_CHE_DOCKER_IMAGE_NAME="rhche/che-server-multiuser";
+    export RH_CHE_PROJECT_NAMESPACE=$(oc whoami)-che5-automated;
     export RH_CHE_GITHUB_BRANCH=master;
   else
-#    export RH_CHE_PROJECT_ID="nightly-fabric8";
-#    export RH_CHE_DOCKER_IMAGE_REGISTRY="dfestal/che-server";
-    export RH_CHE_PROJECT_ID="36bb93b-fabric8-6aee1f9";
-    export RH_CHE_DOCKER_IMAGE_REGISTRY="rhche/rh-che-server";
-    export RH_CHE_PROJECT_NAMESPACE=che6-automated;
+#    export RH_CHE_DOCKER_IMAGE_TAG="nightly-fabric8";
+#    export RH_CHE_DOCKER_IMAGE_NAME="dfestal/che-server";
+    export RH_CHE_DOCKER_IMAGE_TAG="latest";
+    export RH_CHE_DOCKER_IMAGE_NAME="registry.devshift.net/che/rh-che-server";
+    export RH_CHE_PROJECT_NAMESPACE=$(oc whoami)-che6-automated;
     export RH_CHE_GITHUB_BRANCH=rh-che6;
   fi
 }
@@ -54,9 +56,9 @@ function unsetVars() {
   unset RH_CHE_OPENSHIFT_USERNAME;
   unset RH_CHE_OPENSHIFT_PASSWORD;
   unset RH_CHE_OPENSHIFT_TOKEN;
-  unset RH_CHE_PROJECT_ID;
+  unset RH_CHE_DOCKER_IMAGE_TAG;
   unset RH_CHE_OPENSHIFT_URL;
-  unset RH_CHE_DOCKER_IMAGE_REGISTRY;
+  unset RH_CHE_DOCKER_IMAGE_NAME;
   unset RH_CHE_DEPLOY_SCRIPT_CLEANUP;
   unset RH_CHE_WIPE_SQL;
   unset RH_CHE_PROJECT_NAMESPACE;
@@ -64,6 +66,7 @@ function unsetVars() {
   unset RH_CHE_JDBC_USERNAME;
   unset RH_CHE_JDBC_PASSWORD;
   unset RH_CHE_JDBC_URL;
+  unset RH_CHE_RUNNING_STANDALONE_SCRIPT;
   unset RH_CHE_IS_V_FIVE;
   unset IMAGE_POSTGRES;
   unset RH_CHE_STATUS_PROGRESS;
@@ -71,12 +74,12 @@ function unsetVars() {
 }
 
 function clearEnv() {
-  rm wait_until_postgres_is_available.sh 2>1 > /dev/null
-  rm deploy_postgres_only.sh 2>1 > /dev/null
-  rm che-init-image-stream.yaml 2>1 > /dev/null
-  rm rh-che.app.yaml 2>1 > /dev/null
-  rm rh-che.config.yaml 2>1 > /dev/null
-  rm -rf postgres 2>1 > /dev/null
+  rm wait_until_postgres_is_available.sh > /dev/null 2>&1
+  rm deploy_postgres_only.sh > /dev/null 2>&1
+  rm che-init-image-stream.yaml > /dev/null 2>&1
+  rm rh-che.app.yaml > /dev/null 2>&1
+  rm rh-che.config.yaml > /dev/null 2>&1
+  rm -rf postgres > /dev/null 2>&1
 }
 
 function checkCheStatus() {
@@ -101,7 +104,7 @@ function deployPostgres() {
 # PREPARE VARIABLES FOR V6
 setVars
 
-while getopts ':5hnsu:p:r:t:o:e:b:' option; do
+while getopts ':5hnsu:p:r:t:o:e:b:z' option; do
   case "$option" in
     5) # SET VARIABLES FOR V5 !!MUST COME AS FIRST FLAG!!
        export RH_CHE_IS_V_FIVE="true"
@@ -114,7 +117,7 @@ while getopts ':5hnsu:p:r:t:o:e:b:' option; do
        ;;
     s) export RH_CHE_WIPE_SQL="true"
        ;;
-    t) export RH_CHE_PROJECT_ID=$OPTARG
+    t) export RH_CHE_DOCKER_IMAGE_TAG=$OPTARG
        ;;
     u) export RH_CHE_OPENSHIFT_USERNAME=$OPTARG
        ;;
@@ -123,12 +126,14 @@ while getopts ':5hnsu:p:r:t:o:e:b:' option; do
     o) export RH_CHE_OPENSHIFT_TOKEN=$OPTARG
        export RH_CHE_OPENSHIFT_USE_TOKEN="true"
        ;;
-    r) export RH_CHE_DOCKER_IMAGE_REGISTRY=$OPTARG
+    r) export RH_CHE_DOCKER_IMAGE_NAME=$OPTARG
        ;;
     e) export RH_CHE_PROJECT_NAMESPACE=$OPTARG
        ;;
     b) export RH_CHE_GITHUB_BRANCH=$OPTARG
        ;;
+    z) export RH_CHE_RUNNING_STANDALONE_SCRIPT="true"
+       ;; 
     :) echo -e "\033[91;1mMissing argument for -$OPTARG\033[0m" >&2
        echo -e "$usage" >&2
        unsetVars
@@ -168,12 +173,12 @@ fi
 # LOGIN TO OPENSHIFT CONSOLE
 echo -e "\033[1mLogging in to openshift...\033[0m";
 if [ "$RH_CHE_OPENSHIFT_USE_TOKEN" == "true" ]; then
-  if ! (oc login $RH_CHE_OPENSHIFT_URL --insecure-skip-tls-verify=true --token="$RH_CHE_OPENSHIFT_TOKEN" 2>1 > /dev/null); then
+  if ! (oc login $RH_CHE_OPENSHIFT_URL --insecure-skip-tls-verify=true --token="$RH_CHE_OPENSHIFT_TOKEN" > /dev/null 2>&1); then
     echo -e "\033[91;1mOpenshift login with token failed\033[0m"
     exit 1
   fi
 else
-  if ! (oc login $RH_CHE_OPENSHIFT_URL --insecure-skip-tls-verify=true -u "$RH_CHE_OPENSHIFT_USERNAME" -p "$RH_CHE_OPENSHIFT_PASSWORD" 2>1 > /dev/null); then
+  if ! (oc login $RH_CHE_OPENSHIFT_URL --insecure-skip-tls-verify=true -u "$RH_CHE_OPENSHIFT_USERNAME" -p "$RH_CHE_OPENSHIFT_PASSWORD" > /dev/null 2>&1); then
     echo -e "\033[91;1mOpenshift login failed\033[0m"
     exit 1
   fi
@@ -182,13 +187,20 @@ echo -e "\033[92;1mLogin successful, creating project \033[34m$RH_CHE_PROJECT_NA
 
 # CREATE PROJECT
 if [ "$RH_CHE_IS_V_FIVE" == "true" ]; then
-  if ! (oc project $RH_CHE_PROJECT_NAMESPACE 2>1 > /dev/null); then
-    oc new-project $RH_CHE_PROJECT_NAMESPACE --display-name='RH-Che5 Automated Deployment' 2>1 > /dev/null
+  if ! (oc project $RH_CHE_PROJECT_NAMESPACE > /dev/null 2>&1); then
+    oc new-project $RH_CHE_PROJECT_NAMESPACE --display-name='RH-Che5 Automated Deployment' > /dev/null 2>&1
   fi
 else
-  if ! (oc project $RH_CHE_PROJECT_NAMESPACE 2>1 > /dev/null); then
-    oc new-project $RH_CHE_PROJECT_NAMESPACE --display-name='RH-Che6 Automated Deployment' 2>1 > /dev/null
+  if ! (oc project $RH_CHE_PROJECT_NAMESPACE > /dev/null 2>&1); then
+    oc new-project $RH_CHE_PROJECT_NAMESPACE --display-name='RH-Che6 Automated Deployment' > /dev/null 2>&1
   fi
+fi
+
+if ! (oc get project $RH_CHE_PROJECT_NAMESPACE > /dev/null 2>&1); then
+    echo -e "\033[91;1mProject creation failed.\033[0m"
+    exit 1
+else
+    echo -e "\033[92;1mProject created successfully.\033[0;38;5;238m";
 fi
 
 # GET DEPLOYMENT SCRIPTS
@@ -196,36 +208,43 @@ echo -e "\033[0;1mGetting deployment scripts...\033[0m"
 WAIT_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/wait_until_postgres_is_available.sh
 DEPLOY_POSTGRES_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/deploy_postgres_only.sh
 DEPLOY_POSTGRES_CONFIG_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/che-init-image-stream.yaml
-curl -L0fs $WAIT_SCRIPT_URL -o wait_until_postgres_is_available.sh 2>1 > /dev/null
-curl -L0fs $DEPLOY_POSTGRES_SCRIPT_URL -o deploy_postgres_only.sh 2>1 > /dev/null
-curl -L0fs $DEPLOY_POSTGRES_CONFIG_URL -o che-init-image-stream.yaml 2>1 > /dev/null
+curl -L0fs $WAIT_SCRIPT_URL -o wait_until_postgres_is_available.sh > /dev/null 2>&1
+curl -L0fs $DEPLOY_POSTGRES_SCRIPT_URL -o deploy_postgres_only.sh > /dev/null 2>&1
+curl -L0fs $DEPLOY_POSTGRES_CONFIG_URL -o che-init-image-stream.yaml > /dev/null 2>&1
 
 # GET POSTGRES CONFIGS
-mkdir postgres 2>1 > /dev/null
+mkdir postgres > /dev/null 2>&1
 cd postgres || exit 1
 export IMAGE_POSTGRES="eclipse/che-postgres"
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/deployment-config.yaml -o deployment-config.yaml 2>1 > /dev/null); then
-  echo -e "\033[93;1mFile postgres-data-claim.yaml is missing.\033[0m"
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/deployment-config.yaml -o deployment-config.yaml > /dev/null 2>&1); then
+  echo -e "\033[93;1mFile deployment-config.yaml is missing.\033[0m"
   rm deployment-config.yaml
 fi
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/postgres-data-claim.yaml -o postgres-data-claim.yaml 2>1 > /dev/null); then
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/postgres-data-claim.yaml -o postgres-data-claim.yaml > /dev/null 2>&1); then
   echo -e "\033[93;1mFile postgres-data-claim.yaml is missing.\033[0m"
   rm postgres-data-claim.yaml
 fi
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/service.yaml -o service.yaml 2>1 > /dev/null); then
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/service.yaml -o service.yaml > /dev/null 2>&1); then
   echo -e "\033[93;1mFile service.yaml is missing.\033[0m"
   rm service.yaml
 fi
 cd ../ || exit 1
 
 # GET CHE-APP CONFIGS
-if ! (curl -L0fs https://raw.githubusercontent.com/redhat-developer/rh-che/$RH_CHE_GITHUB_BRANCH/openshift/rh-che.app.yaml -o rh-che.app.yaml 2>1 > /dev/null); then
-  echo -e "\033[91;1mCould not download che app definition config!\033[0m"
-  exit 1
-fi
-if ! (curl -L0fs https://raw.githubusercontent.com/redhat-developer/rh-che/$RH_CHE_GITHUB_BRANCH/openshift/rh-che.config.yaml -o rh-che.config.yaml 2>1 > /dev/null); then
-  echo -e "\033[91;1mCould not download che config yaml!\033[0m"
-  exit 1
+if [ "${RH_CHE_RUNNING_STANDALONE_SCRIPT}" == "true" ]; then
+  RH_CHE_APP="./rh-che.app.yaml"
+  RH_CHE_CONFIG="./rh-che.config.yaml"
+  if ! (curl -L0fs https://raw.githubusercontent.com/redhat-developer/rh-che/$RH_CHE_GITHUB_BRANCH/openshift/rh-che.app.yaml -o ${RH_CHE_APP} > /dev/null 2>&1); then
+    echo -e "\033[91;1mCould not download che app definition config!\033[0m"
+    exit 1
+  fi
+  if ! (curl -L0fs https://raw.githubusercontent.com/redhat-developer/rh-che/$RH_CHE_GITHUB_BRANCH/openshift/rh-che.config.yaml -o ${RH_CHE_CONFIG} > /dev/null 2>&1); then
+    echo -e "\033[91;1mCould not download che config yaml!\033[0m"
+    exit 1
+  fi
+else
+  RH_CHE_APP="./../openshift/rh-che.app.yaml"
+  RH_CHE_CONFIG="./../openshift/rh-che.config.yaml"
 fi
 
 chmod 777 wait_until_postgres_is_available.sh
@@ -234,30 +253,29 @@ echo -e "\033[92;1mGetting deployment scripts done.\033[0m"
 
 # DEPLOY POSTRES
 if [ "$RH_CHE_WIPE_SQL" == "true" ]; then
-  if (oc get dc postgres 2>1 > /dev/null); then
+  if (oc get dc postgres > /dev/null 2>&1); then
     oc delete dc postgres
   fi
   deployPostgres
 else
-  if ! (oc get dc postgres 2>1 > /dev/null); then
+  if ! (oc get dc postgres > /dev/null 2>&1); then
     deployPostgres
   fi
 fi
 
 # APPLY CHE CONFIGMAP
-#yq '' ./rh-che.config.yaml | cat
+#yq '' ${RH_CHE_CONFIG} | cat
 CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" | 
                       .\"data\".\"che-keycloak-auth-server-url\" = \"NULL\" | 
                       .\"data\".\"che-keycloak-use-nonce\" = \"false\" | 
                       .\"data\".\"che-keycloak-client-id\" = \"740650a2-9c44-4db5-b067-a3d1b2cd2d01\" | 
                       .\"data\".\"che-keycloak-oidc-provider\" = \"https://auth.prod-preview.openshift.io/api\" | 
                       .\"data\".\"keycloak-github-endpoint\" = \"https://auth.prod-preview.openshift.io/api/token?for=https://github.com\" | 
-                      .\"data\".\"keycloak-oso-endpoint\" = \"https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token\" | 
                       .\"data\".\"service.account.secret\" = \"\" | 
                       .\"data\".\"service.account.id\" = \"\" | 
                       .\"data\".\"che.jdbc.username\" = \"$RH_CHE_JDBC_USERNAME\" | 
                       .\"data\".\"che.jdbc.password\" = \"$RH_CHE_JDBC_PASSWORD\" | 
-                      .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" " ./rh-che.config.yaml)
+                      .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" " ${RH_CHE_CONFIG})
 
 if [ "$RH_CHE_IS_V_FIVE" == "true" ]; then
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
@@ -277,17 +295,17 @@ else
 fi
 
 #echo "$CHE_CONFIG_YAML"
-if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - 2>1 > /dev/null); then
+if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
   echo -e "\033[91;1mFailed to apply configmap.\033[0m"
   exit 1
 fi
-echo -e "\033[92;1mChe config deployed on \033[34m${RH_CHE_PROJECT_ID}\033[0m"
+echo -e "\033[92;1mChe config deployed on \033[34m${RH_CHE_PROJECT_NAMESPACE}\033[0m"
 
 # PROCESS CHE APP CONFIG
-CHE_APP_CONFIG_YAML=$(yq "" ./rh-che.app.yaml)
+CHE_APP_CONFIG_YAML=$(yq "" ${RH_CHE_APP})
 CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
-                      yq "(.parameters[] | select(.name == \"IMAGE\").value) |= \"$RH_CHE_DOCKER_IMAGE_REGISTRY\" | 
-                          (.parameters[] | select(.name == \"IMAGE_TAG\").value) |= \"$RH_CHE_PROJECT_ID\" | 
+                      yq "(.parameters[] | select(.name == \"IMAGE\").value) |= \"$RH_CHE_DOCKER_IMAGE_NAME\" | 
+                          (.parameters[] | select(.name == \"IMAGE_TAG\").value) |= \"$RH_CHE_DOCKER_IMAGE_TAG\" | 
                           (.objects[] | select(.kind == \"DeploymentConfig\").spec.template.spec.containers[0].imagePullPolicy) |= \"Always\"")
 if [ "$RH_CHE_IS_V_FIVE" == "true" ]; then
   CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
@@ -316,7 +334,7 @@ else
 fi
 
 #echo "$CHE_APP_CONFIG_YAML" | oc process -f - | cat
-if ! (echo "$CHE_APP_CONFIG_YAML" | oc process -f - | oc apply -f - 2>1 > /dev/null); then
+if ! (echo "$CHE_APP_CONFIG_YAML" | oc process -f - | oc apply -f - > /dev/null 2>&1); then
   echo -e "\033[91;1mFailed to process che config\033[0m"
   exit 1
 fi
