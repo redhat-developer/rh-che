@@ -9,7 +9,7 @@ set -u
 set +e
 
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
+TARGET=${TARGET:-"centos"}
 # Retrieve credentials to push the image to the docker hub
 cat jenkins-env | grep -e PASS -e GIT -e DEVSHIFT > inherit-env
 . inherit-env
@@ -27,7 +27,11 @@ echo "export OSO_DOMAIN=8a09.starter-us-east-2.openshiftapps.com" >> $config_fil
 echo "export OSO_HOSTNAME=mlabuda-jenkins.8a09.starter-us-east-2.openshiftapps.com" >> $config_file
 echo "export CHE_SERVER_DOCKER_IMAGE_TAG=$CHE_SERVER_DOCKER_IMAGE_TAG" >> $config_file
 echo "export NAMESPACE=${NAMESPACE}" >> $config_file
-
+if [ $TARGET == "rhel" ]; then
+  export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
+else
+  export REGISTRY="push.registry.devshift.net"
+fi
 # Triggers update of tenant and execution of functional tests
 echo "CHE VALIDATION: Verification skipped until job devtools-che-functional-tests get fixed"
 # git clone https://github.com/redhat-developer/che-functional-tests.git
