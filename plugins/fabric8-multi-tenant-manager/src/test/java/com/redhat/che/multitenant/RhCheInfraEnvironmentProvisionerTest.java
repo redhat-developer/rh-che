@@ -58,7 +58,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
   @Mock private OpenShiftUniqueNamesProvisioner uniqueNamesProvisioner;
   @Mock private RouteTlsProvisioner routeTlsProvisioner;
-  @Mock private ServersConverter<?> openShiftServersConverter;
+  @Mock private ServersConverter<OpenShiftEnvironment> openShiftServersConverter;
   @Mock private EnvVarsConverter envVarsConverter;
   @Mock private RestartPolicyRewriter restartPolicyRewriter;
   @Mock private WorkspaceVolumesStrategy volumesStrategy;
