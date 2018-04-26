@@ -26,7 +26,7 @@ echo "export OSO_USER=mlabuda" >> $config_file
 echo "export OSO_DOMAIN=8a09.starter-us-east-2.openshiftapps.com" >> $config_file
 echo "export OSO_HOSTNAME=mlabuda-jenkins.8a09.starter-us-east-2.openshiftapps.com" >> $config_file
 echo "export CHE_SERVER_DOCKER_IMAGE_TAG=$CHE_SERVER_DOCKER_IMAGE_TAG" >> $config_file
-echo "export DOCKER_HUB_NAMESPACE=${DOCKER_HUB_NAMESPACE}" >> $config_file
+echo "export NAMESPACE=${NAMESPACE}" >> $config_file
 
 # Triggers update of tenant and execution of functional tests
 echo "CHE VALIDATION: Verification skipped until job devtools-che-functional-tests get fixed"
