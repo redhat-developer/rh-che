@@ -45,10 +45,9 @@ do
 
   echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
   cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
-  echo "=== DEBUG === $TARGET"
-  if [ "$TARGET" == "rhel" ]; then
+  if [ $TARGET == "rhel" ]; then
     export DOCKERFILE="Dockerfile.rhel"
-    export REGISTRY="push.registry.devshift.net/osio-prod"
+    export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
   else
     export DOCKERFILE="Dockerfile"
     export REGISTRY="push.registry.devshift.net"

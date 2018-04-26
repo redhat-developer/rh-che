@@ -27,9 +27,8 @@ echo "export OSO_DOMAIN=8a09.starter-us-east-2.openshiftapps.com" >> $config_fil
 echo "export OSO_HOSTNAME=mlabuda-jenkins.8a09.starter-us-east-2.openshiftapps.com" >> $config_file
 echo "export CHE_SERVER_DOCKER_IMAGE_TAG=$CHE_SERVER_DOCKER_IMAGE_TAG" >> $config_file
 echo "export NAMESPACE=${NAMESPACE}" >> $config_file
-echo "=== DEBUG === $TARGET"
-if [ "$TARGET" == "rhel" ]; then
-  export REGISTRY="push.registry.devshift.net/osio-prod"
+if [ $TARGET == "rhel" ]; then
+  export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
 else
   export REGISTRY="push.registry.devshift.net"
 fi
