@@ -22,7 +22,7 @@ then
   . inherit-env
   if [ -z "${DEVSHIFT_USERNAME+x}" ]; then echo "WARNING: failed to get DEVSHIFT_USERNAME from jenkins-env file in centos-ci job."; else export DEVSHIFT_USERNAME; fi
   if [ -z "${DEVSHIFT_PASSWORD+x}" ]; then echo "WARNING: failed to get DEVSHIFT_PASSWORD from jenkins-env file in centos-ci job."; else export DEVSHIFT_PASSWORD; fi
-  if [ -z "${RHCHEBOT_DOCKER_HUB_PASSWORD+x}" ]; then echo "WARNING: failed to get RHCHEBOT_DOCKER_HUB_PASSWORD from jenkins-env file in centos-ci job."; else export RHCHEBOT_DOCKER_HUB_PASSWORD; fi
+
   set -x
   yum -y update
   yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker
