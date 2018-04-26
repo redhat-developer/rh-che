@@ -7,7 +7,7 @@
 
 currentDir=`pwd`
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET=${TARGET:-"centos"}
+
 . ${ABSOLUTE_PATH}/../config 
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
@@ -45,13 +45,7 @@ do
 
   echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
   cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
-  if [ $TARGET == "rhel" ]; then
-    export DOCKERFILE="Dockerfile.rhel"
-    export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
-  else
-    export DOCKERFILE="Dockerfile"
-    export REGISTRY="push.registry.devshift.net"
-  fi
+
   if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
     docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
   else

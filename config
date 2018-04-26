@@ -1,6 +1,16 @@
 # Config used by the different scripts
 
+TARGET=${TARGET:-"centos"}
+
 export NAMESPACE="rhchestage"
+
+if [ $TARGET == "rhel" ]; then
+  export DOCKERFILE="Dockerfile.rhel"
+  export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
+else
+  export DOCKERFILE="Dockerfile"
+  export REGISTRY="push.registry.devshift.net"
+fi
 
 export DOCKER_IMAGE="rh-che-server"
 
