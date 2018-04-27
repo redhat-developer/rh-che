@@ -95,6 +95,10 @@
             <artifactId>che-multiuser-keycloak-token-provider</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.che.multiuser</groupId>
+            <artifactId>che-multiuser-personal-account</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.che.plugin</groupId>
             <artifactId>che-plugin-github-oauth2</artifactId>
         </dependency>
