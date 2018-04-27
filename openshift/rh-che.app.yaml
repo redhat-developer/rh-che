@@ -275,6 +275,28 @@ objects:
               configMapKeyRef:
                 key: logs-encoding
                 name: rhche
+          - name: CHE_LOGS_SENTRY_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: che-logs-sentry-level
+                name: rhche
+          - name: SENTRY_DSN
+            valueFrom:
+              configMapKeyRef:
+                key: che-logs-sentry-dsn
+                name: rhche
+          - name: SENTRY_STACKTRACE_APP_PACKAGES
+            valueFrom:
+              configMapKeyRef:
+                key: sentry-stacktrace-app-packages
+                name: rhche
+          - name: SENTRY_ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                key: sentry-environment
+                name: rhche
+          - name: SENTRY_RELEASE
+            value: ${IMAGE_TAG}
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:

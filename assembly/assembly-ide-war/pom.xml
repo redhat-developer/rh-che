@@ -34,6 +34,14 @@
             <type>war</type>
         </dependency>
         <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry-logback</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
@@ -57,6 +65,8 @@
                                 <!-- dependency is required just to overlay it's content -->
                                 <dep>com.redhat.che:fabric8-ide-gwt-app</dep>
                                 <dep>net.logstash.logback:logstash-logback-encoder</dep>
+                                <dep>io.sentry:sentry</dep>
+                                <dep>io.sentry:sentry-logback</dep>
                             </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
