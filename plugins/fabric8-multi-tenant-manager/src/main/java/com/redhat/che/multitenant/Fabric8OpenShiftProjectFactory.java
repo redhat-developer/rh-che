@@ -11,7 +11,9 @@
 package com.redhat.che.multitenant;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
@@ -26,8 +28,10 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
 
   @Inject
   public Fabric8OpenShiftProjectFactory(
-      OpenShiftClientFactory clientFactory, Fabric8WorkspaceEnvironmentProvider envProvider) {
-    super(null, clientFactory);
+      @Nullable @Named("che.infra.openshift.project") String projectName,
+      OpenShiftClientFactory clientFactory,
+      Fabric8WorkspaceEnvironmentProvider envProvider) {
+    super(projectName, clientFactory);
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
