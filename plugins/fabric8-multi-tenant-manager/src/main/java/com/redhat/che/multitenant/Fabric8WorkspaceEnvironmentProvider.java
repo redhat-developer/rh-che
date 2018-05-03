@@ -100,6 +100,8 @@ public class Fabric8WorkspaceEnvironmentProvider {
 
     UserCheTenantData cheTenantData = getUserCheTenantData(subject);
 
+    checkClusterCapacity(cheTenantData);
+
     String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
     LOG.debug("OSO proxy URL - {}", osoProxyUrl);
     String userId = subject.getUserId();
@@ -138,11 +140,19 @@ public class Fabric8WorkspaceEnvironmentProvider {
     }
   }
 
+  private void checkClusterCapacity(UserCheTenantData data) throws InfrastructureException {
+    if (data.isClusterCapacityExhausted() == true) {
+      throw new InfrastructureException(
+          "Cannot start a workspace. OpenShift Online cluster is currently out of capacity");
+    }
+  }
+
   private UserCheTenantData getUserCheTenantData(Subject subject) throws InfrastructureException {
     UserCheTenantData tenantData = tenantDataProvider.getUserCheTenantData(subject, "che");
     return new UserCheTenantData(
         tenantData.getNamespace(),
         multiClusterOpenShiftProxy.getUrl(),
-        tenantData.getRouteBaseSuffix());
+        tenantData.getRouteBaseSuffix(),
+        tenantData.isClusterCapacityExhausted());
   }
 }

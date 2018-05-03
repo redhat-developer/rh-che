@@ -14,11 +14,14 @@ public class UserCheTenantData {
   private String namespace;
   private String clusterUrl;
   private String routePrefix;
+  private boolean clusterCapacityExhausted;
 
-  public UserCheTenantData(String namespace, String clusterUrl, String routePrefix) {
+  public UserCheTenantData(
+      String namespace, String clusterUrl, String routePrefix, boolean clusterCapacityExhausted) {
     this.namespace = namespace;
     this.clusterUrl = clusterUrl;
     this.routePrefix = routePrefix;
+    this.clusterCapacityExhausted = clusterCapacityExhausted;
   }
 
   public String getNamespace() {
@@ -33,8 +36,24 @@ public class UserCheTenantData {
     return routePrefix;
   }
 
+  public boolean isClusterCapacityExhausted() {
+    return clusterCapacityExhausted;
+  }
+
+  public void setClusterCapacityExhausted(boolean clusterCapacityExhausted) {
+    this.clusterCapacityExhausted = clusterCapacityExhausted;
+  }
+
   @Override
   public String toString() {
-    return "{" + namespace + "," + clusterUrl + "," + routePrefix + "}";
+    return "{"
+        + namespace
+        + ","
+        + clusterUrl
+        + ","
+        + routePrefix
+        + ","
+        + clusterCapacityExhausted
+        + "}";
   }
 }

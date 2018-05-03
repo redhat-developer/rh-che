@@ -46,7 +46,7 @@ import org.eclipse.che.commons.subject.Subject;
 public class TenantDataProvider {
 
   private static final int CACHE_TIMEOUT_MINUTES = 10;
-  private static final int CONCURRENT_USERS = 500;
+  private static final int CONCURRENT_USERS = 1000;
 
   private final HttpJsonRequestFactory httpJsonRequestFactory;
   private final String fabric8UserServiceEndpoint;
@@ -119,8 +119,11 @@ public class TenantDataProvider {
           String name = namespace.get("name").getAsString();
           String suffix = namespace.get("cluster-app-domain").getAsString();
           String cluster = namespace.get("cluster-url").getAsString();
+          boolean clusterCapacityExhausted =
+              namespace.get("cluster-capacity-exhausted").getAsBoolean();
 
-          UserCheTenantData cheTenantData = new UserCheTenantData(name, cluster, suffix);
+          UserCheTenantData cheTenantData =
+              new UserCheTenantData(name, cluster, suffix, clusterCapacityExhausted);
           UserCheTenantDataValidator.validate(cheTenantData);
           return cheTenantData;
         }
