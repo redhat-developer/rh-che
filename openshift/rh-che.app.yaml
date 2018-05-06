@@ -227,12 +227,12 @@ objects:
             valueFrom:
               secretKeyRef:
                   key: service.account.secret
-                  name: che
+                  name: rhche
           - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_ID
             valueFrom:
               secretKeyRef:
                   key: service.account.id
-                  name: che
+                  name: rhche
           - name: CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD
             valueFrom:
               configMapKeyRef:
