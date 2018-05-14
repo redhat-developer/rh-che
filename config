@@ -15,7 +15,7 @@ fi
 export DOCKER_IMAGE="rh-che-server"
 
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
-export RH_CHE_GIT_BRANCH=rh-che6
+export RH_CHE_GIT_BRANCH=master
 
 export NPM_CONFIG_PREFIX=~/.che_node_modules
 export PATH=$NPM_CONFIG_PREFIX/bin:$PATH

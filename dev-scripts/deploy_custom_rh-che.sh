@@ -48,7 +48,7 @@ function setVars() {
     export RH_CHE_DOCKER_IMAGE_TAG="latest";
     export RH_CHE_DOCKER_IMAGE_NAME="registry.devshift.net/che/rh-che-server";
     export RH_CHE_PROJECT_NAMESPACE=$(oc whoami)-che6-automated;
-    export RH_CHE_GITHUB_BRANCH=rh-che6;
+    export RH_CHE_GITHUB_BRANCH=master;
   fi
 }
 
