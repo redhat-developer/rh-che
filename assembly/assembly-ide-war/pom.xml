@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016-2017 Red Hat, Inc.
+    Copyright (c) 2016-2018 Red Hat, Inc.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -30,33 +30,30 @@
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>che-plugin-product-info</artifactId>
+            <artifactId>fabric8-ide-gwt-app</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry-logback</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-ide-war</artifactId>
             <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.multiuser</groupId>
-            <artifactId>che-multiuser-keycloak-ide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.multiuser</groupId>
-            <artifactId>che-multiuser-machine-authentication-ide</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-web-resources</id>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -64,144 +61,13 @@
                     <execution>
                         <id>analyze</id>
                         <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Source Generator invocation -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>gwt-xml</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.eclipse.che.util.GwtXmlGenerator</mainClass>
-                            <arguments>
-                                <argument>--rootDir=${generated.sources.directory}</argument>
-                                <argument>--loggingEnabled=${gwt.log.enable}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>extManager-client</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.eclipse.che.util.ExtensionManagerGenerator</mainClass>
-                            <arguments>
-                                <argument>--rootDir=${generated.sources.directory}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>IDEInjector-client</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.eclipse.che.util.IDEInjectorGenerator</mainClass>
-                            <arguments>
-                                <argument>--rootDir=${generated.sources.directory}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>DtoRegistry-client</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.eclipse.che.util.DtoFactoryVisitorRegistryGenerator</mainClass>
-                            <arguments>
-                                <argument>--rootDir=${generated.sources.directory}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.che.core</groupId>
-                <artifactId>che-core-dyna-provider-generator-maven-plugin</artifactId>
-                <version>${che.version}</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${generated.sources.directory}</outputDirectory>
-                </configuration>
-            </plugin>
-            <!-- GWT Maven Plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>gwt-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <!--<goal>test</goal> -->
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-codeserver</artifactId>
-                        <version>${com.google.gwt.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-dev</artifactId>
-                        <version>${com.google.gwt.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-user</artifactId>
-                        <version>${com.google.gwt.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <gwtSdkFirstInClasspath>true</gwtSdkFirstInClasspath>
-                    <extraJvmArgs>${gwt.compiler.extraJvmArgs}</extraJvmArgs>
-                    <modules>
-                        <module>org.eclipse.che.ide.IDE</module>
-                    </modules>
-                    <!-- don' remove it we will use it then need to found 
-                        bug in compiled JS -->
-                    <!--style>DETAILED</style -->
-                    <logLevel>${gwt.compiler.logLevel}</logLevel>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>buildnumber</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <echo append="false" file="${project.build.directory}/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties">revision = ${revision}
-                                    buildTime = ${timestamp}
-                                    version = ${project.version}</echo>
-                            </tasks>
+                            <ignoredUnusedDeclaredDependencies>
+                                <!-- dependency is required just to overlay it's content -->
+                                <dep>com.redhat.che:fabric8-ide-gwt-app</dep>
+                                <dep>net.logstash.logback:logstash-logback-encoder</dep>
+                                <dep>io.sentry:sentry</dep>
+                                <dep>io.sentry:sentry-logback</dep>
+                            </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>
@@ -217,67 +83,24 @@
                             <type>war</type>
                             <includes>
                                 <include>_app/IDE.html</include>
-                                <include>_app/browserNotSupported.js</include>
+                                <include>_app/IDE.css</include>
+                                <include>_app/factory-review.svg</include>
+                                <include>_app/factory-contribute.svg</include>
                                 <include>_app/favicon.ico</include>
                                 <include>META-INF/context.xml</include>
                                 <include>WEB-INF/rewrite.config</include>
                                 <include>WEB-INF/web.xml</include>
                                 <include>WEB-INF/classes/org/eclipse/che/*.class</include>
+                                <include>WEB-INF/lib/</include>
                             </includes>
                         </overlay>
                         <overlay />
                     </overlays>
-                    <packagingExcludes>%regex[WEB-INF\\lib\\(?!.*j2ee).*.jar]</packagingExcludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${generated.sources.directory}</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat>
-                    <buildNumberPropertyName>revision</buildNumberPropertyName>
-                    <doCheck>false</doCheck>
-                    <doUpdate>false</doUpdate>
-                    <shortRevisionLength>16</shortRevisionLength>
                 </configuration>
             </plugin>
         </plugins>
     </build>
     <profiles>
-        <profile>
-            <id>fast</id>
-            <properties>
-                <!-- for some unknown reason the same argument works well in upstream che but not here-->
-                <!-- gwt.compiler.localWorkers>2 -T 1C</gwt.compiler.localWorkers -->
-                <gwt.compiler.localWorkers>2</gwt.compiler.localWorkers>
-            </properties>
-        </profile>
         <profile>
             <id>withDashboard</id>
             <activation>
@@ -286,23 +109,25 @@
                     <value>!true</value>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.che</groupId>
-                    <artifactId>assembly-ide-war</artifactId>
-                    <classifier>classes</classifier>
-                    <exclusions>
-                        <exclusion>
-                            <artifactId>che-plugin-svn-ext-ide</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>che-plugin-product-info</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.che.core</groupId>
+                        <artifactId>che-core-dynamodule-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <scanWarDependencies>true</scanWarDependencies>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>withoutDashboard</id>
@@ -314,33 +139,7 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-src-without-dashboard</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${project.build.directory}/patched/src</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src-without-dashboard/main</directory>
-                                        </resource>
-                                        <resource>
-                                            <directory>src-without-dashboard/test</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    
-                    <!--  add classifier without-dashboard -->
-                    
+                    <!-- add classifier without-dashboard -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
@@ -358,10 +157,6 @@
                     <exclusions>
                         <exclusion>
                             <artifactId>che-plugin-ext-dashboard-client</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>che-plugin-svn-ext-ide</artifactId>
                             <groupId>org.eclipse.che.plugin</groupId>
                         </exclusion>
                         <exclusion>

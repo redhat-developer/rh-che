@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016-2017 Red Hat, Inc.
+    Copyright (c) 2016-2018 Red Hat, Inc.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>5.22.1</version>
+        <version>6.4.1</version>
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>fabric8-ide-parent</artifactId>
@@ -32,6 +32,7 @@
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
+        <sentry.version>1.7.2</sentry.version>
         <unleash.client.java.version>3.0.0</unleash.client.java.version>
         <withoutDashboard>false</withoutDashboard>
     </properties>
@@ -40,12 +41,6 @@
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>che-plugin-bayesian-lang-server</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>che-plugin-product-info</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
             </dependency>
@@ -88,6 +83,12 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-ide-gwt-app</artifactId>
+                <version>${redhat.che.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-ide-stacks</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>jar</type>
@@ -100,15 +101,25 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-workspace-logging-override</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
+                <artifactId>fabric8-plugin-product-info</artifactId>
+                <version>${redhat.che.version}</version>
+                <type>gwt-lib</type>
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>ls-bayesian-agent</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry</artifactId>
+                <version>${sentry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry-logback</artifactId>
+                <version>${sentry.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.finn.unleash</groupId>
@@ -123,120 +134,16 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che</groupId>
-                <artifactId>assembly-wsmaster-war</artifactId>
+                <artifactId>fabric8-ide-gwt-app</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>gwt-app</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che</groupId>
+                <artifactId>che-parent</artifactId>
                 <version>${che.version}</version>
                 <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-ide-war</artifactId>
-                <version>${che.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-ide-war</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-ide-war</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-                <classifier>sources</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-wsagent-war</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-wsagent-war</artifactId>
-                <version>${che.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-wsagent-war</artifactId>
-                <version>${che.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-wsmaster-war</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-wsmaster-war</artifactId>
-                <version>${che.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.assembly-multiuser</groupId>
-                <artifactId>assembly-wsmaster-war</artifactId>
-                <version>${che.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.core</groupId>
-                <artifactId>che-wsagent-core</artifactId>
-                <version>${che.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.dashboard</groupId>
-                <artifactId>che-dashboard-war</artifactId>
-                <version>${che.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.multiuser</groupId>
-                <artifactId>che-multiuser-keycloak-ide</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.multiuser</groupId>
-                <artifactId>che-multiuser-keycloak-server</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.multiuser</groupId>
-                <artifactId>che-multiuser-keycloak-shared</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.multiuser</groupId>
-                <artifactId>che-multiuser-keycloak-token-provider</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.multiuser</groupId>
-                <artifactId>che-multiuser-machine-authentication-ide</artifactId>
-                <version>${che.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.multiuser</groupId>
-                <artifactId>che-multiuser-personal-account</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che.plugin</groupId>
-                <artifactId>che-plugin-docker-machine</artifactId>
-                <version>${che.version}</version>
-                <type>jar</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

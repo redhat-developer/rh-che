@@ -1,0 +1,11 @@
+# Name: rhche-prerequisites
+# Description: Remove rh-che add on pre-requisites
+# Url: https://github.com/redhat-developer/rh-che
+# Required-Vars: NAMESPACE
+# Var-Defaults: NAMESPACE=rhche
+
+echo [CHE] Removing #{NAMESPACE} project
+oc delete project #{NAMESPACE}
+oc adm policy remove-role-from-user system:image-builder developer -n openshift
+
+echo Eclipse Che prerequisites addon removed

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016-2017 Red Hat, Inc.
+    Copyright (c) 2016-2018 Red Hat, Inc.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <outputDirectory>tomcat/webapps</outputDirectory>
-            <outputFileNameMapping>wsmaster.war</outputFileNameMapping>
+            <outputFileNameMapping>api.war</outputFileNameMapping>
             <includes>
                 <include>com.redhat.che:fabric8-ide-assembly-wsmaster-war</include>
             </includes>
@@ -38,13 +38,11 @@
             <outputDirectory />
             <excludes>
                 <exclude>**/tomcat/webapps/ROOT.war</exclude>
-                <exclude>**/tomcat/webapps/wsmaster.war</exclude>
+                <exclude>**/tomcat/webapps/api.war</exclude>
                 <exclude>**/lib/ws-agent.tar.gz</exclude>
                 <exclude>**/tomcat/webapps/dashboard.war</exclude>
                 <exclude>**/tomcat/webapps/swagger.war</exclude>
                 <exclude>**/tomcat/webapps/docs.war</exclude>
-                <exclude>**/stacks/stacks.json</exclude>
-                <exclude>**/tomcat/conf/tomcat-logger.xml</exclude>
             </excludes>
         </fileSet>
         <fileSet>

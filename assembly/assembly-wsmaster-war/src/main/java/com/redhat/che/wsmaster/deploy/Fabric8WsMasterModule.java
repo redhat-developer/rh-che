@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Red Hat, Inc.
+ * Copyright (c) 2016-2018 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,9 @@ import org.eclipse.che.security.oauth.OAuthAuthenticator;
 public class Fabric8WsMasterModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(org.eclipse.che.api.workspace.server.WorkspaceFilesCleaner.class)
-        .to(org.eclipse.che.plugin.openshift.client.OpenShiftWorkspaceFilesCleaner.class);
+    bind(org.eclipse.che.security.oauth.shared.OAuthTokenProvider.class)
+        .to(org.eclipse.che.security.oauth.OAuthAuthenticatorTokenProvider.class);
+    bind(org.eclipse.che.security.oauth.OAuthAuthenticationService.class);
     Multibinder<OAuthAuthenticator> oAuthAuthenticators =
         Multibinder.newSetBinder(binder(), OAuthAuthenticator.class);
     oAuthAuthenticators.addBinding().to(OpenShiftGitHubOAuthAuthenticator.class);

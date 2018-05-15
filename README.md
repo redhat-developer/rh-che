@@ -16,25 +16,25 @@ that adds some Red Hat specific plugins / behaviors up to the standard upstream 
 distribution. The Red Hat distribution powers [openshift.io](https://openshift.io) developers workspaces.
 
 Red Hat modifications against the upstream Che include:
-- The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
-- Keycloak integration
-- [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server) 
+
+* The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
+* [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server)
 
 ## How to build it
 
 ### Build prerequisites
 
 * Set some environment variables:
-    
-    * `DOCKER_HUB_NAMESPACE` can be overridden to point
+
+  * `DOCKER_HUB_NAMESPACE` can be overridden to point
     to your own Docker Hub account
-    
+
     ```bash
     export DOCKER_HUB_NAMESPACE=myDockerNamspace
     ```
 
     The docker namespace used by default is `docker.io/rhchestage`
-    
+
 ### Build Red Hat distribution
 
 ```bash
@@ -50,7 +50,7 @@ distribution and tag them appropriately.
 
 The optional build scripts parameters are the [parameters of the underlying Maven build](#maven-build-parameters).
 
-### Docker scripts to create and tag images from the RH build artifacts 
+### Docker scripts to create and tag images from the RH build artifacts
 
 ##### In the local docker environment
 
@@ -59,7 +59,7 @@ dev-scripts/local_docker_create_images_and_tag.sh
 ```
 __Note:__ This step is already included in the build scripts.
 However, if you plan to deploy or rollupdate to Minishift, you should also create/tag docker images
-in the Minishift docker environment, as detailed in next section. 
+in the Minishift docker environment, as detailed in next section.
 
 ##### In the Minishift docker environment
 
@@ -95,15 +95,34 @@ export OPENSHIFT_FLAVOR=ocp && ./dev-scripts/openshift_deploy.sh
 
 ### Deploy to Minishift
 
-```bash
-SCRIPT_URL=https://raw.githubusercontent.com/redhat-developer/rh-che/master/dev-scripts/openshift_deploy.sh
-curl -fsSL ${SCRIPT_URL} -o get-che.sh && bash get-che.sh
-```
+The easiest way to deploy Che on minishift is to use the minishift addon:
 
-Of course if you have cloned [redhat-developer/rh-che](https://github.com/redhat-developer/rh-che) you can deploy Che on minishift executing:
+* Clone this repository
+
+    ```bash
+    git clone https://github.com/redhat-developer/rh-che
+    cd rh-che
+    ```
+
+* Install rhche-prerequisites minishift addon
+
+    ```bash
+    minishift addons install openshift/minishift-addons/rhche-prerequisites
+    minishift addons apply rhche-prerequisites
+    ```
+
+* Install rhche minishift addon
+
+    ```bash
+    minishift addons install openshift/minishift-addons/rhche
+    minishift addons apply rhche
+    ```
+
+To remove the addon:
 
 ```bash
-./dev-scripts/openshift_deploy.sh
+minishift addons remove rhche && minishift addons uninstall rhche
+minishift addons remove rhche-prerequisites && minishift addons uninstall rhche-prerequisites
 ```
 
 ### Deploy to openshift.io
@@ -156,7 +175,7 @@ dev-scripts/openshift_deploy.sh --command cleanup
 dev-scripts/openshift_deploy.sh --command rollupdate
 ```
 
-__Warning__: If you are deploying the RH distribution build, ensure that you created / tagged the Che docker images 
+__Warning__: If you are deploying the RH distribution build, ensure that you created / tagged the Che docker images
 [*in the Minishift docker environment*](#in-the-minishift-docker-environment).
 If you want to build and deploy the RH distribution to Minishift in one go, you can use the
 [*all-in-one scripts*](#all-in-one-scripts-for-minishift)
@@ -175,9 +194,9 @@ the minishift docker daemon,
     - runs `dev-scripts/build_fabric8.sh [PARAMETERS]`
     - runs `dev-scripts/openshift_deploy.sh --command cleanup`
     - runs `dev-scripts/openshift_deploy.sh`
-    
+
 - `dev-scripts/minishift_build_fabric8_and_rollupdate.sh [PARAMETERS]`:
-    - changes the current docker environment to use 
+    - changes the current docker environment to use
 the minishift docker daemon,
     - runs `dev-scripts/build_fabric8.sh [PARAMETERS]`
     - runs `dev-scripts/openshift_deploy.sh --command rollupdate`
@@ -187,12 +206,12 @@ the minishift docker daemon,
 ### Maven build details
 
 The result of the RedHat Che distribution build will be available at the following location:
-    
+
     rh-che/assembly/assembly-main/target/eclipse-che-fabric8-1.0.0-SNAPSHOT
 
 Alternatively, if the option to remove the Dashboard has been enabled then the classifier `without-dashboard`
 will be used and the result of the RedHat Che distribution build will be available at the following location:
-    
+
     rh-che/assembly/assembly-main/target/eclipse-che-fabric8-1.0.0-SNAPSHOT-without-dashboard
 
 
@@ -210,5 +229,5 @@ For instance, the profile `fast` will skip all the tests and checks as describe 
 
 ##### Enabling / Disabling the Dashboard
 
-By default the Che Dashboard is part of the RedHat Che distribution.
+By default the Che Dashboard is part of the Red Hat Che distribution.
 Howvever it can removed by with the `-DwithoutDashboard` argument

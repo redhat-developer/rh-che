@@ -12,7 +12,7 @@ ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
 
-UPSTREAM_TAG=$(sed -n 's/^revision = \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../assembly/assembly-build-info/target/dependency/WEB-INF/classes/org/eclipse/che/ide/ext/help/client/BuildInfo.properties)
+UPSTREAM_TAG=$(sed -n 's/^SCM-Revision: \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../assembly/assembly-wsmaster-war/target/war/work/org.eclipse.che/assembly-wsmaster-war/META-INF/MANIFEST.MF)
 
 # Now lets build the local docker images
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
@@ -36,10 +36,6 @@ do
       ;;
   esac
 
-  # fetch the right upstream based che-server image to build from
-  docker pull ${CHE_DOCKER_BASE_IMAGE}
-  docker tag ${CHE_DOCKER_BASE_IMAGE} eclipse/che-server:local
-
   # Use of folder
   LOCAL_ASSEMBLY_DIR="${DIR}"/eclipse-che
 
@@ -49,27 +45,28 @@ do
 
   echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
   cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
-  
-  bash ./build.sh --organization:${DOCKER_HUB_NAMESPACE} --tag:${NIGHTLY}
+
+  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+    docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
+  else
+    echo "ERROR: Can not push to registry.devshift.net: credentials are not set. Aborting"
+    exit 1
+  fi
+
+  docker build -t ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG} -f $DIR/${DOCKERFILE} .
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
     exit 2
   fi
 
-  # cleanup
-  docker rmi eclipse/che-server:local
-
   # lets change the tag and push it to the registry
-  docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${TAG}
-  docker tag ${DOCKER_HUB_NAMESPACE}/che-server:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${NIGHTLY}
+  docker tag ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY}
     
-  dockerTags="${dockerTags} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${NIGHTLY} ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${TAG}"
-    
-  if [ "$DeveloperBuild" != "true" ]
-  then
-    docker login -u ${DOCKER_HUB_USER} -p $DOCKER_HUB_PASSWORD -e noreply@redhat.com 
-    docker push ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${NIGHTLY}
-    docker push ${DOCKER_HUB_NAMESPACE}/che-server-multiuser:${TAG}
+  dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}"
+
+  if [ "$DeveloperBuild" != "true" ]; then
+      docker push ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY}
+      docker push ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}
   fi
 done
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016-2017 Red Hat, Inc.
+    Copyright (c) 2016-2018 Red Hat, Inc.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -28,6 +28,14 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
@@ -37,38 +45,46 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-workspace-logging-override</artifactId>
+            <artifactId>ls-bayesian-agent</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>ls-bayesian-agent</artifactId>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry-logback</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
             <artifactId>assembly-wsmaster-war</artifactId>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>che-core-ide-stacks</artifactId>
-                    <groupId>org.eclipse.che.core</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.assembly-multiuser</groupId>
-            <artifactId>assembly-wsmaster-war</artifactId>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>che-core-ide-stacks</artifactId>
-                    <groupId>org.eclipse.che.core</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.assembly-multiuser</groupId>
-            <artifactId>assembly-wsmaster-war</artifactId>
             <type>war</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>che-core-ide-stacks</artifactId>
+                    <groupId>org.eclipse.che.core</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-auth-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-user</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-commons-inject</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.multiuser</groupId>
@@ -77,6 +93,14 @@
         <dependency>
             <groupId>org.eclipse.che.multiuser</groupId>
             <artifactId>che-multiuser-keycloak-token-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.multiuser</groupId>
+            <artifactId>che-multiuser-personal-account</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.plugin</groupId>
+            <artifactId>che-plugin-github-oauth2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -96,6 +120,29 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <id>repack</id>
+                    <phase>process-classes</phase>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                    <configuration>
+                      <target>
+                        <!-- note that here we reference previously declared dependency -->
+                        <unzip src="${org.eclipse.che.multiuser:che-multiuser-keycloak-server:jar}" dest="${project.build.directory}/tmpKeycloakModule"/>
+                        <delete file="${project.build.directory}/tmpKeycloakModule/org/eclipse/che/multiuser/keycloak/server/deploy/KeycloakModule.class"/> 
+                        <!-- now do what you need to any of unpacked files under target/tmp/ -->
+                        <zip basedir="${project.build.directory}/tmpKeycloakModule" destfile="${project.build.directory}/${project.build.finalName}/WEB-INF/lib/che-multiuser-keycloak-server-rhche-${che.version}.jar"/>
+                        <!-- now the modified jar is available  -->
+                      </target>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.che.core</groupId>
                 <artifactId>che-core-dynamodule-maven-plugin</artifactId>
                 <executions>
@@ -108,13 +155,6 @@
                 </executions>
                 <configuration>
                     <scanWarDependencies>true</scanWarDependencies>
-                    <skipResources>
-                        <skipResource>.*WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class</skipResource>
-                        <skipResource>.*WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterServletModule.*</skipResource>
-                        <skipResource>.*WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.*</skipResource>
-                        <skipResource>.*LocalModule.class</skipResource>
-                        <skipResource>.*LocalServletModule.class</skipResource>
-                    </skipResources>
                 </configuration>
             </plugin>
             <plugin>
@@ -123,18 +163,14 @@
                 <configuration>
                     <overlays>
                         <overlay>
-                            <groupId>org.eclipse.che.assembly-multiuser</groupId>
+                            <groupId>org.eclipse.che</groupId>
                             <artifactId>assembly-wsmaster-war</artifactId>
                             <type>war</type>
                         </overlay>
                     </overlays>
-                    <packagingExcludes>WEB-INF/lib/wsmaster-local*.jar,
+                    <packagingExcludes>WEB-INF/lib/che-multiuser-keycloak-server-${che.version}.jar,
                         WEB-INF/lib/che-core-ide-stacks-${che.version}.jar,
-                        WEB-INF/classes/che-in-che.json,
-                        WEB-INF/lib/che-core-db-vendor-h2-*.jar,
-                        WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterModule.class,
-                        WEB-INF/classes/org/eclipse/che/api/deploy/LocalWsMasterModule.class,
-                        WEB-INF/classes/org/eclipse/che/api/deploy/CheWsMasterServletModule.class</packagingExcludes>
+                        WEB-INF/classes/che-in-che.json</packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -144,7 +180,12 @@
                     <execution>
                         <id>analyze</id>
                         <configuration>
-                            <skip>true</skip>
+                            <ignoredUnusedDeclaredDependencies>
+                                <dep>io.sentry:sentry</dep>
+                                <dep>io.sentry:sentry-logback</dep>
+                                <dep>com.redhat.che:fabric8-ide-stacks</dep>
+                                <dep>org.eclipse.che.multiuser:che-multiuser-keycloak-server</dep>
+                            </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>

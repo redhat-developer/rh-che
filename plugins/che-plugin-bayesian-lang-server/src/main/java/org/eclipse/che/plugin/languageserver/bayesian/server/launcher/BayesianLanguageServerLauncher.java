@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Red Hat, Inc.
+ * Copyright (c) 2016-2018 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -107,13 +107,13 @@ public class BayesianLanguageServerLauncher extends LanguageServerLauncherTempla
         Arrays.asList(
             new DocumentFilter(
                 BayesianLanguageServerModule.TXT_LANGUAGE_ID, //
-                "requirements\\.txt", //
+                ".*/requirements\\.txt", //
                 null), //
             new DocumentFilter(
                 JsonModule.LANGUAGE_ID, //
-                "package\\.json", //
+                "./*package\\.json", //
                 null),
-            new DocumentFilter("pom", "pom\\.xml", null)) //
+            new DocumentFilter("pom", ".*/pom\\.xml", null)) //
         );
   }
 }

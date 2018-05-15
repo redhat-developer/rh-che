@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rhche
+type: Opaque
+data:
+  infra-machine-start-timeout: "5"
+  infra-pvc-strategy: "common"
+  infra-trust-certs: "true"
+  multi-user: "true"
+  workspace-storage: "/home/user/che/workspaces"
+  local-conf-dir: "/etc/conf"
+  che.logs.dir: "/data/logs"
+  log-level: "INFO"
+  remote-debugging-enabled: "false"
+  workspaces-memory-limit: "2400"
+  workspaces-memory-limit-max: "2400mb"
+  enable-workspaces-autostart: "false"
+  keycloak-github-endpoint: "NULL"
+  che-server-java-opts: "-XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Xmx180m -Dfile.encoding=UTF8"
+  che-workspaces-java-opts: "-XX:+UseG1GC -XX:+UseStringDeduplication -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1200m -Xms256m"
+  che-openshift-secure-routes: "false"
+  che-secure-external-urls: "false"
+  che-openshift-precreate-subpaths: "false"
+  che-fabric8-multitenant: "true"
+  che-workspace-logs: "/workspace_logs"
+  che-keycloak-realm: "che"
+  che-keycloak-client-id: "che-public"
+  che-keycloak-oidc-provider: "NULL"
+  che-keycloak-use-nonce: "false"
+  che-workspace-server-ping-success-threshold: "2"
+  che-limits-user-workspaces-run-count: "1"
+  che.workspace.agent.dev.inactive_stop_timeout_ms: "1800000"

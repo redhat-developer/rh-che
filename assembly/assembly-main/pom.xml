@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016-2017 Red Hat, Inc.
+    Copyright (c) 2016-2018 Red Hat, Inc.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -33,14 +33,28 @@
             <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
             <type>war</type>
         </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-stacks</artifactId>
-            <type>jar</type>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                    <buildNumberPropertyName>revision</buildNumberPropertyName>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                    <shortRevisionLength>16</shortRevisionLength>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -83,6 +97,25 @@
                                     <outputDirectory>${project.build.directory}/dependency</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>buildnumber</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <!-- revision will be used by .ci/cico_build.sh for evaluation of image tag -->
+                            <tasks>
+                                <echo append="false" file="${project.build.directory}/build-info/revision">${revision}</echo>
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>

@@ -2,21 +2,21 @@ kind: Template
 apiVersion: v1
 metadata:
   labels:
-    app: che
-  name: che
+    app: rhche
+  name: rhche
 objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
     labels:
-      app: che
-    name: che
+      app: rhche
+    name: rhche
 - apiVersion: v1
   kind: Service
   metadata:
     labels:
-      app: che
-    name: che-host
+      app: rhche
+    name: rhche-host
   spec:
     ports:
     - name: http
@@ -24,13 +24,13 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      app: che
+      app: rhche
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     labels:
-      app: che
-    name: che-data-volume
+      app: rhche
+    name: rhche-data-volume
   spec:
     accessModes:
     - ReadWriteOnce
@@ -41,13 +41,13 @@ objects:
   kind: DeploymentConfig
   metadata:
     labels:
-      app: che
-    name: che
+      app: rhche
+    name: rhche
   spec:
     replicas: 1
     revisionHistoryLimit: 2
     selector:
-      app: che
+      app: rhche
     strategy:
       recreateParams:
         timeoutSeconds: 10000
@@ -55,244 +55,258 @@ objects:
     template:
       metadata:
         labels:
-          app: che
+          app: rhche
       spec:
         containers:
         - env:
-          - name: CHE_DOCKER_IP_EXTERNAL
-            valueFrom:
-              configMapKeyRef:
-                key: che-host
-                name: che
-          - name: CHE_WORKSPACE_STORAGE
-            valueFrom:
-              configMapKeyRef:
-                key: workspace-storage
-                name: che
-          - name: CHE_LOGS_DIR
-            valueFrom:
-              configMapKeyRef:
-                key: che.logs.dir
-                name: che
-          - name: CHE_WORKSPACE_STORAGE_CREATE_FOLDERS
-            valueFrom:
-              configMapKeyRef:
-                key: workspace-storage-create-folders
-                name: che
-          - name: CHE_LOCAL_CONF_DIR
-            valueFrom:
-              configMapKeyRef:
-                key: local-conf-dir
-                name: che
-          - name: CHE_OPENSHIFT_PROJECT
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: CHE_OPENSHIFT_SERVICEACCOUNTNAME
-            valueFrom:
-              configMapKeyRef:
-                key: openshift-serviceaccountname
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY
-            valueFrom:
-              configMapKeyRef:
-                key: che-server-evaluation-strategy
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_TEMPLATE
-            valueFrom:
-              configMapKeyRef:
-                key: che.docker.server_evaluation_strategy.custom.template
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_EXTERNAL_PROTOCOL
-            valueFrom:
-              configMapKeyRef:
-                key: che.docker.server_evaluation_strategy.custom.external.protocol
-                name: che
-          - name: CHE_PREDEFINED_STACKS_RELOAD__ON__START
-            valueFrom:
-              configMapKeyRef:
-                key: che.predefined.stacks.reload_on_start
-                name: che
-          - name: CHE_LOG_LEVEL
-            valueFrom:
-              configMapKeyRef:
-                key: log-level
-                name: che
-          - name: CHE_PORT
-            valueFrom:
-              configMapKeyRef:
-                key: port
-                name: che
-          - name: CHE_DOCKER_CONNECTOR
-            valueFrom:
-              configMapKeyRef:
-                key: docker-connector
-                name: che
-          - name: CHE_DEBUG_SERVER
-            valueFrom:
-              configMapKeyRef:
-                key: remote-debugging-enabled
-                name: che
-          - name: CHE_OAUTH_GITHUB_FORCEACTIVATION
-            valueFrom:
-              configMapKeyRef:
-                key: che-oauth-github-forceactivation
-                name: che
-          - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_OVERRIDE
-            valueFrom:
-              configMapKeyRef:
-                key: workspaces-memory-limit
-                name: che
-          - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_REQUEST
-            valueFrom:
-              configMapKeyRef:
-                key: workspaces-memory-request
-                name: che
-          - name: CHE_WORKSPACE_AUTO__START
-            valueFrom:
-              configMapKeyRef:
-                key: enable-workspaces-autostart
-                name: che
-          - name: JAVA_OPTS
-            valueFrom:
-              configMapKeyRef:
-                key: che-server-java-opts
-                name: che
-          - name: CHE_WORKSPACE_JAVA_OPTIONS
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspaces-java-opts
-                name: che
-          - name: CHE_OPENSHIFT_SECURE_ROUTES
-            valueFrom:
-              configMapKeyRef:
-                key: che-openshift-secure-routes
-                name: che
-          - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_SECURE_EXTERNAL_URLS
-            valueFrom:
-              configMapKeyRef:
-                key: che-secure-external-urls
-                name: che
-          - name: CHE_OPENSHIFT_SERVER_INACTIVE_STOP_TIMEOUT_MS
-            valueFrom:
-              configMapKeyRef:
-                key: che-server-timeout-ms
-                name: che
-          - name: CHE_OPENSHIFT_PRECREATE_WORKSPACE_DIRS
-            valueFrom:
-              configMapKeyRef:
-                key: che-openshift-precreate-subpaths
-                name: che
-          - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
-            valueFrom:
-              configMapKeyRef:
-                key: keycloak-github-endpoint
-                name: che
-          - name: CHE_WORKSPACE_AUTO__SNAPSHOT
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-auto-snapshot
-                name: che
-          - name: CHE_FABRIC8_MULTITENANT
-            valueFrom:
-              configMapKeyRef:
-                key: che-fabric8-multitenant
-                name: che
-          - name: CHE_FABRIC8_USER__SERVICE_ENDPOINT
-            valueFrom:
-              configMapKeyRef:
-                key: che-fabric8-user-service-endpoint
-                name: che
-          - name: CHE_FABRIC8_AUTH_ENDPOINT
-            valueFrom:
-              configMapKeyRef:
-                key: che-fabric8-auth-endpoint
-                name: che
-          - name: CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL
-            valueFrom:
-              configMapKeyRef:
-                key: che-fabric8-multicluster-oso-proxy-url
-                name: che
-          - name: CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR
-            valueFrom:
-              configMapKeyRef:
-                key: che-docker-enable-container-stop-detector
-                name: che
-          - name: CHE_WORKSPACE_CHE__SERVER__ENDPOINT
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-che-server-endpoint
-                name: che
-          - name: CHE_WORKSPACE_CHE_LOGS
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-logs
-                name: che
-          - name: CHE_KEYCLOAK_AUTH__SERVER__URL
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-auth-server-url
-                name: che
-          - name: CHE_KEYCLOAK_REALM
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-realm
-                name: che
-          - name: CHE_KEYCLOAK_CLIENT__ID
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-client-id
-                name: che
           - name: CHE_HOST
             valueFrom:
               configMapKeyRef:
                 key: che-host
-                name: che
+                name: rhche
+          - name: CHE_WORKSPACE_STORAGE
+            valueFrom:
+              configMapKeyRef:
+                key: workspace-storage
+                name: rhche
+          - name: CHE_LOGS_DIR
+            valueFrom:
+              configMapKeyRef:
+                key: che.logs.dir
+                name: rhche
+          - name: CHE_LOCAL_CONF_DIR
+            valueFrom:
+              configMapKeyRef:
+                key: local-conf-dir
+                name: rhche
+          - name: CHE_INFRA_OPENSHIFT_PROJECT
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: CHE_PREDEFINED_STACKS_RELOAD__ON__START
+            valueFrom:
+              configMapKeyRef:
+                key: che.predefined.stacks.reload_on_start
+                name: rhche
+          - name: CHE_WORKSPACE_AGENT_DEV_INACTIVE__STOP__TIMEOUT__MS
+            valueFrom:
+              configMapKeyRef:
+                key: che.workspace.agent.dev.inactive_stop_timeout_ms
+                name: rhche
+          - name: CHE_LOG_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: log-level
+                name: rhche
+          - name: CHE_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: port
+                name: rhche
+          - name: CHE_DEBUG_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: remote-debugging-enabled
+                name: rhche
+          - name: CHE_LIMITS_WORKSPACE_ENV_RAM
+            valueFrom:
+              configMapKeyRef:
+                key: workspaces-memory-limit-max
+                name: rhche
+          - name: CHE_WORKSPACE_DEFAULT__MEMORY__MB
+            valueFrom:
+              configMapKeyRef:
+                key: workspaces-memory-limit
+                name: rhche
+          - name: CHE_WORKSPACE_AUTO__START
+            valueFrom:
+              configMapKeyRef:
+                key: enable-workspaces-autostart
+                name: rhche
+          - name: JAVA_OPTS
+            valueFrom:
+              configMapKeyRef:
+                key: che-server-java-opts
+                name: rhche
+          - name: CHE_WORKSPACE_JAVA__OPTIONS
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspaces-java-opts
+                name: rhche
+          - name: CHE_INFRA_OPENSHIFT_TLS__ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: che-openshift-secure-routes
+                name: rhche
+          - name: CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS
+            valueFrom:
+              configMapKeyRef:
+                key: che-openshift-precreate-subpaths
+                name: rhche
+          - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: keycloak-github-endpoint
+                name: rhche
+          - name: CHE_FABRIC8_MULTITENANT
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-multitenant
+                name: rhche
+          - name: CHE_FABRIC8_USER__SERVICE_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-user-service-endpoint
+                name: rhche
+          - name: CHE_FABRIC8_AUTH_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-auth-endpoint
+                name: rhche
+          - name: CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL
+            valueFrom:
+              configMapKeyRef:
+                key: che-fabric8-multicluster-oso-proxy-url
+                name: rhche
+          - name: CHE_API
+            valueFrom:
+              configMapKeyRef:
+                key: che-api
+                name: rhche
+          - name: CHE_WEBSOCKET_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                key: che-websocket-endpoint
+                name: rhche
+          - name: CHE_WORKSPACE_LOGS_ROOT__DIR
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspace-logs
+                name: rhche
+          - name: CHE_KEYCLOAK_AUTH__SERVER__URL
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-auth-server-url
+                name: rhche
+          - name: CHE_KEYCLOAK_REALM
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-realm
+                name: rhche
+          - name: CHE_KEYCLOAK_CLIENT__ID
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-client-id
+                name: rhche
+          - name: CHE_KEYCLOAK_OIDC__PROVIDER
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-oidc-provider
+                name: rhche
+          - name: CHE_KEYCLOAK_USE__NONCE
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-use-nonce
+                name: rhche
           - name: CHE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:
                   key: che.jdbc.password
-                  name: che
+                  name: rhche
           - name: CHE_JDBC_URL
             valueFrom:
               secretKeyRef:
                   key: che.jdbc.url
-                  name: che
+                  name: rhche
           - name: CHE_JDBC_USERNAME
             valueFrom:
               secretKeyRef:
                   key: che.jdbc.username
-                  name: che
+                  name: rhche
           - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_SECRET
             valueFrom:
               secretKeyRef:
                   key: service.account.secret
-                  name: che
+                  name: rhche
           - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_ID
             valueFrom:
               secretKeyRef:
                   key: service.account.id
-                  name: che
-          - name: CHE_WORKSPACE_AGENT_DEV_PING__SUCCESS__THRESHOLD
+                  name: rhche
+          - name: CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD
             valueFrom:
               configMapKeyRef:
-                key: che-wsagent-ping-success-threshold
-                name: che
+                key: che-workspace-server-ping-success-threshold
+                name: rhche
           - name: CHE_LIMITS_USER_WORKSPACES_RUN_COUNT
             valueFrom:
               configMapKeyRef:
                 key: che-limits-user-workspaces-run-count
-                name: che
+                name: rhche
+          - name: CHE_INFRASTRUCTURE_ACTIVE
+            value: "openshift"
+          - name: CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL
+            valueFrom:
+              configMapKeyRef:
+                key: infra-bootstrapper-binary-url
+                name: rhche
+          - name: CHE_INFRA_KUBERNETES_MACHINE__START__TIMEOUT__MIN
+            valueFrom:
+              configMapKeyRef:
+                key: infra-machine-start-timeout
+                name: rhche
+          - name: CHE_INFRA_KUBERNETES_PVC_STRATEGY
+            valueFrom:
+              configMapKeyRef:
+                key: infra-pvc-strategy
+                name: rhche
+          - name: CHE_INFRA_KUBERNETES_TRUST__CERTS
+            valueFrom:
+              configMapKeyRef:
+                key: infra-trust-certs
+                name: rhche
+          - name: CHE_MULTIUSER
+            valueFrom:
+              configMapKeyRef:
+                key: multi-user
+                name: rhche
+          - name: CHE_LOGS_APPENDERS_IMPL
+            valueFrom:
+              configMapKeyRef:
+                key: logs-encoding
+                name: rhche
+          - name: CHE_LOGS_SENTRY_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: che-logs-sentry-level
+                name: rhche
+          - name: SENTRY_DSN
+            valueFrom:
+              configMapKeyRef:
+                key: che-logs-sentry-dsn
+                name: rhche
+          - name: SENTRY_STACKTRACE_APP_PACKAGES
+            valueFrom:
+              configMapKeyRef:
+                key: sentry-stacktrace-app-packages
+                name: rhche
+          - name: SENTRY_ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                key: sentry-environment
+                name: rhche
+          - name: SENTRY_RELEASE
+            value: ${IMAGE_TAG}
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
-              path: /api
+              path: /api/system/state
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 120
             timeoutSeconds: 10
-          name: che
+          name: rhche
           ports:
           - containerPort: 8080
             name: http
@@ -300,7 +314,7 @@ objects:
             name: http-debug
           readinessProbe:
             httpGet:
-              path: /api
+              path: /api/system/state
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 15
@@ -312,29 +326,29 @@ objects:
               memory: 256Mi
           volumeMounts:
           - mountPath: /data
-            name: che-data-volume
-        serviceAccountName: che
+            name: rhche-data-volume
+        serviceAccountName: rhche
         volumes:
-        - name: che-data-volume
+        - name: rhche-data-volume
           persistentVolumeClaim:
-            claimName: che-data-volume
+            claimName: rhche-data-volume
     triggers:
     - type: ConfigChange
 - apiVersion: v1
   kind: Route
   metadata:
     labels:
-      app: che
-    name: che
+      app: rhche
+    name: rhche
   spec:
     tls:
       insecureEdgeTerminationPolicy: Redirect
       termination: edge
     to:
       kind: Service
-      name: che-host
+      name: rhche-host
 parameters:
 - name: IMAGE
-  value: rhche/che-server-multiuser
+  value: rhche/rhche-server
 - name: IMAGE_TAG
   value: latest
