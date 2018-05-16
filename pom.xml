@@ -32,12 +32,25 @@
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
+        <segment.analytics.client.java.version>2.1.1</segment.analytics.client.java.version>
         <sentry.version>1.7.2</sentry.version>
         <unleash.client.java.version>3.0.0</unleash.client.java.version>
         <withoutDashboard>false</withoutDashboard>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>che-plugin-analytics-wsagent</artifactId>
+                <version>${redhat.che.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
+                <artifactId>che-plugin-analytics-wsmaster</artifactId>
+                <version>${redhat.che.version}</version>
+                <type>jar</type>
+            </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>che-plugin-bayesian-lang-server</artifactId>
@@ -112,6 +125,11 @@
                 <type>jar</type>
             </dependency>
             <dependency>
+                <groupId>com.segment.analytics.java</groupId>
+                <artifactId>analytics</artifactId>
+                <version>${segment.analytics.client.java.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.sentry</groupId>
                 <artifactId>sentry</artifactId>
                 <version>${sentry.version}</version>
@@ -137,6 +155,12 @@
                 <artifactId>fabric8-ide-gwt-app</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>gwt-app</type>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.multiuser</groupId>
+                <artifactId>che-multiuser-machine-authentication</artifactId>
+                <version>${che.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che</groupId>

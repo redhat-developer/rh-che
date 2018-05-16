@@ -37,6 +37,10 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>che-plugin-analytics-wsmaster</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
         <dependency>
@@ -123,23 +127,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
-                  <execution>
-                    <id>repack</id>
-                    <phase>process-classes</phase>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                    <configuration>
-                      <target>
-                        <!-- note that here we reference previously declared dependency -->
-                        <unzip src="${org.eclipse.che.multiuser:che-multiuser-keycloak-server:jar}" dest="${project.build.directory}/tmpKeycloakModule"/>
-                        <delete file="${project.build.directory}/tmpKeycloakModule/org/eclipse/che/multiuser/keycloak/server/deploy/KeycloakModule.class"/> 
-                        <!-- now do what you need to any of unpacked files under target/tmp/ -->
-                        <zip basedir="${project.build.directory}/tmpKeycloakModule" destfile="${project.build.directory}/${project.build.finalName}/WEB-INF/lib/che-multiuser-keycloak-server-rhche-${che.version}.jar"/>
-                        <!-- now the modified jar is available  -->
-                      </target>
-                    </configuration>
-                  </execution>
+                    <execution>
+                        <id>repack</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- note that here we reference previously declared dependency -->
+                                <unzip dest="${project.build.directory}/tmpKeycloakModule" src="${org.eclipse.che.multiuser:che-multiuser-keycloak-server:jar}" />
+                                <delete file="${project.build.directory}/tmpKeycloakModule/org/eclipse/che/multiuser/keycloak/server/deploy/KeycloakModule.class" />
+                                <!-- now do what you need to any of unpacked files under target/tmp/ -->
+                                <zip basedir="${project.build.directory}/tmpKeycloakModule" destfile="${project.build.directory}/${project.build.finalName}/WEB-INF/lib/che-multiuser-keycloak-server-rhche-${che.version}.jar" />
+                                <!-- now the modified jar is available  -->
+                            </target>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
