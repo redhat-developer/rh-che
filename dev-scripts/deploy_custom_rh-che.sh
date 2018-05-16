@@ -74,9 +74,6 @@ function unsetVars() {
 }
 
 function clearEnv() {
-  rm wait_until_postgres_is_available.sh > /dev/null 2>&1
-  rm deploy_postgres_only.sh > /dev/null 2>&1
-  rm che-init-image-stream.yaml > /dev/null 2>&1
   rm rh-che.app.yaml > /dev/null 2>&1
   rm rh-che.config.yaml > /dev/null 2>&1
   rm -rf postgres > /dev/null 2>&1
@@ -94,7 +91,7 @@ function checkCheStatus() {
 
 function deployPostgres() {
   echo -e "\033[1mDeploying PostgreSQL\033[0;38;5;60m"
-  if ! (./deploy_postgres_only.sh); then
+  if ! (oc new-app -f postgres/postgres-template.yaml > /dev/null 2>&1); then
     echo -e "\033[0;91;1mFailed to deploy PostgreSQL\033[0m"
     exit 1
   fi
@@ -205,28 +202,14 @@ fi
 
 # GET DEPLOYMENT SCRIPTS
 echo -e "\033[0;1mGetting deployment scripts...\033[0m"
-WAIT_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/wait_until_postgres_is_available.sh
-DEPLOY_POSTGRES_SCRIPT_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/deploy_postgres_only.sh
-DEPLOY_POSTGRES_CONFIG_URL=https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/che-init-image-stream.yaml
-curl -L0fs $WAIT_SCRIPT_URL -o wait_until_postgres_is_available.sh > /dev/null 2>&1
-curl -L0fs $DEPLOY_POSTGRES_SCRIPT_URL -o deploy_postgres_only.sh > /dev/null 2>&1
-curl -L0fs $DEPLOY_POSTGRES_CONFIG_URL -o che-init-image-stream.yaml > /dev/null 2>&1
 
-# GET POSTGRES CONFIGS
+# GET POSTGRES TEMPLATE
 mkdir postgres > /dev/null 2>&1
 cd postgres || exit 1
 export IMAGE_POSTGRES="eclipse/che-postgres"
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/deployment-config.yaml -o deployment-config.yaml > /dev/null 2>&1); then
-  echo -e "\033[93;1mFile deployment-config.yaml is missing.\033[0m"
-  rm deployment-config.yaml
-fi
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/postgres-data-claim.yaml -o postgres-data-claim.yaml > /dev/null 2>&1); then
-  echo -e "\033[93;1mFile postgres-data-claim.yaml is missing.\033[0m"
-  rm postgres-data-claim.yaml
-fi
-if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/multi-user/postgres/service.yaml -o service.yaml > /dev/null 2>&1); then
-  echo -e "\033[93;1mFile service.yaml is missing.\033[0m"
-  rm service.yaml
+if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/openshift/templates/multi/postgres-template.yaml -o postgres-template.yaml > /dev/null 2>&1); then
+  echo -e "\033[93;1mFile postgres-template.yaml is missing.\033[0m"
+  rm postgres-template.yaml
 fi
 cd ../ || exit 1
 
@@ -247,8 +230,6 @@ else
   RH_CHE_CONFIG="./../openshift/rh-che.config.yaml"
 fi
 
-chmod 777 wait_until_postgres_is_available.sh
-chmod 777 deploy_postgres_only.sh
 echo -e "\033[92;1mGetting deployment scripts done.\033[0m"
 
 # DEPLOY POSTRES

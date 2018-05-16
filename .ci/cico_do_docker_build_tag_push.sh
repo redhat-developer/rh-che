@@ -46,11 +46,13 @@ do
   echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
   cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
 
-  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-    docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
-  else
-    echo "ERROR: Can not push to registry.devshift.net: credentials are not set. Aborting"
-    exit 1
+  if [ "$DeveloperBuild" != "true" ]; then
+    if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+      docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
+    else
+      echo "ERROR: Can not push to registry.devshift.net: credentials are not set. Aborting"
+      exit 1
+    fi
   fi
 
   docker build -t ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG} -f $DIR/${DOCKERFILE} .
