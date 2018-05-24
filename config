@@ -4,7 +4,7 @@ TARGET=${TARGET:-"centos"}
 
 export NAMESPACE="rhchestage"
 
-if [ "$TARGET" == "rhel" ] || [ "$TARGET" == "rh-integration-test" ]; then
+if [ "$TARGET" == "rhel" ]; then
   export DOCKERFILE="Dockerfile.rhel"
   export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
 else
@@ -12,7 +12,7 @@ else
   export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net"}
 fi
 
-if [ "$TARGET" == "rh-integration-test" ]; then
+if [ "$PR_CHECK_BUILD" == "true" ]; then
   export DOCKER_IMAGE="rh-che-automation"
 else
   export DOCKER_IMAGE="rh-che-server"
@@ -25,7 +25,7 @@ export NPM_CONFIG_PREFIX=~/.che_node_modules
 export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
 
 export RH_DIST_SUFFIX=fabric8
-if [ "$TARGET" == "rh-integration-test" ]; then
+if [ "$PR_CHECK_BUILD" == "true" ]; then
   export RH_TAG_DIST_SUFFIX=rhcheautomation
 else
   export RH_TAG_DIST_SUFFIX=fabric8

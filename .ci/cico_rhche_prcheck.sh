@@ -21,12 +21,13 @@ export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-che6-automated.dev.
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://dev.rdu2c.fabric8.io:8443/
 export OC_VERSION=3.7.48
-export TARGET="rh-integration-test"
+export TARGET=${TARGET:-"rhel"}
+export PR_CHECK_BUILD=${PR_CHECK_BUILD:-"true"}
 
 function BuildTagAndPushDocker() {
   echo "Docker status:"
   docker images
-  DeveloperBuild="true" .ci/cico_build.sh
+  .ci/cico_build.sh
   echo "After build:"
   docker images
 }
@@ -65,18 +66,6 @@ fi
 if [ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" ] || [ -z "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" ]; then
   echo "RDU2C credentials not set"
   CREDS_NOT_SET="true"
-else
-  if oc login ${DEV_CLUSTER_URL} --insecure-skip-tls-verify \
-                                 -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
-                                 -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}";
-  then
-    echo "Credentials test OK"
-  else
-    echo "Openshift login failed"
-    echo "login: |${RH_CHE_AUTOMATION_RDU2C_USERNAME:0:1}*${RH_CHE_AUTOMATION_RDU2C_USERNAME:7:2}*${RH_CHE_AUTOMATION_RDU2C_USERNAME: -1}|" 
-    echo "passwd: |${RH_CHE_AUTOMATION_RDU2C_PASSWORD:0:1}***${RH_CHE_AUTOMATION_RDU2C_PASSWORD: -1}|" 
-    exit 3
-  fi
 fi
 if [ -z "${KEYCLOAK_TOKEN}" ] || [ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" ] || [ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD}" ]; then
   echo "Prod-preview credentials not set."
@@ -87,6 +76,17 @@ if [ "${CREDS_NOT_SET}" == "true" ]; then
   exit 2
 else
   echo "Credentials set successfully."
+fi
+if oc login ${DEV_CLUSTER_URL} --insecure-skip-tls-verify \
+                               -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
+                               -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}";
+then
+  echo "OpenShift login successful"
+else
+  echo "OpenShift login failed"
+  echo "login: |${RH_CHE_AUTOMATION_RDU2C_USERNAME:0:1}*${RH_CHE_AUTOMATION_RDU2C_USERNAME:7:2}*${RH_CHE_AUTOMATION_RDU2C_USERNAME: -1}|"
+  echo "passwd: |${RH_CHE_AUTOMATION_RDU2C_PASSWORD:0:1}***${RH_CHE_AUTOMATION_RDU2C_PASSWORD: -1}|"
+  exit 3
 fi
 set -x
 

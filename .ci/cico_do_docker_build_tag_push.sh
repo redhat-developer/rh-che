@@ -46,7 +46,8 @@ do
   echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
   cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
 
-  if [ "$DeveloperBuild" != "true" ]; then
+  if [ "$DeveloperBuild" != "true" ] || [ "$PR_CHECK_BUILD" == "true" ];
+  then
     if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
       docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
     else
