@@ -63,6 +63,8 @@ function unsetVars() {
   unset RH_CHE_RUNNING_STANDALONE_SCRIPT;
   unset RH_CHE_IS_V_FIVE;
   unset IMAGE_POSTGRES;
+  unset POSTGRES_STATUS_PROGRESS;
+  unset POSTGRES_STATUS_AVAILABLE;
   unset RH_CHE_STATUS_PROGRESS;
   unset RH_CHE_STATUS_AVAILABLE;
 }
@@ -73,6 +75,12 @@ function clearEnv() {
   rm -rf postgres > /dev/null 2>&1
 }
 
+function checkPostgresStatus() {
+  POSTGRES_DEPLOYMENT_OC_STATUS=$(oc get dc postgres -o json)
+  export POSTGRES_STATUS_PROGRESS=$(echo "$POSTGRES_DEPLOYMENT_OC_STATUS" | jq ".status.conditions | map(select(.type == \"Progressing\").status)[]")
+  export POSTGRES_STATUS_AVAILABLE=$(echo "$POSTGRES_DEPLOYMENT_OC_STATUS" | jq ".status.conditions | map(select(.type == \"Available\").status)[]")
+}
+
 function checkCheStatus() {
   RH_CHE_DEPLOYMENT_OC_STATUS=$(oc get dc rhche -o json)
   export RH_CHE_STATUS_PROGRESS=$(echo "$RH_CHE_DEPLOYMENT_OC_STATUS" | jq ".status.conditions | map(select(.type == \"Progressing\").status)[]")
@@ -80,9 +88,10 @@ function checkCheStatus() {
 }
 
 function waitForPostgresToBeDeleted() {
-  oc delete dc postgres > /dev/null 2>&1
+  oc delete all -l app=postgres > /dev/null 2>&1
+  oc delete pvc/postgres-data > /dev/null 2>&1
   printf "Waiting for postgres deployment to be deleted"
-  while (oc get dc postgres > /dev/null 2>&1); do
+  while (oc get all -l app=postgres 2>&1 | [ "$(wc -l)" -ge 2 ] > /dev/null 2>&1); do
     printf "."
     sleep 1
   done
@@ -90,9 +99,9 @@ function waitForPostgresToBeDeleted() {
 }
 
 function waitForCheToBeDeleted() {
-  oc delete dc rhche > /dev/null 2>&1
+  oc delete all -l app=rhche > /dev/null 2>&1
   printf "Waiting for Rh-Che deployment to be deleted"
-  while (oc get dc rhche > /dev/null 2>&1); do
+  while (oc get all -l app=rhche  2>&1 | [ "$(wc -l)" -ge 2 ] > /dev/null 2>&1); do
     printf "."
     sleep 1
   done
@@ -106,6 +115,19 @@ function deployPostgres() {
     echo -e "\\033[0;91;1mFailed to deploy PostgreSQL\\033[0m"
     exit 5
   fi
+
+  POSTGRES_STARTUP_TIMEOUT=180
+  while [[ "${POSTGRES_STATUS_PROGRESS}" != "\"True\"" || "${POSTGRES_STATUS_AVAILABLE}" != "\"True\"" ]] && [ ${POSTGRES_STARTUP_TIMEOUT} -gt 0 ]; do
+    sleep 1
+    checkPostgresStatus
+    echo -e "\\033[0;38;5;60mPostgres status: Available:\\033[0;1m$POSTGRES_STATUS_AVAILABLE \\033[0;38;5;60mProgressing:\\033[0;1m$POSTGRES_STATUS_PROGRESS \\033[0;38;5;60mTimeout:\\033[0;1m$POSTGRES_STARTUP_TIMEOUT\\033[0m"
+    POSTGRES_STARTUP_TIMEOUT=$((POSTGRES_STARTUP_TIMEOUT-1))
+  done
+  if [ ${POSTGRES_STARTUP_TIMEOUT} == 0 ]; then
+    echo -e "\\033[91;1mFailed to start postgres: timed out\\033[0m"
+    exit 1
+  fi
+
   echo -e "\\033[0;92;1mPostreSQL database successfully deployed\\033[0m"
 }
 
@@ -264,7 +286,8 @@ CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" |
                       .\"data\".\"service.account.id\" = \"\" | 
                       .\"data\".\"che.jdbc.username\" = \"$RH_CHE_JDBC_USERNAME\" | 
                       .\"data\".\"che.jdbc.password\" = \"$RH_CHE_JDBC_PASSWORD\" | 
-                      .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" " ${RH_CHE_CONFIG})
+                      .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" | 
+                      .\"data\".\"logs-encoding\" = \"plaintext\" " ${RH_CHE_CONFIG})
 
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                   yq ".\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io\" |
