@@ -1,6 +1,7 @@
 # Config used by the different scripts
 
 TARGET=${TARGET:-"centos"}
+PR_CHECK_BUILD=${PR_CHECK_BUILD:-"false"}
 
 export NAMESPACE="rhchestage"
 
