@@ -9,12 +9,11 @@ export DeveloperBuild="true"
 
 currentDir=$(pwd)
 
-cd $(dirname "$0")/..
+cd "$(dirname "$0")"/.. || echo "Failed to cd $(dirname "$0")"; exit 1
 
-bash .ci/cico_do_docker_build_tag_push.sh
-if [ $? -ne 0 ]; then
+if ! bash .ci/cico_do_docker_build_tag_push.sh; then
   echo 'Build Failed!'
-  cd ${currentDir}
+  cd "${currentDir}" || echo "Failed to cd ${currentDir}"; exit 1
   exit 1
 fi
-cd ${currentDir}
+cd "${currentDir}" || echo "Failed to cd ${currentDir}"; exit 1
