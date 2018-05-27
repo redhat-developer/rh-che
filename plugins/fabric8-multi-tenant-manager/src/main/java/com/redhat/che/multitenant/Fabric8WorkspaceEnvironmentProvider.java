@@ -97,28 +97,21 @@ public class Fabric8WorkspaceEnvironmentProvider {
 
   public Config getWorkspacesOpenshiftConfig(Subject subject) throws InfrastructureException {
     checkSubject(subject);
-
     UserCheTenantData cheTenantData = getUserCheTenantData(subject);
-
     checkClusterCapacity(cheTenantData);
 
-    String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
-    LOG.debug("OSO proxy URL - {}", osoProxyUrl);
-    String userId = subject.getUserId();
-
     ConfigBuilder configBuilder =
-        new ConfigBuilder()
-            .withMasterUrl(osoProxyUrl)
-            .withNamespace(cheTenantData.getNamespace())
-            .withTrustCerts(true);
+        new ConfigBuilder().withNamespace(cheTenantData.getNamespace()).withTrustCerts(true);
+
+    String userId = subject.getUserId();
 
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
       LOG.debug("Using Che SA token for '{}'", userId);
-      // TODO provide Config to oso proxy which will use Che SA token obtained from fabric-auth and
-      // userId as username
-      configBuilder.withOauthToken(cheServiceAccountToken);
+      String osoProxyUrl = multiClusterOpenShiftProxy.getUrlWithIdentityIdQueryParameter(userId);
+      configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken);
     } else {
-      configBuilder.withOauthToken(subject.getToken());
+      String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
+      configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(subject.getToken());
     }
 
     return configBuilder.build();
