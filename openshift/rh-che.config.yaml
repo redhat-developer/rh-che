@@ -46,3 +46,6 @@ data:
   che-logs-sentry-dsn: 'NULL'
   sentry-stacktrace-app-packages: 'com.redhat,org.eclipse.che'
   sentry-environment: 'dev'
+  analytics.segment_write_key: 'rIZ5NDpUfqkTNdfsBxOBcJoLDT3TxftM' 
+  analytics.woopra_domain: 'test.openshift.io'
+  
