@@ -14,7 +14,7 @@ import static com.redhat.che.plugin.analytics.wsagent.EventProperties.*;
 
 public enum AnalyticsEvent {
   WORKSPACE_STARTED("Start Workspace in Che", 3),
-  WORKSPACE_OPENED("Refreshed Workspace in Che", 3),
+  WORKSPACE_OPENED("Refresh Workspace in Che", 3),
   WORKSPACE_USED("Use Workspace in Che"),
   WORKSPACE_INACTIVE("Keep Workspace Inactive in Che"),
   WORKSPACE_STOPPED("Stop Workspace in Che"),
