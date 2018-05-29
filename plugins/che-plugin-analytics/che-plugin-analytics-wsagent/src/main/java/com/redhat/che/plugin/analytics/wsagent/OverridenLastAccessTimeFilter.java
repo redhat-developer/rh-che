@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Overridden version of the {@link LastAccessTimeFilter} that ignores all accesses to the {@link
  * AnalyticsActivityService}.
  *
- * <p>This important to avoid a REST messaging endless loop between the wsmaster and the wsagent
+ * <p>This is important to avoid a REST messaging endless loop between the wsmaster and the wsagent
  * related to activity notification forwarding.
  *
  * @author David Festal
