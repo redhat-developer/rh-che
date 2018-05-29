@@ -32,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -54,6 +55,9 @@ import org.slf4j.Logger;
 @Singleton
 public class AnalyticsManager {
   private static final Logger LOG = getLogger(AnalyticsManager.class);
+
+  private static final String pingRequestFormat =
+      "http://www.woopra.com/track/ping?host={0}&cookie={1}&timeout={2}";
 
   private final Analytics analytics;
 
@@ -282,12 +286,11 @@ public class AnalyticsManager {
       try {
         URI uri =
             new URI(
-                "http://www.woopra.com/track/ping?host="
-                    + URLEncoder.encode(woopraDomain, "UTF-8")
-                    + "&cookie="
-                    + URLEncoder.encode(cookie, "UTF-8")
-                    + "&timeout="
-                    + pingTimeout);
+                MessageFormat.format(
+                    pingRequestFormat,
+                    URLEncoder.encode(woopraDomain, "UTF-8"),
+                    URLEncoder.encode(cookie, "UTF-8"),
+                    Long.toString(pingTimeout)));
         LOG.debug("Sending a PING request to woopra for user '{}': {}", getUserId(), uri);
         HttpURLConnection httpURLConnection = (HttpURLConnection) uri.toURL().openConnection();
 
