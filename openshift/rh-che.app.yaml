@@ -297,6 +297,16 @@ objects:
                 name: rhche
           - name: SENTRY_RELEASE
             value: ${IMAGE_TAG}
+          - name: CHE_FABRIC8_ANALYTICS_SEGMENT__WRITE__KEY
+            valueFrom:
+              configMapKeyRef:
+                key: analytics.segment_write_key
+                name: rhche
+          - name: CHE_FABRIC8_ANALYTICS_WOOPRA__DOMAIN
+            valueFrom:
+              configMapKeyRef:
+                key: analytics.woopra_domain
+                name: rhche
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
