@@ -17,6 +17,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import org.eclipse.che.api.core.rest.Service;
 
+/**
+ * This service endpoint receives from the Wsmaster workspaces-related events that are relevant for
+ * the AnalyticsManager (telemetry).
+ *
+ * <p>Such avents are activity notification or workspace stop event.
+ *
+ * <p>The endpoints only answers OK, because the corresponding API calls are already detected and
+ * leveraged by the {@link UrlToEventFilter} filter.
+ *
+ * @author David Festal
+ */
 @Singleton
 @Path(AnalyticsActivityService.PATH)
 public class AnalyticsActivityService extends Service {
