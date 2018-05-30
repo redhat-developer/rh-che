@@ -130,6 +130,11 @@
                 <version>${segment.analytics.client.java.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.segment.analytics.java</groupId>
+                <artifactId>analytics-core</artifactId>
+                <version>${segment.analytics.client.java.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.sentry</groupId>
                 <artifactId>sentry</artifactId>
                 <version>${sentry.version}</version>
