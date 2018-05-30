@@ -20,9 +20,9 @@ public enum AnalyticsEvent {
   WORKSPACE_STOPPED("Stop Workspace in Che"),
   EDITOR_USED("Edit Workspace File In Che", 30, new String[] {PROGRAMMING_LANGUAGE});
 
-  private String name;
-  private int expectedDuration;
-  private String[] propertiesToCheck;
+  private final String name;
+  private final int expectedDuration;
+  private final String[] propertiesToCheck;
 
   AnalyticsEvent(String name, int expectedDurationSeconds, String[] propertiesToCheck) {
     this.name = name;
@@ -38,6 +38,7 @@ public enum AnalyticsEvent {
     this(name, -1, new String[0]);
   }
 
+  @Override
   public String toString() {
     return name;
   }
