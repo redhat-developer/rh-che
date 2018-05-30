@@ -21,6 +21,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.Hashing;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.segment.analytics.Analytics;
@@ -39,7 +40,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
@@ -71,35 +71,11 @@ public class AnalyticsManager {
 
   private ScheduledExecutorService checkActivityExecutor =
       Executors.newSingleThreadScheduledExecutor(
-          new ThreadFactory() {
-            @Override
-            public Thread newThread(final Runnable r) {
-              return new Thread(
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      r.run();
-                    }
-                  },
-                  "Analytics Activity Checker");
-            }
-          });
+          new ThreadFactoryBuilder().setNameFormat("Analytics Activity Checker").build());
 
   private ScheduledExecutorService networkExecutor =
       Executors.newSingleThreadScheduledExecutor(
-          new ThreadFactory() {
-            @Override
-            public Thread newThread(final Runnable r) {
-              return new Thread(
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      r.run();
-                    }
-                  },
-                  "Analytics Network Request Submitter");
-            }
-          });
+          new ThreadFactoryBuilder().setNameFormat("Analytics Network Request Submitter").build());
 
   private LoadingCache<String, EventDispatcher> dispatchers;
 
