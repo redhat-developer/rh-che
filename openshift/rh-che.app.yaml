@@ -359,6 +359,6 @@ objects:
       name: rhche-host
 parameters:
 - name: IMAGE
-  value: rhche/rhche-server
+  value: registry.devshift.net/che/rh-che-server
 - name: IMAGE_TAG
   value: latest
