@@ -123,6 +123,11 @@ objects:
               configMapKeyRef:
                 key: enable-workspaces-autostart
                 name: rhche
+          - name: CHE_INFRA_KUBERNETES_PVC_QUANTITY
+            valueFrom:
+              configMapKeyRef:
+                key: workspaces-pvc-storage-size
+                name: rhche        
           - name: JAVA_OPTS
             valueFrom:
               configMapKeyRef:

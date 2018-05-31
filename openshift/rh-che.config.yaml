@@ -48,4 +48,5 @@ data:
   sentry-environment: 'dev'
   analytics.segment_write_key: 'NULL' 
   analytics.woopra_domain: 'NULL'
+  workspaces-pvc-storage-size: '1Gi'
   
