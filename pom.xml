@@ -27,6 +27,7 @@
     <modules>
         <module>plugins</module>
         <module>assembly</module>
+        <module>functional-tests</module>
     </modules>
     <properties>
         <keycloak.version>2.5.0.Final</keycloak.version>

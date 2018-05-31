@@ -231,3 +231,18 @@ For instance, the profile `fast` will skip all the tests and checks as describe 
 
 By default the Che Dashboard is part of the Red Hat Che distribution.
 Howvever it can removed by with the `-DwithoutDashboard` argument
+
+### Running selenium tests
+
+Rh-Che `functional-tests` are based on selenium framework with Guice injection.
+These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`
+
+###### VM options
+    -Dche.threads=1 -Dche.workspace_pool_size=1 -Dche.host="<RH-Che DEPLOYMENT PATH>" -Dche.port=443
+    -Dche.protocol=https -Dgrid.mode=false -Dbrowser=GOOGLE_CHROME -Ddriver.port=9515
+    -Ddriver.version="2.35" -DexcludedGroups=github
+
+###### Env variables
+    CHE_INFRASTRUCTURE=openshift;CHE_TESTUSER_EMAIL=<email>;CHE_TESTUSER_OFFLINE__TOKEN=<refresh_token>;
+    CHE_MULTIUSER=true;CHE_OFFLINE_TO_ACCESS_TOKEN_EXCHANGE_ENDPOINT=https://auth.<OSD URL>/api/token/refresh;
+    CHE_TESTUSER_NAME=<username>;CHE_TESTUSER_PASSWORD=<password>
