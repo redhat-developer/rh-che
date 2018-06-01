@@ -19,7 +19,7 @@ data:
   remote-debugging-enabled: "false"
   workspaces-memory-limit: "2400"
   workspaces-memory-limit-max: "2400mb"
-  enable-workspaces-autostart: "false"
+  enable-workspaces-autostart: "true"
   keycloak-github-endpoint: "https://auth.prod-preview.openshift.io/api/token?for=https://github.com"
   che-server-java-opts: "-XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Xmx180m -Dfile.encoding=UTF8"
   che-workspaces-java-opts: "-XX:+UseG1GC -XX:+UseStringDeduplication -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1200m -Xms256m"
