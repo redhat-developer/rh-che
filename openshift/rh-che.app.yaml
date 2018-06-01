@@ -26,18 +26,6 @@ objects:
     selector:
       app: rhche
 - apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: rhche
-    name: rhche-data-volume
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 1Gi
-- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
@@ -339,14 +327,7 @@ objects:
               memory: 750Mi
             requests:
               memory: 256Mi
-          volumeMounts:
-          - mountPath: /data
-            name: rhche-data-volume
         serviceAccountName: rhche
-        volumes:
-        - name: rhche-data-volume
-          persistentVolumeClaim:
-            claimName: rhche-data-volume
     triggers:
     - type: ConfigChange
 - apiVersion: v1
