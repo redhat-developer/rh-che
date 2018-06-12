@@ -300,6 +300,8 @@ objects:
               configMapKeyRef:
                 key: analytics.woopra_domain
                 name: rhche
+          - name: CHE_OAUTH_SERVICE__MODE
+            value: "embedded"
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:

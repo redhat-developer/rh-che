@@ -28,8 +28,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.eclipse.che.api.languageserver.registry.LanguageRecognizer;
-import org.eclipse.che.api.languageserver.shared.model.LanguageDescription;
 import org.eclipse.che.commons.subject.Subject;
 import org.slf4j.Logger;
 
@@ -47,12 +45,10 @@ public class UrlToEventFilter implements Filter {
 
   private boolean startWorkspaceEventSent = false;
   private final AnalyticsManager manager;
-  private final LanguageRecognizer languageRecognizer;
 
   @Inject
-  public UrlToEventFilter(AnalyticsManager manager, LanguageRecognizer languageRecognizer) {
+  public UrlToEventFilter(AnalyticsManager manager) {
     this.manager = manager;
-    this.languageRecognizer = languageRecognizer;
   }
 
   @Override
@@ -143,25 +139,20 @@ public class UrlToEventFilter implements Filter {
     if (path.endsWith(".jsp")) {
       return "jsp";
     }
-    LanguageDescription languageDesc = languageRecognizer.recognizeByPath(path.substring(17));
-    if (languageDesc == LanguageRecognizer.UNIDENTIFIED) {
-      String extension = "";
-      String fileName = path;
-      int lastSlash = path.lastIndexOf('/');
-      if (lastSlash >= 0) {
-        fileName = path.substring(lastSlash + 1);
-      }
-      int lastPoint = fileName.lastIndexOf('.');
-      if (lastPoint > 0) {
-        extension = fileName.substring(lastPoint + 1);
-      }
-      if (extension.isEmpty()) {
-        language = "unknown";
-      } else {
-        language = "unknown : ." + extension;
-      }
+    String extension = "";
+    String fileName = path;
+    int lastSlash = path.lastIndexOf('/');
+    if (lastSlash >= 0) {
+      fileName = path.substring(lastSlash + 1);
+    }
+    int lastPoint = fileName.lastIndexOf('.');
+    if (lastPoint > 0) {
+      extension = fileName.substring(lastPoint + 1);
+    }
+    if (extension.isEmpty()) {
+      language = "unknown";
     } else {
-      language = languageDesc.getLanguageId();
+      language = "unknown : ." + extension;
     }
     return language;
   }

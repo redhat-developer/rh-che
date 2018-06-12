@@ -11,21 +11,17 @@
 package com.redhat.che.wsmaster.deploy;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
 import org.eclipse.che.inject.DynaModule;
 import org.eclipse.che.multiuser.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
-import org.eclipse.che.security.oauth.OAuthAuthenticator;
+import org.eclipse.che.security.oauth.GitHubOAuthAuthenticator;
 
 /** @author David Festal */
 @DynaModule
 public class Fabric8WsMasterModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(org.eclipse.che.security.oauth.shared.OAuthTokenProvider.class)
-        .to(org.eclipse.che.security.oauth.OAuthAuthenticatorTokenProvider.class);
-    bind(org.eclipse.che.security.oauth.OAuthAuthenticationService.class);
-    Multibinder<OAuthAuthenticator> oAuthAuthenticators =
-        Multibinder.newSetBinder(binder(), OAuthAuthenticator.class);
-    oAuthAuthenticators.addBinding().to(OpenShiftGitHubOAuthAuthenticator.class);
+    bind(GitHubOAuthAuthenticator.class)
+        .to(OpenShiftGitHubOAuthAuthenticator.class)
+        .asEagerSingleton();
   }
 }

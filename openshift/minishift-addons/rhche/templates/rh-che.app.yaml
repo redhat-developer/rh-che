@@ -255,6 +255,8 @@ objects:
             value: "${PROTOCOL}"
           - name: ROUTING_SUFFIX
             value: "${ROUTING_SUFFIX}"
+          - name: CHE_OAUTH_SERVICE__MODE
+            value: "embedded"
           image: ${IMAGE_CHE}:${CHE_VERSION}
           imagePullPolicy: "${PULL_POLICY}"
           livenessProbe:
