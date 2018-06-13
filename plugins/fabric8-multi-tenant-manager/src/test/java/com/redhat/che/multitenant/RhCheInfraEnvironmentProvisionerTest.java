@@ -32,6 +32,7 @@ import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.commons.subject.SubjectImpl;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerServersPortProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
@@ -66,6 +67,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private InstallerServersPortProvisioner installerServersPortProvisioner;
   @Mock private LogsVolumeMachineProvisioner logsVolumeMachineProvisioner;
   @Mock private PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner;
+  @Mock private ImagePullSecretProvisioner imagePullSecretProvisioner;
 
   @Mock private OpenshiftUserTokenProvider openshiftUserTokenProvider;
   @Mock private TenantDataProvider tenantDataProvider;
@@ -97,7 +99,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
             logsVolumeMachineProvisioner,
             openshiftUserTokenProvider,
             tenantDataProvider,
-            podTerminationGracePeriodProvisioner);
+            podTerminationGracePeriodProvisioner,
+            imagePullSecretProvisioner);
 
     Pod pod1 = mock(Pod.class);
     Pod pod2 = mock(Pod.class);

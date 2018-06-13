@@ -27,6 +27,7 @@ import org.eclipse.che.api.workspace.server.spi.provision.env.EnvVarProvider;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerServersPortProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
@@ -73,7 +74,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       LogsVolumeMachineProvisioner logsVolumeMachineProvisioner,
       OpenshiftUserTokenProvider openshiftUserTokenProvider,
       TenantDataProvider tenantDataProvider,
-      PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner) {
+      PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner,
+      ImagePullSecretProvisioner imagePullSecretProvisioner) {
     super(
         pvcEnabled,
         uniqueNamesProvisioner,
@@ -85,7 +87,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         ramLimitProvisioner,
         installerServersPortProvisioner,
         logsVolumeMachineProvisioner,
-        podTerminationGracePeriodProvisioner);
+        podTerminationGracePeriodProvisioner,
+        imagePullSecretProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;
