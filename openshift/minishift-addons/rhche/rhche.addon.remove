@@ -5,9 +5,12 @@
 # Var-Defaults: NAMESPACE=rhche
 
 echo [CHE] Deleting all Che objects (deploymentconfig, services, routes etc...)
-oc delete all -l app=che -n #{NAMESPACE}
+oc delete all -l app=rhche -n #{NAMESPACE}
 
 echo [CHE] Removing Che server Template
 oc delete -f templates/rh-che.app.yaml -n openshift
+
+echo [CHE] Removing Keycloak-dedicated OAuth client
+oc delete oauthclient/kc-client
 
 echo Eclipse Che addon removed

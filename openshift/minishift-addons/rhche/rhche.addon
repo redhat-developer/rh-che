@@ -9,12 +9,14 @@ echo [CHE] Create the Che server Template
 oc apply -f templates/rh-che.app.yaml -n openshift
 
 echo [CHE] Deploying Che (rh-che)
-oc apply -f templates/rh-che.secret.yaml -n #{NAMESPACE}
 oc apply -f templates/rh-che.config.yaml -n #{NAMESPACE}
-oc new-app -p IMAGE_CHE=#{CHE_DOCKER_IMAGE} -p CHE_VERSION=#{CHE_VERSION} -p ROUTING_SUFFIX=#{routing-suffix} rhche -n #{NAMESPACE} 
+oc new-app -p IMAGE_CHE=#{CHE_DOCKER_IMAGE} -p CHE_VERSION=#{CHE_VERSION} -p ROUTING_SUFFIX=#{routing-suffix} -p NAMESPACE=#{NAMESPACE} -p PROTOCOL=http  -p MINISHIFT_CONSOLE=https://#{ip}:8443 rhche -n #{NAMESPACE}
+
+echo [CHE] Preparing Keycloak for use with Minishift... 
+oc  -n #{NAMESPACE} start-build keycloak-minishift-configuration-build --from-dir=keycloak-configurator
 
 echo Please wait while the pods all startup!
 echo You can watch in the OpenShift console via:
 echo   minishift console
 echo Then you should be able the open the Che dashboard here:
-echo   http://che-#{NAMESPACE}.#{routing-suffix}
+echo   http://rhche-#{NAMESPACE}.#{routing-suffix}

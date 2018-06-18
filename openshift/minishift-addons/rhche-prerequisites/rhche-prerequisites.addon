@@ -12,5 +12,8 @@ oc adm policy add-role-to-user admin developer -n #{NAMESPACE}
 echo [CHE] Deploying Postgres
 oc new-app -f templates/postgres-template.yaml -n #{NAMESPACE}
 
+echo [CHE] Adding Minishift certificate as a secret
+ssh docker exec origin /bin/bash -c 'oc -n rhche secret new-basicauth openshift-identity-provider --username='-' --password='-' --ca-cert=./openshift.local.config/master/ca.crt'
+
 echo [CHE] Deploying Keycloak
 oc new-app -f templates/keycloak-template.yaml -p IMAGE_KEYCLOAK=#{KEYCLOAK_DOCKER_IMAGE} -p ROUTING_SUFFIX=#{routing-suffix} -n #{NAMESPACE}
