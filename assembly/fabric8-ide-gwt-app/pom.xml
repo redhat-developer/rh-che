@@ -44,7 +44,7 @@
             <exclusions>
                 <exclusion>
                     <artifactId>che-plugin-product-info</artifactId>
-                    <groupId>org.eclipse.che.plugin</groupId>                    
+                    <groupId>org.eclipse.che.plugin</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
