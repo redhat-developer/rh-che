@@ -11,5 +11,5 @@
 
 if [ -n "${CHE_OSO_USER_TOKEN}" ] && [ -n "${CHE_OSO_PROJECT}" ] && [ -n "${CHE_OSO_CLUSTER}" ]; then
     # login to OSO project where user has edit rights
-    oc login ${CHE_OSO_CLUSTER} --token=${CHE_OSO_USER_TOKEN} && oc project ${CHE_OSO_PROJECT} || true
+    oc login ${CHE_OSO_CLUSTER} --insecure-skip-tls-verify=${CHE_OSO_TRUST_CERTS} --token=${CHE_OSO_USER_TOKEN} && oc project ${CHE_OSO_PROJECT} || true
 fi

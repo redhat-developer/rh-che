@@ -10,6 +10,8 @@
  */
 package com.redhat.che.multitenant;
 
+import static org.eclipse.che.multiuser.keycloak.shared.KeycloakConstants.OIDC_PROVIDER_SETTING;
+
 import com.google.gson.JsonParser;
 import com.redhat.che.multitenant.multicluster.MultiClusterOpenShiftProxy;
 import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
@@ -40,6 +42,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
   private final MultiClusterOpenShiftProxy multiClusterOpenShiftProxy;
   private final CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
   private final TenantDataProvider tenantDataProvider;
+  private final boolean isForMinishift;
 
   private String cheServiceAccountToken;
 
@@ -48,7 +51,8 @@ public class Fabric8WorkspaceEnvironmentProvider {
       @Named("che.fabric8.multitenant") boolean fabric8CheMultitenant,
       MultiClusterOpenShiftProxy multiClusterOpenShiftProxy,
       CheServiceAccountTokenToggle cheServiceAccountTokenToggle,
-      TenantDataProvider tenantDataProvider) {
+      TenantDataProvider tenantDataProvider,
+      @Named("che.fabric8.minishift") boolean isForMinishift) {
     if (!fabric8CheMultitenant) {
       throw new ConfigurationException(
           "Fabric8 Che Multitetant is disabled. "
@@ -57,15 +61,19 @@ public class Fabric8WorkspaceEnvironmentProvider {
     this.multiClusterOpenShiftProxy = multiClusterOpenShiftProxy;
     this.cheServiceAccountTokenToggle = cheServiceAccountTokenToggle;
     this.tenantDataProvider = tenantDataProvider;
+    this.isForMinishift = isForMinishift;
   }
 
   @Inject
   private void setServiceAccountToken(
       @Nullable @Named("che.openshift.service_account.id") String serviceAccId,
       @Nullable @Named("che.openshift.service_account.secret") String serviceAccSecret,
-      @Named("che.fabric8.auth.endpoint") String authEndpoint) {
+      @Nullable @Named(OIDC_PROVIDER_SETTING) String oidcProvider) {
 
-    if (serviceAccId == null || serviceAccId.isEmpty()) {
+    if (serviceAccId == null
+        || serviceAccId.isEmpty()
+        || oidcProvider == null
+        || oidcProvider.isEmpty()) {
       return;
     }
     OkHttpClient client = new OkHttpClient();
@@ -76,8 +84,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
             .add("client_secret", serviceAccSecret)
             .build();
 
-    Request request =
-        new Request.Builder().url(authEndpoint + "/api/token").post(requestBody).build();
+    Request request = new Request.Builder().url(oidcProvider + "/token").post(requestBody).build();
     try (Response response = client.newCall(request).execute()) {
       // Ignore IDE warning:
       // body is not null after call of execute() according to javadocs of method body()
@@ -102,6 +109,10 @@ public class Fabric8WorkspaceEnvironmentProvider {
 
     ConfigBuilder configBuilder =
         new ConfigBuilder().withNamespace(cheTenantData.getNamespace()).withTrustCerts(true);
+
+    if (isForMinishift) {
+      return configBuilder.build();
+    }
 
     String userId = subject.getUserId();
 
