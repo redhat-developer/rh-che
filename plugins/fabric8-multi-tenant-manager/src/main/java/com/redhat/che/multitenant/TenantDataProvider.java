@@ -48,7 +48,7 @@ public class TenantDataProvider {
   private static final int CACHE_TIMEOUT_MINUTES = 10;
   private static final int CONCURRENT_USERS = 1000;
 
-  private final boolean isForMinishift;
+  private final boolean standalone;
   private final String cheNamespace;
   private final HttpJsonRequestFactory httpJsonRequestFactory;
   private final String fabric8UserServiceEndpoint;
@@ -59,10 +59,10 @@ public class TenantDataProvider {
       HttpJsonRequestFactory httpJsonRequestFactory,
       @Named("che.fabric8.user_service.endpoint") String fabric8UserServiceEndpoint,
       @Named("che.infra.openshift.project") String cheNamespace,
-      @Named("che.fabric8.minishift") boolean isForMinishift) {
+      @Named("che.fabric8.standalone") boolean standalone) {
     this.fabric8UserServiceEndpoint = fabric8UserServiceEndpoint;
     this.cheNamespace = cheNamespace;
-    this.isForMinishift = isForMinishift;
+    this.standalone = standalone;
     this.httpJsonRequestFactory = httpJsonRequestFactory;
     this.tenantDataCache =
         CacheBuilder.newBuilder()
@@ -97,7 +97,7 @@ public class TenantDataProvider {
 
   private UserCheTenantData loadUserCheTenantData(CacheKey cacheKey) {
 
-    if (isForMinishift) {
+    if (standalone) {
       String namespaceType = cacheKey.namespaceType;
       String namespaceToUse;
       switch (namespaceType) {

@@ -42,7 +42,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
   private final MultiClusterOpenShiftProxy multiClusterOpenShiftProxy;
   private final CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
   private final TenantDataProvider tenantDataProvider;
-  private final boolean isForMinishift;
+  private final boolean standalone;
 
   private String cheServiceAccountToken;
 
@@ -52,7 +52,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
       MultiClusterOpenShiftProxy multiClusterOpenShiftProxy,
       CheServiceAccountTokenToggle cheServiceAccountTokenToggle,
       TenantDataProvider tenantDataProvider,
-      @Named("che.fabric8.minishift") boolean isForMinishift) {
+      @Named("che.fabric8.standalone") boolean standalone) {
     if (!fabric8CheMultitenant) {
       throw new ConfigurationException(
           "Fabric8 Che Multitetant is disabled. "
@@ -61,7 +61,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
     this.multiClusterOpenShiftProxy = multiClusterOpenShiftProxy;
     this.cheServiceAccountTokenToggle = cheServiceAccountTokenToggle;
     this.tenantDataProvider = tenantDataProvider;
-    this.isForMinishift = isForMinishift;
+    this.standalone = standalone;
   }
 
   @Inject
@@ -110,7 +110,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
     ConfigBuilder configBuilder =
         new ConfigBuilder().withNamespace(cheTenantData.getNamespace()).withTrustCerts(true);
 
-    if (isForMinishift) {
+    if (standalone) {
       return configBuilder.build();
     }
 

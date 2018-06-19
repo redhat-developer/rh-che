@@ -250,7 +250,7 @@ objects:
             value: "${ROUTING_SUFFIX}"
           - name: CHE_OAUTH_SERVICE__MODE
             value: "embedded"
-          - name: CHE_FABRIC8_MINISHIFT
+          - name: CHE_FABRIC8_STANDALONE
             value: "true"
           image: ${IMAGE_CHE}:${CHE_VERSION}
           imagePullPolicy: "${PULL_POLICY}"
