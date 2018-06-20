@@ -3,7 +3,7 @@
 TARGET=${TARGET:-"centos"}
 PR_CHECK_BUILD=${PR_CHECK_BUILD:-"false"}
 
-export NAMESPACE="rhchestage"
+export NAMESPACE=${NAMESPACE:-"rhchestage"}
 
 if [ "$TARGET" == "rhel" ]; then
   export DOCKERFILE="Dockerfile.rhel"

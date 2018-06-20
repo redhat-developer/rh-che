@@ -8,4 +8,7 @@ echo [CHE] Removing #{NAMESPACE} project
 oc delete project #{NAMESPACE}
 oc adm policy remove-role-from-user system:image-builder developer -n openshift
 
+echo [CHE] Removing Keycloak-dedicated OAuth client
+oc delete oauthclient/kc-client
+
 echo Eclipse Che prerequisites addon removed

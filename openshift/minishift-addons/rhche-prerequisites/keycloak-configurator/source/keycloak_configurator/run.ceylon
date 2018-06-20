@@ -18,7 +18,8 @@ import java.nio.file {
 	},
 	Files {
 		writeFile = write
-	}
+	},
+	AccessDeniedException
 }
 import java.util {
 	Arrays {
@@ -27,45 +28,58 @@ import java.util {
 }
 
 import org.keycloak.admin.client {
-	Keycloak {
-		getKeycloak=getInstance
+	KeycloakBuilder {
+		keycloakBuilder = builder
 	}
 }
 import org.keycloak.representations.idm {
 	IdentityProviderRepresentation,
 	AuthenticatorConfigRepresentation
 }
+import org.jboss.resteasy.client.jaxrs {
+	ResteasyClientBuilder
+}
+import java.util.concurrent {
+	TimeUnit {
+		 seconds
+	}
+}
 
-"Configure the embedded Keycloak for running RhChe on Minishift"
+"Configure the dedicated Keycloak for running RhChe in standalone mode on Openshift / Minishift"
 suppressWarnings("deprecation")
 shared void run() {
 	try {
-		value keycloakUrl = process.namedArgumentValue("keycloak-url") else "http://keycloak:5050/auth";
-		value adminPassword = process.namedArgumentValue("admin-password") else "admin";
-		value realmName = process.namedArgumentValue("realm") else "che";
-		value clientId = process.namedArgumentValue("client-id") else "che-public";
-		value providerClientId = process.namedArgumentValue("provider-client-id") else "kc-client";
-		value providerSecret = process.namedArgumentValue("provider-secret") else "openshift";
-		value cheServiceName = process.namedArgumentValue("che-service-name") else "rhche";
+		function argument(String name) => process.namedArgumentValue(name) 
+		else process.environmentVariableValue(name.uppercased.replace("-", "_"));
+		
 		value providerAlias = "openshift-v3";
+		value keycloakUrl = argument("keycloak-url") else "http://keycloak:5050/auth";
+		value adminPassword = argument("admin-password") else "admin";
+		value realmName = argument("realm") else "che";
+		value clientId = argument("client-id") else "che-public";
+		value providerClientId = argument("provider-client-id") else "kc-client";
+		value providerSecret = argument("provider-secret") else "openshift";
+		value cheServiceName = argument("che-service-name") else "rhche";
+		value providerBaseUrl = argument("provider-base-url");
 		
-		value minishiftUrl = process.namedArgumentValue("minishift-url")
-		else process.environmentVariableValue("MINISHIFT_CONSOLE");
 		"You should set the URL of the Minishift console,
-		 either with the 'minishift-url' command line argument,
-		 or with the 'MINISHIFT_CONSOLE' environment variable."
-		assert(exists minishiftUrl);
+		 either with the 'openshift-provider-base-url' command line argument,
+		 or with the 'OPENSHIFT_PROVIDER_BASE_URL' environment variable."
+		assert(exists providerBaseUrl);
 		
-		value keycloak = getKeycloak(
-			keycloakUrl,
-			"master",
-			"admin",
-			adminPassword,
-			"admin-cli");
+		value keycloak = keycloakBuilder()
+				.serverUrl(keycloakUrl)
+				.realm("master")
+				.username("admin")
+				.password(adminPassword)
+				.clientId("admin-cli")
+				.resteasyClient(ResteasyClientBuilder().connectionPoolSize(10).establishConnectionTimeout(10, seconds).build())
+				.build();
 		
 		
+		print("Connecting to the Keycloak server at `` keycloakUrl ``");
 		value systemInfo = keycloak.serverInfo().info.systemInfo;
-		print("Connected to the Keycloak server (version `` systemInfo.version ``) as `` systemInfo.userName `` at `` keycloakUrl ``");
+		print("Connected to the Keycloak server (version `` systemInfo.version ``) at `` keycloakUrl ``");
 		
 		value realm = keycloak.realm(realmName);
 	
@@ -81,7 +95,7 @@ shared void run() {
 				enabled = true;
 				linkOnly = false;
 				config = entries {
-					"baseUrl" -> minishiftUrl,
+					"baseUrl" -> providerBaseUrl,
 					"clientId" -> providerClientId,
 					"hideOnLoginPage" -> "false",
 					"disableUserInfo" -> "false",
@@ -151,7 +165,10 @@ shared void run() {
 		
 		clients.get(cheClient.id).update(cheClient);
 	} catch(Throwable e) {
-		writeFile(path("/dev/termination-log"), str(e.string).bytes);
+		try {
+			writeFile(path("/dev/termination-log"), str(e.string).bytes);
+		} catch(AccessDeniedException ignored) {}
+		
 		throw e;
 	}
 }
