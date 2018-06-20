@@ -17,7 +17,7 @@ UPSTREAM_TAG=$(sed -n 's/^SCM-Revision: \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../a
 # Now lets build the local docker images
 
 ADDONS=${ABSOLUTE_PATH}/../openshift/minishift-addons
-KEYCLOAK_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
+KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
 
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 cd ${DIR}
@@ -77,20 +77,20 @@ do
   fi
   
   if [ "${NIGHTLY}" != "*-no-dashboard" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
-    docker build -t ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
+    docker build -t ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
       if [ $? -ne 0 ]; then
         echo 'Docker Build Failed'
         exit 2
       fi
     
       # lets change the tag and push it to the registry
-      docker tag ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${NIGHTLY}
+      docker tag ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
         
-      dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${TAG}"
+      dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}"
     
       if [ "$DeveloperBuild" != "true" ]; then
-          docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${NIGHTLY}
-          docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_CONFIGURATOR_IMAGE}:${TAG}
+          docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
+          docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}
       fi
   fi
 done
