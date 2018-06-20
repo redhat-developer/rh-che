@@ -17,7 +17,6 @@ UPSTREAM_TAG=$(sed -n 's/^SCM-Revision: \(.\{7\}\).*/\1/p' ${ABSOLUTE_PATH}/../a
 # Now lets build the local docker images
 
 ADDONS=${ABSOLUTE_PATH}/../openshift/minishift-addons
-KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
 
 DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 cd ${DIR}
