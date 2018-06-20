@@ -45,7 +45,28 @@ import java.util.concurrent {
 	}
 }
 
-"Configure the dedicated Keycloak for running RhChe in standalone mode on Openshift / Minishift"
+"
+ Configure the dedicated Keycloak for running RhChe in standalone mode on Openshift / Minishift
+ 
+ This contains the following changes in the Keycloak server:
+ 
+ - In order to keep the feature that logs in the `oc `client with user OpenShift token at workspace start,
+ the minishift account is linked to the user Keycloak account using a Keycloak Openshift identity provider.
+ 
+ - Additionally, in order to avoid the need for the user to explicitly link his minishift account to his main
+ Che Keycloak account, we switch the Keycloak autentication to use the Openshift identity provider.
+ This way, when the user first logs into the Che server, he logs with his Minishift account and the Minishift
+ and Keycloak accounts are linked automatically. Later, when he stars a workspace, and types the `oc project` command
+ in a terminal, he's automatically connected to the default `myproject` openshift project available in Minishift by default.
+ This provides a behavior very similar with what exists under OSIO.
+ 
+ - Finally, the allowed web origins and redirect urls in Keycloak are modified because by default they contain the
+ `che` prefix (OpenShift service name) and here we use `rhche`.
+ 
+ To apply these 3 main changes, this command is run as an OpenShift Job when the Keycloak server is
+ applied / started in Minishift by the Minishift addon.
+ "
+by("David Festal")
 suppressWarnings("deprecation")
 shared void run() {
 	try {
