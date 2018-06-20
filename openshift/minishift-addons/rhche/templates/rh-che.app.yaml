@@ -328,4 +328,3 @@ parameters:
   displayName: OpenShift Online Proxy Service
   description: URL of the OpenShift Online Proxy service
   value: '${PROTOCOL}://f8osoproxy-${NAMESPACE}.${ROUTING_SUFFIX}'
-    
