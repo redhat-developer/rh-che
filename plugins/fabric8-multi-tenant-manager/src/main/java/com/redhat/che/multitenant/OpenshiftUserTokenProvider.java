@@ -51,19 +51,26 @@ public class OpenshiftUserTokenProvider {
       @Nullable @Named(OIDC_PROVIDER_SETTING) String oidcProvider,
       @Nullable @Named(AUTH_SERVER_URL_SETTING) String keycloakServerURL,
       @Nullable @Named(REALM_SETTING) String keycloakRealm,
-      OkHttpClient httpClient) {
-    if (oidcProvider != null) {
-      this.tokenEndpoint = oidcProvider + "/token?for=openshift";
-    } else if (keycloakServerURL != null) {
-      this.tokenEndpoint =
-          keycloakServerURL + "/realms/" + keycloakRealm + "/broker/openshift-v3/token";
+      OkHttpClient httpClient,
+      @Named("che.fabric8.standalone") boolean standalone) {
+
+    if (standalone) {
+      // When RhChe is used in standalone mode, it uses the dedicated Keycloak as
+      // the Che authentication provider
+
+      if (keycloakServerURL == null) {
+        throw new RuntimeException("The 'AUTH_SERVER_URL_SETTING' property should be set");
+      }
+      tokenEndpoint = keycloakServerURL + "/realms/" + keycloakRealm + "/broker/openshift-v3/token";
     } else {
-      throw new RuntimeException(
-          "Either the '"
-              + AUTH_SERVER_URL_SETTING
-              + "' or '"
-              + OIDC_PROVIDER_SETTING
-              + "' property should be set");
+      // When RhChe is used in OSIO mode (along with the oter fabric8 services, it uses the
+      // alternate
+      // fabric8_auth OIDC provider as the Che authentication provider.
+
+      if (oidcProvider == null) {
+        throw new RuntimeException("The 'OIDC_PROVIDER_SETTING' property should be set");
+      }
+      tokenEndpoint = oidcProvider + "/token?for=openshift";
     }
     this.httpClient = httpClient;
     this.tokenCache =
