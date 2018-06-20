@@ -12,7 +12,7 @@
 suppressWarnings("packageName")
 native("jvm")
 license("Eclipse Public License v1.0")
-by("David festal")
+by("David Festal")
 module keycloak_configurator "1.0.0" {
 	shared import maven:"org.keycloak:keycloak-admin-client" "3.4.3.Final";
 	shared import maven:"org.keycloak:keycloak-services" "3.4.3.Final";
