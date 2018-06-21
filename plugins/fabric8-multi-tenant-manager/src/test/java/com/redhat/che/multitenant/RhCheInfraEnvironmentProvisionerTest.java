@@ -100,7 +100,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
             openshiftUserTokenProvider,
             tenantDataProvider,
             podTerminationGracePeriodProvisioner,
-            imagePullSecretProvisioner);
+            imagePullSecretProvisioner,
+            false);
 
     Pod pod1 = mock(Pod.class);
     Pod pod2 = mock(Pod.class);
@@ -142,7 +143,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
     provisioner.provision(openShiftEnvironment, runtimeIdentity);
 
-    assertEquals(con2EnvVars.size(), 3);
+    assertEquals(con2EnvVars.size(), 4);
     verifyOcLoginEnvVarsPresence(con2EnvVars);
   }
 
@@ -152,7 +153,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
     provisioner.provision(openShiftEnvironment, runtimeIdentity);
 
-    assertEquals(con3EnvVars.size(), 4);
+    assertEquals(con3EnvVars.size(), 5);
     verifyOcLoginEnvVarsPresence(con3EnvVars);
     verifyEnvVarPresence("OTHER_VAR", "otherValue", con3EnvVars);
   }

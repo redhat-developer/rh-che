@@ -3,7 +3,7 @@
 TARGET=${TARGET:-"centos"}
 PR_CHECK_BUILD=${PR_CHECK_BUILD:-"false"}
 
-export NAMESPACE="rhchestage"
+export NAMESPACE=${NAMESPACE:-"rhchestage"}
 
 if [ "$TARGET" == "rhel" ]; then
   export DOCKERFILE="Dockerfile.rhel"
@@ -18,6 +18,8 @@ if [ "$PR_CHECK_BUILD" == "true" ]; then
 else
   export DOCKER_IMAGE="rh-che-server"
 fi
+KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
+
 
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master

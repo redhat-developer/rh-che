@@ -10,6 +10,10 @@
  */
 package com.redhat.che.multitenant;
 
+import static org.eclipse.che.multiuser.keycloak.shared.KeycloakConstants.AUTH_SERVER_URL_SETTING;
+import static org.eclipse.che.multiuser.keycloak.shared.KeycloakConstants.OIDC_PROVIDER_SETTING;
+import static org.eclipse.che.multiuser.keycloak.shared.KeycloakConstants.REALM_SETTING;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -24,6 +28,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.subject.Subject;
 
 /**
@@ -43,8 +48,30 @@ public class OpenshiftUserTokenProvider {
 
   @Inject
   public OpenshiftUserTokenProvider(
-      @Named("che.fabric8.auth.endpoint") String authEndpoint, OkHttpClient httpClient) {
-    this.tokenEndpoint = authEndpoint + "/api/token?for=openshift";
+      @Nullable @Named(OIDC_PROVIDER_SETTING) String oidcProvider,
+      @Nullable @Named(AUTH_SERVER_URL_SETTING) String keycloakServerURL,
+      @Nullable @Named(REALM_SETTING) String keycloakRealm,
+      OkHttpClient httpClient,
+      @Named("che.fabric8.standalone") boolean standalone) {
+
+    if (standalone) {
+      // When RhChe is used in standalone mode, it uses the dedicated Keycloak as
+      // the Che authentication provider
+
+      if (keycloakServerURL == null) {
+        throw new RuntimeException("The 'AUTH_SERVER_URL_SETTING' property should be set");
+      }
+      tokenEndpoint = keycloakServerURL + "/realms/" + keycloakRealm + "/broker/openshift-v3/token";
+    } else {
+      // When RhChe is used in OSIO mode (along with the oter fabric8 services, it uses the
+      // alternate
+      // fabric8_auth OIDC provider as the Che authentication provider.
+
+      if (oidcProvider == null) {
+        throw new RuntimeException("The 'OIDC_PROVIDER_SETTING' property should be set");
+      }
+      tokenEndpoint = oidcProvider + "/token?for=openshift";
+    }
     this.httpClient = httpClient;
     this.tokenCache =
         CacheBuilder.newBuilder()

@@ -54,11 +54,13 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
   public static final String TOKEN_VAR = "CHE_OSO_USER_TOKEN";
   public static final String CLUSTER_VAR = "CHE_OSO_CLUSTER";
   public static final String PROJECT_VAR = "CHE_OSO_PROJECT";
+  public static final String TRUST_CERTS_VAR = "CHE_OSO_TRUST_CERTS";
 
   private static final Logger LOG = getLogger(RhCheInfraEnvironmentProvisioner.class);
 
   private final OpenshiftUserTokenProvider openshiftUserTokenProvider;
   private final TenantDataProvider tenantDataProvider;
+  private boolean trustCerts;
 
   @Inject
   public RhCheInfraEnvironmentProvisioner(
@@ -75,7 +77,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       OpenshiftUserTokenProvider openshiftUserTokenProvider,
       TenantDataProvider tenantDataProvider,
       PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner,
-      ImagePullSecretProvisioner imagePullSecretProvisioner) {
+      ImagePullSecretProvisioner imagePullSecretProvisioner,
+      @Named("che.infra.kubernetes.trust_certs") boolean trustCerts) {
     super(
         pvcEnabled,
         uniqueNamesProvisioner,
@@ -92,6 +95,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;
+    this.trustCerts = trustCerts;
   }
 
   @Override
@@ -138,6 +142,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       UserCheTenantData tenantData = tenantDataProvider.getUserCheTenantData(subject, "user");
       envVars.put(CLUSTER_VAR, tenantData.getClusterUrl());
       envVars.put(PROJECT_VAR, tenantData.getNamespace());
+      envVars.put(TRUST_CERTS_VAR, Boolean.toString(trustCerts));
     } catch (InfrastructureException e) {
       throw new InfrastructureException(
           format(

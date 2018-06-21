@@ -65,4 +65,16 @@ docker tag "${STAGE_IMAGE_TO_PROMOTE}" "${PROD_IMAGE_DEVSHIFT_LATEST}"
 docker push "${PROD_IMAGE_DEVSHIFT}"
 docker push "${PROD_IMAGE_DEVSHIFT_LATEST}"
 
+STAGE_IMAGE_TO_PROMOTE="${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${CHE_SERVER_DOCKER_IMAGE_TAG}"
+PROD__IMAGE_DEVSHIFT="${REGISTRY}/che/rh-che-standalone-keycloak-configurator:${TAG_SHORT_COMMIT_HASH}"
+PROD__IMAGE_DEVSHIFT_LATEST="${REGISTRY}/che/rh-che-standalone-keycloak-configurator:latest"
+
+echo "CHE VALIDATION: Pushing image ${PROD_IMAGE_DEVSHIFT} and ${PROD_IMAGE_DEVSHIFT_LATEST} to ${REGISTRY} registry"
+
+docker tag "${STAGE_IMAGE_TO_PROMOTE}" "${PROD_IMAGE_DEVSHIFT}"
+docker tag "${STAGE_IMAGE_TO_PROMOTE}" "${PROD_IMAGE_DEVSHIFT_LATEST}"
+
+docker push "${PROD_IMAGE_DEVSHIFT}"
+docker push "${PROD_IMAGE_DEVSHIFT_LATEST}"
+
 echo "CHE VALIDATION: Image pushed to devshift registry"

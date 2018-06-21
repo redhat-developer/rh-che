@@ -5,7 +5,15 @@
 # Var-Defaults: NAMESPACE=rhche
 
 echo [CHE] Removing #{NAMESPACE} project
+
+oc delete all -l app=keycloak -n #{NAMESPACE}
+oc delete pvc keycloak-log keycloak-data  -n #{NAMESPACE}
+oc delete all -l app=postgres -n #{NAMESPACE}
+oc delete pvc postgres-data  -n #{NAMESPACE}
+oc adm policy remove-role-from-user admin developer -n #{NAMESPACE}
 oc delete project #{NAMESPACE}
-oc adm policy remove-role-from-user system:image-builder developer -n openshift
+
+echo [CHE] Removing Keycloak-dedicated OAuth client
+oc delete oauthclient/kc-client
 
 echo Eclipse Che prerequisites addon removed

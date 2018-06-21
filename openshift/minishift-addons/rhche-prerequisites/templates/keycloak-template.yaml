@@ -9,6 +9,8 @@ kind: Template
 apiVersion: v1
 metadata:
   name: keycloak
+  labels:
+    app: keycloak
   annotations:
     description: Che
 objects:
@@ -16,6 +18,8 @@ objects:
   kind: DeploymentConfig
   metadata:
     name: keycloak
+    labels:
+      app: keycloak
   spec:
     replicas: 1
     selector:
@@ -53,6 +57,11 @@ objects:
             value: "${ROUTING_SUFFIX}"
           - name: CHE_KEYCLOAK_ADMIN_REQUIRE_UPDATE_PASSWORD
             value: "${CHE_KEYCLOAK_ADMIN_REQUIRE_UPDATE_PASSWORD}"
+          - name: OPENSHIFT_IDENTITY_PROVIDER_CERTIFICATE
+            valueFrom:
+              secretKeyRef:
+                key: ca.crt
+                name: openshift-identity-provider
           image: '${IMAGE_KEYCLOAK}:${CHE_VERSION}'
           command: ["/scripts/kc_realm_user.sh"]
           imagePullPolicy: Always
@@ -100,6 +109,8 @@ objects:
   kind: Service
   metadata:
     name: keycloak
+    labels:
+      app: keycloak
   spec:
     ports:
     - name: "5050"
@@ -112,6 +123,8 @@ objects:
   kind: Route
   metadata:
     name: keycloak
+    labels:
+      app: keycloak
   spec:
     port:
       targetPort: "5050"
@@ -122,6 +135,8 @@ objects:
   kind: PersistentVolumeClaim
   metadata:
     name: keycloak-data
+    labels:
+      app: keycloak
   spec:
     accessModes:
     - ReadWriteOnce
@@ -132,13 +147,45 @@ objects:
   kind: PersistentVolumeClaim
   metadata:
     name: keycloak-log
+    labels:
+      app: keycloak
   spec:
     accessModes:
     - ReadWriteOnce
     resources:
       requests:
         storage: 1Gi
-
+- apiVersion: v1
+  kind: OAuthClient
+  metadata:
+    name: kc-client
+    labels:
+      app: keycloak
+  secret: "openshift"
+  redirectURIs:
+    - "${PROTOCOL}://keycloak-${NAMESPACE}.${ROUTING_SUFFIX}/auth/realms/che/broker/openshift-v3/endpoint"
+  grantMethod: prompt
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: configure-keycloak
+    labels:
+      app: keycloak
+  spec:
+    parallelism: 1    
+    completions: 1    
+    template:         
+      metadata:
+        name: configure-keycloak
+      spec:
+        containers:
+        - name: configure-keycloak
+          image: ${KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE}:${RH_CHE_VERSION}
+          imagePullPolicy: Always
+          env:
+          - name: PROVIDER_BASE_URL
+            value: ${PROVIDER_BASE_URL}
+        restartPolicy: OnFailure    
 parameters:
 - name: PROTOCOL
   displayName: htpps or http protocol
@@ -159,6 +206,21 @@ parameters:
   displayName: Require admin password update
   description: Ask for a password update after 1st login by admin user
   value: "true"
+- name: NAMESPACE
+  displayName: Minishift namespace 
+  description: Minishift namespace used to install Keycloak
+- name: PROVIDER_BASE_URL
+  displayName: Openshift provider base URL 
+  description: Base URL of the Openshift identity provider in Keycloak 
+- name: KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE
+  displayName: Keycloak configurator image
+  description: Keycloak configurator image for RhChe standalone
+  value: registry.devshift.net/che/rh-che-standalone-keycloak-configurator
+- name: RH_CHE_VERSION
+  displayName: RhChe version
+  description: RhChe version which defaults to latest
+  value: latest
+      
 labels:
   app: keycloak
   template: keycloak

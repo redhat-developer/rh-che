@@ -1,0 +1,15 @@
+
+[compiler]
+source=source
+resource=resource
+
+[compiler.jvm]
+source=source
+resource=resource
+module=keycloak_configurator
+
+[defaults]
+encoding=UTF-8
+flatclasspath=true
+autoexportmavendependencies=true
+fullyexportmavendependencies=true

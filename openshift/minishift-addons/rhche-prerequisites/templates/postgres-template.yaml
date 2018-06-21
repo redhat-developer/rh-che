@@ -9,6 +9,8 @@ kind: Template
 apiVersion: v1
 metadata:
   name: postgres
+  labels:
+    app: postgres
   annotations:
     description: Che
 objects:
@@ -16,6 +18,8 @@ objects:
   kind: DeploymentConfig
   metadata:
     name: postgres
+    labels:
+      app: postgres
   spec:
     replicas: 1
     selector:
@@ -83,6 +87,8 @@ objects:
   kind: Service
   metadata:
     name: postgres
+    labels:
+      app: postgres
   spec:
     ports:
     - name: "5432"
@@ -94,6 +100,8 @@ objects:
   kind: PersistentVolumeClaim
   metadata:
     name: postgres-data
+    labels:
+      app: postgres
   spec:
     accessModes:
     - ReadWriteOnce

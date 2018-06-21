@@ -21,6 +21,17 @@ objects:
       app: rhche
     name: rhche
 - apiVersion: v1
+  kind: RoleBinding
+  metadata:
+    name: rhche
+    labels:
+      app: rhche
+  roleRef:
+    name: admin
+  subjects:
+  - kind: ServiceAccount
+    name: rhche
+- apiVersion: v1
   kind: Service
   metadata:
     labels:
@@ -78,13 +89,13 @@ objects:
                 key: multi-user
                 name: rhche
           - name: CHE_HOST
-            value: "che-${NAMESPACE}.${ROUTING_SUFFIX}"
+            value: "rhche-${NAMESPACE}.${ROUTING_SUFFIX}"
           - name: CHE_PORT
             value: "8080"
           - name: CHE_API
-            value: "${PROTOCOL}://che-${NAMESPACE}.${ROUTING_SUFFIX}/api"
+            value: "${PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/api"
           - name: CHE_WEBSOCKET_ENDPOINT
-            value: "${WS_PROTOCOL}://che-${NAMESPACE}.${ROUTING_SUFFIX}/api/websocket"
+            value: "${WS_PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/api/websocket"
           - name: CHE_DEBUG_SERVER
             valueFrom:
               configMapKeyRef:
@@ -93,7 +104,7 @@ objects:
           - name: CHE_INFRASTRUCTURE_ACTIVE
             value: "openshift"
           - name: CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL
-            value: "${PROTOCOL}://che-${NAMESPACE}.${ROUTING_SUFFIX}/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
+            value: "${PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
           - name: CHE_INFRA_KUBERNETES_MACHINE__START__TIMEOUT__MIN
             valueFrom:
               configMapKeyRef:
@@ -191,10 +202,7 @@ objects:
                 key: che-workspaces-java-opts
                 name: rhche
           - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
-            valueFrom:
-              configMapKeyRef:
-                key: keycloak-github-endpoint
-                name: rhche
+            value: ${CHE_KEYCLOAK_AUTH__SERVER__URL}/realms/che/broker/github/token
           - name: CHE_FABRIC8_MULTITENANT
             valueFrom:
               configMapKeyRef:
@@ -216,31 +224,10 @@ objects:
               configMapKeyRef:
                 key: che-keycloak-realm
                 name: rhche
-          - name: CHE_JDBC_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                  key: che.jdbc.password
-                  name: rhche
-          - name: CHE_JDBC_URL
-            valueFrom:
-              secretKeyRef:
-                  key: che.jdbc.url
-                  name: rhche
-          - name: CHE_JDBC_USERNAME
-            valueFrom:
-              secretKeyRef:
-                  key: che.jdbc.username
-                  name: rhche
           - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_SECRET
-            valueFrom:
-              secretKeyRef:
-                  key: service.account.secret
-                  name: rhche
+            value: NULL
           - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_ID
-            valueFrom:
-              secretKeyRef:
-                  key: service.account.id
-                  name: rhche
+            value: NULL
           - name: CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD
             valueFrom:
               configMapKeyRef:
@@ -257,7 +244,9 @@ objects:
             value: "${ROUTING_SUFFIX}"
           - name: CHE_OAUTH_SERVICE__MODE
             value: "embedded"
-          image: ${IMAGE_CHE}:${CHE_VERSION}
+          - name: CHE_FABRIC8_STANDALONE
+            value: "true"
+          image: ${IMAGE_RH_CHE}:${RH_CHE_VERSION}
           imagePullPolicy: "${PULL_POLICY}"
           livenessProbe:
             httpGet:
@@ -295,18 +284,17 @@ objects:
         terminationGracePeriodSeconds: 30
     triggers:
     - type: ConfigChange
-
 parameters:
 - name: ROUTING_SUFFIX
   displayName: Routing suffix of your OpenShift cluster
   description: This is the suffix appended to routes in your OpenShift cluster <route>-<project>.<routing_suffix>
-- name: CHE_VERSION
+- name: RH_CHE_VERSION
   displayName: Eclipse Che version
   description: Eclipse Che version which defaults to nightly
   value: latest
-- name: IMAGE_CHE
-  displayName: Eclipse Che server image
-  description: Che server Docker image. Defaults to docker.io/eclipse/che-server
+- name: IMAGE_RH_CHE
+  displayName: RhChe server image
+  description: RhChe server Docker image.
   value: registry.devshift.net/che/rh-che-server
 - name: PROTOCOL
   displayName: https or http protocol
@@ -340,4 +328,3 @@ parameters:
   displayName: OpenShift Online Proxy Service
   description: URL of the OpenShift Online Proxy service
   value: '${PROTOCOL}://f8osoproxy-${NAMESPACE}.${ROUTING_SUFFIX}'
-
