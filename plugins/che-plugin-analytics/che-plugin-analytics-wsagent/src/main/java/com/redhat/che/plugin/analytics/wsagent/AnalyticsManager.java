@@ -11,11 +11,17 @@
 
 package com.redhat.che.plugin.analytics.wsagent;
 
-import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.*;
-import static com.redhat.che.plugin.analytics.wsagent.EventProperties.*;
+import static com.google.common.collect.ImmutableMap.of;
+import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_INACTIVE;
+import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_STARTED;
+import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_STOPPED;
+import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_USED;
+import static com.redhat.che.plugin.analytics.wsagent.EventProperties.WORKSPACE_ID;
+import static com.redhat.che.plugin.analytics.wsagent.EventProperties.WORKSPACE_NAME;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -27,10 +33,13 @@ import com.google.inject.name.Named;
 import com.segment.analytics.Analytics;
 import com.segment.analytics.messages.TrackMessage;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -38,6 +47,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.PreDestroy;
@@ -61,10 +71,14 @@ public class AnalyticsManager {
 
   private final Analytics analytics;
 
-  private final long noActivityTimeout = 60000 * 3;
-  private final long pingTimeout = 30 * 1000;
+  @VisibleForTesting static long pingTimeoutSeconds = 30;
+  private long pingTimeout = pingTimeoutSeconds * 1000;
+
+  @VisibleForTesting long noActivityTimeout = 60000 * 3;
+
   private final String workspaceId;
-  private final String workspaceName;
+
+  @VisibleForTesting final String workspaceName;
 
   private String segmentWriteKey;
   private String woopraDomain;
@@ -77,15 +91,18 @@ public class AnalyticsManager {
       Executors.newSingleThreadScheduledExecutor(
           new ThreadFactoryBuilder().setNameFormat("Analytics Network Request Submitter").build());
 
-  private LoadingCache<String, EventDispatcher> dispatchers;
+  @VisibleForTesting LoadingCache<String, EventDispatcher> dispatchers;
 
-  private String workspaceStartingUserId = null;
+  @VisibleForTesting String workspaceStartingUserId = null;
+  @VisibleForTesting HttpUrlConnectionProvider httpUrlConnectionProvider = null;
 
   @Inject
   public AnalyticsManager(
       @Named("env.CHE_WORKSPACE_ID") String workspaceId,
       HttpJsonRequestFactory requestFactory,
-      @Named("che.api") String apiEndpoint) {
+      @Named("che.api") String apiEndpoint,
+      AnalyticsProvider analyticsProvider,
+      HttpUrlConnectionProvider httpUrlConnectionProvider) {
     try {
       String endpoint = apiEndpoint + "/fabric8-che-analytics/segment-write-key";
       segmentWriteKey = requestFactory.fromUrl(endpoint).request().asString();
@@ -115,18 +132,21 @@ public class AnalyticsManager {
     }
 
     if (isEnabled()) {
-      analytics =
-          Analytics.builder(segmentWriteKey)
-              .networkExecutor(networkExecutor)
-              .flushQueueSize(1)
-              .build();
+      this.httpUrlConnectionProvider = httpUrlConnectionProvider;
+
+      analytics = analyticsProvider.getAnalytics(segmentWriteKey, networkExecutor);
     } else {
       analytics = null;
     }
 
     this.workspaceId = workspaceId;
 
-    checkActivityExecutor.scheduleAtFixedRate(this::checkActivity, 20, 20, SECONDS);
+    long checkActivityPeriod = pingTimeoutSeconds * 2 / 3;
+
+    LOG.debug("CheckActivityPeriod: {}", checkActivityPeriod);
+
+    checkActivityExecutor.scheduleAtFixedRate(
+        this::checkActivity, checkActivityPeriod, checkActivityPeriod, SECONDS);
 
     dispatchers =
         CacheBuilder.newBuilder()
@@ -226,13 +246,14 @@ public class AnalyticsManager {
     ;
   }
 
-  private class EventDispatcher {
+  @VisibleForTesting
+  class EventDispatcher {
 
-    private String userId;
-    private String cookie;
+    @VisibleForTesting String userId;
+    @VisibleForTesting String cookie;
 
     private AnalyticsEvent lastEvent = null;
-    private Map<String, Object> lastEventProperties = null;
+    @VisibleForTesting Map<String, Object> lastEventProperties = null;
     private long lastActivityTime;
     private long lastEventTime;
     private String lastIp = null;
@@ -243,7 +264,7 @@ public class AnalyticsManager {
     EventDispatcher(String userId, AnalyticsManager manager) {
       this.userId = userId;
       this.commonProperties =
-          ImmutableMap.<String, Object>of(
+          of(
               WORKSPACE_ID, workspaceId,
               WORKSPACE_NAME, workspaceName);
       this.cookie =
@@ -260,15 +281,14 @@ public class AnalyticsManager {
 
     void sendPingRequest() {
       try {
-        URI uri =
-            new URI(
-                MessageFormat.format(
-                    pingRequestFormat,
-                    URLEncoder.encode(woopraDomain, "UTF-8"),
-                    URLEncoder.encode(cookie, "UTF-8"),
-                    Long.toString(pingTimeout)));
+        String uri =
+            MessageFormat.format(
+                pingRequestFormat,
+                URLEncoder.encode(woopraDomain, "UTF-8"),
+                URLEncoder.encode(cookie, "UTF-8"),
+                Long.toString(pingTimeout));
         LOG.debug("Sending a PING request to woopra for user '{}': {}", getUserId(), uri);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) uri.toURL().openConnection();
+        HttpURLConnection httpURLConnection = httpUrlConnectionProvider.getHttpUrlConnection(uri);
 
         String responseMessage;
         try (BufferedReader br =
@@ -408,6 +428,39 @@ public class AnalyticsManager {
       } catch (ExecutionException e) {
       }
     }
+    shutdown();
+  }
+
+  void shutdown() {
     checkActivityExecutor.shutdown();
+    if (analytics != null) {
+      analytics.shutdown();
+    }
+  }
+}
+
+/**
+ * Returns an {@link Analytics} object from a Segment write Key.
+ *
+ * @author David Festal
+ */
+class AnalyticsProvider {
+  public Analytics getAnalytics(String segmentWriteKey, ExecutorService networkExecutor) {
+    return Analytics.builder(segmentWriteKey)
+        .networkExecutor(networkExecutor)
+        .flushQueueSize(1)
+        .build();
+  }
+}
+
+/**
+ * Returns a {@link HttpURLConnection} object from a {@link URI}.
+ *
+ * @author David Festal
+ */
+class HttpUrlConnectionProvider {
+  public HttpURLConnection getHttpUrlConnection(String uri)
+      throws MalformedURLException, IOException, URISyntaxException {
+    return (HttpURLConnection) new URI(uri).toURL().openConnection();
   }
 }
