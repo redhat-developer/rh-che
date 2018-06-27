@@ -15,6 +15,7 @@ import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.*;
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Singleton;
 import java.io.IOException;
@@ -43,7 +44,7 @@ import org.slf4j.Logger;
 public class UrlToEventFilter implements Filter {
   private static final Logger LOG = getLogger(UrlToEventFilter.class);
 
-  private boolean startWorkspaceEventSent = false;
+  @VisibleForTesting boolean startWorkspaceEventSent = false;
   private final AnalyticsManager manager;
 
   @Inject
@@ -128,17 +129,8 @@ public class UrlToEventFilter implements Filter {
     }
   }
 
-  private String guessLanguage(String path) {
-    String language;
-    if (path.endsWith(".xml")) {
-      return "xml";
-    }
-    if (path.endsWith(".js")) {
-      return "javascript";
-    }
-    if (path.endsWith(".jsp")) {
-      return "jsp";
-    }
+  @VisibleForTesting
+  String guessLanguage(String path) {
     String extension = "";
     String fileName = path;
     int lastSlash = path.lastIndexOf('/');
@@ -150,11 +142,73 @@ public class UrlToEventFilter implements Filter {
       extension = fileName.substring(lastPoint + 1);
     }
     if (extension.isEmpty()) {
-      language = "unknown";
-    } else {
-      language = "unknown : ." + extension;
+      return "unknown";
     }
-    return language;
+    switch (extension) {
+      case "xml":
+        return "xml";
+
+      case "md":
+        return "markdown";
+
+      case "js":
+        return "javascript";
+
+      case "jsp":
+        return "jsp";
+
+      case "java":
+        return "java";
+
+      case "yaml":
+      case "yml":
+        return "yaml";
+
+      case "ts":
+        return "typescript";
+
+      case "py":
+        return "python";
+
+      case "php":
+        return "php";
+
+      case "ceylon":
+        return "ceylon";
+
+      case "cs":
+      case "csx":
+        return "csharp";
+
+      case "c":
+      case "h":
+      case "cpp":
+      case "hpp":
+      case "cc":
+      case "hh":
+      case "hxx":
+      case "cxx":
+      case "C":
+      case "H":
+      case "CPP":
+      case "HPP":
+      case "CC":
+      case "HH":
+      case "CXX":
+      case "HXX":
+        return "cpp";
+
+      case "json":
+      case "bowerrc":
+      case "jshintrc":
+      case "jscsrc":
+      case "eslintrc":
+      case "babelrc":
+        return "json";
+
+      default:
+        return "unknown : ." + extension;
+    }
   }
 
   @Override
