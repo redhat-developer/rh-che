@@ -210,11 +210,11 @@ public class UrlToEventFilter implements Filter {
         return "css";
 
       case "html":
-          return "html";
+        return "html";
 
       case "sh":
-          return "shellscript";
-          
+        return "shellscript";
+
       default:
         return "unknown : ." + extension;
     }
