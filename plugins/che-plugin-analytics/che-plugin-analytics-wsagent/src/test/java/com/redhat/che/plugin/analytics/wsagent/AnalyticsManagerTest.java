@@ -90,7 +90,7 @@ public class AnalyticsManagerTest {
     when(workspaceNameResponse.asDto(WorkspaceDto.class)).thenReturn(workspaceDto);
     when(workspaceDto.getConfig()).thenReturn(workspaceConfigDto);
     when(workspaceConfigDto.getName()).thenReturn(WORKSPACE_NAME);
-    when(analyticsProvider.getAnalytics()).thenReturn(analytics);
+    when(analyticsProvider.getAnalytics(any(), any())).thenReturn(analytics);
     when(httpUrlConnectionProvider.getHttpUrlConnection(any())).thenReturn(urlConnection);
     when(urlConnection.getInputStream())
         .then(inv -> new ByteArrayInputStream("success: true".getBytes("UTF-8")));

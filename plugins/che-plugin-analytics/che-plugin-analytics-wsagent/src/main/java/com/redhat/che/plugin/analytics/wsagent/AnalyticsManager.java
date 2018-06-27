@@ -47,13 +47,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
-import org.eclipse.che.commons.annotation.Nullable;
 import org.slf4j.Logger;
 
 /**
@@ -101,8 +101,8 @@ public class AnalyticsManager {
       @Named("env.CHE_WORKSPACE_ID") String workspaceId,
       HttpJsonRequestFactory requestFactory,
       @Named("che.api") String apiEndpoint,
-      @Nullable AnalyticsProvider analyticsProvider,
-      @Nullable HttpUrlConnectionProvider httpUrlConnectionProvider) {
+      AnalyticsProvider analyticsProvider,
+      HttpUrlConnectionProvider httpUrlConnectionProvider) {
     try {
       String endpoint = apiEndpoint + "/fabric8-che-analytics/segment-write-key";
       segmentWriteKey = requestFactory.fromUrl(endpoint).request().asString();
@@ -132,33 +132,9 @@ public class AnalyticsManager {
     }
 
     if (isEnabled()) {
-      if (analyticsProvider == null) {
-        analyticsProvider =
-            new AnalyticsProvider() {
-              @Override
-              public Analytics getAnalytics() {
-                return Analytics.builder(segmentWriteKey)
-                    .networkExecutor(networkExecutor)
-                    .flushQueueSize(1)
-                    .build();
-              }
-            };
-      }
+      this.httpUrlConnectionProvider = httpUrlConnectionProvider;
 
-      if (httpUrlConnectionProvider != null) {
-        this.httpUrlConnectionProvider = httpUrlConnectionProvider;
-      } else {
-        this.httpUrlConnectionProvider =
-            new HttpUrlConnectionProvider() {
-              @Override
-              public HttpURLConnection getHttpUrlConnection(String uri)
-                  throws MalformedURLException, IOException, URISyntaxException {
-                return (HttpURLConnection) new URI(uri).toURL().openConnection();
-              }
-            };
-      }
-
-      analytics = analyticsProvider.getAnalytics();
+      analytics = analyticsProvider.getAnalytics(segmentWriteKey, networkExecutor);
     } else {
       analytics = null;
     }
@@ -468,8 +444,13 @@ public class AnalyticsManager {
  *
  * @author David Festal
  */
-interface AnalyticsProvider {
-  Analytics getAnalytics();
+class AnalyticsProvider {
+  public Analytics getAnalytics(String segmentWriteKey, ExecutorService networkExecutor) {
+    return Analytics.builder(segmentWriteKey)
+        .networkExecutor(networkExecutor)
+        .flushQueueSize(1)
+        .build();
+  }
 }
 
 /**
@@ -477,7 +458,9 @@ interface AnalyticsProvider {
  *
  * @author David Festal
  */
-interface HttpUrlConnectionProvider {
-  HttpURLConnection getHttpUrlConnection(String uri)
-      throws MalformedURLException, IOException, URISyntaxException;
+class HttpUrlConnectionProvider {
+  public HttpURLConnection getHttpUrlConnection(String uri)
+      throws MalformedURLException, IOException, URISyntaxException {
+    return (HttpURLConnection) new URI(uri).toURL().openConnection();
+  }
 }
