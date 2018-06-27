@@ -4,7 +4,6 @@
 
 [![Periodic tests against 2a (prod-preview)](https://ci.centos.org/buildStatus/icon?job=devtools-che-functional-tests-periodical-prod-preview.openshift.io-2a)](https://ci.centos.org/view/Devtools/job/devtools-che-functional-tests-periodical-prod-preview.openshift.io-2a/)
 
-
 # Eclipse Che on OpenShift 
 
 ## Table Of Content
