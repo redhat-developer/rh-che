@@ -206,6 +206,15 @@ public class UrlToEventFilter implements Filter {
       case "babelrc":
         return "json";
 
+      case "css":
+        return "css";
+
+      case "html":
+          return "html";
+
+      case "sh":
+          return "shellscript";
+          
       default:
         return "unknown : ." + extension;
     }
