@@ -11,8 +11,8 @@ set +e
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Retrieve credentials to push the image to the docker hub
-cat jenkins-env | grep -e PASS -e GIT -e DEVSHIFT > inherit-env
-. inherit-env
+  eval "$(./env-toolkit load -f jenkins-env.json -r PASS DEVSHIFT ^QUAY)"
+
 . ${ABSOLUTE_PATH}/../config
 
 # CHE_SERVER_DOCKER_IMAGE_TAG has to be set in che_image_tag.env file
@@ -46,14 +46,14 @@ else
   exit 1
 fi
 
-if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-  docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
+if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
+  docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" ${REGISTRY}
 else
   echo "ERROR: Can not push to ${REGISTRY}: credentials are not set. Aborting"
   exit 1
 fi
 
-STAGE_IMAGE_TO_PROMOTE="${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${CHE_SERVER_DOCKER_IMAGE_TAG}"
+STAGE_IMAGE_TO_PROMOTE="${DOCKER_IMAGE_URL}:${CHE_SERVER_DOCKER_IMAGE_TAG}"
 PROD_IMAGE_DEVSHIFT="${REGISTRY}/che/rh-che-server:${TAG_SHORT_COMMIT_HASH}"
 PROD_IMAGE_DEVSHIFT_LATEST="${REGISTRY}/che/rh-che-server:latest"
 

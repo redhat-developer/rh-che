@@ -59,7 +59,7 @@ echo "Running ${JOB_NAME} build number #${BUILD_NUMBER}, testing creds:"
 
 CREDS_NOT_SET="false"
 curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
-if [ -z "${DEVSHIFT_USERNAME}" ] || [ -z "${DEVSHIFT_PASSWORD}" ]; then
+if [ -z "${QUAY_USERNAME}" ] || [ -z "${QUAY_PASSWORD}" ]; then
   echo "Docker registry credentials not set"
   CREDS_NOT_SET="true"
 fi

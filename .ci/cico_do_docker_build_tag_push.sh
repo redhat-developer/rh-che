@@ -8,7 +8,7 @@
 currentDir=`pwd`
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-. ${ABSOLUTE_PATH}/../config 
+. ${ABSOLUTE_PATH}/../config
 
 RH_CHE_TAG=$(git rev-parse --short HEAD)
 
@@ -22,8 +22,7 @@ DIR=${ABSOLUTE_PATH}/../dockerfiles/che-fabric8
 cd ${DIR}
 
 distPath='assembly/assembly-main/target/eclipse-che-*/eclipse-che-*'
-for distribution in `echo ${ABSOLUTE_PATH}/../${distPath};`
-do
+for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
   case "$distribution" in
     ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
       TAG=${UPSTREAM_TAG}-${RH_TAG_DIST_SUFFIX}-no-dashboard-${RH_CHE_TAG}
@@ -49,10 +48,9 @@ do
   echo "Copying assembly ${distribution} --> ${LOCAL_ASSEMBLY_DIR}"
   cp -r "${distribution}" "${LOCAL_ASSEMBLY_DIR}"
 
-  if [ "$DeveloperBuild" != "true" ] || [ "$PR_CHECK_BUILD" == "true" ];
-  then
-    if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-      docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" ${REGISTRY}
+  if [ "$DeveloperBuild" != "true" ] || [ "$PR_CHECK_BUILD" == "true" ]; then
+    if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
+      docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" ${REGISTRY}
     else
       echo "ERROR: Can not push to registry.devshift.net: credentials are not set. Aborting"
       exit 1
@@ -67,26 +65,27 @@ do
 
   # lets change the tag and push it to the registry
   docker tag ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY}
-    
+
   dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}"
 
   if [ "$DeveloperBuild" != "true" ]; then
       docker push ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY}
       docker push ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}
   fi
-  
+
   if [ "${NIGHTLY}" != "*-no-dashboard" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
-    docker build -t ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
+      docker build -t ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
+
       if [ $? -ne 0 ]; then
         echo 'Docker Build Failed'
         exit 2
       fi
-    
+
       # lets change the tag and push it to the registry
       docker tag ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
-        
+
       dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}"
-    
+
       if [ "$DeveloperBuild" != "true" ]; then
           docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
           docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}

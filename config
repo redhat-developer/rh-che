@@ -3,23 +3,24 @@
 TARGET=${TARGET:-"centos"}
 PR_CHECK_BUILD=${PR_CHECK_BUILD:-"false"}
 
+export REGISTRY="quay.io"
 export NAMESPACE=${NAMESPACE:-"rhchestage"}
-
-if [ "$TARGET" == "rhel" ]; then
-  export DOCKERFILE="Dockerfile.rhel"
-  export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
-else
-  export DOCKERFILE="Dockerfile"
-  export REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net"}
-fi
 
 if [ "$PR_CHECK_BUILD" == "true" ]; then
   export DOCKER_IMAGE="rh-che-automation"
 else
   export DOCKER_IMAGE="rh-che-server"
 fi
-KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
 
+if [ "$TARGET" == "rhel" ]; then
+  export DOCKERFILE="Dockerfile.rhel"
+  export DOCKER_IMAGE_URL="${REGISTRY}/rhel-${NAMESPACE}-${DOCKER_IMAGE}"
+else
+  export DOCKERFILE="Dockerfile"
+  export DOCKER_IMAGE_URL="${REGISTRY}/${NAMESPACE}-${DOCKER_IMAGE}"
+fi
+
+KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
 
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master
@@ -35,3 +36,9 @@ else
 fi
 
 export RH_NO_DASHBOARD_SUFFIX=without-dashboard
+
+che-rh-che-automation
+che-rh-che-server
+rhchestage-rh-che-automation
+rhchestage-rh-che-server
+rhchestage-rh-che-standalone-keycloak-configurator

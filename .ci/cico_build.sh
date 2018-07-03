@@ -15,30 +15,35 @@ currentDir=$(pwd)
 ciDir=$(dirname "$0")
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-if [ "$DeveloperBuild" != "true" ] && [ "$PR_CHECK_BUILD" != "true" ];
-then
+if [ "$DeveloperBuild" != "true" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
   set +x
-  cat jenkins-env | grep -e PASS -e DEVSHIFT > inherit-env
-  . inherit-env
-  if [ -z "${DEVSHIFT_USERNAME+x}" ]; then echo "WARNING: failed to get DEVSHIFT_USERNAME from jenkins-env file in centos-ci job."; else export DEVSHIFT_USERNAME; fi
-  if [ -z "${DEVSHIFT_PASSWORD+x}" ]; then echo "WARNING: failed to get DEVSHIFT_PASSWORD from jenkins-env file in centos-ci job."; else export DEVSHIFT_PASSWORD; fi
+
+  eval "$(./env-toolkit load -f jenkins-env.json -r PASS DEVSHIFT ^QUAY)"
+
+  if [ -z "${QUAY_USERNAME}" ]; then
+    echo "WARNING: failed to get QUAY_USERNAME from jenkins-env file in centos-ci job."
+  fi
+
+  if [ -z "${QUAY_PASSWORD}" ]; then
+    echo "WARNING: failed to get QUAY_PASSWORD from jenkins-env file in centos-ci job."
+  fi
 
   set -x
   yum -y update
   yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker
   yum -y install rh-maven33 rh-nodejs4
-  
+
   BuildUser="chebuilder"
 
   useradd ${BuildUser}
   groupadd docker
   gpasswd -a ${BuildUser} docker
-  
+
   systemctl start docker
-  
+
   chmod a+x ..
   chown -R ${BuildUser}:${BuildUser} ${currentDir}
-  
+
   runBuild() {
     runuser - ${BuildUser} -c "$*"
   }
@@ -48,7 +53,7 @@ else
   }
 fi
 
-source ${ABSOLUTE_PATH}/../config 
+source ${ABSOLUTE_PATH}/../config
 
 runBuild "cd ${ABSOLUTE_PATH} && bash ./cico_do_build_che.sh $*"
 if [ $? -eq 0 ]; then

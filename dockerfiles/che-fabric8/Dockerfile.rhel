@@ -6,7 +6,7 @@
 
 # RHEL parent dockerfile: https://github.com/rhdt/EL-Dockerfiles/blob/master/base/rh-che/Dockerfile
 
-FROM prod.registry.devshift.net/osio-prod/base/rh-che:latest
+FROM quay.io/openshiftio/rhel-base-rh-che:latest
 
 ENV LANG="C.UTF-8" \
     CHE_HOME=/home/user/che \
