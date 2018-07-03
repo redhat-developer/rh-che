@@ -36,9 +36,3 @@ else
 fi
 
 export RH_NO_DASHBOARD_SUFFIX=without-dashboard
-
-che-rh-che-automation
-che-rh-che-server
-rhchestage-rh-che-automation
-rhchestage-rh-che-server
-rhchestage-rh-che-standalone-keycloak-configurator
