@@ -33,50 +33,42 @@ function BuildTagAndPushDocker() {
 }
 
 # Retrieve and test credentials
-if [ ! -f "./jenkins-env" ]; then
-  echo "CRITICAL ERROR: Jenkins env was not provided by jenkins job"
-  exit 1
-fi
-
 set +x
-echo "***IMPORT jenkins-env NAMES DEBUG***"
-cat ./jenkins-env | sed 's;=.*;;' | sort
-echo "***==============================***"
-
-grep -E "(DEVSHIFT|KEYCLOAK|BUILD_NUMBER|JOB_NAME|RH_CHE)" ./jenkins-env | sed 's/^/export /g' | sed 's/= /=/g' > ./export_env_variables
-if [ ! -f "./export_env_variables" ]; then
-  echo "CRITICAL ERROR: sed edit of ./jeninks_env failed"
-  exit 1
-fi
-
-source export_env_variables
-
-echo "***DEBUG FOR VARIABLE NAMES [POST-IMPORT]***"
-env | sed 's;=.*;;' | sort
-echo "***======================================***"
+eval "$(./env-toolkit load -f jenkins-env.json -r \
+        ^DEVSHIFT_TAG_LEN$ \
+        ^QUAY_ \
+        ^KEYCLOAK \
+        ^BUILD_NUMBER$ \
+        ^JOB_NAME$ \
+        ^RH_CHE)"
 
 echo "Running ${JOB_NAME} build number #${BUILD_NUMBER}, testing creds:"
 
 CREDS_NOT_SET="false"
 curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
-if [ -z "${QUAY_USERNAME}" ] || [ -z "${QUAY_PASSWORD}" ]; then
+
+if [[ -z "${QUAY_USERNAME}" && -z "${QUAY_PASSWORD}" ]]; then
   echo "Docker registry credentials not set"
   CREDS_NOT_SET="true"
 fi
-if [ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" ] || [ -z "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" ]; then
+
+if [[ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" || -z "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" ]]; then
   echo "RDU2C credentials not set"
   CREDS_NOT_SET="true"
 fi
-if [ -z "${KEYCLOAK_TOKEN}" ] || [ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" ] || [ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD}" ]; then
+
+if [[ -z "${KEYCLOAK_TOKEN}" || -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" || -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD}" ]]; then
   echo "Prod-preview credentials not set."
   CREDS_NOT_SET="true"
 fi
-if [ "${CREDS_NOT_SET}" == "true" ]; then
+
+if [ "${CREDS_NOT_SET}" = "true" ]; then
   echo "Failed to parse jenkins secure store credentials"
   exit 2
 else
   echo "Credentials set successfully."
 fi
+
 if oc login ${DEV_CLUSTER_URL} --insecure-skip-tls-verify \
                                -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
                                -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}";
@@ -88,6 +80,7 @@ else
   echo "passwd: |${RH_CHE_AUTOMATION_RDU2C_PASSWORD:0:1}***${RH_CHE_AUTOMATION_RDU2C_PASSWORD: -1}|"
   exit 3
 fi
+
 set -x
 
 # Getting core repos ready
