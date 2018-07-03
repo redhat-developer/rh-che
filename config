@@ -12,15 +12,21 @@ else
   export DOCKER_IMAGE="rh-che-server"
 fi
 
+
 if [ "$TARGET" == "rhel" ]; then
   export DOCKERFILE="Dockerfile.rhel"
-  export DOCKER_IMAGE_URL="${REGISTRY}/rhel-${NAMESPACE}-${DOCKER_IMAGE}"
+  export DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/rhel-${NAMESPACE}-${DOCKER_IMAGE}"
+  export PROD_IMAGE_URL="${REGISTRY}/openshiftio/rhel-che-${DOCKER_IMAGE}"
 else
   export DOCKERFILE="Dockerfile"
-  export DOCKER_IMAGE_URL="${REGISTRY}/${NAMESPACE}-${DOCKER_IMAGE}"
+  export DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
+  export PROD_IMAGE_URL="${REGISTRY}/openshiftio/che-${DOCKER_IMAGE}"
 fi
 
 KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
+
+KEYCLOAK_DOCKER_IMAGE_URL=${REGISTRY}/openshiftio/${NAMESPACE}-${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}
+KEYCLOAK_PROD_IMAGE_URL=${REGISTRY}/openshiftio/che-${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}
 
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master

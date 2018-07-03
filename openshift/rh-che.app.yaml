@@ -115,7 +115,7 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: workspaces-pvc-storage-size
-                name: rhche        
+                name: rhche
           - name: JAVA_OPTS
             valueFrom:
               configMapKeyRef:
@@ -347,6 +347,6 @@ objects:
       name: rhche-host
 parameters:
 - name: IMAGE
-  value: registry.devshift.net/che/rh-che-server
+  value: quay.io/openshiftio/che-rh-che-server
 - name: IMAGE_TAG
   value: latest

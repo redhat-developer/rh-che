@@ -57,24 +57,24 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
     fi
   fi
 
-  docker build -t ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG} -f $DIR/${DOCKERFILE} .
+  docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f $DIR/${DOCKERFILE} .
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
     exit 2
   fi
 
   # lets change the tag and push it to the registry
-  docker tag ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY}
+  docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${NIGHTLY}
 
   dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}"
 
   if [ "$DeveloperBuild" != "true" ]; then
-      docker push ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY}
-      docker push ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}
+      docker push ${DOCKER_IMAGE_URL}:${NIGHTLY}
+      docker push ${DOCKER_IMAGE_URL}:${TAG}
   fi
 
   if [ "${NIGHTLY}" != "*-no-dashboard" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
-      docker build -t ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
+      docker build -t ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
 
       if [ $? -ne 0 ]; then
         echo 'Docker Build Failed'
@@ -82,13 +82,13 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
       fi
 
       # lets change the tag and push it to the registry
-      docker tag ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
+      docker tag ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
 
       dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}"
 
       if [ "$DeveloperBuild" != "true" ]; then
-          docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY}
-          docker push ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}
+          docker push ${KEYCLOAK_DOCKER_IMAGE_URL}:${NIGHTLY}
+          docker push ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG}
       fi
   fi
 done

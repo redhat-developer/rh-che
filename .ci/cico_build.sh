@@ -15,7 +15,7 @@ currentDir=$(pwd)
 ciDir=$(dirname "$0")
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-if [ "$DeveloperBuild" != "true" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
+if [[ "$DeveloperBuild" != "true" && "$PR_CHECK_BUILD" != "true" ]]; then
   set +x
 
   eval "$(./env-toolkit load -f jenkins-env.json -r PASS DEVSHIFT ^QUAY)"
