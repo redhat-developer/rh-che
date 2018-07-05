@@ -103,6 +103,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
   }
 
   public Config getWorkspacesOpenshiftConfig(Subject subject) throws InfrastructureException {
+    Config config;
     checkSubject(subject);
     UserCheTenantData cheTenantData = getUserCheTenantData(subject);
     checkClusterCapacity(cheTenantData);
@@ -115,17 +116,19 @@ public class Fabric8WorkspaceEnvironmentProvider {
     }
 
     String userId = subject.getUserId();
+    String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
 
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
-      LOG.debug("Using Che SA token for '{}'", userId);
-      String osoProxyUrl = multiClusterOpenShiftProxy.getUrlWithIdentityIdQueryParameter(userId);
-      configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken);
+      LOG.info("Using Che SA token for '{}'", userId);
+      config =
+          configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken).build();
+      LOG.info("Adding Impersonate Header '{}'", userId);
+      config.getRequestConfig().setImpersonateUsername(userId);
     } else {
-      String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
-      configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(subject.getToken());
+      config = configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(subject.getToken()).build();
     }
 
-    return configBuilder.build();
+    return config;
   }
 
   public String getWorkspacesOpenshiftNamespace(Subject subject) throws InfrastructureException {

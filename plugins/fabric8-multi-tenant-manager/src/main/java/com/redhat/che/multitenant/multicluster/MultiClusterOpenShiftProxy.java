@@ -33,8 +33,4 @@ public class MultiClusterOpenShiftProxy {
   public String getUrl() {
     return this.url;
   }
-
-  public String getUrlWithIdentityIdQueryParameter(String identityId) {
-    return this.url + "?identity_id=" + identityId;
-  }
 }
