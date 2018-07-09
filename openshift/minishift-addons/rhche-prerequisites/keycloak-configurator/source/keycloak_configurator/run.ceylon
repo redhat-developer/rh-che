@@ -95,8 +95,8 @@ shared void run() {
 		value providerBaseUrl = argument("provider-base-url");
 		
 		"You should set the URL of the Minishift console,
-		 either with the 'openshift-provider-base-url' command line argument,
-		 or with the 'OPENSHIFT_PROVIDER_BASE_URL' environment variable."
+		 either with the 'provider-base-url' command line argument,
+		 or with the 'PROVIDER_BASE_URL' environment variable."
 		assert(exists providerBaseUrl);
 		
 		value keycloak = keycloakBuilder()
@@ -162,7 +162,8 @@ shared void run() {
 			authFlows.updateAuthenticatorConfig(redirectorConfigId, redirectorConfig);
 		} else {
 			authFlows.newExecutionConfig(redirector.id, object extends AuthenticatorConfigRepresentation() {
-				this.config = entries {
+				\ialias = providerAlias;
+				config = entries {
 					"defaultProvider" -> providerAlias
 				};
 			});
