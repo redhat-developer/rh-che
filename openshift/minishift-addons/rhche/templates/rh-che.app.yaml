@@ -314,8 +314,8 @@ parameters:
   value: 'Recreate'
 - name: PULL_POLICY
   displayName: Che server image pull policy
-  description: Always pull by default. Can be IfNotPresent
-  value: 'Always'
+  description: Pull the image only if not present in the local registry by default. Can be 'Always' and 'Never'
+  value: 'IfNotPresent'
 - name: CHE_FABRIC8_USER__SERVICE_ENDPOINT
   displayName: User Service Endpoint
   description: URL of the user services API endpoint
