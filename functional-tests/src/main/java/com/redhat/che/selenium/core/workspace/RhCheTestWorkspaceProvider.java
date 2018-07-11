@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016-2018 Red Hat, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Red Hat, Inc. - initial API and implementation
+ */
 package com.redhat.che.selenium.core.workspace;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -32,20 +42,26 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
       TestWorkspaceServiceClient testWorkspaceServiceClient,
       TestWorkspaceServiceClientFactory testWorkspaceServiceClientFactory,
       CheStarterWrapper cheStarterWrapper) {
-    super(poolSize, threads, defaultMemoryGb, defaultUser, workspaceDtoDeserializer,
-        testWorkspaceServiceClient, testWorkspaceServiceClientFactory);
+    super(
+        poolSize,
+        threads,
+        defaultMemoryGb,
+        defaultUser,
+        workspaceDtoDeserializer,
+        testWorkspaceServiceClient,
+        testWorkspaceServiceClientFactory);
     this.cheStarterWrapper = cheStarterWrapper;
   }
 
   @Override
-  public TestWorkspace createWorkspace(TestUser owner, int memoryGB, String template, boolean startAfterCreation) {
+  public TestWorkspace createWorkspace(
+      TestUser owner, int memoryGB, String template, boolean startAfterCreation) {
     this.cheStarterWrapper.start();
     return new RhCheTestWorkspaceImpl(
         owner,
         testWorkspaceServiceClient instanceof RhCheTestWorkspaceServiceClient
             ? (RhCheTestWorkspaceServiceClient) testWorkspaceServiceClient
-            : null
-    );
+            : null);
   }
 
   @Override
@@ -71,8 +87,7 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
                       defaultUser,
                       testWorkspaceServiceClient instanceof RhCheTestWorkspaceServiceClient
                           ? (RhCheTestWorkspaceServiceClient) testWorkspaceServiceClient
-                          : null
-                  );
+                          : null);
             } catch (Exception e) {
               // scheduled executor service doesn't log any exceptions, so log possible exception
               // here
@@ -97,5 +112,4 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
         100,
         TimeUnit.MILLISECONDS);
   }
-
 }

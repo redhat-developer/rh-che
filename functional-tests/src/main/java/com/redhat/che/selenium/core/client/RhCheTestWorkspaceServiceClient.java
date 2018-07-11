@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016-2018 Red Hat, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Red Hat, Inc. - initial API and implementation
+ */
 package com.redhat.che.selenium.core.client;
 
 import com.google.inject.Inject;
@@ -21,7 +31,8 @@ import org.slf4j.LoggerFactory;
 public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServiceClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(RhCheTestWorkspaceServiceClient.class);
-  private static final String CREATE_WORKSPACE_REQUEST_JSON_PATH = "/configs/create-workspace-request.json";
+  private static final String CREATE_WORKSPACE_REQUEST_JSON_PATH =
+      "/configs/create-workspace-request.json";
 
   private TestUser owner = null;
   private String token = null;
@@ -59,13 +70,16 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
   }
 
   @Override
-  public Workspace createWorkspace(String workspaceName, int memory, MemoryMeasure memoryUnit,
-      WorkspaceConfigDto workspace) throws Exception {
+  public Workspace createWorkspace(
+      String workspaceName, int memory, MemoryMeasure memoryUnit, WorkspaceConfigDto workspace)
+      throws Exception {
     if (owner == null) {
       throw new IllegalStateException("Workspace does not have an owner.");
     }
     String name = this.cheStarterWrapper.createWorkspace(CREATE_WORKSPACE_REQUEST_JSON_PATH, token);
-    return requestFactory.fromUrl(getNameBasedUrl(name, owner.getName())).request()
+    return requestFactory
+        .fromUrl(getNameBasedUrl(name, owner.getName()))
+        .request()
         .asDto(WorkspaceDto.class);
   }
 
@@ -77,6 +91,7 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
       waitStatus(workspaceName, owner.getName(), WorkspaceStatus.RUNNING);
       LOG.info("Workspace " + workspaceName + "is running.");
     } catch (Exception e) {
+
       LOG.error("Failed to start workspace \"" + workspaceName + "\": " + e.getMessage(), e);
       throw e;
     }
@@ -97,5 +112,4 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
       throw e;
     }
   }
-
 }

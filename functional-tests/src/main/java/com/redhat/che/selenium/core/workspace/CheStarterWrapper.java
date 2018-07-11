@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 Red Hat, Inc.
+ * Copyright (c) 2016-2018 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,9 +35,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.embedded.EmbeddedMaven;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Katerina Kanova (kkanova)
- */
+/** @author Katerina Kanova (kkanova) */
 public class CheStarterWrapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(CheStarterWrapper.class);
@@ -50,8 +48,8 @@ public class CheStarterWrapper {
   public CheStarterWrapper(
       @Named("che.osio.url") String osioUrlPart,
       @Named("che.host") String cheHost,
-      @Named("che.chromedriver.port") String chromedriverPort
-  ) throws IOException, InterruptedException {
+      @Named("che.chromedriver.port") String chromedriverPort)
+      throws IOException, InterruptedException {
     this.host = cheHost;
     this.osioUrlPart = osioUrlPart;
     /* RUN CHROMEDRIVER */
@@ -71,7 +69,6 @@ public class CheStarterWrapper {
   }
 
   public void start() throws IllegalStateException {
-    //TODO: Check if che starter is running;
     try {
       File cheStarterDir =
           new File(System.getProperty("user.dir"), "target" + File.separator + "che-starter");
@@ -86,8 +83,7 @@ public class CheStarterWrapper {
       props.setProperty(
           "GITHUB_TOKEN_URL",
           "https://auth." + this.osioUrlPart + "/api/token?for=https://github.com");
-      props.setProperty(
-          "CHE_SERVER_URL", "https://rhche." + this.osioUrlPart);
+      props.setProperty("CHE_SERVER_URL", "https://rhche." + this.osioUrlPart);
       String pom = cheStarterDir.getAbsolutePath() + File.separator + "pom.xml";
       EmbeddedMaven.forProject(pom)
           .useMaven3Version("3.5.2")
@@ -108,8 +104,8 @@ public class CheStarterWrapper {
   public String createWorkspace(String pathToJson, String token) throws Exception {
     BufferedReader buffer = null;
     try {
-      buffer = new BufferedReader(
-          new InputStreamReader(getClass().getResourceAsStream(pathToJson)));
+      buffer =
+          new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(pathToJson)));
     } catch (Exception e) {
       LOG.error("File with json was not found on address: " + pathToJson, e);
       throw e;
@@ -118,13 +114,14 @@ public class CheStarterWrapper {
     String path = "/workspace";
     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     RequestBody body = RequestBody.create(JSON, json);
-    StringBuilder sb = new StringBuilder(this.cheStarterURL)
-        .append(path)
-        .append("?")
-        .append("masterUrl=")
-        .append(this.host)
-        .append("&")
-        .append("namespace=sth");
+    StringBuilder sb =
+        new StringBuilder(this.cheStarterURL)
+            .append(path)
+            .append("?")
+            .append("masterUrl=")
+            .append(this.host)
+            .append("&")
+            .append("namespace=sth");
     Builder requestBuilder = new Request.Builder().url(sb.toString());
     requestBuilder.addHeader("Content-Type", "application/json");
     requestBuilder.addHeader("Authorization", "Bearer " + token);
@@ -134,7 +131,7 @@ public class CheStarterWrapper {
       Response response = client.newCall(request).execute();
       return getNameFromResponse(response);
     } catch (IOException e) {
-      LOG.error("Workspace could not be created : "+e.getMessage(), e);
+      LOG.error("Workspace could not be created : " + e.getMessage(), e);
       return null;
     }
   }
@@ -151,10 +148,10 @@ public class CheStarterWrapper {
     OkHttpClient client = new OkHttpClient();
     try {
       Response response = client.newCall(requestBuilder.delete().build()).execute();
-      LOG.info("Workspace delete response : "+response.message());
+      LOG.info("Workspace delete response : " + response.message());
       return response.isSuccessful();
     } catch (IOException e) {
-      LOG.error("Workspace could not be deleted : "+e.getMessage(), e);
+      LOG.error("Workspace could not be deleted : " + e.getMessage(), e);
       return false;
     }
   }
@@ -187,20 +184,16 @@ public class CheStarterWrapper {
         }
       }
     } catch (IOException e) {
-      LOG.error("Workspace start failed : "+e.getMessage(), e);
+      LOG.error("Workspace start failed : " + e.getMessage(), e);
       throw e;
     }
   }
 
-  // ================= //
-  //  PRIVATE METHODS  //
-  // ================= //
-
   private String getNameFromResponse(Response response) {
     try {
       String responseString = response.body().string();
-      Object jsonDocument = Configuration.defaultConfiguration().jsonProvider()
-          .parse(responseString);
+      Object jsonDocument =
+          Configuration.defaultConfiguration().jsonProvider().parse(responseString);
       return JsonPath.read(jsonDocument, "$.config.name");
     } catch (IOException e) {
       LOG.error(e.getLocalizedMessage());
@@ -220,5 +213,4 @@ public class CheStarterWrapper {
       // repository already cloned. Do nothing.
     }
   }
-
 }

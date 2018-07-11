@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 Red Hat, Inc.
+ * Copyright (c) 2016-2018 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-/**
- * @author Anatolii Bazko
- */
+/** @author Anatolii Bazko */
 public class RhCheTestWorkspaceImpl implements TestWorkspace {
 
   private static final Logger LOG = LoggerFactory.getLogger(RhCheTestWorkspaceImpl.class);
@@ -38,8 +36,7 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
   private RhCheTestWorkspaceServiceClient workspaceServiceClient;
 
   public RhCheTestWorkspaceImpl(
-      TestUser owner,
-      RhCheTestWorkspaceServiceClient testWorkspaceServiceClient) {
+      TestUser owner, RhCheTestWorkspaceServiceClient testWorkspaceServiceClient) {
     this.id = new AtomicReference<>();
     this.workspaceName = new AtomicReference<>();
     this.owner = new AtomicReference<>();
@@ -58,23 +55,24 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
                 this.id.set(ws.getId());
                 this.workspaceName.set(ws.getConfig().getName());
                 long start = System.currentTimeMillis();
-                workspaceServiceClient
-                    .start(this.id.get(), this.workspaceName.get(), this.owner.get());
+                workspaceServiceClient.start(
+                    this.id.get(), this.workspaceName.get(), this.owner.get());
                 LOG.info(
                     "Workspace name='{}' id='{}' started in {} sec.",
                     workspaceName.get(),
                     ws.getId(),
                     (System.currentTimeMillis() - start) / 1000);
               } catch (Exception e) {
-                String errorMessage = format("Workspace name='%s' start failed.",
-                    this.workspaceName.get());
+                String errorMessage =
+                    format("Workspace name='%s' start failed.", this.workspaceName.get());
                 LOG.error(errorMessage, e);
 
                 try {
-                  workspaceServiceClient
-                      .delete(this.workspaceName.get(), this.owner.get().getName());
+                  workspaceServiceClient.delete(
+                      this.workspaceName.get(), this.owner.get().getName());
                 } catch (Exception e1) {
-                  LOG.error("Failed to remove workspace name='{}' when start is failed.",
+                  LOG.error(
+                      "Failed to remove workspace name='{}' when start is failed.",
                       this.workspaceName.get());
                 }
 
@@ -114,12 +112,11 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
     this.future.thenAccept(
         aVoid -> {
           try {
-            this.workspaceServiceClient
-                .delete(this.workspaceName.get(), this.owner.get().getName());
+            this.workspaceServiceClient.delete(
+                this.workspaceName.get(), this.owner.get().getName());
           } catch (Exception e) {
             throw new RuntimeException(format("Failed to remove workspace '%s'", this), e);
           }
         });
   }
-
 }

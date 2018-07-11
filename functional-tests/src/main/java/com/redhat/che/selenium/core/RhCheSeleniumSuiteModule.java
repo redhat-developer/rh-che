@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2016-2018 Red Hat, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Red Hat, Inc. - initial API and implementation
+ */
 package com.redhat.che.selenium.core;
 
 import static com.google.inject.name.Names.named;
@@ -23,12 +33,11 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
     config.getMap().forEach((key, value) -> bindConstant().annotatedWith(named(key)).to(value));
     bind(DefaultTestUserProvider.class).to(MultiUserCheDefaultTestUserProvider.class);
     bind(DefaultTestUser.class).toProvider(DefaultTestUserProvider.class);
-    install(new FactoryModuleBuilder()
-        .implement(TestWorkspaceServiceClient.class, RhCheTestWorkspaceServiceClient.class)
-        .build(TestWorkspaceServiceClientFactory.class)
-    );
+    install(
+        new FactoryModuleBuilder()
+            .implement(TestWorkspaceServiceClient.class, RhCheTestWorkspaceServiceClient.class)
+            .build(TestWorkspaceServiceClientFactory.class));
     bind(TestWorkspaceServiceClient.class).to(RhCheTestWorkspaceServiceClient.class);
     bind(TestWorkspaceProvider.class).to(RhCheTestWorkspaceProvider.class).asEagerSingleton();
   }
-
 }
