@@ -347,6 +347,6 @@ objects:
       name: rhche-host
 parameters:
 - name: IMAGE
-  value: quay.io/openshiftio/che-rh-che-server
+  value: quay.io/openshiftio/rhel-che-rh-che-server
 - name: IMAGE_TAG
   value: latest
