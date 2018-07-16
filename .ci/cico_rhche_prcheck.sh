@@ -20,7 +20,7 @@ set +o nounset
 export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-che6-automated.dev.rdu2c.fabric8.io/
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://dev.rdu2c.fabric8.io:8443/
-export OC_VERSION=3.7.48
+export OC_VERSION=3.9.33
 export TARGET=${TARGET:-"rhel"}
 export PR_CHECK_BUILD=${PR_CHECK_BUILD:-"true"}
 
