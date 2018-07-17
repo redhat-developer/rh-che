@@ -11,7 +11,7 @@ set +e
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Retrieve credentials to push the image to the docker hub
-  eval "$(./env-toolkit load -f jenkins-env.json -r PASS DEVSHIFT ^QUAY)"
+  eval "$(./env-toolkit load -f jenkins-env.json -r ^GIT_COMMIT$ PASS DEVSHIFT ^QUAY)"
 
 . ${ABSOLUTE_PATH}/../config
 
