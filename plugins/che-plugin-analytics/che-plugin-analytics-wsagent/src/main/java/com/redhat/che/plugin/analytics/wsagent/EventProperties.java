@@ -14,4 +14,14 @@ public interface EventProperties {
   public static final String PROGRAMMING_LANGUAGE = "programming language";
   public static final String WORKSPACE_ID = "workspace id";
   public static final String WORKSPACE_NAME = "workspace name";
+  public static final String STACK_ID = "stack id";
+  public static final String FACTORY_ID = "factory id";
+  public static final String FACTORY_NAME = "factory name";
+  public static final String FACTORY_OWNER = "factory owner";
+  public static final String CREATED = "creation time";
+  public static final String UPDATED = "start time";
+  public static final String STOPPED = "last stop time";
+  public static final String AGE = "age";
+  public static final String RETURN_DELAY = "return delay ";
+  public static final String FIRST_START = "first start";
 }

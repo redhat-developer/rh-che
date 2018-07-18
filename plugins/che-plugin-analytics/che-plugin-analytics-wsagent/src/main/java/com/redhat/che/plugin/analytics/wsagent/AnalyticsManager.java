@@ -11,13 +11,15 @@
 
 package com.redhat.che.plugin.analytics.wsagent;
 
-import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.ImmutableMap.builder;
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_INACTIVE;
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_STARTED;
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_STOPPED;
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_USED;
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.WORKSPACE_ID;
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.WORKSPACE_NAME;
+import static java.lang.Long.parseLong;
+import static java.util.AbstractMap.SimpleImmutableEntry;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -43,6 +45,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -52,7 +55,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import org.eclipse.che.api.core.model.workspace.Workspace;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
+import org.eclipse.che.api.factory.shared.dto.FactoryDto;
+import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.slf4j.Logger;
 
@@ -79,6 +85,16 @@ public class AnalyticsManager {
   private final String workspaceId;
 
   @VisibleForTesting final String workspaceName;
+  @VisibleForTesting final String factoryId;
+  @VisibleForTesting final String stackId;
+  @VisibleForTesting final String factoryName;
+  @VisibleForTesting final String factoryOwner;
+  @VisibleForTesting final String createdOn;
+  @VisibleForTesting final String updatedOn;
+  @VisibleForTesting final String stoppedOn;
+  @VisibleForTesting final Long age;
+  @VisibleForTesting final Long returnDelay;
+  @VisibleForTesting final Boolean firstStart;
 
   private String segmentWriteKey;
   private String woopraDomain;
@@ -115,15 +131,66 @@ public class AnalyticsManager {
 
     try {
       String endpoint = apiEndpoint + "/workspace/" + workspaceId;
-      workspaceName =
-          requestFactory
-              .fromUrl(endpoint)
-              .request()
-              .asDto(WorkspaceDto.class)
-              .getConfig()
-              .getName();
+
+      Workspace workspace = requestFactory.fromUrl(endpoint).request().asDto(WorkspaceDto.class);
+
+      createdOn = workspace.getAttributes().get(Constants.CREATED_ATTRIBUTE_NAME);
+      updatedOn = workspace.getAttributes().get(Constants.UPDATED_ATTRIBUTE_NAME);
+      stoppedOn = workspace.getAttributes().get(Constants.STOPPED_ATTRIBUTE_NAME);
+
+      Long createDate = null;
+      Long updateDate = null;
+      Long stopDate = null;
+      try {
+        createDate = parseLong(createdOn);
+      } catch (NumberFormatException nfe) {
+        LOG.warn("the create timestamp ( " + createdOn + " ) has invalid format", nfe);
+      }
+      try {
+        updateDate = parseLong(updatedOn);
+      } catch (NumberFormatException nfe) {
+        LOG.warn("the update timestamp ( " + updatedOn + " ) has invalid format", nfe);
+      }
+      if (stoppedOn != null) {
+        try {
+          stopDate = parseLong(stoppedOn);
+        } catch (NumberFormatException nfe) {
+          LOG.warn("the stop timestamp ( " + stoppedOn + " ) has invalid format", nfe);
+        }
+      }
+
+      if (updateDate != null && createDate != null) {
+        age = (updateDate - createDate) / 1000;
+      } else {
+        age = null;
+      }
+      if (updateDate != null && stopDate != null) {
+        returnDelay = (updateDate - stopDate) / 1000;
+      } else {
+        returnDelay = null;
+      }
+      if (updateDate != null) {
+        firstStart = stopDate == null;
+      } else {
+        firstStart = null;
+      }
+
+      stackId = workspace.getAttributes().get("stackId");
+      factoryId = workspace.getAttributes().get("factoryId");
+      if (factoryId != null) {
+        endpoint = apiEndpoint + "/factory/" + factoryId;
+
+        FactoryDto factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
+        factoryName = factory.getName();
+        factoryOwner = factory.getCreator().getName();
+      } else {
+        factoryName = null;
+        factoryOwner = null;
+      }
+
+      workspaceName = workspace.getConfig().getName();
     } catch (Exception e) {
-      throw new RuntimeException("Can't get workspace name for Che analytics", e);
+      throw new RuntimeException("Can't get workspace informations for Che analytics", e);
     }
 
     if (!segmentWriteKey.isEmpty() && woopraDomain.isEmpty()) {
@@ -263,11 +330,31 @@ public class AnalyticsManager {
 
     EventDispatcher(String userId, AnalyticsManager manager) {
       this.userId = userId;
-      this.commonProperties =
-          of(
-              WORKSPACE_ID, workspaceId,
-              WORKSPACE_NAME, workspaceName);
-      this.cookie =
+      ImmutableMap.Builder<String, Object> commonPropertiesBuilder = builder();
+
+      commonPropertiesBuilder.put(WORKSPACE_ID, workspaceId);
+      commonPropertiesBuilder.put(WORKSPACE_NAME, workspaceName);
+
+      Arrays.asList(
+              new SimpleImmutableEntry<>(EventProperties.CREATED, createdOn),
+              new SimpleImmutableEntry<>(EventProperties.UPDATED, updatedOn),
+              new SimpleImmutableEntry<>(EventProperties.STOPPED, stoppedOn),
+              new SimpleImmutableEntry<>(EventProperties.AGE, age),
+              new SimpleImmutableEntry<>(EventProperties.RETURN_DELAY, returnDelay),
+              new SimpleImmutableEntry<>(EventProperties.FIRST_START, firstStart),
+              new SimpleImmutableEntry<>(EventProperties.STACK_ID, stackId),
+              new SimpleImmutableEntry<>(EventProperties.FACTORY_ID, factoryId),
+              new SimpleImmutableEntry<>(EventProperties.FACTORY_NAME, factoryName),
+              new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner))
+          .forEach(
+              (entry) -> {
+                if (entry.getValue() != null) {
+                  commonPropertiesBuilder.put(entry.getKey(), entry.getValue());
+                }
+              });
+
+      commonProperties = commonPropertiesBuilder.build();
+      cookie =
           Hashing.md5()
               .hashString(workspaceId + userId + System.currentTimeMillis(), StandardCharsets.UTF_8)
               .toString();
