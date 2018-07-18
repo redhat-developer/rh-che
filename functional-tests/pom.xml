@@ -42,6 +42,13 @@
                 <!-- <version>${che.version}</version> -->
                 <version>6.8.0</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.che.selenium</groupId>
+                <artifactId>che-selenium-test</artifactId>
+                <version>6.8.0</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -99,6 +106,12 @@
             <artifactId>che-selenium-test</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.che.selenium</groupId>
+            <artifactId>che-selenium-test</artifactId>
+            <type>test-jar</type>
+            <!--<scope>test</scope>-->
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -128,6 +141,7 @@
                                     <ignoreArtifacts>
                                         <ignoreArtifact>org.eclipse.che.selenium:che-selenium-core:jar</ignoreArtifact>
                                         <ignoreArtifact>org.eclipse.che.selenium:che-selenium-test:jar</ignoreArtifact>
+                                        <ignoreArtifact>org.eclipse.che.selenium:che-selenium-test:test-jar</ignoreArtifact>
                                     </ignoreArtifacts>
                                 </requireDepMgt>
                             </rules>
