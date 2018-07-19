@@ -61,6 +61,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
   private final OpenshiftUserTokenProvider openshiftUserTokenProvider;
   private final TenantDataProvider tenantDataProvider;
   private boolean trustCerts;
+  private String wsAgentRoutingTimeout;
 
   @Inject
   public RhCheInfraEnvironmentProvisioner(
@@ -78,7 +79,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       TenantDataProvider tenantDataProvider,
       PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner,
       ImagePullSecretProvisioner imagePullSecretProvisioner,
-      @Named("che.infra.kubernetes.trust_certs") boolean trustCerts) {
+      @Named("che.infra.kubernetes.trust_certs") boolean trustCerts,
+      @Named("che.fabric8.wsagent_routing_timeout") String wsAgentRoutingTimeout) {
     super(
         pvcEnabled,
         uniqueNamesProvisioner,
@@ -96,6 +98,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;
     this.trustCerts = trustCerts;
+    this.wsAgentRoutingTimeout = wsAgentRoutingTimeout;
   }
 
   @Override
@@ -116,6 +119,16 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       // oc login injection is not critical - lets continue start of the workspace if failed
       LOG.error(e.getLocalizedMessage());
     }
+
+    osEnv
+        .getRoutes()
+        .forEach(
+            (name, route) -> {
+              Map<String, String> annotations = route.getMetadata().getAnnotations();
+              if (annotations.containsKey("org.eclipse.che.server.wsagent/http.path")) {
+                annotations.put("haproxy.router.openshift.io/timeout", wsAgentRoutingTimeout);
+              }
+            });
   }
 
   private void addTokenEnvVar(Map<String, String> envVars, Subject subject)

@@ -22,10 +22,14 @@ import static org.testng.Assert.assertTrue;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
+import io.fabric8.openshift.api.model.Route;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.commons.env.EnvironmentContext;
@@ -51,6 +55,7 @@ import org.testng.annotations.Test;
 
 @Listeners(MockitoTestNGListener.class)
 public class RhCheInfraEnvironmentProvisionerTest {
+  private static final String WSAGENT_ROUTER_TIMEOUT = "10m";
   private static final String USER_ID = "userId";
   private static final String NAMESPACE = "project1";
   private static final String CLUSTER_URL = "https://api.starter-us-east-2.openshift.com/";
@@ -77,6 +82,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
   private List<EnvVar> con1EnvVars;
   private List<EnvVar> con2EnvVars;
   private List<EnvVar> con3EnvVars;
+  private Map<String, String> wsAgentRouteAnnotations;
+
   private RhCheInfraEnvironmentProvisioner provisioner;
 
   @BeforeMethod
@@ -101,7 +108,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
             tenantDataProvider,
             podTerminationGracePeriodProvisioner,
             imagePullSecretProvisioner,
-            false);
+            false,
+            WSAGENT_ROUTER_TIMEOUT);
 
     Pod pod1 = mock(Pod.class);
     Pod pod2 = mock(Pod.class);
@@ -110,12 +118,17 @@ public class RhCheInfraEnvironmentProvisionerTest {
     Container container1 = mock(Container.class);
     Container container2 = mock(Container.class);
     Container container3 = mock(Container.class);
+    Route wsAgentRoute = mock(Route.class);
+    ObjectMeta wsAgentRouteMetadata = mock(ObjectMeta.class);
+    wsAgentRouteAnnotations = new HashMap<>();
+    wsAgentRouteAnnotations.put("org.eclipse.che.server.wsagent/http.path", "/api");
 
     when(runtimeIdentity.getOwnerId()).thenReturn(USER_ID);
     when(openshiftUserTokenProvider.getToken(eq(SUBJECT))).thenReturn(OSO_TOKEN);
     when(tenantDataProvider.getUserCheTenantData(eq(SUBJECT), eq("user")))
         .thenReturn(new UserCheTenantData(NAMESPACE, CLUSTER_URL, null, false));
     when(openShiftEnvironment.getPods()).thenReturn(of("pod1", pod1, "pod2", pod2));
+    when(openShiftEnvironment.getRoutes()).thenReturn(of("routeName", wsAgentRoute));
     when(pod1.getSpec()).thenReturn(podSpec1);
     when(pod2.getSpec()).thenReturn(podSpec2);
     when(podSpec1.getContainers()).thenReturn(singletonList(container1));
@@ -123,6 +136,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
     when(container1.getEnv()).thenReturn(con1EnvVars);
     when(container2.getEnv()).thenReturn(con2EnvVars);
     when(container3.getEnv()).thenReturn(con3EnvVars);
+    when(wsAgentRoute.getMetadata()).thenReturn(wsAgentRouteMetadata);
+    when(wsAgentRouteMetadata.getAnnotations()).thenReturn(wsAgentRouteAnnotations);
 
     EnvironmentContext.getCurrent().setSubject(SUBJECT);
   }
@@ -135,6 +150,15 @@ public class RhCheInfraEnvironmentProvisionerTest {
     verifyOcLoginEnvVarsPresence(con2EnvVars);
     verifyOcLoginEnvVarsPresence(con3EnvVars);
     verify(tenantDataProvider).getUserCheTenantData(eq(SUBJECT), eq("user"));
+  }
+
+  @Test
+  public void shouldAnnotateWsAgentRouteWithTimeout() throws Exception {
+    provisioner.provision(openShiftEnvironment, runtimeIdentity);
+
+    assertTrue(wsAgentRouteAnnotations.containsKey("haproxy.router.openshift.io/timeout"));
+    assertEquals(
+        wsAgentRouteAnnotations.get("haproxy.router.openshift.io/timeout"), WSAGENT_ROUTER_TIMEOUT);
   }
 
   @Test
