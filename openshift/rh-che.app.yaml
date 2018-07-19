@@ -37,9 +37,9 @@ objects:
     selector:
       app: rhche
     strategy:
-      recreateParams:
+      rollingParams:
         timeoutSeconds: 10000
-      type: Recreate
+      type: Rolling
     template:
       metadata:
         labels:
