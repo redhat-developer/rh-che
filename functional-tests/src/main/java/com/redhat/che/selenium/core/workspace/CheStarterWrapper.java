@@ -15,12 +15,8 @@ import com.google.inject.name.Named;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -28,10 +24,6 @@ import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.JGitInternalException;
-import org.jboss.shrinkwrap.resolver.api.maven.embedded.EmbeddedMaven;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,17 +33,16 @@ public class CheStarterWrapper {
   private static final Logger LOG = LoggerFactory.getLogger(CheStarterWrapper.class);
 
   private String host;
-  private String osioUrlPart;
+
+  @Inject(optional = true)
+  @Named("sys.cheStarterUrl")
   private String cheStarterURL = "http://localhost:10000";
 
   @Inject
   public CheStarterWrapper(
-      @Named("che.osio.url") String osioUrlPart,
-      @Named("che.host") String cheHost,
-      @Named("che.chromedriver.port") String chromedriverPort)
+      @Named("che.host") String cheHost, @Named("che.chromedriver.port") String chromedriverPort)
       throws IOException, InterruptedException {
     this.host = cheHost;
-    this.osioUrlPart = osioUrlPart;
     /* RUN CHROMEDRIVER */
     String chromeDriverCheckCommand =
         "lsof -i TCP | grep -q 'localhost:" + chromedriverPort + " (LISTEN)'";
@@ -67,37 +58,26 @@ public class CheStarterWrapper {
       }
     }
   }
-
-  public void start() throws IllegalStateException {
+  /** Checks whether che-starter is already running. Throws RuntimeException otherwise. */
+  public void checkIsRunning() {
+    Builder requestBuilder = new Request.Builder().url(this.cheStarterURL);
+    Request livenessRequest = requestBuilder.get().build();
+    OkHttpClient client = new OkHttpClient();
+    Response livenessResponse;
     try {
-      File cheStarterDir =
-          new File(System.getProperty("user.dir"), "target" + File.separator + "che-starter");
-
-      cloneGitDirectory(cheStarterDir);
-
-      LOG.info("Running che starter.");
-      Properties props = new Properties();
-      props.setProperty(
-          "OPENSHIFT_TOKEN_URL",
-          "https://sso." + this.osioUrlPart + "/auth/realms/fabric8/broker/openshift-v3/token");
-      props.setProperty(
-          "GITHUB_TOKEN_URL",
-          "https://auth." + this.osioUrlPart + "/api/token?for=https://github.com");
-      props.setProperty("CHE_SERVER_URL", "https://rhche." + this.osioUrlPart);
-      String pom = cheStarterDir.getAbsolutePath() + File.separator + "pom.xml";
-      EmbeddedMaven.forProject(pom)
-          .useMaven3Version("3.5.2")
-          .setGoals("spring-boot:run")
-          .setProperties(props)
-          .useAsDaemon()
-          .withWaitUntilOutputLineMathes(".*Started Application in.*", 10, TimeUnit.MINUTES)
-          .build();
-
-    } catch (GitAPIException e) {
-      throw new IllegalStateException(
-          "There was a problem with getting the git che-starter repository", e);
-    } catch (TimeoutException e) {
-      throw new IllegalStateException("The che-starter haven't started within 300 seconds.", e);
+      livenessResponse = client.newCall(livenessRequest).execute();
+      if (livenessResponse.code() != 200) {
+        String errMsg =
+            "Liveness probe for che-starter failed with HTTP code: "
+                + livenessResponse.code()
+                + ". It is probably not running";
+        LOG.error(errMsg);
+        throw new RuntimeException(errMsg);
+      }
+    } catch (IOException e) {
+      String errMsg = "Liveness probe for che-starter failed.";
+      LOG.error(errMsg, e);
+      throw new RuntimeException(errMsg, e);
     }
   }
 
@@ -200,17 +180,5 @@ public class CheStarterWrapper {
       e.printStackTrace();
     }
     return null;
-  }
-
-  private void cloneGitDirectory(File cheStarterDir) throws GitAPIException {
-    LOG.info("Cloning che-starter project.");
-    try {
-      Git.cloneRepository()
-          .setURI("https://github.com/redhat-developer/che-starter")
-          .setDirectory(cheStarterDir)
-          .call();
-    } catch (JGitInternalException ex) {
-      // repository already cloned. Do nothing.
-    }
   }
 }
