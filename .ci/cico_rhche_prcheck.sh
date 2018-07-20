@@ -17,7 +17,7 @@ set +o nounset
 
 /usr/sbin/setenforce 0
 
-export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-che6-automated.dev.rdu2c.fabric8.io/
+export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-che6-automated.dev.rdu2c.fabric8.io/
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://dev.rdu2c.fabric8.io:8443/
 export OC_VERSION=3.9.33
@@ -125,6 +125,7 @@ if ./dev-scripts/deploy_custom_rh-che.sh -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}
                                          -t nightly-"${RH_TAG_DIST_SUFFIX}" \
                                          -e che6-automated \
                                          -s \
+                                         -U \
                                          -z;
 then
   echo "Che successfully deployed."

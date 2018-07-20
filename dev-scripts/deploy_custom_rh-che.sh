@@ -26,6 +26,7 @@ usage="\\033[93;1m$(basename "$0") \\033[0;1m[-u <username>] [-p <passwd>] [-o <
     \\033[1m-t\\033[0m  [\\033[1mdefault=latest\\033[0m] tag for specific build (first 7 characters of commit hash)
     \\033[1m-r\\033[0m  docker image registry from where to pull
     \\033[1m-z\\033[0m  run this script as a standalone self-contained application
+    \\033[1m-U\\033[0m  use unsecure route (do not annotate route)
 
 \\033[32;1mrequirements\\033[0m:
     \\033[1moc\\033[0m  openshift origin CLI admin (dnf install origin-clients)
@@ -41,6 +42,7 @@ export RH_CHE_JDBC_USERNAME=pgche;
 export RH_CHE_JDBC_PASSWORD=pgchepassword;
 export RH_CHE_JDBC_URL=jdbc:postgresql://postgres:5432/dbche;
 export RH_CHE_RUNNING_STANDALONE_SCRIPT="false";
+export RH_CHE_USE_TLS="true"
 
 export RH_CHE_DOCKER_IMAGE_TAG="latest";
 export RH_CHE_DOCKER_REPOSITORY="registry.devshift.net/che/rh-che-server";
@@ -67,6 +69,7 @@ function unsetVars() {
   unset POSTGRES_STATUS_AVAILABLE;
   unset RH_CHE_STATUS_PROGRESS;
   unset RH_CHE_STATUS_AVAILABLE;
+  unset RH_CHE_USE_TLS;
 }
 
 function clearEnv() {
@@ -132,7 +135,7 @@ function deployPostgres() {
 }
 
 # Parse commandline flags
-while getopts ':hnsu:p:r:t:o:e:b:z' option; do
+while getopts ':hnsUu:p:r:t:o:e:b:z' option; do
   case "$option" in
     h) echo -e "$usage"
        exit 0
@@ -158,6 +161,8 @@ while getopts ':hnsu:p:r:t:o:e:b:z' option; do
        ;;
     z) export RH_CHE_RUNNING_STANDALONE_SCRIPT="true"
        ;; 
+    U) export RH_CHE_USE_TLS="false"
+       ;;
     :) echo -e "\\033[91;1mMissing argument for -$OPTARG\\033[0m" >&2
        echo -e "$usage" >&2
        unsetVars
@@ -275,6 +280,12 @@ if (oc get dc rhche > /dev/null 2>&1); then
   waitForCheToBeDeleted
 fi
 
+if [ "${RH_CHE_USE_TLS}" == "true" ]; then
+  SECURE="s"
+else
+  SECURE=""
+fi
+
 # APPLY CHE CONFIGMAP
 CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" | 
                       .\"data\".\"che-keycloak-auth-server-url\" = \"NULL\" | 
@@ -291,10 +302,12 @@ CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" |
 
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                   yq ".\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io\" |
-                      .\"data\".\"infra-bootstrapper-binary-url\" = \"https://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
-                      .\"data\".\"che-api\" = \"https://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api\" |
-                      .\"data\".\"che-websocket-endpoint\" = \"wss://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/websocket\" |
-                      .\"metadata\".\"name\" = \"rhche\" ")
+                      .\"data\".\"infra-bootstrapper-binary-url\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
+                      .\"data\".\"che-api\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api\" |
+                      .\"data\".\"che-websocket-endpoint\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/websocket\" |
+                      .\"metadata\".\"name\" = \"rhche\" |
+                      .\"data\".\"che-openshift-secure-routes\" = \"$RH_CHE_USE_TLS\" |
+                      .\"data\".\"che-secure-external-urls\" = \"$RH_CHE_USE_TLS\" ")
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
   echo -e "\\033[91;1mFailed to apply configmap [$?].\\033[0m"
@@ -321,6 +334,11 @@ CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
                           (.objects[] | select(.kind == \"DeploymentConfig\").spec.template.spec.containers[0].env[] |
                            select(.name == \"CHE_JDBC_USERNAME\").valueFrom) |= {\"configMapKeyRef\":{\"key\":\"che.jdbc.username\",\"name\":\"rhche\"}}")
 
+if [ "${RH_CHE_USE_TLS}" != "true" ]; then
+  CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | yq "del (.objects[] | select(.kind == \"Route\").spec.tls)")
+fi
+
+
 if ! (echo "$CHE_APP_CONFIG_YAML" | oc process -f - | oc apply -f - > /dev/null 2>&1); then
   echo -e "\\033[91;1mFailed to process che config [$?]\\033[0m"
   exit 5
@@ -338,8 +356,14 @@ if [ ${CHE_STARTUP_TIMEOUT} == 0 ]; then
   exit 1
 fi
 
-oc annotate --overwrite=true route/rhche kubernetes.io/tls-acme=true
-echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttps://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/\\033[0m"
+if [ "${RH_CHE_USE_TLS}" == "true" ]; then
+  echo -e "Annotating route"
+  oc annotate --overwrite=true route/rhche kubernetes.io/tls-acme=true
+else
+  echo -e "Annotating route skipped"
+fi
+
+echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttp$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/\\033[0m"
 
 # CLEANUP
 if [ "$RH_CHE_DEPLOY_SCRIPT_CLEANUP" = true ]; then
