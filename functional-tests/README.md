@@ -23,7 +23,8 @@ verify Che itself.
 There are some jobs running periodically on clusters us-east-2, us-east-2a and free-stg as you can see in the begining of this readme.
 
 ## How to run it
-These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`
+These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`. Tests expects che starter running. You can specify che starter url or use default (default value is http://localhost:10000).
+Che starter can be cloned from github: https://github.com/redhat-developer/che-starter.
 
 To run these tests it is necessary to have some variables set:
 
@@ -41,6 +42,7 @@ VM options
 | driver.port | port of driver (e.g. port of chromedriver) |
 | driver.version | version of driver |
 | excludedGroups | group of tests to be excluded |
+| cheStarterUrl | url of running che starter |
 
 Environment variables
 
