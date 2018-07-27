@@ -48,4 +48,15 @@ end
 hnote over Commiter: After PR is unblocked and approved,\n the Commiter can confirm a merge.
 Commiter -[#000]> master : merge
 destroy PR_Check
+... merge to master jenkins jobs ...
+note over PR_Check, ci.centos.org
+  After successful merge and build of
+  devtools-rh-che-build-che-credentials-master
+  the dependency build will be triggered to ensure
+  latest packages are contained in the docker image
+end note
+master -[#00F]>> ci.centos.org : webhooks merge, trigger dependency build
+activate ci.centos.org
+|||
+deactivate ci.centos.org
 @enduml

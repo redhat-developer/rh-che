@@ -52,7 +52,7 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
     if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
       docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" ${REGISTRY}
     else
-      echo "ERROR: Can not push to registry.devshift.net: credentials are not set. Aborting"
+      echo "ERROR: Can not push to ${REGISTRY}: credentials are not set. Aborting"
       exit 1
     fi
   fi
