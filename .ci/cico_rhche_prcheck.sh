@@ -118,10 +118,10 @@ source ./config
 BuildTagAndPushDocker
 
 # Deploy rh-che image
-echo "Deploying nightly-${RH_TAG_DIST_SUFFIX} from registry.devshift.net/osio-prod/${NAMESPACE}/${DOCKER_IMAGE}"
+echo "Deploying nightly-${RH_TAG_DIST_SUFFIX} from ${DOCKER_IMAGE_URL}"
 if ./dev-scripts/deploy_custom_rh-che.sh -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
                                          -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" \
-                                         -r prod.registry.devshift.net/osio-prod/"${NAMESPACE}"/"${DOCKER_IMAGE}" \
+                                         -r "${DOCKER_IMAGE_URL}" \
                                          -t nightly-"${RH_TAG_DIST_SUFFIX}" \
                                          -e che6-automated \
                                          -s \
