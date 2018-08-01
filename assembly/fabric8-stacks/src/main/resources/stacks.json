@@ -1,36 +1,96 @@
 [
   {
-    "id": "java-centos-mysql",
+    "id": "simple-theia",
     "creator": "ide",
-    "name": "Java-MySQL CentOS",
-    "description": "Multi-machine environment with Java CentOS Stack and MySQL database",
+    "name": "Theia IDE",
+    "description": "Theia IDE With JS and Java Tooling",
     "scope": "general",
     "tags": [
-      "Java 1.8, Tomcat 8, MySQL 5.7"
+      "Theia",
+      "Alpine",
+      "CentOS"
     ],
-    "components": [
-      {
-        "name": "JDK",
-        "version": "1.8.0_45"
-      },
-      {
-        "name": "Maven",
-        "version": "3.2.2"
-      },
-      {
-        "name": "Tomcat",
-        "version": "8.0.24"
-      }
-    ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/centos_jdk8"
-    },
     "workspaceConfig": {
       "environments": {
         "default": {
           "machines": {
-            "dev-machine": {
+            "theia": {
+              "servers": {
+                "theia": {
+                  "attributes": {
+                    "type": "ide"
+                  },
+                  "protocol": "http",
+                  "port": "3000",
+                  "path": "/"
+                },
+                "theia-dev": {
+                  "attributes": {
+                    "type": "ide-dev"
+                  },
+                  "protocol": "http",
+                  "port": "3030"
+                }
+              },
+              "installers": [],
+              "volumes": {
+                "projects": {
+                  "path": "/projects"
+                }
+              },
+              "env": {
+                "CHE_MACHINE_NAME": "theia",
+                "HOSTED_PLUGIN_HOSTNAME": "0.0.0.0"
+              },
+              "attributes": {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "contentType": "",
+            "type": "dockerimage",
+            "content": "eclipse/che-theia:0.4.0-next.b17727c1-6.8.0"
+          }
+        }
+      },
+      "defaultEnv": "default",
+      "name": "theia",
+      "projects": [],
+      "commands": []
+    },
+    "stackIcon": {
+      "name": "type-theia.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "openshift-sql",
+    "name": "Java + MySQL DB",
+    "description": "Multi Container Workspace: Java + MySQL",
+    "scope": "general",
+    "components": [
+      {
+        "name": "Centos",
+        "version": "7"
+      },
+      {
+        "name": "OpenJDK",
+        "version": "1.8.0_144"
+      },
+      {
+        "name": "MySQL",
+        "version": "5.7.21"
+      }
+    ],
+    "tags": [
+      "Java 1.8, Tomcat 8, MySQL 5.7"
+    ],
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "web/main": {
               "installers": [
                 "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
@@ -38,23 +98,22 @@
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
-              "servers": {},
-              "attributes": {}
+              "servers": {
+                "tomcat8": {
+                  "protocol": "http",
+                  "port": "8080/tcp"
+                }
+              }
             },
-            "db": {
-              "installers": [
-                "org.eclipse.che.terminal",
-                "org.eclipse.che.exec",
-                "com.redhat.oc-login"
-              ],
-              "servers": {},
-              "attributes": {}
+            "web/mysql": {
+              "installers": [],
+              "servers": {}
             }
           },
           "recipe": {
-            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/centos_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
+            "content": "kind: List\nitems:\n - \n  apiVersion: v1\n  kind: Pod\n  metadata:\n   name: web\n   labels:\n    type: db\n  spec:\n   containers:\n    - \n     image: registry.devshift.net/che/centos_jdk8\n     name: main\n     ports:\n      - \n       containerPort: 8080\n       protocol: TCP\n     resources:\n      limits:\n       memory: 1536Mi\n    - \n     image: centos/mysql-57-centos7\n     name: mysql\n     ports:\n      - \n       name: mysql\n       containerPort: 3306\n       protocol: TCP\n     env:\n      - \n       name: MYSQL_USER\n       value: petclinic\n      - \n       name: MYSQL_ROOT_PASSWORD\n       value: password\n      - \n       name: MYSQL_PASSWORD\n       value: password\n      - \n       name: MYSQL_DATABASE\n       value: petclinic\n     resources:\n      limits:\n       memory: 512Mi\n - \n  apiVersion: v1\n  kind: Service\n  metadata:\n   name: db\n  spec:\n   selector:\n    type: db\n   ports:\n    - \n     name: mysql\n     port: 3306\n     protocol: TCP\n     targetPort: mysql\n",
             "contentType": "application/x-yaml",
-            "type": "compose"
+            "type": "openshift"
           }
         }
       },
@@ -65,47 +124,42 @@
         {
           "commandLine": "mvn clean install -f ${current.project.path}",
           "name": "build",
-          "type": "mvn"
-        },
-        {
-          "commandLine": "mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'show databases;'",
-          "name": "show databases",
-          "type": "custom"
+          "type": "mvn",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
         }
       ]
-    },
-    "stackIcon": {
-      "name": "type-java-mysql.svg",
-      "mediaType": "image/svg+xml"
     }
   },
   {
-    "id": "java-mysql",
+    "id": "android-default",
     "creator": "ide",
-    "name": "Java-MySQL",
-    "description": "Multi-machine environment with Default Java Stack and MySQL database",
-    "scope": "advanced",
+    "name": "Android",
+    "description": "Default Android Stack with Java 1.8 and Android SDK",
+    "scope": "general",
     "tags": [
-      "Java 1.8, Tomcat 8, MySQL 5.7"
+      "Android"
     ],
     "components": [
       {
+        "name": "Centos",
+        "version": "7"
+      },
+      {
         "name": "JDK",
-        "version": "1.8.0_45"
+        "version": "1.8.0_144"
       },
       {
         "name": "Maven",
-        "version": "3.2.2"
+        "version": "3.5.3"
       },
       {
-        "name": "Tomcat",
-        "version": "8.0.24"
+        "name": "Android API",
+        "version": "21"
       }
     ],
-    "source": {
-      "type": "image",
-      "origin": "registry.devshift.net/che/ubuntu_jdk8"
-    },
     "workspaceConfig": {
       "environments": {
         "default": {
@@ -115,26 +169,22 @@
                 "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
                 "org.eclipse.che.ws-agent",
-                "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
-              "servers": {},
-              "attributes": {}
-            },
-            "db": {
-              "installers": [
-                "org.eclipse.che.exec",
-                "org.eclipse.che.terminal",
-                "com.redhat.oc-login"
-              ],
-              "servers": {},
-              "attributes": {}
+              "servers": {
+                "VNC" : {
+                  "port" : "6091",
+                  "protocol" : "http"
+                }
+              },
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
             }
           },
           "recipe": {
-            "content": "services:\n db:\n  image: centos/mysql-57-centos7\n  environment:\n   MYSQL_ROOT_PASSWORD: password\n   MYSQL_DATABASE: petclinic\n   MYSQL_USER: petclinic\n   MYSQL_PASSWORD: password\n  mem_limit: 1073741824\n dev-machine:\n  image: registry.devshift.net/che/ubuntu_jdk8\n  mem_limit: 2147483648\n  depends_on:\n    - db",
-            "contentType": "application/x-yaml",
-            "type": "compose"
+            "content": "eclipse/android",
+            "type": "dockerimage"
           }
         }
       },
@@ -143,14 +193,18 @@
       "description": null,
       "commands": [
         {
-          "commandLine": "mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'show databases;'",
-          "name": "show databases",
-          "type": "custom"
+          "commandLine": "mvn clean install -f ${current.project.path}",
+          "name": "build",
+          "type": "mvn",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
         }
       ]
     },
     "stackIcon": {
-      "name": "type-java-mysql.svg",
+      "name": "type-android.svg",
       "mediaType": "image/svg+xml"
     }
   },
@@ -171,12 +225,12 @@
     ],
     "components": [
       {
-        "name": "JDK",
-        "version": "1.8.0_45"
+        "name": "Ubuntu",
+        "version": "16.04"
       },
       {
-        "name": "Maven",
-        "version": "3.2.2"
+        "name": "JDK",
+        "version": "1.8.0_162"
       },
       {
         "name": "Tomcat",
@@ -295,7 +349,7 @@
     "components": [
       {
         "name": "CentOS",
-        "version": "---"
+        "version": "7"
       },
       {
         "name": ".NET Core SDK",
@@ -382,11 +436,11 @@
     "components": [
       {
         "name": "CentOS",
-        "version": "---"
+        "version": "7"
       },
       {
         "name": "JDK",
-        "version": "1.8.0_45"
+        "version": "1.8.0_144"
       },
       {
         "name": "Maven",
@@ -413,7 +467,12 @@
                 "com.redhat.bayesian.lsp",
                 "com.redhat.oc-login"
               ],
-              "servers": {},
+              "servers": {
+                "tomcat8" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                }
+              },
               "attributes": {
                 "memoryLimitBytes": "2147483648"
               }
@@ -452,25 +511,20 @@
     "description": "Eclipse Vert.x Stack on CentOS.",
     "scope": "general",
     "tags": [
-      "Java",
-      "JDK",
-      "Maven",
-      "Vert.x",
-      "CentOS",
-      "Git"
+      "Vert.x"
     ],
     "components": [
       {
         "name": "CentOS",
-        "version": "---"
+        "version": "7"
       },
       {
         "name": "JDK",
-        "version": "1.8.0_45"
+        "version": "1.8.0_144"
       },
       {
         "name": "Maven",
-        "version": "3.2.2"
+        "version": "3.3.9"
       }
     ],
     "source": {
@@ -551,25 +605,20 @@
     "description": "Spring Boot Stack on CentOS.",
     "scope": "general",
     "tags": [
-      "Java",
-      "JDK",
-      "Maven",
-      "Spring Boot",
-      "CentOS",
-      "Git"
+      "Spring Boot"
     ],
     "components": [
       {
         "name": "CentOS",
-        "version": "---"
+        "version": "7"
       },
       {
         "name": "JDK",
-        "version": "1.8.0"
+        "version": "1.8.0_161"
       },
       {
         "name": "Maven",
-        "version": "3.3"
+        "version": "3.3.9"
       }
     ],
     "source": {
@@ -662,12 +711,7 @@
       "origin": "registry.devshift.net/che/wildfly-swarm"
     },
     "tags": [
-      "Java",
-      "JDK",
-      "Maven",
-      "WildFly Swarm",
-      "CentOS",
-      "Git"
+      "WildFly Swarm"
     ],
     "workspaceConfig": {
       "name": "default",
@@ -716,7 +760,7 @@
             "previewUrl": "${server.8080/tcp}",
             "goal": "Run"
           },
-          "commandLine": "cd ${current.project.path} && scl enable rh-maven33 'java -jar target/*-swarm.jar'"
+          "commandLine": "cd ${current.project.path} && scl enable rh-maven33 'java -jar target/*-thorntail.jar'"
         }
       ],
       "projects": [],
@@ -726,11 +770,11 @@
     "components": [
       {
         "name": "CentOS",
-        "version": "---"
+        "version": "7"
       },
       {
         "name": "JDK",
-        "version": "1.8.0_45"
+        "version": "1.8.0_144"
       },
       {
         "name": "Maven",
@@ -804,34 +848,509 @@
       "defaultEnv": "default",
       "description": null
     },
-    "components": [
-      {
-        "name": "Node.JS",
-        "version": "---"
-      },
-      {
-        "name": "NPM",
-        "version": "---"
-      },
-      {
-        "name": "Gulp",
-        "version": "---"
-      },
-      {
-        "name": "Bower",
-        "version": "---"
-      },
-      {
-        "name": "Grunt",
-        "version": "---"
-      },
-      {
-        "name": "Yeoman",
-        "version": "---"
-      }
-    ],
+    "components": [],
     "stackIcon": {
       "name": "type-node.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "php-default",
+    "creator": "ide",
+    "name": "PHP",
+    "description": "Default PHP Stack with PHP 7.1, most popular extensions.",
+    "scope": "general",
+    "tags": [
+      "centos-php"
+    ],
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "7"
+      },
+      {
+        "name": "PHP",
+        "version": "7.1.20"
+      },
+      {
+        "name": "Composer",
+        "version": "1.6.5"
+      },
+      {
+        "name": "Zend Debugger",
+        "version": "9.1.0"
+      },
+      {
+        "name": "HTTPD",
+        "version": "2.4.18"
+      }
+    ],
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "installers": [
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "org.eclipse.che.ls.php",
+                "com.redhat.oc-login"
+              ],
+              "servers": {
+                "8080/tcp": {
+                  "port": "8080",
+                  "protocol": "http"
+                },
+                "8000/tcp": {
+                  "port": "8000",
+                  "protocol": "http"
+                },
+                "80/tcp": {
+                  "port": "80",
+                  "protocol": "http"
+                }
+              },
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "content": "registry.devshift.net/che/centos_php",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "name": "run php script",
+          "type": "custom",
+          "commandLine": "[ -z ${editor.current.file.path} ] && echo \"Open a PHP file in the editor before executing this command.\" || php ${editor.current.file.path}",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Run"
+          }
+        },
+        {
+          "name": "debug php script",
+          "type": "custom",
+          "commandLine": "[ -z ${editor.current.file.path} ] && echo \"Open a PHP file in the editor before executing this command.\" || QUERY_STRING=\"start_debug=1&debug_host=localhost&debug_port=10137\" php ${editor.current.file.path}",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Debug"
+          }
+        },
+        {
+          "name": "start apache",
+          "type": "custom",
+          "commandLine": "httpd -k start && tail -f /var/log/httpd/access_log -f /var/log/httpd/error_log",
+          "attributes": {
+            "previewUrl": "${server.8080/tcp}/${current.project.relpath}",
+            "goal": "Run"
+          }
+        },
+        {
+          "name": "stop apache",
+          "type": "custom",
+          "commandLine": "httpd -k stop",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Run"
+          }
+        },
+        {
+          "name": "restart apache",
+          "type": "custom",
+          "commandLine": "httpd -k restart",
+          "attributes": {
+            "previewUrl": "${server.8080/tcp}/${current.project.relpath}",
+            "goal": "Run"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-php.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "python-default",
+    "creator": "ide",
+    "name": "Python",
+    "description": "Default Python Stack",
+    "scope": "general",
+    "tags": [
+      "Python 3.5",
+      "pip"
+    ],
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "7"
+      },
+      {
+        "name": "Python",
+        "version": "3.6.3"
+      },
+      {
+        "name": "PIP",
+        "version": "18.0"
+      }
+    ],
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "installers": [
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "org.eclipse.che.ls.python",
+                "com.redhat.oc-login"
+              ],
+              "servers": {
+                "8080/tcp" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                },
+                "8000/tcp" : {
+                  "port" : "8000",
+                  "protocol" : "http"
+                }
+              },
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "content": "registry.devshift.net/che/centos_python",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "name": "run",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && python main.py",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Run"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-python.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "rails-default",
+    "creator": "ide",
+    "name": "Rails",
+    "description": "Default Ruby on Rails Stack ",
+    "scope": "general",
+    "tags": [
+      "Ruby",
+      "Rails",
+      "Bundler"
+    ],
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "7"
+      },
+      {
+        "name": "Ruby",
+        "version": "2.5.0"
+      },
+      {
+        "name": "Rails",
+        "version": "5.2.0"
+      },
+      {
+        "name": "Bundler",
+        "version": "1.16.3"
+      }
+    ],
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "installers": [
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.redhat.oc-login"
+              ],
+              "servers": {
+                "3000/tcp" : {
+                  "port" : "3000",
+                  "protocol" : "http"
+                }
+              },
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "content": "registry.devshift.net/che/centos_ruby",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "name": "install dependencies",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && bundle install",
+          "attributes": {
+            "previewUrl": "",
+            "goal": "Build"
+          }
+        },
+        {
+          "name": "run",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && rails server -b 0.0.0.0",
+          "attributes": {
+            "previewUrl": "${server.3000/tcp}",
+            "goal": "Run"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-ruby.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "id": "go-default",
+    "creator": "ide",
+    "name": "Go",
+    "description": "Default Go Stack with Go 1.8",
+    "scope": "general",
+    "tags": [
+      "Go"
+    ],
+    "components": [
+      {
+        "name": "CentOS",
+        "version": "7"
+      },
+      {
+        "name": "Go",
+        "version": "1.8"
+      }
+    ],
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "installers": [
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "org.eclipse.che.ls.golang",
+                "com.redhat.oc-login"
+              ],
+              "servers": {
+                "8080/tcp" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                }
+              },
+              "attributes" : {
+                "memoryLimitBytes": "2147483648"
+              }
+            }
+          },
+          "recipe": {
+            "content": "eclipse/centos_go",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "commands": [
+        {
+          "name": "run",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && go get -d && go run main.go",
+          "attributes": {
+            "previewUrl": "${server.8080/tcp}",
+            "goal": "Run"
+          }
+        },
+        {
+          "name": "test",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && go get -d && go test",
+          "attributes": {
+            "previewUrl": "${server.8080/tcp}",
+            "goal": "Test"
+          }
+        },
+        {
+          "name": "build",
+          "type": "custom",
+          "commandLine": "cd ${current.project.path} && go get -d && go build",
+          "attributes": {
+            "previewUrl": "${server.8080/tcp}",
+            "goal": "Build"
+          }
+        }
+      ]
+    },
+    "stackIcon": {
+      "name": "type-go.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
+    "description": "Ceylon stack with Java, JavaScript and Dart backends on CentOS.",
+    "creator": "ide",
+    "scope": "advanced",
+    "name": "Ceylon with Java JavaScript Dart on CentOS",
+    "id": "ceylon-java-javascript-dart-centos",
+    "components": [
+      {
+        "name": "Centos",
+        "version": "7"
+      },
+      {
+        "name": "Ceylon",
+        "version": "1.3.2"
+      }
+    ],
+    "tags": [
+      "Ceylon",
+      "Dart"
+    ],
+    "workspaceConfig": {
+      "defaultEnv": "default",
+      "environments": {
+        "default": {
+          "machines": {
+            "dev-machine": {
+              "attributes": {
+                "memoryLimitBytes": "2147483648"
+              },
+              "servers": {
+                "tomcat8" : {
+                  "port" : "8080",
+                  "protocol" : "http"
+                },
+                "tomcat8-debug" : {
+                  "port" : "8000",
+                  "protocol" : "http"
+                }
+              },
+              "installers": [
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "org.eclipse.che.ls.json"
+              ]
+            }
+          },
+          "recipe": {
+            "content": "registry.centos.org/che-stacks/centos-ceylon-nodejs-dart",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "projects": [],
+      "name": "default",
+      "commands": [
+        {
+          "commandLine": "rm -Rf ${current.project.path}/modules ",
+          "name": "clean modules",
+          "attributes": {
+            "goal": "Build",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        },
+        {
+          "commandLine": "cd ${current.project.path} && ceylon compile",
+          "name": "compile for JVM",
+          "attributes": {
+            "goal": "Build",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        },
+        {
+          "commandLine": "cd ${current.project.path} && ceylon compile-js",
+          "name": "compile for JS",
+          "attributes": {
+            "goal": "Build",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        },
+        {
+          "commandLine": "cd ${current.project.path} && ceylon compile-dart",
+          "name": "compile for Dart",
+          "attributes": {
+            "goal": "Build",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        },
+        {
+          "commandLine": "cd ${current.project.path} && ceylon run",
+          "name": "Run on JVM",
+          "attributes": {
+            "goal": "Run",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        },
+        {
+          "commandLine": "cd ${current.project.path} && ceylon run-js",
+          "name": "Run on NodeJS",
+          "attributes": {
+            "goal": "Run",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        },
+        {
+          "commandLine": "cd ${current.project.path} && ceylon run-dart $(ceylon config get runtool.module)",
+          "name": "Run on Dart",
+          "attributes": {
+            "goal": "Run",
+            "previewUrl": ""
+          },
+          "type": "custom"
+        }
+      ],
+      "links": []
+    },
+    "stackIcon": {
+      "name": "type-ceylon.svg",
       "mediaType": "image/svg+xml"
     }
   }
