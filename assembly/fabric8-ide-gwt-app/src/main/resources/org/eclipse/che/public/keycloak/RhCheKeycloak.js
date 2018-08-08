@@ -33,6 +33,91 @@ var osioProvisioningLogout;
 var osioProvisioningURL;
 var osioUserToApprove;
 
+function initAnalytics(writeKey){
+
+  // Create a queue, but don't obliterate an existing one!
+  var analytics = window.analytics = window.analytics || [];
+
+  // If the real analytics.js is already on the page return.
+  if (analytics.initialize) return;
+
+  // If the snippet was invoked already show an error.
+  if (analytics.invoked) {
+    if (window.console && console.error) {
+      console.error('Segment snippet included twice.');
+    }
+    return;
+  }
+
+  // Invoked flag, to make sure the snippet
+  // is never invoked twice.
+  analytics.invoked = true;
+
+  // A list of the methods in Analytics.js to stub.
+  analytics.methods = [
+    'trackSubmit',
+    'trackClick',
+    'trackLink',
+    'trackForm',
+    'pageview',
+    'identify',
+    'reset',
+    'group',
+    'track',
+    'ready',
+    'alias',
+    'debug',
+    'page',
+    'once',
+    'off',
+    'on'
+  ];
+
+  // Define a factory to create stubs. These are placeholders
+  // for methods in Analytics.js so that you never have to wait
+  // for it to load to actually record data. The `method` is
+  // stored as the first argument, so we can replay the data.
+  analytics.factory = function(method){
+    return function(){
+      var args = Array.prototype.slice.call(arguments);
+      args.unshift(method);
+      analytics.push(args);
+      return analytics;
+    };
+  };
+
+  // For each of our methods, generate a queueing stub.
+  for (var i = 0; i < analytics.methods.length; i++) {
+    var key = analytics.methods[i];
+    analytics[key] = analytics.factory(key);
+  }
+
+  // Define a method to load Analytics.js from our CDN,
+  // and that will be sure to only ever load it once.
+  analytics.load = function(key, options){
+    // Create an async script element based on your key.
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = 'https://cdn.segment.com/analytics.js/v1/'
+      + key + '/analytics.min.js';
+
+    // Insert our script next to the first script element.
+    var first = document.getElementsByTagName('script')[0];
+    first.parentNode.insertBefore(script, first);
+    analytics._loadOptions = options;
+  };
+
+  // Add a version to keep track of what's in the wild.
+  analytics.SNIPPET_VERSION = '4.1.0';
+
+  // Load Analytics.js with your key, which will automatically
+  // load the tools you've enabled for your account. Boosh!
+  analytics.load(writeKey);
+
+  return;
+};
+
 (function( window, undefined ) {
     var osioURLSuffix;
     
@@ -182,6 +267,42 @@ var osioUserToApprove;
             }
         });
     }
+
+    function identifyUser(keycloak) {
+        return get("/api/fabric8-che-analytics/segment-write-key", keycloak.token)
+        .then(function (request) {
+        	var segmentKey = request.responseText;
+        	initAnalytics(segmentKey);
+        	return get(osioApiURL + "/user", keycloak.token)
+            .then((request) => {
+            	try {
+                	var json = JSON.parse(request.response);
+                    if (json && json.data) {
+                    	var user = json.data;
+                	    var traits = {
+                		        avatar: user.attributes.imageURL,
+                		        email: user.attributes.email,
+                		        username: user.attributes.username,
+                		        website: user.attributes.url,
+                		        name: user.attributes.fullName,
+                		        description: user.attributes.bio
+        		        }
+        			    if (localStorage['openshiftio.adobeMarketingCloudVisitorId']) {
+        		           traits.adobeMarketingCloudVisitorId = localStorage['openshiftio.adobeMarketingCloudVisitorId'];
+        		        }
+        		        analytics.identify(user.id, traits);
+                    }
+            	} catch(err) {}
+                return request;
+            })
+            .catch(function(request) {
+            	return request;
+            });
+        })
+        .catch(function(request) {
+        	return request;
+        });
+    }
     
     function userNeedsApproval(error_description) {
     	try {
@@ -244,7 +365,8 @@ var osioUserToApprove;
         kc.init = function (initOptions) {
             var finalPromise = createPromise();
 
-            if (document.getElementsByClassName('ide-page-loader-content').length > 0) {
+            var isInCheDashboard = document.getElementsByClassName('ide-page-loader-content').length > 0;
+            if (isInCheDashboard) {
                 var pageLoaderDiv = document.getElementsByClassName('ide-page-loader-content')[0];
                 var loaderImage = pageLoaderDiv.getElementsByTagName("img")[0];
                 if (loaderImage) {
@@ -276,14 +398,24 @@ var osioUserToApprove;
             var promise = originalInit(initOptions);
             promise.success(function(arg) {
                 var keycloak = kc;
+              var lastProvisioningDate = sessionStorage.getItem('osio-provisioning');
               sessionStorage.removeItem('osio-provisioning');
               var w = window.open('', 'osio_provisioning');
               w && w.close();
-              performAccounkLinking(keycloak)
+              identifyUser(keycloak)
+              .then(function() {
+            	  if (window.analytics && lastProvisioningDate) {
+            		  analytics.track('Provision User For Che');
+            	  }
+                  return performAccounkLinking(keycloak);
+              })
               .then(()=>{
                   return setUpNamespaces(keycloak);
               })
               .then(() => {
+        		  if (window.analytics && isInCheDashboard) {
+        			  analytics.track('Enter Che Dashboard');
+        		  }
             	  setStatusMessage(osio_msg_started);
                   finalPromise.setSuccess(arg);
               })
