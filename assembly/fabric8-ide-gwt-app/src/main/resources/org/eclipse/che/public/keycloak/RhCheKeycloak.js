@@ -312,9 +312,13 @@ function initAnalytics(writeKey){
                         return error.detail.replace("' is not approved", "")
                         .replace("user '", "");
                     }
-                    if(error.code == "forbidden_error" &&
-                            error.detail == "user is not authorized to access OpenShift") {
-                        return "unknown";
+                    if(error.code == "forbidden_error" && error.detail
+                            && error.detail.startsWith("user is not authorized to access OpenShift")) {
+                        if (error.detail.startsWith("user is not authorized to access OpenShift: ")) {
+                            return error.detail.replace("user is not authorized to access OpenShift: ", "");
+                        } else {
+                            return "unknown";
+                        }
                     }
                 } 
             }
