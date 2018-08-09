@@ -125,8 +125,7 @@ if ./dev-scripts/deploy_custom_rh-che.sh -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}
                                          -t nightly-"${RH_TAG_DIST_SUFFIX}" \
                                          -e che6-automated \
                                          -s \
-                                         -U \
-                                         -z;
+                                         -U;
 then
   echo "Che successfully deployed."
 else
