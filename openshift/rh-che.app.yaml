@@ -303,7 +303,10 @@ objects:
           - name: CHE_OAUTH_SERVICE__MODE
             value: "embedded"
           - name: CHE_KEYCLOAK_JS__ADAPTER__URL
-            value: "/_app/keycloak/RhCheKeycloak.js"
+            valueFrom:
+              configMapKeyRef:
+                key: che-keycloak-js-adapter-url
+                name: rhche
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
