@@ -15,6 +15,9 @@ const osio_msg_setting_up_namespaces = "Setting up your <strong>OpenShift.io</st
 const osio_msg_error_no_resources = "Resources required to use <strong>Eclipse Che</strong> could not be granted to the user.<br>Please contact support.";
 const osio_msg_started = "<strong>Eclipse Che</strong> is loading";
 
+const telemetry_event_enter_che_dashboard = 'enter che dashboard';
+const telemetry_event_provision_user_for_che = 'provision user for che';
+
 function provision_osio(redirect_uri) {
     var provisioningWindow = window.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(redirect_uri), 'osio_provisioning');
     if(! provisioningWindow) {
@@ -351,7 +354,7 @@ function initAnalytics(writeKey){
             return kc;
         }
         
-        var osioAuthURL = config.oidcProvider;
+        osioAuthURL = config.oidcProvider;
         
         if (osioAuthURL.includes('.prod-preview.')) {
             osioApiURL = 'https://api.prod-preview.openshift.io/api';
@@ -409,7 +412,7 @@ function initAnalytics(writeKey){
                 identifyUser(keycloak)
                 .then(function() {
                     if (window.analytics && lastProvisioningDate) {
-                        analytics.track('Provision User For Che');
+                        analytics.track(telemetry_event_provision_user_for_che);
                     }
                     return performAccounkLinking(keycloak);
                 })
@@ -418,7 +421,7 @@ function initAnalytics(writeKey){
                 })
                 .then(() => {
                     if (window.analytics && isInCheDashboard) {
-                        analytics.track('Enter Che Dashboard');
+                        analytics.track(telemetry_event_enter_che_dashboard);
                     }
                     setStatusMessage(osio_msg_started);
                     finalPromise.setSuccess(arg);
