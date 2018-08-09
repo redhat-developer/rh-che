@@ -119,18 +119,8 @@ function initAnalytics(writeKey){
 };
 
 (function( window, undefined ) {
-    var osioURLSuffix;
-
-    if (window.location.host.includes('prod-preview')) {
-        osioURLSuffix = 'prod-preview.openshift.io';
-        osioProvisioningURL = "https://manage.openshift.com/openshiftio?cluster=starter-us-east-2a"
-    } else {
-        osioURLSuffix = 'openshift.io';
-        osioProvisioningURL = "https://manage.openshift.com/register/openshiftio_create"
-    }
-
-    var osioApiURL = 'https://api.' + osioURLSuffix + '/api';
-    var osioAuthURL = 'https://auth.' + osioURLSuffix + '/api';
+    var osioApiURL;
+    var osioAuthURL;
 
     function createPromise() {
         var p = {
@@ -357,6 +347,20 @@ function initAnalytics(writeKey){
     var originalKeycloak = window.Keycloak;
     window.Keycloak = function(config) {
         kc = originalKeycloak(config);
+        if (config && !config.oidcProvider) {
+            return kc;
+        }
+        
+        var osioAuthURL = config.oidcProvider;
+        
+        if (osioAuthURL.includes('.prod-preview.')) {
+            osioApiURL = 'https://api.prod-preview.openshift.io/api';
+            osioProvisioningURL = "https://manage.openshift.com/openshiftio?cluster=starter-us-east-2a";
+        } else {
+            osioApiURL = 'https://api.openshift.io/api';
+            osioProvisioningURL = "https://manage.openshift.com/register/openshiftio_create";
+        }
+
         osioProvisioningLogout = function() {
             kc.logout();
             return false;
