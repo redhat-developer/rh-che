@@ -411,8 +411,10 @@ function initAnalytics(writeKey){
                 var keycloak = kc;
                 var lastProvisioningDate = sessionStorage.getItem('osio-provisioning');
                 sessionStorage.removeItem('osio-provisioning');
-                var w = window.open('', 'osio_provisioning');
-                w && w.close();
+                if (lastProvisioningDate) {
+                    var w = window.open('', 'osio_provisioning');
+                    w && w.close();
+                }
                 identifyUser(keycloak)
                 .then(function() {
                     if (window.analytics && lastProvisioningDate) {
@@ -492,11 +494,9 @@ function initAnalytics(writeKey){
                         }
                     }
                 } else {
+                    sessionStorage.removeItem('osio-provisioning');
                     sessionStorage.removeItem('osio-provisioning-notification-message');
                     setStatusMessage("Error during authentication");
-                    var w = window.open('', 'osio_provisioning');
-                    w && w.close();
-                    sessionStorage.removeItem('osio-provisioning');
                     finalPromise.setError(data);
                 }
             });
