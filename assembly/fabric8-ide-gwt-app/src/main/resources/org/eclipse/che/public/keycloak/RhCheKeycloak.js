@@ -469,15 +469,15 @@ function initAnalytics(writeKey){
                                     provisioningMessageDiv.style = "height: 100%; z-index: 999; position:fixed; padding:0; margin:0; top:0; left:0; width: 100%; height: 100%; background:rgba(255,255,255,1);";
                                     provisioningMessageDiv.innerHTML = '<iframe id="osio-provisioning-frame" style="border: 0px; width: 100%; height: 100%"></iframe>';
                                     document.body.appendChild(provisioningMessageDiv);
-
+                                    var htmlContent;
+                                    if (osioUserToApprove != 'unknown') {
+                                        htmlContent = request.responseText.replace('<span id="osio-user-placeholder"></span>', '<span id="osio-user-placeholder">' + osioUserToApprove + '</span>');
+                                    } else {
+                                        htmlContent = request.responseText;
+                                    }
                                     var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document
                                     osioProvisioningFrameDocument.open();
-                                    osioProvisioningFrameDocument.write(request.responseText);
-                                    osioProvisioningFrameDocument.onload = function() {
-                                        if (osioUserToApprove != 'unknown') {
-                                            osioProvisioningFrameDocument.getElementById('osio-user-placeholder').innerHTML=", " + osioUserToApprove;
-                                        }
-                                    }
+                                    osioProvisioningFrameDocument.write(htmlContent);
                                     osioProvisioningFrameDocument.close();
                                 } else {
                                     sessionStorage.removeItem('osio-provisioning-notification-message');
