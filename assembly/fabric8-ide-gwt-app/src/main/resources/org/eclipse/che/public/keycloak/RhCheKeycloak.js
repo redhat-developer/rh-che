@@ -471,7 +471,7 @@ function initAnalytics(writeKey){
                                     document.body.appendChild(provisioningMessageDiv);
                                     var htmlContent;
                                     if (osioUserToApprove != 'unknown') {
-                                        htmlContent = request.responseText.replace('<span id="osio-user-placeholder"></span>', '<span id="osio-user-placeholder">' + osioUserToApprove + '</span>');
+                                        htmlContent = request.responseText.replace('<span id="osio-user-placeholder"></span>', '<span id="osio-user-placeholder">, ' + osioUserToApprove + '</span>');
                                     } else {
                                         htmlContent = request.responseText;
                                     }
