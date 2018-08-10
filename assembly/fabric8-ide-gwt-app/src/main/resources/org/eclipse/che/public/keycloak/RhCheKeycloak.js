@@ -12,7 +12,7 @@
 const osio_msg_provisioning = "Creating your <strong>OpenShift</strong> account";
 const osio_msg_linking_account = "Linking your <strong>OpenShift</strong> account";
 const osio_msg_setting_up_namespaces = "Setting up your <strong>OpenShift.io</strong> environment";
-const osio_msg_error_no_resources = "Resources required to use <strong>Eclipse Che</strong> could not be granted to the user.<br>Please contact support.";
+const osio_msg_error_no_resources = "Resources required to use <strong>Eclipse Che</strong> could not be granted to the user.<br>You may want to <a href='' onclick='return osioProvisioningLogout()'>use a different account</a><br>or contact support.";
 const osio_msg_started = "<strong>Eclipse Che</strong> is loading";
 
 const telemetry_event_enter_che_dashboard = 'enter che dashboard';
@@ -473,10 +473,12 @@ function initAnalytics(writeKey){
                                     var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document
                                     osioProvisioningFrameDocument.open();
                                     osioProvisioningFrameDocument.write(request.responseText);
-                                    osioProvisioningFrameDocument.close();
-                                    if (osioUserToApprove != 'unknown') {
-                                        osioProvisioningFrameDocument.getElementById('osio-user-placeholder').innerHTML=", " + osioUserToApprove;
+                                    osioProvisioningFrameDocument.onload = function() {
+                                        if (osioUserToApprove != 'unknown') {
+                                            osioProvisioningFrameDocument.getElementById('osio-user-placeholder').innerHTML=", " + osioUserToApprove;
+                                        }
                                     }
+                                    osioProvisioningFrameDocument.close();
                                 } else {
                                     sessionStorage.removeItem('osio-provisioning-notification-message');
                                     finalPromise.setError({ error: 'invalid_request', error_description: 'OSIO provisioning page loaded at URL: ' + provisioningPage + ' should be valid HTML' });
