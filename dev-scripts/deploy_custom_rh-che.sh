@@ -258,8 +258,9 @@ if [ "${RH_CHE_RUNNING_STANDALONE_SCRIPT}" == "true" ]; then
     exit 2
   fi
 else
-  RH_CHE_APP="./../openshift/rh-che.app.yaml"
-  RH_CHE_CONFIG="./../openshift/rh-che.config.yaml"
+  ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  RH_CHE_APP="${ABSOLUTE_PATH}/../openshift/rh-che.app.yaml"
+  RH_CHE_CONFIG="${ABSOLUTE_PATH}/../openshift/rh-che.config.yaml"
 fi
 
 echo -e "\\033[92;1mGetting deployment scripts done.\\033[0m"
