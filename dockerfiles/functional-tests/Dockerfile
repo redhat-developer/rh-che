@@ -10,9 +10,9 @@ USER root
 
 ENV LANG=en_US.utf8 \
     DISPLAY=:99 \
-    FABRIC8_USER_NAME=fabric8 \
-    HOME=/home/${FABRIC8_USER_NAME} \
-    WORKSPACE=$HOME/che
+    FABRIC8_USER_NAME=fabric8
+ENV HOME=/home/$FABRIC8_USER_NAME
+ENV WORKSPACE=$HOME/che
 
 COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
 
