@@ -22,6 +22,22 @@ else
   exit 1
 fi
 
+# Build and push PR-Check base image
+
+docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f ${DOCKER_PATH}/${DOCKERFILE} .
+if [ $? -ne 0 ]; then
+  echo 'Docker Build Failed'
+  exit 2
+fi
+
+docker push ${DOCKER_IMAGE_URL}:${TAG}
+
+# Build and push functional-tests base image
+
+DOCKERFILE="functional-tests/Dockerfile"
+DOCKER_IMAGE="rh-che-functional-tests-dep"
+DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
+
 docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f ${DOCKER_PATH}/${DOCKERFILE} .
 if [ $? -ne 0 ]; then
   echo 'Docker Build Failed'
