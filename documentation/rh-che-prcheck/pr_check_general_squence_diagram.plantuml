@@ -55,8 +55,11 @@ note over PR_Check, ci.centos.org
   the dependency build will be triggered to ensure
   latest packages are contained in the docker image
 end note
-master -[#00F]>> ci.centos.org : webhooks merge, trigger dependency build
+master -[#00F]>> ci.centos.org : webhooks merge - trigger dependency build
+activate ci.centos.org
+ci.centos.org -[#00F]>> ci.centos.org : functional tests dep build
 activate ci.centos.org
 |||
+deactivate ci.centos.org
 deactivate ci.centos.org
 @enduml
