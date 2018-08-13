@@ -1,0 +1,51 @@
+@startuml
+'*** init ***
+skinparam backgroundColor #EEEBDC
+actor Commiter
+participant master
+participant PR_Check
+entity ci.centos.org
+database dev.rdu2c.fabric8.io
+'=== **** ===
+
+Commiter -[#000]> master : Open pull request
+master -[#00F]>> PR_Check : init
+activate PR_Check
+== Commit until success ==
+Commiter -[#000]> PR_Check : Commit, push
+PR_Check -[#00F]>> ci.centos.org : trigger_prcheck
+activate ci.centos.org
+alt Build - case_failure
+        PR_Check <<-[#F00]- ci.centos.org : build_failed
+        master <<-[#F00]- PR_Check : pr_block
+        Commiter <<-[#F00]- PR_Check : notify, link to artifacts
+else Build - case_success
+        ci.centos.org -[#0F0]>> dev.rdu2c.fabric8.io : build success, deploy
+        alt Deployment - case_failure
+                ci.centos.org <<-[#F00]- dev.rdu2c.fabric8.io : deployment_failed
+                PR_Check <<-[#F00]- ci.centos.org : build_failed
+                master <<-[#F00]- PR_Check : pr_block
+                Commiter <<-[#F00]- PR_Check : notify, link to artifacts
+        else Deployment - case_success
+                ci.centos.org <<-[#0F0]- dev.rdu2c.fabric8.io : deployment_success
+                note over ci.centos.org, dev.rdu2c.fabric8.io : Server remains deployed until next PR_Check run
+                ci.centos.org -[#00F]>> dev.rdu2c.fabric8.io : run funtional tests smoke suite
+                alt TestSuite - case_failure
+                        ci.centos.org <<-[#F00]- dev.rdu2c.fabric8.io : tests_run_failure
+                        PR_Check <<-[#F00]- ci.centos.org : build_failed
+                        master <<-[#F00]- PR_Check : pr_block
+                        Commiter <<-[#F00]- PR_Check : notify, link to artifacts
+                else TestSuite - case_success
+                        ci.centos.org <<-[#0F0]- dev.rdu2c.fabric8.io : tests_run_success
+                        PR_Check <<-[#0F0]- ci.centos.org : build_success
+                        deactivate ci.centos.org
+                        master <<-[#0F0]- PR_Check : pr_unlock
+                        Commiter <<-[#0F0]- PR_Check : notify, link to deployment
+                end
+        end
+end
+... more commits still possible ...
+hnote over Commiter: After PR is unblocked and approved,\n the Commiter can confirm a merge.
+Commiter -[#000]> master : merge
+destroy PR_Check
+@enduml
