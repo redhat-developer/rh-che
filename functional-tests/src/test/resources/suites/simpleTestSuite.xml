@@ -18,7 +18,11 @@
 
     <test name="all">
         <classes>
-            <class name="org.eclipse.che.selenium.miscellaneous.DialogAboutTest"/>
+            <class name="org.eclipse.che.selenium.dashboard.CreateWorkspaceTest"/>
+            <class name="org.eclipse.che.selenium.dashboard.FactoriesListTest"/>
+            <class name="org.eclipse.che.selenium.factory.CheckFactoryWithPerUserCreatePolicyTest"/>
+            <class name="org.eclipse.che.selenium.dashboard.RenameWorkspaceTest"/>
+            <class name="org.eclipse.che.selenium.dashboard.CreateAndDeleteProjectsTest"/>
         </classes>
     </test>
 </suite>
