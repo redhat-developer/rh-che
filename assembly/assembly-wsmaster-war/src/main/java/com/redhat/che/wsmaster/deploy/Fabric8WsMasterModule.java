@@ -12,7 +12,11 @@
 package com.redhat.che.wsmaster.deploy;
 
 import com.google.inject.AbstractModule;
+import com.redhat.che.multitenant.Fabric8AuthServiceClient;
+import com.redhat.che.multitenant.Fabric8OAuthAPIProvider;
 import org.eclipse.che.inject.DynaModule;
+import org.eclipse.che.multiuser.keycloak.server.KeycloakServiceClient;
+import org.eclipse.che.multiuser.keycloak.server.deploy.OAuthAPIProvider;
 import org.eclipse.che.multiuser.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
 import org.eclipse.che.security.oauth.GitHubOAuthAuthenticator;
 
@@ -24,5 +28,7 @@ public class Fabric8WsMasterModule extends AbstractModule {
     bind(GitHubOAuthAuthenticator.class)
         .to(OpenShiftGitHubOAuthAuthenticator.class)
         .asEagerSingleton();
+    bind(OAuthAPIProvider.class).to(Fabric8OAuthAPIProvider.class);
+    bind(KeycloakServiceClient.class).to(Fabric8AuthServiceClient.class).asEagerSingleton();
   }
 }

@@ -300,8 +300,6 @@ objects:
               configMapKeyRef:
                 key: analytics.woopra_domain
                 name: rhche
-          - name: CHE_OAUTH_SERVICE__MODE
-            value: "embedded"
           - name: CHE_KEYCLOAK_JS__ADAPTER__URL
             valueFrom:
               configMapKeyRef:
