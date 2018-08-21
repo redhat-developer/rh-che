@@ -40,24 +40,8 @@ public class CheStarterWrapper {
   private String cheStarterURL = "http://localhost:10000";
 
   @Inject
-  public CheStarterWrapper(
-      @Named("che.host") String cheHost, @Named("che.chromedriver.port") String chromedriverPort)
-      throws IOException, InterruptedException {
+  public CheStarterWrapper(@Named("che.host") String cheHost) {
     this.host = cheHost;
-    /* RUN CHROMEDRIVER */
-    String chromeDriverCheckCommand =
-        "lsof -i TCP | grep -q 'localhost:" + chromedriverPort + " (LISTEN)'";
-    Process chromeDriverCheck = Runtime.getRuntime().exec(chromeDriverCheckCommand);
-    chromeDriverCheck.waitFor();
-    if (chromeDriverCheck.exitValue() != 0) {
-      try {
-        Process chromedriver = Runtime.getRuntime().exec("chromedriver");
-        LOG.info("Chromedriver successfully started.");
-      } catch (IOException e) {
-        LOG.error("Could not start process chromedriver:" + e.getMessage());
-        throw e;
-      }
-    }
   }
   /** Checks whether che-starter is already running. Throws RuntimeException otherwise. */
   public void checkIsRunning() {
