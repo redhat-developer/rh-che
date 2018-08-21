@@ -21,6 +21,18 @@
     </parent>
     <artifactId>functional-tests</artifactId>
     <properties>
+        <browser>GOOGLE_CHROME</browser>
+        <che.host>che.openshift.io</che.host>
+        <che.infrastructure>openshift</che.infrastructure>
+        <che.multiuser>true</che.multiuser>
+        <che.offline.to.access.token.exchange.endpoint>https://auth.openshift.io/api/token/refresh</che.offline.to.access.token.exchange.endpoint>
+        <che.port>443</che.port>
+        <che.protocol>https</che.protocol>
+        <che.threads>1</che.threads>
+        <che.workspace_pool_size>0</che.workspace_pool_size>
+        <cheStarterUrl>http://localhost:10000</cheStarterUrl>
+        <driver.port>9515</driver.port>
+        <grid.mode>false</grid.mode>
         <org.apache.maven.verson>3.5.2</org.apache.maven.verson>
         <skipTests>true</skipTests>
     </properties>
@@ -35,18 +47,18 @@
                 <groupId>org.eclipse.che.selenium</groupId>
                 <artifactId>che-selenium-core</artifactId>
                 <!-- <version>${che.version}</version> -->
-                <version>6.8.0</version>
+                <version>6.9.0</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che.selenium</groupId>
                 <artifactId>che-selenium-test</artifactId>
                 <!-- <version>${che.version}</version> -->
-                <version>6.8.0</version>
+                <version>6.9.0</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che.selenium</groupId>
                 <artifactId>che-selenium-test</artifactId>
-                <version>6.8.0</version>
+                <version>6.9.0</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -120,6 +132,11 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -150,6 +167,73 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>functional-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <property>
+                                            <name>configfailurepolicy</name>
+                                            <value>continue</value>
+                                        </property>
+                                        <property>
+                                            <name>listener</name>
+                                            <value>com.redhat.che.selenium.core.RhCheSeleniumTestHandler</value>
+                                        </property>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>${project.basedir}/src/test/resources/suites/simpleTestSuite.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                            <systemPropertyVariables>
+                                <che.threads>${che.threads}</che.threads>
+                                <che.host>${che.host}</che.host>
+                                <che.workspace_pool_size>${che.workspace_pool_size}</che.workspace_pool_size>
+                                <che.port>${che.port}</che.port>
+                                <che.protocol>${che.protocol}</che.protocol>
+                                <browser>${browser}</browser>
+                                <grid.mode>${grid.mode}</grid.mode>
+                                <driver.port>${driver.port}</driver.port>
+                                <che.multiuser>${che.multiuser}</che.multiuser>
+                                <che.infrastructure>${che.infrastructure}</che.infrastructure>
+                                <che.testuser.email>${che.testuser.email}</che.testuser.email>
+                                <che.testuser.name>${che.testuser.name}</che.testuser.name>
+                                <che.testuser.offline_token>${che.testuser.offline_token}</che.testuser.offline_token>
+                                <che.testuser.password>${che.testuser.password}</che.testuser.password>
+                                <che.offline.to.access.token.exchange.endpoint>${che.offline.to.access.token.exchange.endpoint}</che.offline.to.access.token.exchange.endpoint>
+                                <excludedGroups>${excludedGroups}</excludedGroups>
+                                <cheStarterUrl>${cheStarterUrl}</cheStarterUrl>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+    </profiles>
 </project>

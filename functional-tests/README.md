@@ -23,38 +23,61 @@ verify Che itself.
 There are some jobs running periodically on clusters us-east-2, us-east-2a and free-stg as you can see in the begining of this readme.
 
 ## How to run it
-These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`. Tests expects che starter running. You can specify che starter url or use default (default value is http://localhost:10000).
-Che starter can be cloned from github: https://github.com/redhat-developer/che-starter.
+Prerequisities:
+* Working account on Openshift.io.
+* Running che-starter. Can be run as docker container like this:
+```
+docker run -p 10000:10000 -e "GITHUB_TOKEN_URL=https://auth.openshift.io/api/token?for=https://github.com" -e "OPENSHIFT_TOKEN_URL=https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" -e "CHE_SERVER_URL=https://che.openshift.io" registry.devshift.net/almighty/che-starter:latest
+```
 
-To run these tests it is necessary to have some variables set:
+### Run tests via maven:
+By default, tests will execute against production environment (che.openshift.io).
+```
+mvn clean verify -Pfunctional-tests \
+    -Dche.testuser.name=<OSIO_USERNAME> \
+    -Dche.testuser.email=<OSIO_EMAIL> \
+    -Dche.testuser.offline_token=<OSIO_OFFLINE_TOKEN> \
+    -Dche.testuser.password=<OSIO_PASSWORD>
+```
+If you need to run tests against another environment (for example prod-preview), few more variables have to be set (and che-starter has to be started with different parameters). For example, running tests against `prod-preview` will look like this:
+```
+docker run -p 10000:10000 \
+    -e "GITHUB_TOKEN_URL=https://auth.prod-preview.openshift.io/api/token?for=https://github.com" \
+    -e "OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" \
+    -e "CHE_SERVER_URL=https://che.prod-preview.openshift.io" \
+    registry.devshift.net/almighty/che-starter:latest
 
-VM options
+mvn clean verify -Pfunctional-tests \
+    -Dche.testuser.name=<OSIO_PROD_PREVIEW_USERNAME> \
+    -Dche.testuser.email=<OSIO_PROD_PREVIEW__EMAIL> \
+    -Dche.testuser.offline_token=<OSIO_PROD_PREVIEW__OFFLINE_TOKEN> \
+    -Dche.testuser.password=<OSIO_PROD_PREVIEW__PASSWORD> \
+    -Dche.host=che.prod-preview.openshift.io \
+    -Dche.offline.to.access.token.exchange.endpoint=https://auth.prod-preview.openshift.io/api/token/refresh
+```
 
-| Variable | Descrition |
-|----------|---------|
-| che.threads | threads in which tests will be executed |
-| che.workspace_pool_size | amount of workspace to be used while testing |
-| che.host | host where Che runs (e.g. rhche.openshift.io) |
-| che.port | port where Che runs (e.g. 443) |
-| che.protocol | protocol (https) |
-| grid.mode | false |
-| browser | browser for selenium tests (e.g. GOOGLE_CHROME) |
-| driver.port | port of driver (e.g. port of chromedriver) |
-| driver.version | version of driver |
-| excludedGroups | group of tests to be excluded |
-| cheStarterUrl | url of running che starter |
+### Full list of variables
 
-Environment variables
+These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`.
 
-| Variable | Descrition |
-|----------|---------|
-| CHE_INFRASTRUCTURE | infrastructure on which Che runs (e.g. openshift) |
-| CHE_TESTUSER_EMAIL | email of testing user |
-| CHE_TESTUSER_OFFLINE__TOKEN | refresh token of testing user |
-| CHE_MULTIUSER | use multiuser mode |
-| CHE_OFFLINE_TO_ACCESS_TOKEN_EXCHANGE_ENDPOINT | endpoint for autentization (e.g. https://auth.openshift.io/api/token/refresh) |
-| CHE_TESTUSER_NAME | username of testing user |
-| CHE_TESTUSER_PASSWORD | password of testing user |
+VM options (Mandatory parameters in __bold__)
+
+| Variable | Description | Default value|
+|----------|---------| --- |
+| __che.testuser.email__ | Openshift.io e-mail |  |
+| __che.testuser.name__ | Openshift.io username |  |
+| __che.testuser.offline_token__ | Openshift.io offline token |  |
+| __che.testuser.password__ | Openshift.io password |  |
+| che.threads | Thread count| `1` |
+| che.workspace_pool_size | Amount of workspace to be used while testing | `1` |
+| che.host | Host where Che runs | `che.openshift.io` |
+| che.port | Port where Che runs | `443` |
+| che.protocol | Protocol | `https` |
+| grid.mode | Used, when running with selenium-grid | `false` |
+| browser | browser for selenium tests | `GOOGLE_CHROME` |
+| driver.port | port of driver | `9515` |
+| excludedGroups | Group of tests to be excluded |  |
+| cheStarterUrl | URL of running che starter | `http://localhost:10000` |
 
 ## Further details
 
