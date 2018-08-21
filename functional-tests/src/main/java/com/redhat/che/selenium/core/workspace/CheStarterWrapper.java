@@ -129,6 +129,13 @@ public class CheStarterWrapper {
     try {
       Response response = client.newCall(requestBuilder.delete().build()).execute();
       LOG.info("Workspace delete response : " + response.message());
+      if (!response.isSuccessful()) {
+        if (response.message().equals("Workspace not found")) {
+          LOG.warn(
+              "Workspace could not be deleteded because workspace is not found. Continuing tests.");
+          return true;
+        }
+      }
       return response.isSuccessful();
     } catch (IOException e) {
       LOG.error("Workspace could not be deleted : " + e.getMessage(), e);
