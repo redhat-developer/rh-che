@@ -10,9 +10,6 @@ ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCKER_PATH=${ABSOLUTE_PATH}/../dockerfiles/
 REGISTRY="quay.io"
 NAMESPACE=${NAMESPACE:-"rhchestage"}
-DOCKERFILE="pr-check/Dockerfile"
-DOCKER_IMAGE="rh-che-automation-dep"
-DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 TAG="latest"
 
 cat jenkins-env \
@@ -29,7 +26,14 @@ else
   exit 1
 fi
 
+yum update --assumeyes
+yum install --assumeyes docker
+
 # Build and push PR-Check base image
+
+DOCKERFILE="pr-check/Dockerfile"
+DOCKER_IMAGE="rh-che-automation-dep"
+DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
 docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f ${DOCKER_PATH}/${DOCKERFILE} .
 if [ $? -ne 0 ]; then
