@@ -15,6 +15,13 @@ DOCKER_IMAGE="rh-che-automation-dep"
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 TAG="latest"
 
+cat jenkins-env \
+    | grep -E '(QUAY)' \
+    | sed 's/ //g' \
+    | sed 's/^/export /g' \
+    > /tmp/export-env
+source /tmp/export-env
+
 if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
   docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" ${REGISTRY}
 else
