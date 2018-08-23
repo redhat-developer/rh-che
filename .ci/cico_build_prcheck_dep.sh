@@ -19,15 +19,16 @@ cat jenkins-env \
     > /tmp/export-env
 source /tmp/export-env
 
+yum update --assumeyes
+yum install --assumeyes docker
+systemctl start docker
+
 if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
   docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" ${REGISTRY}
 else
   echo "ERROR: Can not push to ${REGISTRY}: credentials are not set. Aborting"
   exit 1
 fi
-
-yum update --assumeyes
-yum install --assumeyes docker
 
 # Build and push PR-Check base image
 
