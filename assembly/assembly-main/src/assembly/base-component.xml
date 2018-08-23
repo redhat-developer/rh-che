@@ -32,6 +32,15 @@
                 <include>com.redhat.che:fabric8-ide-assembly-wsagent-server</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <outputDirectory>tomcat/webapps</outputDirectory>
+            <outputFileNameMapping>docs.war</outputFileNameMapping>
+            <includes>
+                <include>com.redhat.che:fabric8-ide-docs</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>
