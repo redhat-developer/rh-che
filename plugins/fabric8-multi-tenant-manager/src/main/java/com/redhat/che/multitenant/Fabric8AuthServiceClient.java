@@ -1,9 +1,10 @@
 /*
  * Copyright (c) 2016-2018 Red Hat, Inc.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
@@ -14,6 +15,7 @@ import com.google.common.io.CharStreams;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.name.Named;
 import io.jsonwebtoken.Jwt;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,38 +42,49 @@ import org.eclipse.che.commons.lang.Pair;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakServiceClient;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakSettings;
-import org.eclipse.che.multiuser.keycloak.shared.KeycloakConstants;
 import org.eclipse.che.multiuser.keycloak.shared.dto.KeycloakErrorResponse;
 
+/**
+ * Abstraction of fabric8 auth server, allowing for account linking and obtaining github tokens.
+ *
+ * @author Angel Misevski (amisevsk@redhat.com)
+ */
 @Singleton
 public class Fabric8AuthServiceClient extends KeycloakServiceClient {
 
-  private static final String LINKING_URL_SUFFIX = "/link";
-  private KeycloakSettings keycloakSettings;
+  private static final String GITHUB_LINK_API_PATH = "/api/token/link?for=https://github.com";
+  private static final String GITHUB_TOKEN_API_PATH = "/api/token?for=https://github.com";
   private static final Gson gson =
       new GsonBuilder()
           .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
           .create();
 
+  private final String githubTokenEndpoint;
+  private final String githubLinkEndpoint;
+
   @Inject
-  public Fabric8AuthServiceClient(KeycloakSettings keycloakSettings) {
+  public Fabric8AuthServiceClient(
+      @Named("che.fabric8.auth.endpoint") String baseAuthUrl, KeycloakSettings keycloakSettings) {
     super(keycloakSettings);
-    this.keycloakSettings = keycloakSettings;
+    this.githubTokenEndpoint = baseAuthUrl + GITHUB_TOKEN_API_PATH;
+    this.githubLinkEndpoint = baseAuthUrl + GITHUB_LINK_API_PATH;
   }
 
+  /**
+   * Return account linking url for user. Note that this does not return the fabric8 auth linking
+   * URL, but instead makes a request to that url and returns the redirect obtained from there. This
+   * is because requests to fabric8 auth need the Authorization header, and a user's browser will
+   * not include this header by default, so returning the direct URL does not work.
+   */
   @Override
   public String getAccountLinkingURL(
       @SuppressWarnings("rawtypes") Jwt token, String oauthProvider, String redirectAfterLogin) {
-    // TODO: Better way of obtaining link url
     String linkingEndpoint =
-        UriBuilder.fromUri(keycloakSettings.get().get(KeycloakConstants.TOKEN_ENDPOINT_SETTING))
-            .path(LINKING_URL_SUFFIX)
-            .queryParam("for", "https://github.com")
+        UriBuilder.fromUri(githubLinkEndpoint)
             .queryParam("redirect", redirectAfterLogin)
             .build()
             .toString();
     try {
-      // TODO: require Authorization header in this request so have to do it here
       String redirectLocationJson = doRequest(linkingEndpoint, HttpMethod.GET, null);
       String redirectLocation =
           gson.<Map<String, String>>fromJson(redirectLocationJson, Map.class)
@@ -87,15 +100,15 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
     }
   }
 
+  /** Return user's {@link GithubToken} from the fabric8 auth github endpoint. */
   public GithubToken getGithubToken()
       throws ServerException, ForbiddenException, NotFoundException, UnauthorizedException,
           BadRequestException, IOException {
-    String githubEndpoint = keycloakSettings.get().get(KeycloakConstants.GITHUB_ENDPOINT_SETTING);
-    String response = doRequest(githubEndpoint, HttpMethod.GET, null);
+    String response = doRequest(githubTokenEndpoint, HttpMethod.GET, null);
     return gson.fromJson(response, GithubToken.class);
   }
 
-  // TODO Duplicated code from `KeycloakServiceClient`
+  /** Note this method is duplicated from {@link KeycloakServiceClient} */
   private String doRequest(String url, String method, List<Pair<String, ?>> parameters)
       throws IOException, ServerException, ForbiddenException, NotFoundException,
           UnauthorizedException, BadRequestException {
@@ -162,6 +175,7 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
     }
   }
 
+  /** Class to allow parsing json response from auth server for github token */
   class GithubToken {
     private String accessToken;
     private String providerApiUrl;
