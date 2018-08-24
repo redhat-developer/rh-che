@@ -32,11 +32,11 @@ fi
 
 # Build and push PR-Check base image
 
-DOCKERFILE="pr-check/Dockerfile"
+DOCKERFILE="pr-check/"
 DOCKER_IMAGE="rh-che-automation-dep"
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
-docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f ${DOCKER_PATH}/${DOCKERFILE} .
+docker build -t ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_PATH}${DOCKERFILE}
 if [ $? -ne 0 ]; then
   echo 'Docker Build Failed'
   exit 2
@@ -46,11 +46,11 @@ docker push ${DOCKER_IMAGE_URL}:${TAG}
 
 # Build and push functional-tests base image
 
-DOCKERFILE="functional-tests/Dockerfile"
+DOCKERFILE="functional-tests/"
 DOCKER_IMAGE="rh-che-functional-tests-dep"
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
-docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f ${DOCKER_PATH}/${DOCKERFILE} .
+docker build -t ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_PATH}${DOCKERFILE}
 if [ $? -ne 0 ]; then
   echo 'Docker Build Failed'
   exit 2
