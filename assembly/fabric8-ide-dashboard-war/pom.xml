@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2016-2018 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>fabric8-ide-assembly-parent</artifactId>
+        <groupId>com.redhat.che</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <artifactId>fabric8-ide-dashboard-war</artifactId>
+    <packaging>war</packaging>
+    <name>Fabric8 IDE :: Assemblies :: Dashboard</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.che.dashboard</groupId>
+            <artifactId>che-dashboard-war</artifactId>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <!-- Build Process: (More details in README.md)                -->
+        <!--   1. Extract upstream dashboard dependency's sources to   -->
+        <!--      ${project.build.directory}/sources                   -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extract-upstream-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <failOnMissingClassifierArtifact>true</failOnMissingClassifierArtifact>
+                            <outputDirectory>${project.build.directory}/sources</outputDirectory>
+                            <type>jar</type>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        <!--   2. Copy src directory over top of extracted upstream    -->
+        <!--      sources from step 1.                                 -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-custom-files</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy todir="${basedir}/target/sources/" overwrite="true">
+                                    <fileset dir="${basedir}">
+                                        <include name="src/**"/>
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+        <!--   3. Build dashboard as in upstream, using docker image   -->
+                    <execution>
+                        <id>build-image</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- build user dashboard with maven -->
+                                <exec dir="${basedir}" executable="docker" failonerror="true">
+                                    <arg value="build" />
+                                    <arg value="-t" />
+                                    <arg value="eclipse-che-dashboard" />
+                                    <arg value="--build-arg"/>
+                                    <arg value="SOURCES_DIR=./target/sources"/>
+                                    <arg value="." />
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+        <!--   4. Get 'compiled' dashboard from dockerfile, extract to -->
+        <!--      ${project.build.directory}/dist                      -->
+        <!--      This step is identical to the upstream build         -->
+                    <execution>
+                        <id>unpack-docker-build</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- build user dashboard with docker -->
+                                <exec executable="bash">
+                                    <arg value="-c" />
+                                    <arg value="docker run --rm eclipse-che-dashboard | tar -C target/ -xf -" />
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+        <!--   5. Update base path for index.html to /dashboard/       -->
+        <!--      This step is identical to upstream build             -->
+                    <execution>
+                        <id>update-href</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- Change base HREF of the application that will be hosted on /dashboard -->
+                                <replace file="${basedir}/target/dist/index.html">
+                                    <replacetoken><![CDATA[<base href="/">]]></replacetoken>
+                                    <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
+                                </replace>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        <!--   6. Build war file as in upstream build                  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>target/dist</directory>
+                        </resource>
+                    </webResources>
+                    <webXml>${basedir}/target/sources/src/webapp/WEB-INF/web.xml</webXml>
+                    <packagingExcludes>/webapp/</packagingExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

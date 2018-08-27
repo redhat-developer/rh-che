@@ -32,6 +32,7 @@
         <module>assembly-wsmaster-war</module>
         <module>assembly-main</module>
         <module>fabric8-ide-docs</module>
+        <module>fabric8-ide-dashboard-war</module>
     </modules>
     <build>
         <pluginManagement>

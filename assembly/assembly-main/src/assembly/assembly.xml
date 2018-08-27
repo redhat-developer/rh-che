@@ -41,7 +41,7 @@
             <outputDirectory>tomcat/webapps</outputDirectory>
             <outputFileNameMapping>dashboard.war</outputFileNameMapping>
             <includes>
-                <include>org.eclipse.che.dashboard:che-dashboard-war</include>
+                <include>com.redhat.che:fabric8-ide-dashboard-war</include>
             </includes>
         </dependencySet>
     </dependencySets>
