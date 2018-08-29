@@ -53,9 +53,6 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
     super(
         null,
         null,
-        null,
-        null,
-        null,
         doTrustCerts != null ? doTrustCerts.booleanValue() : false,
         maxConcurrentRequests,
         maxConcurrentRequestsPerHost,

@@ -116,12 +116,12 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
         return;
       }
 
-      String userId = extractUserId(httpRequest);
-
       String workspaceId = pathParts[pathParts.length - 1];
       if (workspaceId == null) {
         return;
       }
+
+      String userId = extractUserId(httpRequest, workspaceId);
 
       try {
         final WorkspaceImpl workspace = workspaceManager.getWorkspace(workspaceId);
@@ -198,7 +198,7 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
             });
   }
 
-  private String extractUserId(HttpServletRequest httpRequest) {
+  private String extractUserId(HttpServletRequest httpRequest, String workspaceId) {
     // First search in the session fro activity notification coming from the client
 
     final HttpSession session = httpRequest.getSession();
@@ -222,7 +222,9 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
     // check token signature and verify is this token machine or not
     try {
       final Jws<Claims> jwt =
-          Jwts.parser().setSigningKey(keyManager.getKeyPair().getPublic()).parseClaimsJws(token);
+          Jwts.parser()
+              .setSigningKey(keyManager.getKeyPair(workspaceId).getPublic())
+              .parseClaimsJws(token);
       final Claims claims = jwt.getBody();
 
       if (MACHINE_TOKEN_KIND.equals(jwt.getHeader().get("kind"))) {
@@ -231,7 +233,9 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
     } catch (UnsupportedJwtException
         | MalformedJwtException
         | SignatureException
-        | ExpiredJwtException ex) {
+        | ExpiredJwtException
+        | IllegalArgumentException
+        | ServerException ex) {
       LOG.warn("Could not get a user Id from a machine token", ex);
     }
     return null;

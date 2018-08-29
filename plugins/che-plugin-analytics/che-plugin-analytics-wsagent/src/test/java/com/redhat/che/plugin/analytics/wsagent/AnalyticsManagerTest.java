@@ -164,9 +164,8 @@ public class AnalyticsManagerTest {
   }
 
   @Test(
-    expectedExceptions = {RuntimeException.class},
-    expectedExceptionsMessageRegExp = "Can't get Che analytics settings from wsmaster"
-  )
+      expectedExceptions = {RuntimeException.class},
+      expectedExceptionsMessageRegExp = "Can't get Che analytics settings from wsmaster")
   public void constructWithExceptionDuringWriteKeyRetrieval() throws Exception {
     when(requestToGetSegmentWriteKey.request()).thenThrow(NotFoundException.class);
     new AnalyticsManager(
@@ -174,9 +173,8 @@ public class AnalyticsManagerTest {
   }
 
   @Test(
-    expectedExceptions = {RuntimeException.class},
-    expectedExceptionsMessageRegExp = "Can't get Che analytics settings from wsmaster"
-  )
+      expectedExceptions = {RuntimeException.class},
+      expectedExceptionsMessageRegExp = "Can't get Che analytics settings from wsmaster")
   public void constructWithExceptionDuringWoopraDomainRetrieval() throws Exception {
     when(requestToGetWoopraDomain.request()).thenThrow(NotFoundException.class);
     new AnalyticsManager(
@@ -184,9 +182,8 @@ public class AnalyticsManagerTest {
   }
 
   @Test(
-    expectedExceptions = {RuntimeException.class},
-    expectedExceptionsMessageRegExp = "Can't get workspace informations for Che analytics"
-  )
+      expectedExceptions = {RuntimeException.class},
+      expectedExceptionsMessageRegExp = "Can't get workspace informations for Che analytics")
   public void constructWithExceptionDuringWorkspaceNameRetrieval() throws Exception {
     when(requestToGetWorkspaceName.request()).thenThrow(NotFoundException.class);
     new AnalyticsManager(
@@ -208,10 +205,9 @@ public class AnalyticsManagerTest {
   }
 
   @Test(
-    expectedExceptions = {RuntimeException.class},
-    expectedExceptionsMessageRegExp =
-        "The Woopra domain should be set to provide better visit tracking and duration calculation"
-  )
+      expectedExceptions = {RuntimeException.class},
+      expectedExceptionsMessageRegExp =
+          "The Woopra domain should be set to provide better visit tracking and duration calculation")
   public void exceptionOnEmptyWoopraDomain() throws Exception {
     when(woopraDomainResponse.asString()).thenReturn("");
     new AnalyticsManager(
