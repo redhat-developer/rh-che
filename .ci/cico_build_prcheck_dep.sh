@@ -19,9 +19,11 @@ cat jenkins-env \
     > /tmp/export-env
 source /tmp/export-env
 
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 yum update --assumeyes
 yum install --assumeyes docker
 systemctl start docker
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
   docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" ${REGISTRY}
@@ -42,7 +44,9 @@ if [ $? -ne 0 ]; then
   exit 2
 fi
 
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 docker push ${DOCKER_IMAGE_URL}:${TAG}
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 # Build and push functional-tests base image
 
@@ -56,4 +60,6 @@ if [ $? -ne 0 ]; then
   exit 2
 fi
 
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 docker push ${DOCKER_IMAGE_URL}:${TAG}
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
