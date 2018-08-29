@@ -6,7 +6,7 @@ During the maven build, the contents of the `./src` directory are copied over th
 
 The build process is fairly non-standard, as the upstream project is an angularjs project, and not java. The steps are:
 
-1. The upstream dashboard's source files are unpacked to the directory `./target/sources` via the maven dependency plugin.
+1. The upstream dashboard's source files are unpacked to the directory `./target/sources` via the maven dependency plugin. A diff between this unpacked directory and the local `./src` directory is taken and saved to `./target/source_tree.diff`.
 2. The contents and structure of `./src` are copied *over* `./target/sources`
 3. The dashboard is built in a docker container, as in the upstream build, using the Dockerfile at this root of this submodules source tree.
 4. The docker image is used to extract the built dashboard to `./target/dist`

@@ -56,11 +56,28 @@
                     </execution>
                 </executions>
             </plugin>
-        <!--   2. Copy src directory over top of extracted upstream    -->
-        <!--      sources from step 1.                                 -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+        <!--   1.5 Log a diff of the ./src directory vs the unpacked    -->
+        <!--       upstream dependency's source tree                    -->
+
+                    <execution>
+                        <id>diff-source-trees</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec executable="diff" osfamily="Unix" output="${project.build.directory}/src_tree.diff">
+                                    <arg line="-u -r ${basedir}/src ${basedir}/target/sources/src" />
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+        <!--   2. Copy src directory over top of extracted upstream    -->
+        <!--      sources from step 1.                                 -->
                     <execution>
                         <id>copy-custom-files</id>
                         <phase>generate-sources</phase>
@@ -69,7 +86,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy todir="${basedir}/target/sources/" overwrite="true">
+                                <copy todir="${basedir}/target/sources/" overwrite="true" verbose="true">
                                     <fileset dir="${basedir}">
                                         <include name="src/**"/>
                                     </fileset>
