@@ -17,17 +17,16 @@ import com.redhat.che.selenium.core.client.RhCheTestWorkspaceServiceClient;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.PreDestroy;
 import org.eclipse.che.api.core.model.workspace.Workspace;
 import org.eclipse.che.selenium.core.user.TestUser;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** @author Anatolii Bazko */
-public class RhCheTestWorkspaceImpl implements TestWorkspace {
+/** @author Katerina Foniok */
+public class ProvidedWorkspace implements TestWorkspace {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RhCheTestWorkspaceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ProvidedWorkspace.class);
 
   private CompletableFuture<Void> future;
   private AtomicReference<String> id;
@@ -35,21 +34,20 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
   private TestUser owner;
   private RhCheTestWorkspaceServiceClient workspaceServiceClient;
 
-  public RhCheTestWorkspaceImpl(
-      TestUser owner, RhCheTestWorkspaceServiceClient testWorkspaceServiceClient) {
+  public ProvidedWorkspace(
+      TestUser owner,
+      RhCheTestWorkspaceServiceClient testWorkspaceServiceClient,
+      String givenWorkspaceName) {
     this.id = new AtomicReference<>();
     this.owner = owner;
     this.workspaceServiceClient = testWorkspaceServiceClient;
-    if (this.workspaceServiceClient == null) {
-      throw new IllegalArgumentException(
-          "workspaceServiceClient is null. Probably AbstractTestWorkspaceServiceClient is not instance of RhChe...");
-    }
 
     this.future =
         CompletableFuture.runAsync(
             () -> {
               try {
-                final Workspace ws = workspaceServiceClient.createWorkspaceWithCheStarter();
+                final Workspace ws =
+                    workspaceServiceClient.findExistingWorkspace(givenWorkspaceName);
                 this.id.set(ws.getId());
                 this.workspaceName = ws.getConfig().getName();
                 long start = System.currentTimeMillis();
@@ -63,7 +61,6 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
                 String errorMessage =
                     format("Workspace name='%s' start failed.", this.workspaceName);
                 LOG.error(errorMessage, e);
-                deleteImmidiatelly();
                 throw new IllegalStateException(errorMessage, e);
               }
             });
@@ -89,29 +86,8 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
     return this.owner;
   }
 
-  public void deleteImmidiatelly() {
-    try {
-      this.workspaceServiceClient.delete(this.workspaceName, this.owner.getName());
-    } catch (Exception e) {
-      LOG.error("Failed to remove workspace named '%s' '%s'", this.workspaceName);
-      throw new RuntimeException(
-          format("Failed to remove workspace named '%s' '%s'", this.workspaceName, this), e);
-    }
-  }
-
-  @PreDestroy
   @Override
-  @SuppressWarnings("FutureReturnValueIgnored")
   public void delete() {
-    this.future.thenAccept(
-        aVoid -> {
-          try {
-            this.workspaceServiceClient.delete(this.workspaceName, this.owner.getName());
-          } catch (Exception e) {
-            LOG.error("Failed to remove workspace named '%s' '%s'", this.workspaceName);
-            throw new RuntimeException(
-                format("Failed to remove workspace named '%s' '%s'", this.workspaceName, this), e);
-          }
-        });
+    // the provided workspace should not be deleted
   }
 }

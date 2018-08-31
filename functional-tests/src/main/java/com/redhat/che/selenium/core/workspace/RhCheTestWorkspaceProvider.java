@@ -20,7 +20,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
 import org.eclipse.che.commons.lang.concurrent.LoggingUncaughtExceptionHandler;
-import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClient;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClientFactory;
 import org.eclipse.che.selenium.core.user.DefaultTestUser;
 import org.eclipse.che.selenium.core.user.TestUser;
@@ -32,6 +31,7 @@ import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
 
   private CheStarterWrapper cheStarterWrapper;
+  private final RhCheTestWorkspaceServiceClient rhcheWorksapceClient;
 
   @Inject
   protected RhCheTestWorkspaceProvider(
@@ -40,7 +40,7 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
       @Named("workspace.default_memory_gb") int defaultMemoryGb,
       DefaultTestUser defaultUser,
       WorkspaceDtoDeserializer workspaceDtoDeserializer,
-      TestWorkspaceServiceClient testWorkspaceServiceClient,
+      RhCheTestWorkspaceServiceClient testWorkspaceServiceClient,
       TestWorkspaceServiceClientFactory testWorkspaceServiceClientFactory,
       CheStarterWrapper cheStarterWrapper) {
     super(
@@ -52,17 +52,19 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
         testWorkspaceServiceClient,
         testWorkspaceServiceClientFactory);
     this.cheStarterWrapper = cheStarterWrapper;
+    this.rhcheWorksapceClient = testWorkspaceServiceClient;
   }
 
   @Override
   public TestWorkspace createWorkspace(
       TestUser owner, int memoryGB, String template, boolean startAfterCreation) {
     this.cheStarterWrapper.checkIsRunning();
-    return new RhCheTestWorkspaceImpl(
-        owner,
-        testWorkspaceServiceClient instanceof RhCheTestWorkspaceServiceClient
-            ? (RhCheTestWorkspaceServiceClient) testWorkspaceServiceClient
-            : null);
+    return new RhCheTestWorkspaceImpl(owner, rhcheWorksapceClient);
+  }
+
+  public ProvidedWorkspace findWorkspace(TestUser owner, String name) {
+    this.cheStarterWrapper.checkIsRunning();
+    return new ProvidedWorkspace(owner, rhcheWorksapceClient, name);
   }
 
   @Override
@@ -83,12 +85,7 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
             String name = generateName();
             TestWorkspace testWorkspace;
             try {
-              testWorkspace =
-                  new RhCheTestWorkspaceImpl(
-                      defaultUser,
-                      testWorkspaceServiceClient instanceof RhCheTestWorkspaceServiceClient
-                          ? (RhCheTestWorkspaceServiceClient) testWorkspaceServiceClient
-                          : null);
+              testWorkspace = new RhCheTestWorkspaceImpl(defaultUser, rhcheWorksapceClient);
             } catch (Exception e) {
               // scheduled executor service doesn't log any exceptions, so log possible exception
               // here

@@ -14,8 +14,13 @@ package com.redhat.che.selenium.core;
 import static com.google.inject.name.Names.named;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
+import com.google.inject.util.Providers;
 import com.redhat.che.selenium.core.client.RhCheTestWorkspaceServiceClient;
+import com.redhat.che.selenium.core.workspace.ProvidedWorkspace;
 import com.redhat.che.selenium.core.workspace.RhCheTestWorkspaceProvider;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClient;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClientFactory;
@@ -24,6 +29,7 @@ import org.eclipse.che.selenium.core.configuration.TestConfiguration;
 import org.eclipse.che.selenium.core.provider.DefaultTestUserProvider;
 import org.eclipse.che.selenium.core.user.DefaultTestUser;
 import org.eclipse.che.selenium.core.user.MultiUserCheDefaultTestUserProvider;
+import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspaceProvider;
 
 public class RhCheSeleniumSuiteModule extends AbstractModule {
@@ -40,5 +46,37 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
             .build(TestWorkspaceServiceClientFactory.class));
     bind(TestWorkspaceServiceClient.class).to(RhCheTestWorkspaceServiceClient.class);
     bind(TestWorkspaceProvider.class).to(RhCheTestWorkspaceProvider.class).asEagerSingleton();
+    if (config.getMap().get("che.workspaceName") == null) {
+      bind(String.class)
+          .annotatedWith(Names.named("che.workspaceName"))
+          .toProvider(Providers.<String>of(null));
+    }
+  }
+
+  @Provides
+  public TestWorkspace getWorkspace(
+      TestWorkspaceProvider workspaceProvider,
+      DefaultTestUser testUser,
+      @Named("workspace.default_memory_gb") int defaultMemoryGb)
+      throws Exception {
+    TestWorkspace ws =
+        workspaceProvider.createWorkspace(testUser, defaultMemoryGb, "default.json", true);
+    ws.await();
+    return ws;
+  }
+
+  @Provides
+  public ProvidedWorkspace getProvidedWorkspace(
+      RhCheTestWorkspaceProvider workspaceProvider,
+      DefaultTestUser testUser,
+      @Named("che.workspaceName") String givenWorkspaceName)
+      throws Exception {
+    if (givenWorkspaceName == null) {
+      throw new RuntimeException(
+          "Variable `che.workspaceName` must be set to use ProvidedWorkspace");
+    }
+    ProvidedWorkspace ws = workspaceProvider.findWorkspace(testUser, givenWorkspaceName);
+    ws.await();
+    return ws;
   }
 }
