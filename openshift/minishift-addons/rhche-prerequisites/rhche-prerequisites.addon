@@ -2,7 +2,7 @@
 # Description: Setup and Configure Prerequisites to run Eclipse Che (rh-che distribution)
 # Url: https://github.com/redhat-developer/rh-che
 # Required-Vars: NAMESPACE, KEYCLOAK_DOCKER_IMAGE, RH_CHE_VERSION, KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE
-# Var-Defaults: NAMESPACE=rhche, KEYCLOAK_DOCKER_IMAGE=eclipse/che-keycloak, RH_CHE_VERSION=latest, KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE=registry.devshift.net/che/rh-che-standalone-keycloak-configurator
+# Var-Defaults: NAMESPACE=rhche, KEYCLOAK_DOCKER_IMAGE=eclipse/che-keycloak, RH_CHE_VERSION=latest, KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE=quay.io/openshiftio/che-rh-che-standalone-keycloak-configurator
 # OpenShift-Version: >=3.5.0
 
 echo [CHE] Creating #{NAMESPACE} project as developer

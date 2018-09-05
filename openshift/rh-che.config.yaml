@@ -1,53 +1,59 @@
+# Copyright (c) 2012-2018 Red Hat, Inc
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: rhche
 type: Opaque
 data:
+  analytics.segment_write_key: 'NULL' 
+  analytics.woopra_domain: 'NULL'
+  che-api: "https://che.prod-preview.openshift.io/api"
+  che-fabric8-auth-endpoint: "https://auth.prod-preview.openshift.io"
+  che-fabric8-multicluster-oso-proxy-url: "https://f8osoproxy-test-dsaas-preview.b6ff.rh-idev.openshiftapps.com"
+  che-fabric8-multitenant: "true"
+  che-fabric8-user-service-endpoint: "https://api.prod-preview.openshift.io/api/user/services"
+  che-host: "che.prod-preview.openshift.io"
+  che-keycloak-auth-server-url: "NULL"
+  che-keycloak-client-id: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"
+  che-keycloak-js-adapter-url: "/_app/keycloak/RhCheKeycloak.js"
+  che-keycloak-oidc-provider: "https://auth.prod-preview.openshift.io/api"
+  che-keycloak-realm: "NULL"
+  che-keycloak-use-nonce: "false"
+  che-limits-user-workspaces-run-count: "1"
+  che.logs.dir: "/data/logs"
+  che-logs-sentry-dsn: 'NULL'
+  che-logs-sentry-level: 'WARN'
+  che-openshift-precreate-subpaths: "false"
+  che-openshift-secure-routes: "true"
+  che.predefined.stacks.reload_on_start: "true"
+  che-secure-external-urls: "true"
+  che-server-java-opts: "-XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Xmx180m -Dfile.encoding=UTF8"
+  che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
+  che.workspace.agent.dev.inactive_stop_timeout_ms: "900000"
+  che-workspace-logs: "/workspace_logs"
+  che-workspace-server-ping-success-threshold: "2"
+  che-workspaces-java-opts: "-XX:+UseG1GC -XX:+UseStringDeduplication -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1200m -Xms256m"
+  enable-workspaces-autostart: "true"
   infra-bootstrapper-binary-url: "https://che.prod-preview.openshift.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
   infra-machine-start-timeout: "5"
   infra-pvc-strategy: "common"
   infra-trust-certs: "true"
-  multi-user: "true"
-  che-host: "che.prod-preview.openshift.io"
-  workspace-storage: "/home/user/che/workspaces"
+  keycloak-github-endpoint: "https://auth.prod-preview.openshift.io/api/token?for=https://github.com"
   local-conf-dir: "/etc/conf"
-  che.logs.dir: "/data/logs"
-  che.predefined.stacks.reload_on_start: "true"
   log-level: "INFO"
+  logs-encoding: "json"
+  multi-user: "true"
   port: "8080"
   remote-debugging-enabled: "false"
+  sentry-environment: 'dev'
+  sentry-stacktrace-app-packages: 'com.redhat,org.eclipse.che'
   workspaces-memory-limit: "3000"
   workspaces-memory-limit-max: "3gb"
-  enable-workspaces-autostart: "true"
-  keycloak-github-endpoint: "https://auth.prod-preview.openshift.io/api/token?for=https://github.com"
-  che-server-java-opts: "-XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Xmx180m -Dfile.encoding=UTF8"
-  che-workspaces-java-opts: "-XX:+UseG1GC -XX:+UseStringDeduplication -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1200m -Xms256m"
-  che-openshift-secure-routes: "true"
-  che-secure-external-urls: "true"
-  che-openshift-precreate-subpaths: "false"
-  che-fabric8-multitenant: "true"
-  che-fabric8-user-service-endpoint: "https://api.prod-preview.openshift.io/api/user/services"
-  che-fabric8-auth-endpoint: "https://auth.prod-preview.openshift.io"
-  che-fabric8-multicluster-oso-proxy-url: "https://f8osoproxy-test-dsaas-preview.b6ff.rh-idev.openshiftapps.com"
-  che-api: "https://che.prod-preview.openshift.io/api"
-  che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
-  che-workspace-logs: "/workspace_logs"
-  che-keycloak-auth-server-url: "NULL"
-  che-keycloak-realm: "NULL"
-  che-keycloak-client-id: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"
-  che-keycloak-oidc-provider: "https://auth.prod-preview.openshift.io/api"
-  che-keycloak-js-adapter-url: "/_app/keycloak/RhCheKeycloak.js"
-  che-keycloak-use-nonce: "false"
-  che-workspace-server-ping-success-threshold: "2"
-  che-limits-user-workspaces-run-count: "1"
-  che.workspace.agent.dev.inactive_stop_timeout_ms: "900000"
-  logs-encoding: "json"
-  che-logs-sentry-level: 'WARN'
-  che-logs-sentry-dsn: 'NULL'
-  sentry-stacktrace-app-packages: 'com.redhat,org.eclipse.che'
-  sentry-environment: 'dev'
-  analytics.segment_write_key: 'NULL' 
-  analytics.woopra_domain: 'NULL'
   workspaces-pvc-storage-size: '1Gi'
-  
+  workspace-storage: "/home/user/che/workspaces"

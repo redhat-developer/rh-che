@@ -6,6 +6,8 @@
 
 echo [CHE] Deleting all Che objects (deploymentconfig, services, routes etc...)
 oc delete all -l app=rhche -n #{NAMESPACE}
+oc delete rolebinding rhche -n #{NAMESPACE}
+oc delete serviceaccount rhche -n #{NAMESPACE}
 
 echo [CHE] Removing Che server Template
 oc delete -f templates/rh-che.app.yaml -n openshift

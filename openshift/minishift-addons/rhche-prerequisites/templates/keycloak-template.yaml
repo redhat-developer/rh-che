@@ -215,12 +215,11 @@ parameters:
 - name: KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE
   displayName: Keycloak configurator image
   description: Keycloak configurator image for RhChe standalone
-  value: registry.devshift.net/che/rh-che-standalone-keycloak-configurator
+  value: quay.io/openshiftio/che-rh-che-standalone-keycloak-configurator
 - name: RH_CHE_VERSION
   displayName: RhChe version
   description: RhChe version which defaults to latest
   value: latest
-      
 labels:
   app: keycloak
   template: keycloak
