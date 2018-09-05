@@ -12,7 +12,7 @@ CHE_DIR=$HOME/che
 LS_DIR=${CHE_DIR}/ls-bayesian
 LS_LAUNCHER=${LS_DIR}/launch.sh
 
-AGENT_BINARIES_URI=https://github.com/fabric8-analytics/fabric8-analytics-lsp-server/releases/download/0.0.5/ca-lsp-server.tar
+AGENT_BINARIES_URI=https://github.com/fabric8-analytics/fabric8-analytics-lsp-server/releases/download/v0.1.32/ca-lsp-server.tar
 
 
 if [ -f /etc/centos-release ]; then
