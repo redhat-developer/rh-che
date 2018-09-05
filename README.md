@@ -1,6 +1,6 @@
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-che-credentials-master)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-build-che-credentials-master/)
 
-# Eclipse Che on OpenShift 
+# Eclipse Che on OpenShift - TEST
 
 ## Table Of Content
 
