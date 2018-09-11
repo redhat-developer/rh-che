@@ -129,34 +129,54 @@ public class CheStarterWrapper {
   }
 
   public void startWorkspace(String WorkspaceID, String name, String token) throws Exception {
+    patchPrepareEnv(name, token);
+    sendStartRequest(WorkspaceID, token);
+  }
+
+  public void sendStartRequest(String id, String token) throws IOException {
     OkHttpClient client = new OkHttpClient();
-    String path = "/workspace/" + name;
-    StringBuilder sb = new StringBuilder(this.cheStarterURL);
-    sb.append(path);
-    sb.append("?");
-    sb.append("masterUrl=").append(this.host).append("&").append("namespace=sthf");
+    RequestBody body = RequestBody.create(null, new byte[0]);
+    StringBuilder sb = new StringBuilder("https://" + this.host);
+    sb.append("/api/workspace/");
+    sb.append(id);
+    sb.append("/runtime");
     Builder requestBuilder = new Request.Builder().url(sb.toString());
     requestBuilder.addHeader("Authorization", "Bearer " + token);
-    RequestBody body = RequestBody.create(null, new byte[0]);
-    Request request = requestBuilder.patch(body).build();
+    Request request = requestBuilder.post(body).build();
     try {
       Response response = client.newCall(request).execute();
       if (response.isSuccessful()) {
-        LOG.info("Prepare workspace request send. Starting workspace.");
-        sb = new StringBuilder("https://" + this.host);
-        sb.append("/api/workspace/");
-        sb.append(WorkspaceID);
-        sb.append("/runtime");
-        requestBuilder = new Request.Builder().url(sb.toString());
-        requestBuilder.addHeader("Authorization", "Bearer " + token);
-        request = requestBuilder.post(body).build();
-        response = client.newCall(request).execute();
-        if (response.isSuccessful()) {
-          LOG.info("Workspace was started. Waiting until workspace is running.");
-        }
+        LOG.info("Workspace was started. Waiting until workspace is running.");
       }
     } catch (IOException e) {
       LOG.error("Workspace start failed : " + e.getMessage(), e);
+      throw e;
+    }
+  }
+
+  private void patchPrepareEnv(String name, String token) throws IOException {
+    OkHttpClient client = new OkHttpClient();
+    StringBuilder sb;
+    Builder requestBuilder;
+    Request request;
+    RequestBody body = RequestBody.create(null, new byte[0]);
+    Response response;
+    String path = "/workspace/" + name;
+    sb = new StringBuilder(this.cheStarterURL);
+    sb.append(path);
+    sb.append("?");
+    sb.append("masterUrl=").append(this.host).append("&").append("namespace=sthf");
+    requestBuilder = new Request.Builder().url(sb.toString());
+    requestBuilder.addHeader("Authorization", "Bearer " + token);
+    body = RequestBody.create(null, new byte[0]);
+    request = requestBuilder.patch(body).build();
+    try {
+      response = client.newCall(request).execute();
+      if (response.isSuccessful()) {
+        LOG.info("Prepare workspace request send. Starting workspace named: " + name + ".");
+      }
+    } catch (IOException e) {
+      LOG.error("Failed to set environment before workspace start: " + e.getMessage(), e);
       throw e;
     }
   }

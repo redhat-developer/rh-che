@@ -59,7 +59,7 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
   public TestWorkspace createWorkspace(
       TestUser owner, int memoryGB, String template, boolean startAfterCreation) {
     this.cheStarterWrapper.checkIsRunning();
-    return new RhCheTestWorkspaceImpl(owner, rhcheWorksapceClient);
+    return new RhCheTestWorkspaceImpl(owner, rhcheWorksapceClient, startAfterCreation);
   }
 
   public ProvidedWorkspace findWorkspace(TestUser owner, String name) {
@@ -85,7 +85,8 @@ public class RhCheTestWorkspaceProvider extends AbstractTestWorkspaceProvider {
             String name = generateName();
             TestWorkspace testWorkspace;
             try {
-              testWorkspace = new RhCheTestWorkspaceImpl(defaultUser, rhcheWorksapceClient);
+              // third parameter (startAfterCreation) set to true as upstream
+              testWorkspace = new RhCheTestWorkspaceImpl(defaultUser, rhcheWorksapceClient, true);
             } catch (Exception e) {
               // scheduled executor service doesn't log any exceptions, so log possible exception
               // here

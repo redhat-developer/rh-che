@@ -21,6 +21,7 @@ import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.redhat.che.selenium.core.client.RhCheTestWorkspaceServiceClient;
 import com.redhat.che.selenium.core.workspace.ProvidedWorkspace;
+import com.redhat.che.selenium.core.workspace.RhCheTestWorkspaceImpl;
 import com.redhat.che.selenium.core.workspace.RhCheTestWorkspaceProvider;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClient;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClientFactory;
@@ -61,6 +62,19 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
       throws Exception {
     TestWorkspace ws =
         workspaceProvider.createWorkspace(testUser, defaultMemoryGb, "default.json", true);
+    ws.await();
+    return ws;
+  }
+
+  @Provides
+  public RhCheTestWorkspaceImpl getRhCheWorkspace(
+      TestWorkspaceProvider workspaceProvider,
+      DefaultTestUser testUser,
+      @Named("workspace.default_memory_gb") int defaultMemoryGb)
+      throws Exception {
+    RhCheTestWorkspaceImpl ws =
+        (RhCheTestWorkspaceImpl)
+            workspaceProvider.createWorkspace(testUser, defaultMemoryGb, "default.json", true);
     ws.await();
     return ws;
   }

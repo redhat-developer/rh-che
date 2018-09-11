@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PreDestroy;
 import org.eclipse.che.api.core.model.workspace.Workspace;
+import org.eclipse.che.api.core.model.workspace.WorkspaceStatus;
 import org.eclipse.che.selenium.core.user.TestUser;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.slf4j.Logger;
@@ -34,9 +35,13 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
   private String workspaceName;
   private TestUser owner;
   private RhCheTestWorkspaceServiceClient workspaceServiceClient;
+  private boolean startAfterCreation;
 
   public RhCheTestWorkspaceImpl(
-      TestUser owner, RhCheTestWorkspaceServiceClient testWorkspaceServiceClient) {
+      TestUser owner,
+      RhCheTestWorkspaceServiceClient testWorkspaceServiceClient,
+      boolean startAfterCreation) {
+    this.startAfterCreation = startAfterCreation;
     this.id = new AtomicReference<>();
     this.owner = owner;
     this.workspaceServiceClient = testWorkspaceServiceClient;
@@ -49,16 +54,24 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
         CompletableFuture.runAsync(
             () -> {
               try {
+                LOG.info("Creating new workspace with che-starter.");
                 final Workspace ws = workspaceServiceClient.createWorkspaceWithCheStarter();
                 this.id.set(ws.getId());
                 this.workspaceName = ws.getConfig().getName();
                 long start = System.currentTimeMillis();
-                workspaceServiceClient.start(this.id.get(), this.workspaceName, this.owner);
-                LOG.info(
-                    "Workspace name='{}' id='{}' started in {} sec.",
-                    workspaceName,
-                    ws.getId(),
-                    (System.currentTimeMillis() - start) / 1000);
+                if (startAfterCreation) {
+                  workspaceServiceClient.start(this.id.get(), this.workspaceName, this.owner);
+                  LOG.info(
+                      "Workspace name='{}' id='{}' started in {} sec.",
+                      workspaceName,
+                      ws.getId(),
+                      (System.currentTimeMillis() - start) / 1000);
+                } else {
+                  LOG.info(
+                      "Workspace "
+                          + workspaceName
+                          + " should not be started directly after creation - skipping.");
+                }
               } catch (Exception e) {
                 String errorMessage =
                     format("Workspace name='%s' start failed.", this.workspaceName);
@@ -99,6 +112,15 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
     }
   }
 
+  public void startWorkspace() throws Exception {
+    try {
+      workspaceServiceClient.start(id.toString(), workspaceName, owner);
+    } catch (Exception e) {
+      LOG.error("Could not start workspace with name: " + workspaceName);
+      throw e;
+    }
+  }
+
   @PreDestroy
   @Override
   @SuppressWarnings("FutureReturnValueIgnored")
@@ -113,5 +135,16 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
                 format("Failed to remove workspace named '%s' '%s'", this.workspaceName, this), e);
           }
         });
+  }
+
+  public boolean checkStatus(String status) {
+    try {
+      WorkspaceStatus actualStatus = workspaceServiceClient.getStatus(id.toString());
+      return status.equals(actualStatus.toString());
+    } catch (Exception e) {
+      LOG.error("Could not get status of workspace named: " + workspaceName);
+      e.printStackTrace();
+      return false;
+    }
   }
 }
