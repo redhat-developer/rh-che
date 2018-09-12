@@ -191,3 +191,31 @@ Steps 1 and 2 can be shortcut if only one rh-che pod is present (i.e. you're not
 ----
 oc port-forward $(oc get po | grep "rhche\S*" -o) 8000
 ----
+
+== All-in-one build and update commands
+These commands will do a full build (skipping tests) of rh-che and rollout a new deployment. They assume that they are being executed from this repositorys root directory, and that environment variables
+[source,bash]
+----
+export DOCKER_IMAGE=fabric8/rh-che
+export DOCKER_TAG=local
+----
+have been set appropriately (i.e. to match whatever is currently deployed). To do a limited build (e.g. if working on the dashboard component only), the maven build command can be modified according to the <<Building rh-che>> section.
+
+=== Minishift
+Ensure `eval $(minishift docker-env)` and `eval $(minishift oc-env)` have been executed.
+[source,bash]
+----
+mvn -Pfast -Dskip-enforce -Dskip-validate-sources clean install && \
+./dev-scripts/create_docker_image.sh ${DOCKER_IMAGE}:${DOCKER_TAG} && \
+oc rollout latest rhche
+----
+
+=== Dev-cluster
+Ensure you are logged in via `oc` and have push rights to the relevant repository.
+[source,bash]
+----
+mvn -Pfast -Dskip-enforce -Dskip-validate-sources clean install && \
+./dev-scripts/create_docker_image.sh ${DOCKER_IMAGE}:${DOCKER_TAG} && \
+docker push ${DOCKER_IMAGE}:${DOCKER_TAG} && \
+oc rollout latest rhche
+----
