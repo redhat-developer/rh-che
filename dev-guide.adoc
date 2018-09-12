@@ -3,7 +3,7 @@
 :toc-title:
 
 == Building rh-che
-With the exception of the dashboard component, rh-che is a straightforward maven project and can be built as expected. For additional information on the build process for the dashboard component, see link:assembly/fabric8-ide-dashboard-war/README.md[README.md] in the dashboard subcomponent. 
+With the exception of the dashboard component, rh-che is a straightforward maven project and can be built as expected. For additional information on the build process for the dashboard component, see link:assembly/fabric8-ide-dashboard-war/README.md[README.md] in the dashboard subcomponent.
 
 [NOTE]
 ====
@@ -23,7 +23,7 @@ mvn clean install
 ==== Build only only one component and dependents (e.g. dashboard component):
 [source,bash]
 ----
-mvn clean install -pl ':fabric8-ide-dashboard-war' --amd 
+mvn clean install -pl ':fabric8-ide-dashboard-war' --amd
 ----
 
 ==== Build, skipping tests and optional checks
@@ -32,7 +32,7 @@ Use the `-Pfast` option:
 ----
 mvn clean install -Pfast
 ----
-This is equivalent to 
+This is equivalent to
 [source,bash]
 ----
 mvn -DskipTests=true \
@@ -85,7 +85,7 @@ CHE_TESTUSER_PASSWORD=<password>;
 The scripts in this section assume that the maven build was completed successfully and that built artifacts exist at `+./assembly/assembly-main/target/eclipse-che-*/eclipse-che-*+`
 ====
 
-The simplest way to create a docker image locally is to use the provided script: 
+The simplest way to create a docker image locally is to use the provided script:
 
 [source,bash]
 ----
@@ -111,7 +111,7 @@ will create the image tagged `eclipse/che:local`
 === Deploying on minishift locally
 [CAUTION]
 ====
-When working on minishift, it is helpful to make sure you are working in the VM's docker environment instead of the default. A good practice is to execute 
+When working on minishift, it is helpful to make sure you are working in the VM's docker environment instead of the default. A good practice is to execute
 [source,bash]
 ----
 eval $(minishift oc-env)
@@ -221,7 +221,7 @@ $ oc edit dc rhche
 # Delete these lines and the deployment will automatically rollout.
 ----
 ====
-Enabling debugging in Che is done via the environment variable `CHE_DEBUG_SERVER`. By default, this environment variable is set according to the `remote-debugging-enabled` configmap entry when rh-che is deployed. 
+Enabling debugging in Che is done via the environment variable `CHE_DEBUG_SERVER`. By default, this environment variable is set according to the `remote-debugging-enabled` configmap entry when rh-che is deployed.
 
 For deployments done using the minishift addon, the default is `"true"`; for dev-cluster deployments, the default is `false` but can be enabled by modifying the configmap and rolling out a new deployment.
 
@@ -251,7 +251,7 @@ oc port-forward rhche-72-49tt6 8000:8000
 Steps 1 and 2 can be shortcut if only one rh-che pod is present (i.e. you're not in the middle of a rolling deploy / the deploy pod is not there):
 [source,bash]
 ----
-oc port-forward $(oc get po | grep "rhche\S*" -o) 8000
+oc port-forward $(oc get pods --selector="deploymentconfig=rhche" --no-headers=true -o custom-columns=:metadata.name) 8000
 ----
 
 === Debugging wsagent pods (workspaces)
