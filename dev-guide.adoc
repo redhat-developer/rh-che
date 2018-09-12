@@ -201,7 +201,26 @@ Once rh-che has been deployed (whether it's to minishift or the dev-cluster), ma
 . Running `oc rollout latest rhche` (assuming you're logged in)
 
 == Debugging rh-che
-
+[INFO]
+====
+By default, Che deployed on OpenShift will have a liveness probe to check container health. This can interfere with debugging in some cases, as the liveness probe checks `/api/system/state` on `wsmaster`. If you encounter this error, the liveness probe can be removed by editing it out of the `rhche` Deployment Config:
+[source,bash]
+----
+$ oc edit dc rhche
+# Find the livenessProbe in the yaml; it should look something like
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/system/state
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+# Delete these lines and the deployment will automatically rollout.
+----
+====
 Enabling debugging in Che is done via the environment variable `CHE_DEBUG_SERVER`. By default, this environment variable is set according to the `remote-debugging-enabled` configmap entry when rh-che is deployed. 
 
 For deployments done using the minishift addon, the default is `"true"`; for dev-cluster deployments, the default is `false` but can be enabled by modifying the configmap and rolling out a new deployment.
@@ -234,6 +253,24 @@ Steps 1 and 2 can be shortcut if only one rh-che pod is present (i.e. you're not
 ----
 oc port-forward $(oc get po | grep "rhche\S*" -o) 8000
 ----
+
+=== Debugging wsagent pods (workspaces)
+_See also_: link:https://github.com/eclipse/che/wiki/Development-Workflow#debugging-workspace-agent[upstream docs]
+
+By default workspace pods expose a JDPA debug port. The easiest way to connect to a workspace pod is again by using `oc port-forward`:
+
+[source,bash]
+----
+oc port-forward <workspace_pod_name> 4403:4403
+----
+which will allow connecting a remote debugger to `localhost:4403`
+
+A shortcut, if _only a single workspace is running_, is to use a selector to automatically get the pod name:
+[source,bash]
+----
+oc port-forward $(oc get pods --selector="che.workspace_id" --no-headers=true -o custom-columns=:metadata.name) 4403
+----
+
 
 == All-in-one build and update commands
 These commands will do a full build (skipping tests) of rh-che and rollout a new deployment. They assume that they are being executed from this repositorys root directory, and that environment variables
