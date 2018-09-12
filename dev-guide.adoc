@@ -3,7 +3,12 @@
 :toc-title:
 
 == Building rh-che
-With the exception of the dashboard component, rh-che is a straightforward maven project and can be built as expected. For additional information on the build process for the dashboard component, see link:assembly/fabric8-ide-dashboard-war/README.md[README.md] in the dashboard subcomponent.
+With the exception of the dashboard component, rh-che is a straightforward maven project and can be built as expected. For additional information on the build process for the dashboard component, see link:assembly/fabric8-ide-dashboard-war/README.md[README.md] in the dashboard subcomponent. 
+
+[NOTE]
+====
+The rh-che maven build accomodates the same parameters as the upstream maven build
+====
 
 ==== Basic build of all components:
 [source,bash]
