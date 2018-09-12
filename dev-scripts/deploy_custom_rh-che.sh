@@ -45,7 +45,7 @@ export RH_CHE_RUNNING_STANDALONE_SCRIPT="false";
 export RH_CHE_USE_TLS="true"
 
 export RH_CHE_DOCKER_IMAGE_TAG="latest";
-export RH_CHE_DOCKER_REPOSITORY="registry.devshift.net/che/rh-che-server";
+export RH_CHE_DOCKER_REPOSITORY="quay.io/openshiftio/che-rh-che-server";
 export RH_CHE_GITHUB_BRANCH=master;
 
 function unsetVars() {
