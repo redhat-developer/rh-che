@@ -14,6 +14,8 @@ ENV LANG=en_US.utf8 \
 
 COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
 RUN yum update --assumeyes && \
+	yum install --assumeyes epel-release && \
+	yum install --assumeyes chromedriver && \
     yum install --assumeyes google-chrome-stable && \
     yum install --assumeyes \
         xorg-x11-server-Xvfb \
