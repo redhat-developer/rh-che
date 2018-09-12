@@ -9,6 +9,10 @@ With the exception of the dashboard component, rh-che is a straightforward maven
 ====
 The rh-che maven build accomodates the same parameters as the upstream maven build
 ====
+[NOTE]
+====
+The final build artifacts will be available in `+./assembly/assembly-main/target/eclipse-che-*/+`
+====
 
 ==== Basic build of all components:
 [source,bash]
@@ -42,13 +46,37 @@ Which can be slightly sped up further by adding `-Dskip-validate-sources -Dskip-
 ==== Add license headers to all files (fix license check step of full build):
 [source,bash]
 ----
-mvn com.mycila:license-maven-plugin:format
+mvn license:format
 ----
 
 ==== Format all files (fix check-format step of full build):
 [source,bash]
 ----
 mvn fmt:format
+----
+
+== Running Selenium Tests
+Rh-Che `functional-tests` are based on selenium framework with Guice injection.
+These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`
+
+=== VM options
+[source,bash]
+----
+-Dche.threads=1 -Dche.workspace_pool_size=1 -Dche.host="<RH-Che DEPLOYMENT PATH>" -Dche.port=443 \
+  -Dche.protocol=https -Dgrid.mode=false -Dbrowser=GOOGLE_CHROME -Ddriver.port=9515 \
+  -Ddriver.version="2.35" -DexcludedGroups=github
+----
+
+=== Env variables
+[source,bash]
+----
+CHE_INFRASTRUCTURE=openshift;
+CHE_TESTUSER_EMAIL=<email>;
+CHE_TESTUSER_OFFLINE__TOKEN=<refresh_token>;
+CHE_MULTIUSER=true;
+CHE_OFFLINE_TO_ACCESS_TOKEN_EXCHANGE_ENDPOINT=https://auth.<OSD URL>/api/token/refresh;
+CHE_TESTUSER_NAME=<username>;
+CHE_TESTUSER_PASSWORD=<password>;
 ----
 
 == Creating docker images
@@ -136,6 +164,16 @@ The minishift addon uses the yaml files (`rh-che.app.yaml`, `rh-che.config.yaml`
 
 
 === Deploying to dev-cluster
+[WARNING]
+====
+The `deploy_custom_rh-che.sh` script requires `yq`, a commandline yaml processor. There are (at least) *two* projects named `yq`:
+
+. There is the Python-based `jq` wrapper: https://github.com/kislyuk/yq
+. There is the Go-based `jq` replacement: https://github.com/mikefarah/yq
+
+The Go-based implementation has not been tested and potentially has issues, but the dev-script is confirmed to work with the Python-based `yq` with version `>2.6.0`.
+====
+
 A prerequisite for deploying on the dev-cluster is pushing a server image to a repository. Once this is done (and assuming you are logged into the dev-cluster locally), deploying rh-che is simply done by using the `./dev-scripts/deploy_custom_rh-che.sh` script:
 [source,bash]
 ----
