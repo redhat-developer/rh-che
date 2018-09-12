@@ -47,40 +47,31 @@ mvn fmt:format
 ----
 
 == Creating docker images
+[NOTE]
+====
+The scripts in this section assume that the maven build was completed successfully and that built artifacts exist at `+./assembly/assembly-main/target/eclipse-che-*/eclipse-che-*+`
+====
+
 The simplest way to create a docker image locally is to use the provided script: 
 
 [source,bash]
 ----
-./dev-scripts/local_docker_create_images_and_tag.sh
+./dev-scripts/create_docker_image.sh [docker image name and tag]
 ----
+which simply automates copying the built artifacts to the appropriate directory and running a docker build.
 
-This will create four images in your current docker environment:
-
+Example:
 [source,bash]
 ----
-quay.io/rhchestage/rh-che-standalone-keycloak-configurator:nightly-fabric8
-quay.io/openshiftio/rhchestage-rh-che-standalone-keycloak-configurator:[hash1]-fabric8-[hash2]
-
-quay.io/openshiftio/rhchestage-rh-che-server:nightly-fabric8
-quay.io/openshiftio/rhchestage-rh-che-server:[hash1]-fabric8-[hash2]
+./dev-scripts/create_docker_image.sh
 ----
 
-where `hash1` is the hash of the git commit from the upstream che dependency and `hash2` is the hash of the git commit used in the local repository. 
-
-The image `rh-che-standalone-keycloak-configurator` is used to configure keycloak in non-dev-cluster deployments, and `rhchestage-rh-che-server` is the server image.
-
-In general, the keycloak configurator image is not very useful unless local modifications are necessary; the image used by default in the deploy step is sufficient.
-
-=== Alternative docker build
-To avoid using the script and creating unnecessary tags, the commands
+will create the image tagged `fabric8/rh-che-server` (the default), while
 [source,bash]
 ----
-rm -rf ./dockerfiles/che-fabric8/eclipse-che
-cp -r ./assembly/assembly-main/target/eclipse-che-*/eclipse-che-* \
-      ./dockerfiles/che-fabric8/eclipse-che 
-docker build -t '[docker name and tag]' './dockerfiles/che-fabric8/'
+./dev-scripts/create_docker_image.sh eclipse/che:local
 ----
-will create the server image in the local docker environment.
+will create the image tagged `eclipse/che:local`
 
 == Deploying rh-che
 
