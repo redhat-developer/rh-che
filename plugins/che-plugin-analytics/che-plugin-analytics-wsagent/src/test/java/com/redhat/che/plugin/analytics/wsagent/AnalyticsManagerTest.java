@@ -133,6 +133,7 @@ public class AnalyticsManagerTest {
   @AfterMethod
   public void cleanUp() {
     if (manager != null) {
+      manager.networkExecutor.shutdownNow();
       manager.shutdown();
     }
   }

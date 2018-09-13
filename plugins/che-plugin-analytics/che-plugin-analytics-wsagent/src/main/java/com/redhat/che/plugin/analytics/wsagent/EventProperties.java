@@ -25,4 +25,7 @@ public interface EventProperties {
   public static final String AGE = "age";
   public static final String RETURN_DELAY = "return delay ";
   public static final String FIRST_START = "first start";
+  public static final String LAST_WORKSPACE_FAILED = "last workspace failed";
+  public static final String LAST_WORKSPACE_FAILURE = "last workspace failure";
+  public static final String OSIO_SPACE_ID = "osio space id";
 }

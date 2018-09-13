@@ -27,6 +27,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.Hashing;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -52,7 +53,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.che.api.core.model.workspace.Workspace;
@@ -92,6 +96,10 @@ public class AnalyticsManager {
   @VisibleForTesting final String createdOn;
   @VisibleForTesting final String updatedOn;
   @VisibleForTesting final String stoppedOn;
+  @VisibleForTesting final String stoppedAbnormally;
+  @VisibleForTesting final String lastErrorMessage;
+  @VisibleForTesting final String osioSpaceId;
+
   @VisibleForTesting final Long age;
   @VisibleForTesting final Long returnDelay;
   @VisibleForTesting final Boolean firstStart;
@@ -103,7 +111,8 @@ public class AnalyticsManager {
       Executors.newSingleThreadScheduledExecutor(
           new ThreadFactoryBuilder().setNameFormat("Analytics Activity Checker").build());
 
-  private ScheduledExecutorService networkExecutor =
+  @VisibleForTesting
+  ScheduledExecutorService networkExecutor =
       Executors.newSingleThreadScheduledExecutor(
           new ThreadFactoryBuilder().setNameFormat("Analytics Network Request Submitter").build());
 
@@ -137,6 +146,9 @@ public class AnalyticsManager {
       createdOn = workspace.getAttributes().get(Constants.CREATED_ATTRIBUTE_NAME);
       updatedOn = workspace.getAttributes().get(Constants.UPDATED_ATTRIBUTE_NAME);
       stoppedOn = workspace.getAttributes().get(Constants.STOPPED_ATTRIBUTE_NAME);
+      stoppedAbnormally =
+          workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
+      lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
 
       Long createDate = null;
       Long updateDate = null;
@@ -177,16 +189,29 @@ public class AnalyticsManager {
 
       stackId = workspace.getAttributes().get("stackId");
       factoryId = workspace.getAttributes().get("factoryId");
-      if (factoryId != null) {
+      if (factoryId != null && !"undefined".equals(factoryId)) {
         endpoint = apiEndpoint + "/factory/" + factoryId;
 
-        FactoryDto factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
-        factoryName = factory.getName();
-        factoryOwner = factory.getCreator().getName();
+        FactoryDto factory = null;
+        try {
+          factory = requestFactory.fromUrl(endpoint).request().asDto(FactoryDto.class);
+        } catch (Exception e) {
+          LOG.warn(
+              "Can't get workspace factory ('" + factoryId + "') informations for Che analytics",
+              e);
+        }
+        if (factory != null) {
+          factoryName = factory.getName();
+          factoryOwner = factory.getCreator().getName();
+        } else {
+          factoryName = null;
+          factoryOwner = null;
+        }
       } else {
         factoryName = null;
         factoryOwner = null;
       }
+      osioSpaceId = workspace.getAttributes().get("osio_spaceId");
 
       workspaceName = workspace.getConfig().getName();
     } catch (Exception e) {
@@ -208,7 +233,7 @@ public class AnalyticsManager {
 
     this.workspaceId = workspaceId;
 
-    long checkActivityPeriod = pingTimeoutSeconds * 2 / 3;
+    long checkActivityPeriod = pingTimeoutSeconds / 3;
 
     LOG.debug("CheckActivityPeriod: {}", checkActivityPeriod);
 
@@ -217,6 +242,15 @@ public class AnalyticsManager {
 
     dispatchers =
         CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .maximumSize(10)
+            .removalListener(
+                (RemovalNotification<String, EventDispatcher> n) -> {
+                  EventDispatcher dispatcher = n.getValue();
+                  if (dispatcher != null) {
+                    dispatcher.close();
+                  }
+                })
             .build(CacheLoader.<String, EventDispatcher>from(userId -> newEventDispatcher(userId)));
   }
 
@@ -283,8 +317,6 @@ public class AnalyticsManager {
                   }
                 }
               }
-
-              networkExecutor.submit(dispatcher::sendPingRequest);
             });
   }
 
@@ -325,6 +357,8 @@ public class AnalyticsManager {
     private long lastEventTime;
     private String lastIp = null;
     private String lastUserAgent = null;
+    private ScheduledFuture<?> pinger = null;
+    private Future<?> pingRetryer = null;
 
     private Map<String, Object> commonProperties;
 
@@ -345,7 +379,10 @@ public class AnalyticsManager {
               new SimpleImmutableEntry<>(EventProperties.STACK_ID, stackId),
               new SimpleImmutableEntry<>(EventProperties.FACTORY_ID, factoryId),
               new SimpleImmutableEntry<>(EventProperties.FACTORY_NAME, factoryName),
-              new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner))
+              new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner),
+              new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILED, stoppedAbnormally),
+              new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILURE, lastErrorMessage),
+              new SimpleImmutableEntry<>(EventProperties.OSIO_SPACE_ID, osioSpaceId))
           .forEach(
               (entry) -> {
                 if (entry.getValue() != null) {
@@ -366,8 +403,13 @@ public class AnalyticsManager {
       lastActivityTime = System.currentTimeMillis();
     }
 
-    void sendPingRequest() {
+    void sendPingRequest(boolean retrying) {
+      boolean failed = false;
       try {
+        if (pingRetryer != null) {
+          pingRetryer.cancel(true);
+        }
+
         String uri =
             MessageFormat.format(
                 pingRequestFormat,
@@ -389,11 +431,17 @@ public class AnalyticsManager {
           responseMessage = sw.toString();
         }
         LOG.debug("Woopra PING response for user '{}': {}", userId, responseMessage);
-        if (responseMessage == null || !responseMessage.toString().contains("success: true")) {
+        if (responseMessage == null || !responseMessage.toString().contains("success:")) {
           LOG.warn("Cannot ping woopra: response message : {}", responseMessage);
+          failed = true;
         }
       } catch (Exception e) {
         LOG.warn("Cannot ping woopra", e);
+        failed = true;
+      }
+
+      if (failed && !retrying) {
+        pingRetryer = networkExecutor.schedule(() -> sendPingRequest(true), 5, TimeUnit.SECONDS);
       }
     }
 
@@ -472,6 +520,17 @@ public class AnalyticsManager {
 
         lastEvent = event;
         lastEventProperties = properties;
+
+        long pingPeriod = pingTimeoutSeconds / 2;
+
+        if (pinger != null) {
+          pinger.cancel(true);
+        }
+
+        LOG.debug("scheduling ping request with the following delay: " + pingPeriod);
+        pinger =
+            networkExecutor.scheduleAtFixedRate(
+                () -> sendPingRequest(false), pingPeriod, pingPeriod, TimeUnit.SECONDS);
       }
       return eventId;
     }
@@ -498,6 +557,13 @@ public class AnalyticsManager {
 
     long getLastEventTime() {
       return lastEventTime;
+    }
+
+    void close() {
+      if (pinger != null) {
+        pinger.cancel(true);
+      }
+      pinger = null;
     }
   }
 
