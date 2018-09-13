@@ -17,7 +17,6 @@ distribution. The Red Hat distribution powers [openshift.io](https://openshift.i
 
 Red Hat modifications against the upstream Che include:
 
-* The ability to disable the Dashboard (and remove the *Go to Dashboard* button from the Che IDE)
 * [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server)
 
 ## How to build it
