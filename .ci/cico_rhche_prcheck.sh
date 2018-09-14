@@ -17,9 +17,9 @@ set +o nounset
 
 /usr/sbin/setenforce 0
 
-export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-che6-automated.dev.rdu2c.fabric8.io/
+export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-che6-automated.devtools-dev.ext.devshift.net/
 export BASEDIR=$(pwd)
-export DEV_CLUSTER_URL=https://dev.rdu2c.fabric8.io:8443/
+export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 export OC_VERSION=3.9.33
 export TARGET=${TARGET:-"rhel"}
 export PR_CHECK_BUILD=${PR_CHECK_BUILD:-"true"}

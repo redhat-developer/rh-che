@@ -37,7 +37,7 @@ export RH_CHE_DEPLOY_SCRIPT_CLEANUP="true";
 export RH_CHE_WIPE_SQL="false";
 export RH_CHE_IS_V_FIVE="false";
 export RH_CHE_OPENSHIFT_USE_TOKEN="false";
-export RH_CHE_OPENSHIFT_URL=https://dev.rdu2c.fabric8.io:8443;
+export RH_CHE_OPENSHIFT_URL=https://devtools-dev.ext.devshift.net:8443;
 export RH_CHE_JDBC_USERNAME=pgche;
 export RH_CHE_JDBC_PASSWORD=pgchepassword;
 export RH_CHE_JDBC_URL=jdbc:postgresql://postgres:5432/dbche;
@@ -302,10 +302,10 @@ CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" |
                       .\"data\".\"logs-encoding\" = \"plaintext\" " ${RH_CHE_CONFIG})
 
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                  yq ".\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io\" |
-                      .\"data\".\"infra-bootstrapper-binary-url\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
-                      .\"data\".\"che-api\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api\" |
-                      .\"data\".\"che-websocket-endpoint\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/api/websocket\" |
+                  yq ".\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net\" |
+                      .\"data\".\"infra-bootstrapper-binary-url\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
+                      .\"data\".\"che-api\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api\" |
+                      .\"data\".\"che-websocket-endpoint\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket\" |
                       .\"metadata\".\"name\" = \"rhche\" |
                       .\"data\".\"che-openshift-secure-routes\" = \"$RH_CHE_USE_TLS\" |
                       .\"data\".\"che-secure-external-urls\" = \"$RH_CHE_USE_TLS\" ")
@@ -364,7 +364,7 @@ else
   echo -e "Annotating route skipped"
 fi
 
-echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttp$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.dev.rdu2c.fabric8.io/\\033[0m"
+echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttp$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/\\033[0m"
 
 # CLEANUP
 if [ "$RH_CHE_DEPLOY_SCRIPT_CLEANUP" = true ]; then
