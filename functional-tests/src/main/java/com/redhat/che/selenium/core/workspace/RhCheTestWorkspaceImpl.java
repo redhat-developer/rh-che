@@ -13,6 +13,7 @@ package com.redhat.che.selenium.core.workspace;
 
 import static java.lang.String.format;
 
+import com.google.inject.Inject;
 import com.redhat.che.selenium.core.client.RhCheTestWorkspaceServiceClient;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,7 +26,7 @@ import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** @author Anatolii Bazko */
+/** @author Tibor Dancs */
 public class RhCheTestWorkspaceImpl implements TestWorkspace {
 
   private static final Logger LOG = LoggerFactory.getLogger(RhCheTestWorkspaceImpl.class);
@@ -37,6 +38,7 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
   private RhCheTestWorkspaceServiceClient workspaceServiceClient;
   private boolean startAfterCreation;
 
+  @Inject
   public RhCheTestWorkspaceImpl(
       TestUser owner,
       RhCheTestWorkspaceServiceClient testWorkspaceServiceClient,

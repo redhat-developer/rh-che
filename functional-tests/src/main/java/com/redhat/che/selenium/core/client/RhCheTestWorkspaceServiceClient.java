@@ -85,6 +85,7 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
     if (owner == null) {
       throw new IllegalStateException("Workspace does not have an owner.");
     }
+    this.cheStarterWrapper.checkIsRunning(this.token);
     String name = this.cheStarterWrapper.createWorkspace(CREATE_WORKSPACE_REQUEST_JSON_PATH, token);
     return requestFactory
         .fromUrl(getNameBasedUrl(name, owner.getName()))
@@ -100,6 +101,7 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
       return;
     }
     try {
+      this.cheStarterWrapper.checkIsRunning(this.token);
       this.cheStarterWrapper.startWorkspace(workspaceId, workspaceName, token);
       waitStatus(workspaceName, owner.getName(), WorkspaceStatus.RUNNING);
       LOG.info("Workspace " + workspaceName + "is running.");
@@ -112,6 +114,7 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
   @Override
   public void delete(String workspaceName, String userName) throws Exception {
     try {
+      this.cheStarterWrapper.checkIsRunning(this.token);
       boolean isDeleted = this.cheStarterWrapper.deleteWorkspace(workspaceName, token);
       if (!isDeleted) {
         LOG.error(
@@ -161,7 +164,8 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
             "Workspace %s, status=%s, expected status=%s", workspaceName, status, expectedStatus));
   }
 
-  public void startWithoutPatch(String id) throws IOException {
+  public void startWithoutPatch(String id) throws Exception {
+    this.cheStarterWrapper.checkIsRunning(this.token);
     cheStarterWrapper.sendStartRequest(id, token);
   }
 }

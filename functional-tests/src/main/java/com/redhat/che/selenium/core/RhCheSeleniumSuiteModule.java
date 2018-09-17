@@ -30,6 +30,7 @@ import org.eclipse.che.selenium.core.configuration.TestConfiguration;
 import org.eclipse.che.selenium.core.provider.DefaultTestUserProvider;
 import org.eclipse.che.selenium.core.user.DefaultTestUser;
 import org.eclipse.che.selenium.core.user.MultiUserCheDefaultTestUserProvider;
+import org.eclipse.che.selenium.core.user.TestUser;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspaceProvider;
 
@@ -41,6 +42,7 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
     config.getMap().forEach((key, value) -> bindConstant().annotatedWith(named(key)).to(value));
     bind(DefaultTestUserProvider.class).to(MultiUserCheDefaultTestUserProvider.class);
     bind(DefaultTestUser.class).toProvider(DefaultTestUserProvider.class);
+    bind(TestUser.class).to(DefaultTestUser.class);
     install(
         new FactoryModuleBuilder()
             .implement(TestWorkspaceServiceClient.class, RhCheTestWorkspaceServiceClient.class)
