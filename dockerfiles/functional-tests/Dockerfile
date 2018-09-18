@@ -14,8 +14,8 @@ ENV LANG=en_US.utf8 \
 
 COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
 RUN yum update --assumeyes && \
-	yum install --assumeyes epel-release && \
-	yum install --assumeyes chromedriver && \
+    yum install --assumeyes epel-release && \
+    yum install --assumeyes chromedriver && \
     yum install --assumeyes google-chrome-stable && \
     yum install --assumeyes \
         xorg-x11-server-Xvfb \
@@ -31,5 +31,5 @@ WORKDIR $HOME/che/
 ENTRYPOINT ["/home/fabric8/docker-entrypoint.sh"]
 
 RUN mkdir $HOME/tmp/ && cd $HOME/tmp/ && git clone https://github.com/redhat-developer/che-functional-tests.git && \
-    cd $HOME/tmp/che-functional-tests && mvn clean install -DskipTests=true && \
+    cd $HOME/tmp/che-functional-tests && mvn clean install -B -DskipTests=true && \
     cd $HOME/ && rm -rf tmp
