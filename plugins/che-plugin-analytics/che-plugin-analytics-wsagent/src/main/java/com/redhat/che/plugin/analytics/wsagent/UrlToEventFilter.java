@@ -86,7 +86,7 @@ public class UrlToEventFilter implements Filter {
       String method = httpRequest.getMethod();
 
       final HttpSession session = httpRequest.getSession();
-      Subject subject = (Subject) session.getAttribute("principal");
+      Subject subject = (Subject) session.getAttribute("che_subject");
       if (subject == null) {
         LOG.warn("No Subject to find out a user for analytics");
         return;

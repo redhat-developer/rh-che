@@ -60,7 +60,7 @@ public class UrlToEventFilterTest {
     when(request.getHeader("X-Forwarded-For")).thenReturn(FORWARDED_FOR);
     when(request.getRemoteAddr()).thenReturn(REMOTE_ADDRESS);
     when(request.getHeader("User-Agent")).thenReturn(USER_AGENT);
-    when(session.getAttribute("principal")).thenReturn(subject);
+    when(session.getAttribute("che_subject")).thenReturn(subject);
     when(subject.getUserId()).thenReturn(USER_ID);
     when(request.getServletPath()).thenReturn("anything");
     when(request.getMethod()).thenReturn("anything");
@@ -106,7 +106,7 @@ public class UrlToEventFilterTest {
 
   @Test
   public void doNothingIfNoSubject() throws Exception {
-    when(session.getAttribute("principal")).thenReturn(null);
+    when(session.getAttribute("che_subject")).thenReturn(null);
 
     filter.doFilter(request, response, filterChain);
 

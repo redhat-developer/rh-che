@@ -12,6 +12,12 @@
 package com.redhat.che.plugin.analytics.wsmaster;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.matcher.AbstractMatcher;
+import com.google.inject.matcher.Matchers;
+import java.lang.reflect.Method;
+import org.eclipse.che.api.factory.server.FactoryParametersResolver;
+import org.eclipse.che.api.factory.shared.dto.FactoryDto;
+import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
 import org.eclipse.che.inject.DynaModule;
 
 /**
@@ -25,5 +31,27 @@ public class AnalyticsWsMasterModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(AnalyticsSettingsService.class);
+    bind(AttributesCompleter.class);
+
+    final FactoryUrlSetterInterceptor factoryUrlSetterInterceptor =
+        new FactoryUrlSetterInterceptor();
+    requestInjection(factoryUrlSetterInterceptor);
+    bindInterceptor(
+        Matchers.subclassesOf(FactoryParametersResolver.class),
+        Matchers.returns(Matchers.subclassesOf(FactoryDto.class)),
+        factoryUrlSetterInterceptor);
+
+    final StartNumberSetterInterceptor startNumberSetterInterceptor =
+        new StartNumberSetterInterceptor();
+    requestInjection(startNumberSetterInterceptor);
+    bindInterceptor(
+        Matchers.subclassesOf(WorkspaceRuntimes.class),
+        new AbstractMatcher<Method>() {
+          @Override
+          public boolean matches(Method m) {
+            return "startAsync".equals(m.getName());
+          }
+        },
+        startNumberSetterInterceptor);
   }
 }

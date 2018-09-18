@@ -19,7 +19,6 @@ import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_U
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.WORKSPACE_ID;
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.WORKSPACE_NAME;
 import static java.lang.Long.parseLong;
-import static java.util.AbstractMap.SimpleImmutableEntry;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -46,6 +45,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -53,7 +53,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -77,12 +76,12 @@ public class AnalyticsManager {
   private static final Logger LOG = getLogger(AnalyticsManager.class);
 
   private static final String pingRequestFormat =
-      "http://www.woopra.com/track/ping?host={0}&cookie={1}&timeout={2}";
+      "http://www.woopra.com/track/ping?host={0}&cookie={1}&timeout={2}&ka={3}&ra={4}";
 
   private final Analytics analytics;
 
   @VisibleForTesting static long pingTimeoutSeconds = 30;
-  private long pingTimeout = pingTimeoutSeconds * 1000;
+  @VisibleForTesting static long pingTimeout = pingTimeoutSeconds * 1000;
 
   @VisibleForTesting long noActivityTimeout = 60000 * 3;
 
@@ -93,12 +92,15 @@ public class AnalyticsManager {
   @VisibleForTesting final String stackId;
   @VisibleForTesting final String factoryName;
   @VisibleForTesting final String factoryOwner;
+  @VisibleForTesting final String factoryUrl;
   @VisibleForTesting final String createdOn;
   @VisibleForTesting final String updatedOn;
   @VisibleForTesting final String stoppedOn;
   @VisibleForTesting final String stoppedAbnormally;
   @VisibleForTesting final String lastErrorMessage;
   @VisibleForTesting final String osioSpaceId;
+  @VisibleForTesting final String sourceTypes;
+  @VisibleForTesting final String startNumber;
 
   @VisibleForTesting final Long age;
   @VisibleForTesting final Long returnDelay;
@@ -149,6 +151,8 @@ public class AnalyticsManager {
       stoppedAbnormally =
           workspace.getAttributes().get(Constants.STOPPED_ABNORMALLY_ATTRIBUTE_NAME);
       lastErrorMessage = workspace.getAttributes().get(Constants.ERROR_MESSAGE_ATTRIBUTE_NAME);
+      sourceTypes = workspace.getAttributes().get("sourceTypes");
+      startNumber = workspace.getAttributes().get("startNumber");
 
       Long createDate = null;
       Long updateDate = null;
@@ -207,9 +211,25 @@ public class AnalyticsManager {
           factoryName = null;
           factoryOwner = null;
         }
+        factoryUrl = null;
       } else {
-        factoryName = null;
-        factoryOwner = null;
+        String parametersPrefix = "factory.parameter.";
+        Map<String, String> configAttributes = workspace.getConfig().getAttributes();
+        if (configAttributes.containsKey(parametersPrefix + "name")) {
+          factoryName = configAttributes.get(parametersPrefix + "name");
+        } else {
+          factoryName = null;
+        }
+        if (configAttributes.containsKey(parametersPrefix + "user")) {
+          factoryOwner = configAttributes.get(parametersPrefix + "user");
+        } else {
+          factoryOwner = null;
+        }
+        if (configAttributes.containsKey(parametersPrefix + "url")) {
+          factoryUrl = configAttributes.get(parametersPrefix + "url");
+        } else {
+          factoryUrl = null;
+        }
       }
       osioSpaceId = workspace.getAttributes().get("osio_spaceId");
 
@@ -233,7 +253,7 @@ public class AnalyticsManager {
 
     this.workspaceId = workspaceId;
 
-    long checkActivityPeriod = pingTimeoutSeconds / 3;
+    long checkActivityPeriod = pingTimeoutSeconds / 2;
 
     LOG.debug("CheckActivityPeriod: {}", checkActivityPeriod);
 
@@ -292,29 +312,26 @@ public class AnalyticsManager {
                   return;
                 }
                 LOG.debug(
-                    "Skip sending 'WORKSPACE_INACTIVE' event for user: {} since it is the same event as the previous one",
+                    "Skipped sending 'WORKSPACE_INACTIVE' event for user: {} since it is the same event as the previous one",
                     dispatcher.getUserId());
-              } else {
-                synchronized (dispatcher) {
-                  AnalyticsEvent lastEvent = dispatcher.getLastEvent();
-                  if (lastEvent == null) {
-                    return;
-                  }
+                return;
+              }
+              synchronized (dispatcher) {
+                AnalyticsEvent lastEvent = dispatcher.getLastEvent();
+                if (lastEvent == null) {
+                  return;
+                }
 
-                  long expectedDuration = lastEvent.getExpectedDurationSeconds() * 1000;
-                  if (lastEvent == WORKSPACE_INACTIVE
-                      || (expectedDuration >= 0
-                          && System.currentTimeMillis()
-                              > expectedDuration + dispatcher.getLastEventTime())) {
-                    if (dispatcher.sendTrackEvent(
-                            WORKSPACE_USED,
-                            Collections.emptyMap(),
-                            dispatcher.getLastIp(),
-                            dispatcher.getLastUserAgent())
-                        != null) {
-                      return;
-                    }
-                  }
+                long expectedDuration = lastEvent.getExpectedDurationSeconds() * 1000;
+                if (lastEvent == WORKSPACE_INACTIVE
+                    || (expectedDuration >= 0
+                        && System.currentTimeMillis()
+                            > expectedDuration + dispatcher.getLastEventTime())) {
+                  dispatcher.sendTrackEvent(
+                      WORKSPACE_USED,
+                      Collections.emptyMap(),
+                      dispatcher.getLastIp(),
+                      dispatcher.getLastUserAgent());
                 }
               }
             });
@@ -358,7 +375,6 @@ public class AnalyticsManager {
     private String lastIp = null;
     private String lastUserAgent = null;
     private ScheduledFuture<?> pinger = null;
-    private Future<?> pingRetryer = null;
 
     private Map<String, Object> commonProperties;
 
@@ -379,10 +395,13 @@ public class AnalyticsManager {
               new SimpleImmutableEntry<>(EventProperties.STACK_ID, stackId),
               new SimpleImmutableEntry<>(EventProperties.FACTORY_ID, factoryId),
               new SimpleImmutableEntry<>(EventProperties.FACTORY_NAME, factoryName),
+              new SimpleImmutableEntry<>(EventProperties.FACTORY_URL, factoryUrl),
               new SimpleImmutableEntry<>(EventProperties.FACTORY_OWNER, factoryOwner),
               new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILED, stoppedAbnormally),
               new SimpleImmutableEntry<>(EventProperties.LAST_WORKSPACE_FAILURE, lastErrorMessage),
-              new SimpleImmutableEntry<>(EventProperties.OSIO_SPACE_ID, osioSpaceId))
+              new SimpleImmutableEntry<>(EventProperties.OSIO_SPACE_ID, osioSpaceId),
+              new SimpleImmutableEntry<>(EventProperties.SOURCE_TYPES, sourceTypes),
+              new SimpleImmutableEntry<>(EventProperties.START_NUMBER, startNumber))
           .forEach(
               (entry) -> {
                 if (entry.getValue() != null) {
@@ -406,17 +425,19 @@ public class AnalyticsManager {
     void sendPingRequest(boolean retrying) {
       boolean failed = false;
       try {
-        if (pingRetryer != null) {
-          pingRetryer.cancel(true);
-        }
-
         String uri =
             MessageFormat.format(
                 pingRequestFormat,
                 URLEncoder.encode(woopraDomain, "UTF-8"),
                 URLEncoder.encode(cookie, "UTF-8"),
-                Long.toString(pingTimeout));
-        LOG.debug("Sending a PING request to woopra for user '{}': {}", getUserId(), uri);
+                Long.toString(pingTimeout),
+                Long.toString(pingTimeout),
+                UUID.randomUUID().toString());
+        LOG.debug(
+            "Sending a PING request to woopra for user '{}' and cookie {} : {}",
+            getUserId(),
+            cookie,
+            uri);
         HttpURLConnection httpURLConnection = httpUrlConnectionProvider.getHttpUrlConnection(uri);
 
         String responseMessage;
@@ -430,18 +451,29 @@ public class AnalyticsManager {
           }
           responseMessage = sw.toString();
         }
-        LOG.debug("Woopra PING response for user '{}': {}", userId, responseMessage);
-        if (responseMessage == null || !responseMessage.toString().contains("success:")) {
-          LOG.warn("Cannot ping woopra: response message : {}", responseMessage);
+        LOG.debug(
+            "Woopra PING response for user '{}' and cookie {} : {}",
+            userId,
+            cookie,
+            responseMessage);
+        if (responseMessage == null) {
           failed = true;
+        }
+        if (!responseMessage.toString().contains("success: true")
+            && !responseMessage.toString().contains("success: queued")) {
+          failed = true;
+        }
+        if (failed) {
+          LOG.warn(
+              "Cannot ping woopra for cookie {} - response message : {}", cookie, responseMessage);
         }
       } catch (Exception e) {
         LOG.warn("Cannot ping woopra", e);
         failed = true;
       }
 
-      if (failed && !retrying) {
-        pingRetryer = networkExecutor.schedule(() -> sendPingRequest(true), 5, TimeUnit.SECONDS);
+      if (failed && lastEvent != null) {
+        sendTrackEvent(lastEvent, lastEventProperties, getLastIp(), getLastUserAgent(), true);
       }
     }
 
@@ -471,13 +503,22 @@ public class AnalyticsManager {
 
     String sendTrackEvent(
         AnalyticsEvent event, final Map<String, Object> properties, String ip, String userAgent) {
+      return sendTrackEvent(event, properties, ip, userAgent, false);
+    }
+
+    String sendTrackEvent(
+        AnalyticsEvent event,
+        final Map<String, Object> properties,
+        String ip,
+        String userAgent,
+        boolean force) {
       String eventId;
       lastIp = ip;
       lastUserAgent = userAgent;
       final String theIp = ip != null ? ip : "0.0.0.0";
       synchronized (this) {
         lastEventTime = System.currentTimeMillis();
-        if (areEventsEqual(event, properties)) {
+        if (!force && areEventsEqual(event, properties)) {
           LOG.debug("Skipping event " + event.toString() + " since it is the same as the last one");
           return null;
         }
@@ -487,10 +528,9 @@ public class AnalyticsManager {
             TrackMessage.builder(event.toString()).userId(userId).messageId(eventId);
 
         ImmutableMap.Builder<String, Object> integrationBuilder =
-            ImmutableMap.<String, Object>builder().put("cookie", cookie);
-        if (event.getExpectedDurationSeconds() == 0) {
-          integrationBuilder.put("duration", 0);
-        }
+            ImmutableMap.<String, Object>builder()
+                .put("cookie", cookie)
+                .put("timeout", pingTimeout);
         messageBuilder.integrationOptions("Woopra", integrationBuilder.build());
 
         ImmutableMap.Builder<String, Object> propertiesBuilder =
@@ -521,7 +561,7 @@ public class AnalyticsManager {
         lastEvent = event;
         lastEventProperties = properties;
 
-        long pingPeriod = pingTimeoutSeconds / 2;
+        long pingPeriod = pingTimeoutSeconds / 3 + 2;
 
         if (pinger != null) {
           pinger.cancel(true);

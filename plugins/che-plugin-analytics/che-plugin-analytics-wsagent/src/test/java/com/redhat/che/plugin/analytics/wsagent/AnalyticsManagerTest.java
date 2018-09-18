@@ -40,6 +40,7 @@ import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceConfigDto;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
@@ -256,7 +257,9 @@ public class AnalyticsManagerTest {
 
       assertEquals(sentMessage.event(), WORKSPACE_USED.toString());
       assertEquals(sentMessage.userId(), USER_ID);
-      assertEquals(sentMessage.integrations(), of("Woopra", of("cookie", dispatcher.cookie)));
+      assertEquals(
+          sentMessage.integrations(),
+          of("Woopra", of("cookie", dispatcher.cookie, "timeout", AnalyticsManager.pingTimeout)));
       assertEquals(sentMessage.context(), of("ip", IP, "userAgent", USER_AGENT));
       assertEquals(
           sentMessage.properties(),
@@ -430,7 +433,7 @@ public class AnalyticsManagerTest {
     ArgumentCaptor<TrackMessage.Builder> argCaptor =
         ArgumentCaptor.forClass(TrackMessage.Builder.class);
 
-    verify(analytics, timeout(AnalyticsManager.pingTimeoutSeconds * 1000).atLeast(2))
+    verify(analytics, timeout(AnalyticsManager.pingTimeout).atLeast(2))
         .enqueue(argCaptor.capture());
 
     assertEquals(
@@ -454,7 +457,7 @@ public class AnalyticsManagerTest {
     ArgumentCaptor<TrackMessage.Builder> argCaptor =
         ArgumentCaptor.forClass(TrackMessage.Builder.class);
 
-    verify(analytics, timeout(AnalyticsManager.pingTimeoutSeconds * 1000).atLeast(2))
+    verify(analytics, timeout(AnalyticsManager.pingTimeout).atLeast(2))
         .enqueue(argCaptor.capture());
 
     assertEquals(
@@ -479,7 +482,7 @@ public class AnalyticsManagerTest {
     ArgumentCaptor<TrackMessage.Builder> argCaptor =
         ArgumentCaptor.forClass(TrackMessage.Builder.class);
 
-    verify(analytics, timeout(AnalyticsManager.pingTimeoutSeconds * 1000).atLeast(2))
+    verify(analytics, timeout(AnalyticsManager.pingTimeout).atLeast(2))
         .enqueue(argCaptor.capture());
 
     assertEquals(
@@ -504,7 +507,7 @@ public class AnalyticsManagerTest {
     ArgumentCaptor<TrackMessage.Builder> argCaptor =
         ArgumentCaptor.forClass(TrackMessage.Builder.class);
 
-    verify(analytics, timeout(AnalyticsManager.pingTimeoutSeconds * 1000).atLeast(2))
+    verify(analytics, timeout(AnalyticsManager.pingTimeout).atLeast(2))
         .enqueue(argCaptor.capture());
 
     assertEquals(
@@ -529,14 +532,14 @@ public class AnalyticsManagerTest {
     ArgumentCaptor<TrackMessage.Builder> argCaptor =
         ArgumentCaptor.forClass(TrackMessage.Builder.class);
 
-    verify(analytics, timeout(AnalyticsManager.pingTimeoutSeconds * 1000).atLeast(1))
+    verify(analytics, timeout(AnalyticsManager.pingTimeout).atLeast(1))
         .enqueue(argCaptor.capture());
 
     assertEquals(capturedEventNames(argCaptor), Arrays.asList(WORKSPACE_USED.toString()));
 
     EventDispatcher dispatcher = manager.dispatchers.get(USER_ID);
 
-    verify(urlConnection, timeout(AnalyticsManager.pingTimeoutSeconds * 1000)).getInputStream();
+    verify(urlConnection, timeout(AnalyticsManager.pingTimeout)).getInputStream();
 
     String expectedUriString =
         "http://www.woopra.com/track/ping?host="
@@ -544,10 +547,13 @@ public class AnalyticsManagerTest {
             + "&cookie="
             + URLEncoder.encode(dispatcher.cookie, "UTF-8")
             + "&timeout="
-            + Long.toString(AnalyticsManager.pingTimeoutSeconds * 1000);
+            + Long.toString(AnalyticsManager.pingTimeout)
+            + "&ka="
+            + Long.toString(AnalyticsManager.pingTimeout)
+            + "&ra=";
 
-    verify(httpUrlConnectionProvider, timeout(AnalyticsManager.pingTimeoutSeconds * 1000))
-        .getHttpUrlConnection(expectedUriString);
+    verify(httpUrlConnectionProvider, timeout(AnalyticsManager.pingTimeout))
+        .getHttpUrlConnection(ArgumentMatchers.startsWith(expectedUriString));
   }
 
   private List<String> capturedEventNames(ArgumentCaptor<TrackMessage.Builder> argCaptor) {

@@ -19,6 +19,7 @@ public interface EventProperties {
   public static final String FACTORY_ID = "factory id";
   public static final String FACTORY_NAME = "factory name";
   public static final String FACTORY_OWNER = "factory owner";
+  public static final String FACTORY_URL = "factory url";
   public static final String CREATED = "creation time";
   public static final String UPDATED = "start time";
   public static final String STOPPED = "last stop time";
@@ -28,4 +29,6 @@ public interface EventProperties {
   public static final String LAST_WORKSPACE_FAILED = "last workspace failed";
   public static final String LAST_WORKSPACE_FAILURE = "last workspace failure";
   public static final String OSIO_SPACE_ID = "osio space id";
+  public static final String SOURCE_TYPES = "source types";
+  public static final String START_NUMBER = "start number";
 }
