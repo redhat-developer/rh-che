@@ -48,4 +48,3 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 ADD eclipse-che /home/user/eclipse-che
 RUN find /home/user -type d -exec chmod 777 {} \;
-
