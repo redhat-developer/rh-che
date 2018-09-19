@@ -37,6 +37,7 @@ export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
 export RH_DIST_SUFFIX=fabric8
 if [ "$PR_CHECK_BUILD" == "true" ]; then
   export RH_TAG_DIST_SUFFIX=rhcheautomation
+  export RH_PULL_REQUEST_ID="${ghprbPullId}"
 else
   export RH_TAG_DIST_SUFFIX=fabric8
 fi

@@ -11,6 +11,6 @@ USER root
 RUN yum update --assumeyes && \
     yum install --assumeyes docker tree git patch pcp bzip2 golang make java-1.8.0-openjdk java-1.8.0-openjdk-devel centos-release-scl && \
     yum install --assumeyes rh-maven33 rh-nodejs4 && yum clean all && rm -rf /var/cache/yum && \
-    scl enable rh-nodejs4 "npm install --global gulp-cli" && \
+    scl enable rh-nodejs4 "npm install --global gulp-cli bower" && \
     cd /tmp/ && git clone https://github.com/redhat-developer/rh-che.git && \
-    scl enable rh-maven33 rh-nodejs4 "mvn -B -f /tmp/rh-che/ clean install" && rm -rf /tmp/rh-che/
+    scl enable rh-maven33 rh-nodejs4 "mvn -B -f /tmp/rh-che/ -Pnative clean install" && rm -rf /tmp/rh-che/

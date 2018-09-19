@@ -17,7 +17,6 @@ set +o nounset
 
 /usr/sbin/setenforce 0
 
-export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-che6-automated.devtools-dev.ext.devshift.net/
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 export OC_VERSION=3.9.33
@@ -40,9 +39,10 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^KEYCLOAK \
         ^BUILD_NUMBER$ \
         ^JOB_NAME$ \
+        ^ghprbPullId$ \
         ^RH_CHE)"
 
-echo "Running ${JOB_NAME} build number #${BUILD_NUMBER}, testing creds:"
+echo "Running ${JOB_NAME} PR: #${ghprbPullId}, build number #${BUILD_NUMBER}, testing creds:"
 
 CREDS_NOT_SET="false"
 curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
@@ -84,9 +84,9 @@ fi
 set -x
 
 # Getting core repos ready
-yum install epel-release --assumeyes
+yum install --assumeyes epel-release
 yum update --assumeyes
-yum install python-pip --assumeyes
+yum install --assumeyes python-pip
 
 # Test and show version
 pip -V
@@ -122,12 +122,14 @@ echo "Deploying nightly-${RH_TAG_DIST_SUFFIX} from ${DOCKER_IMAGE_URL}"
 if ./dev-scripts/deploy_custom_rh-che.sh -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
                                          -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" \
                                          -r "${DOCKER_IMAGE_URL}" \
-                                         -t nightly-"${RH_TAG_DIST_SUFFIX}" \
-                                         -e che6-automated \
+                                         -t "${RH_TAG_DIST_SUFFIX}"-"${RH_PULL_REQUEST_ID}" \
+                                         -e prcheck-${RH_PULL_REQUEST_ID} \
+                                         -S "$QUAY_SECRET_JSON" \
                                          -s \
                                          -U;
 then
   echo "Che successfully deployed."
+  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-prcheck-${RH_PULL_REQUEST_ID}.devtools-dev.ext.devshift.net/
 else
   echo "Custom che deployment failed. Error code:$?"
   exit 4

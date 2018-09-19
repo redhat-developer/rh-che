@@ -43,6 +43,7 @@ export RH_CHE_JDBC_PASSWORD=pgchepassword;
 export RH_CHE_JDBC_URL=jdbc:postgresql://postgres:5432/dbche;
 export RH_CHE_RUNNING_STANDALONE_SCRIPT="false";
 export RH_CHE_USE_TLS="true"
+export RH_CHE_APPLY_SECRET="false"
 
 export RH_CHE_DOCKER_IMAGE_TAG="latest";
 export RH_CHE_DOCKER_REPOSITORY="quay.io/openshiftio/che-rh-che-server";
@@ -70,6 +71,8 @@ function unsetVars() {
   unset RH_CHE_STATUS_PROGRESS;
   unset RH_CHE_STATUS_AVAILABLE;
   unset RH_CHE_USE_TLS;
+  unset RH_CHE_APPLY_SECRET;
+  unset RH_CHE_OC_SECRET;
 }
 
 function clearEnv() {
@@ -135,7 +138,7 @@ function deployPostgres() {
 }
 
 # Parse commandline flags
-while getopts ':hnsUu:p:r:t:o:e:b:z' option; do
+while getopts ':hnu:szUS:b:e:r:t:o:p:' option; do
   case "$option" in
     h) echo -e "$usage"
        exit 0
@@ -162,6 +165,9 @@ while getopts ':hnsUu:p:r:t:o:e:b:z' option; do
     z) export RH_CHE_RUNNING_STANDALONE_SCRIPT="true"
        ;; 
     U) export RH_CHE_USE_TLS="false"
+       ;;
+    S) export RH_CHE_APPLY_SECRET="true"
+       export RH_CHE_OC_SECRET=$OPTARG
        ;;
     :) echo -e "\\033[91;1mMissing argument for -$OPTARG\\033[0m" >&2
        echo -e "$usage" >&2
@@ -343,6 +349,13 @@ fi
 if ! (echo "$CHE_APP_CONFIG_YAML" | oc process -f - | oc apply -f - > /dev/null 2>&1); then
   echo -e "\\033[91;1mFailed to process che config [$?]\\033[0m"
   exit 5
+fi
+
+# APPLY SECRET IF REQUESTED
+if [ "$RH_CHE_APPLY_SECRET" == "true" ]; then
+  echo "$RH_CHE_OC_SECRET" | oc apply -f -
+  oc secrets link default quay-dev-deployer --for=pull
+  oc secrets link rhche quay-dev-deployer --for=pull
 fi
 
 CHE_STARTUP_TIMEOUT=300
