@@ -50,6 +50,7 @@ import org.eclipse.che.api.workspace.shared.dto.event.WorkspaceStatusEvent;
 import org.eclipse.che.commons.auth.token.RequestTokenExtractor;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.multiuser.machine.authentication.server.signature.SignatureKeyManager;
+import org.eclipse.che.multiuser.machine.authentication.server.signature.SignatureKeyManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,7 +224,7 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
     try {
       final Jws<Claims> jwt =
           Jwts.parser()
-              .setSigningKey(keyManager.getKeyPair(workspaceId).getPublic())
+              .setSigningKey(keyManager.getOrCreateKeyPair(workspaceId).getPublic())
               .parseClaimsJws(token);
       final Claims claims = jwt.getBody();
 
@@ -233,9 +234,9 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
     } catch (UnsupportedJwtException
         | MalformedJwtException
         | SignatureException
+        | SignatureKeyManagerException
         | ExpiredJwtException
-        | IllegalArgumentException
-        | ServerException ex) {
+        | IllegalArgumentException ex) {
       LOG.warn("Could not get a user Id from a machine token", ex);
     }
     return null;
