@@ -84,7 +84,7 @@ fi
 set -x
 
 # Getting core repos ready
-rpm -iUvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum install epel-release --assumeyes
 yum update --assumeyes
 yum install python-pip --assumeyes
 

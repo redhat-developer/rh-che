@@ -90,4 +90,8 @@ public class ProvidedWorkspace implements TestWorkspace {
   public void delete() {
     // the provided workspace should not be deleted
   }
+
+  public String getProjectGitUrl(int projectSerialNumber) throws Exception {
+    return workspaceServiceClient.getProjectGitUrl(this.workspaceName, projectSerialNumber);
+  }
 }

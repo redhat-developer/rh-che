@@ -168,4 +168,11 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
     this.cheStarterWrapper.checkIsRunning(this.token);
     cheStarterWrapper.sendStartRequest(id, token);
   }
+
+  public String getProjectGitUrl(String workspaceName, int projectSerialNumber)
+      throws ServerException, UnauthorizedException, ForbiddenException, NotFoundException,
+          ConflictException, BadRequestException, IOException {
+    Workspace w = findExistingWorkspace(workspaceName);
+    return w.getConfig().getProjects().get(projectSerialNumber).getSource().getLocation();
+  }
 }
