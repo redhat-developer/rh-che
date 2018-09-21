@@ -42,6 +42,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerSe
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.RamLimitProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
@@ -81,6 +82,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private TenantDataProvider tenantDataProvider;
   @Mock private RuntimeIdentity runtimeIdentity;
   @Mock private OpenShiftEnvironment openShiftEnvironment;
+  @Mock private ServiceAccountProvisioner serviceAccountProvisioner;
 
   private List<EnvVar> con1EnvVars;
   private List<EnvVar> con2EnvVars;
@@ -112,6 +114,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             podTerminationGracePeriodProvisioner,
             imagePullSecretProvisioner,
             proxySettingsProvisioner,
+            serviceAccountProvisioner,
             false,
             WSAGENT_ROUTER_TIMEOUT);
 

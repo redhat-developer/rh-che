@@ -33,6 +33,7 @@ import org.eclipse.che.selenium.core.user.MultiUserCheDefaultTestUserProvider;
 import org.eclipse.che.selenium.core.user.TestUser;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspaceProvider;
+import org.eclipse.che.selenium.core.workspace.WorkspaceTemplate;
 
 public class RhCheSeleniumSuiteModule extends AbstractModule {
 
@@ -63,7 +64,8 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
       @Named("workspace.default_memory_gb") int defaultMemoryGb)
       throws Exception {
     TestWorkspace ws =
-        workspaceProvider.createWorkspace(testUser, defaultMemoryGb, "default.json", true);
+        workspaceProvider.createWorkspace(
+            testUser, defaultMemoryGb, WorkspaceTemplate.DEFAULT, true);
     ws.await();
     return ws;
   }
@@ -76,7 +78,8 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
       throws Exception {
     RhCheTestWorkspaceImpl ws =
         (RhCheTestWorkspaceImpl)
-            workspaceProvider.createWorkspace(testUser, defaultMemoryGb, "default.json", true);
+            workspaceProvider.createWorkspace(
+                testUser, defaultMemoryGb, WorkspaceTemplate.DEFAULT, true);
     ws.await();
     return ws;
   }
