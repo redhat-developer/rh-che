@@ -49,6 +49,7 @@ data:
   log-level: "INFO"
   logs-encoding: "json"
   multi-user: "true"
+  plugin-registry-url: 'https://che-plugin-registry.prod-preview.openshift.io/'
   port: "8080"
   remote-debugging-enabled: "false"
   sentry-environment: 'dev'

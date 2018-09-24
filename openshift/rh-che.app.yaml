@@ -253,6 +253,11 @@ objects:
               secretKeyRef:
                   key: service.account.secret
                   name: rhche
+          - name: CHE_WORKSPACE_PLUGIN__REGISTRY__URL
+            valueFrom:
+              configMapKeyRef:
+                key: plugin-registry-url
+                name: rhche
           - name: CHE_PORT
             valueFrom:
               configMapKeyRef:
