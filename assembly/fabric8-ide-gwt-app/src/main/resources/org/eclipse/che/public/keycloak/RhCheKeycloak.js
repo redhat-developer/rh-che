@@ -17,6 +17,13 @@ const osio_msg_started = "<strong>Eclipse Che</strong> is loading";
 
 const telemetry_event_enter_che_dashboard = 'enter che dashboard';
 const telemetry_event_provision_user_for_che = 'provision user for che';
+const telemetry_event_display_provisioning_page_for_che = 'display provisioning page for che';
+const telemetry_event_enter_provisioning_page_for_che = 'enter provisioning page for che';
+const telemetry_event_trigger_account_linking = 'trigger openshift account linking for che';
+const telemetry_event_setup_namespaces = 'setup namespaces for che';
+
+const provisioningWaitDelay = 1000;
+const provisioningTimeout = 2 * 60 * 1000;
 
 function provision_osio(redirect_uri) {
     var provisioningWindow = window.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(redirect_uri), 'osio_provisioning');
@@ -24,6 +31,7 @@ function provision_osio(redirect_uri) {
         setStatusMessage("User provisioning should happen in a separate window.<br/> \
         Please enable popups, before retrying");
     } else {
+        track(telemetry_event_enter_provisioning_page_for_che, { user: osioUserToApprove });
         sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
         sessionStorage.setItem('osio-provisioning', new Date().getTime());
         window.blur();
@@ -35,6 +43,17 @@ function provision_osio(redirect_uri) {
 var osioProvisioningLogout;
 var osioProvisioningURL;
 var osioUserToApprove;
+var setStatusMessage;
+
+function track(eventName, attributes) {
+    if (window.analytics) {
+        if (attributes) {
+            analytics.track(eventName, attributes);
+        } else {
+            analytics.track(eventName);
+        }
+    }
+}
 
 function initAnalytics(writeKey){
 
@@ -80,7 +99,7 @@ function initAnalytics(writeKey){
     // for methods in Analytics.js so that you never have to wait
     // for it to load to actually record data. The `method` is
     // stored as the first argument, so we can replay the data.
-    analytics.factory = function(method){
+    analytics.factory = function(method){120000
         return function(){
             var args = Array.prototype.slice.call(arguments);
             args.unshift(method);
@@ -187,6 +206,28 @@ function initAnalytics(writeKey){
         });
     }
 
+    function post(url, body, token) {
+        return new Promise((resolve, reject) => {
+            var request = new XMLHttpRequest();
+            request.onerror = request.onabort = function(error) {
+                reject(error);
+            };
+            request.onload = function() {
+                if (request.status === 200) {
+                    resolve(this)
+                } else {
+                    reject(this);
+                }
+            };
+
+            request.open("POST", url, true);
+            if (token) {
+                request.setRequestHeader("Authorization", "Bearer " + token);
+            }
+            request.send(body);
+        });
+    }
+
     function performAccounkLinking(keycloak) {
         return get(osioApiURL + "/users?filter%5Busername%5D=" + encodeURIComponent(keycloak.tokenParsed.preferred_username), keycloak.token)
         .then((request) => {
@@ -216,9 +257,10 @@ function initAnalytics(writeKey){
                     .then((request) => {
                         var json = JSON.parse(request.responseText);
                         if (json && json.redirect_location) {
+                            track(telemetry_event_trigger_account_linking, { 'redirect location': json.redirect_location });
                             sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_linking_account);
                             window.location.replace(json.redirect_location);
-                            return Promise.reject("Will redirect the page");
+                            return new Promise((resolve, reject) => {});
                         } else {
                             sessionStorage.removeItem('osio-provisioning-notification-message');
                             return Promise.reject("Cannot get account linking page for user: " + keycloak.tokenParsed.preferred_username)
@@ -238,6 +280,7 @@ function initAnalytics(writeKey){
         return get(osioApiURL + "/user/services", keycloak.token)
         .catch(function (error) {
             sessionStorage.removeItem('osio-provisioning-notification-message');
+            track(telemetry_event_setup_namespaces);
             setStatusMessage(osio_msg_setting_up_namespaces);
             return get(osioApiURL + "/user", keycloak.token)
             .then((request) => checkNamespacesCreated(keycloak, new Date().getTime() + 30000));
@@ -262,10 +305,7 @@ function initAnalytics(writeKey){
     }
 
     function identifyUser(keycloak) {
-        return get("/api/fabric8-che-analytics/segment-write-key", keycloak.token)
-        .then(function (request) {
-            var segmentKey = request.responseText;
-            initAnalytics(segmentKey);
+        if (window.analytics) {
             return get(osioApiURL + "/user", keycloak.token)
             .then((request) => {
                 try {
@@ -284,19 +324,34 @@ function initAnalytics(writeKey){
                             traits.adobeMarketingCloudVisitorId = localStorage['openshiftio.adobeMarketingCloudVisitorId'];
                         }
                         analytics.identify(user.id, traits);
+                        return true;
+                    } else {
+                        post('/api/fabric8-che-analytics/error', "Invalid user data for user " + keycloak.tokenParsed.sub + "\nResponse body: " + request.responseText);
+                        return true;
                     }
-                } catch(err) {}
-                return request;
+                } catch(err) {
+                    post('/api/fabric8-che-analytics/error', "Exception when parsing the user data for user " + keycloak.tokenParsed.sub + " :" + err + "\nResponse body: " + request.responseText);
+                    return true;
+                }
             })
             .catch(function(request) {
-                return request;
+                post('/api/fabric8-che-analytics/error', "Error when getting user informations: status code: " + request.status + " - Response body: " + request.responseText);
+                    return true;
             });
-        })
-        .catch(function(request) {
-            return request;
-        });
+        } else {
+            post('/api/fabric8-che-analytics/warning', "Following user accessed the Dashboard without being fully identified inside Telemetry: " + keycloak.tokenParsed.sub);
+            return true;
+        }
     }
 
+    function identifyUserWithId(keycloak) {
+        if(window.analytics) {
+            analytics.identify(keycloak.tokenParsed.sub);
+        } else {
+            post('/api/fabric8-che-analytics/warning', "Following user accessed the Dashboard without being identified by ID inside Telemetry: " + keycloak.tokenParsed.sub);
+        }
+    }
+    
     function userNeedsApproval(error_description) {
         try {
             var data = JSON.parse(error_description);
@@ -325,8 +380,6 @@ function initAnalytics(writeKey){
         } catch(err) {
         }
     }
-
-    var setStatusMessage;
 
     var scripts = document.getElementsByTagName("script");
     var originalKeycloakScript;
@@ -406,103 +459,134 @@ function initAnalytics(writeKey){
 
             setStatusMessage("");
 
-            var promise = originalInit(initOptions);
-            promise.success(function(arg) {
-                var keycloak = kc;
-                var lastProvisioningDate = sessionStorage.getItem('osio-provisioning');
-                sessionStorage.removeItem('osio-provisioning');
-                if (lastProvisioningDate) {
-                    var w = window.open('', 'osio_provisioning');
-                    w && w.close();
+            const segmentWriteKeyUrl = '/api/fabric8-che-analytics/segment-write-key';
+            get(segmentWriteKeyUrl)
+            .then((request) => {
+                var segmentKey = request.responseText;
+                if (segmentKey != '') {
+                    initAnalytics(segmentKey);
                 }
-                identifyUser(keycloak)
-                .then(function() {
-                    if (window.analytics && lastProvisioningDate) {
-                        analytics.track(telemetry_event_provision_user_for_che);
-                    }
-                    return performAccounkLinking(keycloak);
-                })
-                .then(()=>{
-                    return setUpNamespaces(keycloak);
-                })
-                .then(() => {
-                    if (window.analytics && isInCheDashboard) {
-                        analytics.track(telemetry_event_enter_che_dashboard);
-                    }
-                    setStatusMessage(osio_msg_started);
-                    finalPromise.setSuccess(arg);
-                })
-                .catch((errorMessage) => {
-                    setStatusMessage(osio_msg_error_no_resources);
-                    finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
-                });
-            }).error(function(data) {
-                var keycloak = kc;
-                if (data && data.error_description) {
-                    osioUserToApprove = userNeedsApproval(data.error_description);
-                }
-
-                if (osioUserToApprove) {
+                
+                var promise = originalInit(initOptions);
+                promise.success((arg) => {
+                    var keycloak = kc;
+                    identifyUserWithId(keycloak);
                     var lastProvisioningDate = sessionStorage.getItem('osio-provisioning');
-                    var isProvisioning = false;
-                    var provisioningTimeoutFailure = false;
-                    if (lastProvisioningDate) {
-                        if (new Date().getTime() < parseInt(lastProvisioningDate) + 120000) {
-                            isProvisioning = true;
-                        } else {
-                            provisioningTimeoutFailure = true;
-                        }
-                    }
-
-                    if (provisioningTimeoutFailure) {
-                        sessionStorage.removeItem('osio-provisioning');
-                        sessionStorage.removeItem('osio-provisioning-notification-message')
-                        setStatusMessage(osio_msg_error_no_resources);
-                        finalPromise.setError(data);
-                    } else {
-                        if (!isProvisioning) {
-                            get(provisioningPage)
-                            .then(function(request) {
-                                var contentType = request.getResponseHeader('content-type');
-                                if ( contentType && contentType.includes('html')) {
-                                    var provisioningMessageDiv = document.createElement('div');
-                                    provisioningMessageDiv.style = "height: 100%; z-index: 999; position:fixed; padding:0; margin:0; top:0; left:0; width: 100%; height: 100%; background:rgba(255,255,255,1);";
-                                    provisioningMessageDiv.innerHTML = '<iframe id="osio-provisioning-frame" style="border: 0px; width: 100%; height: 100%"></iframe>';
-                                    document.body.appendChild(provisioningMessageDiv);
-                                    var htmlContent;
-                                    if (osioUserToApprove != 'unknown') {
-                                        htmlContent = request.responseText.replace('<span id="osio-user-placeholder"></span>', '<span id="osio-user-placeholder">, ' + osioUserToApprove + '</span>');
-                                    } else {
-                                        htmlContent = request.responseText;
-                                    }
-                                    var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document
-                                    osioProvisioningFrameDocument.open();
-                                    osioProvisioningFrameDocument.write(htmlContent);
-                                    osioProvisioningFrameDocument.close();
-                                } else {
-                                    sessionStorage.removeItem('osio-provisioning-notification-message');
-                                    finalPromise.setError({ error: 'invalid_request', error_description: 'OSIO provisioning page loaded at URL: ' + provisioningPage + ' should be valid HTML' });
-                                }
-                            }, function(request) {
-                                sessionStorage.removeItem('osio-provisioning-notification-message');
-                                finalPromise.setError({ error: 'invalid_request', error_description: "OSIO provisioning page could not be loaded at URL: " + provisioningPage });
-                            });
-                        } else {
-                            setStatusMessage(osio_msg_provisioning);
-                            sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
-                            setTimeout(function(){
-                                window.location.reload();
-                            }, 1000);
-                        }
-                    }
-                } else {
+                    var lastProvisioningTimeoutFailure = sessionStorage.getItem('osio-provisioning-timeout-failure');
                     sessionStorage.removeItem('osio-provisioning');
-                    sessionStorage.removeItem('osio-provisioning-notification-message');
-                    setStatusMessage("Error during authentication");
-                    finalPromise.setError(data);
-                }
-            });
+                    sessionStorage.removeItem('osio-provisioning-timeout-failure');
+                    if (lastProvisioningDate) {
+                        var w = window.open('', 'osio_provisioning');
+                        w && w.close();
+                    }
+                    if (lastProvisioningDate || lastProvisioningTimeoutFailure) {
+                        track(telemetry_event_provision_user_for_che);
+                    }
+                    performAccounkLinking(keycloak)
+                    .then(()=>{
+                        return setUpNamespaces(keycloak);
+                    })
+                    .then(() => {
+                        identifyUser(keycloak)
+                        .then(function() {
+                            if (isInCheDashboard) {
+                                track(telemetry_event_enter_che_dashboard);
+                            }
+                            setStatusMessage(osio_msg_started);
+                            finalPromise.setSuccess(arg);
+                        })
+                    })
+                    .catch((errorMessage) => {
+                        post('/api/fabric8-che-analytics/error', errorMessage);
+                        setStatusMessage(osio_msg_error_no_resources);
+                        finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
+                    });
+                }).error((data) => {
+                    sessionStorage.removeItem('osio-provisioning-timeout-failure');
+                    var keycloak = kc;
+                    if (data && data.error_description) {
+                        osioUserToApprove = userNeedsApproval(data.error_description);
+                    }
 
+                    if (osioUserToApprove) {
+                        var lastProvisioningDate = sessionStorage.getItem('osio-provisioning');
+                        var isProvisioning = false;
+                        var provisioningTimeoutFailure = false;
+                        if (lastProvisioningDate) {
+                            if (new Date().getTime() < parseInt(lastProvisioningDate) + provisioningTimeout) {
+                                isProvisioning = true;
+                            } else {
+                                provisioningTimeoutFailure = true;
+                            }
+                        }
+
+                        if (provisioningTimeoutFailure) {
+                            post('/api/fabric8-che-analytics/error', 'Timeout while waiting for OSIO provisioning after opening the `manage.openshift.com` page for user: ' + osioUserToApprove);
+                            sessionStorage.setItem('osio-provisioning-timeout-failure', 'true');
+                            sessionStorage.removeItem('osio-provisioning');
+                            sessionStorage.removeItem('osio-provisioning-notification-message')
+                            setStatusMessage(osio_msg_error_no_resources);
+                            finalPromise.setError({ error: 'invalid_request', error_description: 'Timeout while waiting for OSIO provisioning' });
+                        } else {
+                            if (!isProvisioning) {
+                                get(provisioningPage)
+                                .then((request) => {
+                                    var contentType = request.getResponseHeader('content-type');
+                                    if ( contentType && contentType.includes('html')) {
+                                        var provisioningMessageDiv = document.createElement('div');
+                                        provisioningMessageDiv.style = "height: 100%; z-index: 999; position:fixed; padding:0; margin:0; top:0; left:0; width: 100%; height: 100%; background:rgba(255,255,255,1);";
+                                        provisioningMessageDiv.innerHTML = '<iframe id="osio-provisioning-frame" style="border: 0px; width: 100%; height: 100%"></iframe>';
+                                        document.body.appendChild(provisioningMessageDiv);
+                                        var htmlContent;
+                                        if (osioUserToApprove != 'unknown') {
+                                            htmlContent = request.responseText.replace('<span id="osio-user-placeholder"></span>', '<span id="osio-user-placeholder">, ' + osioUserToApprove + '</span>');
+                                        } else {
+                                            htmlContent = request.responseText;
+                                        }
+                                        var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document
+                                        osioProvisioningFrameDocument.open();
+                                        osioProvisioningFrameDocument.write(htmlContent);
+                                        osioProvisioningFrameDocument.close();
+                                        track(telemetry_event_display_provisioning_page_for_che, { user: osioUserToApprove });
+                                    } else {
+                                        const errorMessage = 'OSIO provisioning page loaded at URL: ' + provisioningPage + ' should be valid HTML';
+                                        post('/api/fabric8-che-analytics/error', errorMessage + ' for user ' + osioUserToApprove);
+                                        sessionStorage.removeItem('osio-provisioning-notification-message');
+                                        finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
+                                    }
+                                }, (request) => {
+                                    const errorMessage = "OSIO provisioning page could not be loaded at URL: " + provisioningPage;
+                                    post('/api/fabric8-che-analytics/error', errorMessage + ' for user ' + osioUserToApprove);
+                                    sessionStorage.removeItem('osio-provisioning-notification-message');
+                                    finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
+                                });
+                            } else {
+                                setStatusMessage(osio_msg_provisioning);
+                                sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, provisioningWaitDelay);
+                            }
+                        }
+                    } else {
+                        var errorMessage;
+                        if (data && data.error_description) {
+                            errorMessage = data.error_description;
+                        } else {
+                            errorMessage = "Login to RHD failed for an unknown reason";
+                        }
+                        post('/api/fabric8-che-analytics/error', errorMessage);
+                        sessionStorage.removeItem('osio-provisioning');
+                        sessionStorage.removeItem('osio-provisioning-notification-message');
+                        setStatusMessage("Error during authentication");
+                        finalPromise.setError(data);
+                    }
+                });
+            })
+            .catch((request) => {
+                finalPromise.setError({ error: 'invalid_request', error_description: 'Che server API is unreachable at URL: ' + segmentWriteKeyUrl });
+            })
+            
             return finalPromise.promise;
         }
         return kc;
