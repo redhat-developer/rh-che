@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
 import com.google.inject.Provider;
+import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
 import io.fabric8.kubernetes.client.Config;
 import java.util.Optional;
 import org.eclipse.che.api.core.NotFoundException;
@@ -27,6 +28,8 @@ import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
 import org.eclipse.che.api.workspace.server.spi.RuntimeContext;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.workspace.infrastructure.kubernetes.cache.KubernetesRuntimeStateCache;
+import org.eclipse.che.workspace.infrastructure.kubernetes.model.KubernetesRuntimeState;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
@@ -39,6 +42,7 @@ public class Fabric8OpenShiftClientFactoryTest {
   private static final String WS_ID = "testWsID";
   private static final String CURRENT_USER_ID = "currentUserID";
   private static final String OWNER_USER_ID = "ownerUserID";
+  private static final String GUESSED_NAMESPACE = "guessedNamespace";
 
   @Mock private Fabric8WorkspaceEnvironmentProvider environmentProvider;
   @Mock private Config defaultConfig;
@@ -46,9 +50,16 @@ public class Fabric8OpenShiftClientFactoryTest {
   @Mock private Provider<WorkspaceRuntimes> workspaceRuntimeProvider;
   @Mock private WorkspaceRuntimes workspaceRuntimes;
   @Mock private WorkspaceSubjectsRegistry subjectsRegistry;
+  @Mock private KubernetesRuntimeStateCache runtimeStateCache;
+  @Mock private CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
+  @Mock private KubernetesRuntimeState runtimeState;
   @Mock private Subject currentSubject;
   @Mock private Subject ownerSubject;
-  @Mock private RuntimeContext runtimeContext;
+
+  @SuppressWarnings("rawtypes")
+  @Mock
+  private RuntimeContext runtimeContext;
+
   @Mock private RuntimeIdentity runtimeIdentity;
 
   private Fabric8OpenShiftClientFactory factory;
@@ -66,7 +77,16 @@ public class Fabric8OpenShiftClientFactoryTest {
 
     factory =
         new Fabric8OpenShiftClientFactory(
-            environmentProvider, workspaceRuntimeProvider, subjectsRegistry, true, 1, 1, 1, 1);
+            environmentProvider,
+            workspaceRuntimeProvider,
+            subjectsRegistry,
+            runtimeStateCache,
+            cheServiceAccountTokenToggle,
+            true,
+            1,
+            1,
+            1,
+            1);
 
     EnvironmentContext.getCurrent().setSubject(currentSubject);
   }
@@ -108,7 +128,7 @@ public class Fabric8OpenShiftClientFactoryTest {
 
   @Test
   public void
-      returnsConfigUsingCurrentSubjectWhenSubjectsRegistryDoesNotContainTheCorrespondingOne()
+      returnsConfigUsingCurrentSubjectWhenSubjectsRegistryDoesNotContainTheCorrespondingOneAndNoRuntimeState()
           throws Exception {
     when(subjectsRegistry.getSubject(OWNER_USER_ID)).thenThrow(new NotFoundException("test error"));
 
@@ -116,6 +136,37 @@ public class Fabric8OpenShiftClientFactoryTest {
 
     assertEquals(config, expectedConfig);
     verify(environmentProvider).getWorkspacesOpenshiftConfig(eq(currentSubject));
+  }
+
+  @Test
+  public void
+      returnsConfigUsingCurrentSubjectWhenSubjectsRegistryDoesNotContainTheCorrespondingOneAndNotUsingCheSaAndRuntimeStateExists()
+          throws Exception {
+    when(subjectsRegistry.getSubject(OWNER_USER_ID)).thenThrow(new NotFoundException("test error"));
+    when(runtimeStateCache.get(any())).thenReturn(Optional.of(runtimeState));
+    when(runtimeState.getNamespace()).thenReturn(GUESSED_NAMESPACE);
+    when(cheServiceAccountTokenToggle.useCheServiceAccountToken(OWNER_USER_ID)).thenReturn(false);
+
+    Config config = factory.buildConfig(defaultConfig, WS_ID);
+
+    assertEquals(config, expectedConfig);
+    verify(environmentProvider).getWorkspacesOpenshiftConfig(eq(currentSubject));
+  }
+
+  @Test
+  public void
+      returnsConfigUsingGuessedSubjectWhenSubjectsRegistryDoesNotContainTheCorrespondingOneAndUsingCheSaAndRuntimeStateExists()
+          throws Exception {
+    when(subjectsRegistry.getSubject(OWNER_USER_ID)).thenThrow(new NotFoundException("test error"));
+    when(runtimeStateCache.get(any())).thenReturn(Optional.of(runtimeState));
+    when(runtimeState.getNamespace()).thenReturn(GUESSED_NAMESPACE);
+    when(cheServiceAccountTokenToggle.useCheServiceAccountToken(OWNER_USER_ID)).thenReturn(true);
+
+    Config config = factory.buildConfig(defaultConfig, WS_ID);
+
+    assertEquals(config, expectedConfig);
+    verify(environmentProvider)
+        .getWorkspacesOpenshiftConfig(eq(new GuessedSubject(OWNER_USER_ID, GUESSED_NAMESPACE)));
   }
 
   @Test

@@ -156,6 +156,12 @@ public class Fabric8WorkspaceEnvironmentProvider {
   }
 
   private UserCheTenantData getUserCheTenantData(Subject subject) throws InfrastructureException {
+    if (subject instanceof GuessedSubject) {
+      GuessedSubject guessedSubject = (GuessedSubject) subject;
+      return new UserCheTenantData(
+          guessedSubject.getNamespace(), multiClusterOpenShiftProxy.getUrl(), "unknown", false);
+    }
+
     UserCheTenantData tenantData = tenantDataProvider.getUserCheTenantData(subject, "che");
     return new UserCheTenantData(
         tenantData.getNamespace(),

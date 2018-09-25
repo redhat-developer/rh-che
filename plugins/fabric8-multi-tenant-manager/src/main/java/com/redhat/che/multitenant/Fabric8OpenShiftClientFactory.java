@@ -12,18 +12,22 @@
 package com.redhat.che.multitenant;
 
 import com.google.inject.Provider;
+import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
 import io.fabric8.kubernetes.client.Config;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.eclipse.che.api.core.NotFoundException;
+import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.api.workspace.server.spi.RuntimeContext;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.workspace.infrastructure.kubernetes.cache.KubernetesRuntimeStateCache;
+import org.eclipse.che.workspace.infrastructure.kubernetes.model.KubernetesRuntimeState;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +39,8 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
   private final Fabric8WorkspaceEnvironmentProvider envProvider;
   private final Provider<WorkspaceRuntimes> workspaceRuntimeProvider;
   private final WorkspaceSubjectsRegistry subjectsRegistry;
+  private final KubernetesRuntimeStateCache runtimeStateCache;
+  private final CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
 
   private static final Logger LOG = LoggerFactory.getLogger(Fabric8OpenShiftClientFactory.class);
 
@@ -43,6 +49,8 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
       Fabric8WorkspaceEnvironmentProvider envProvider,
       Provider<WorkspaceRuntimes> workspaceRuntimeProvider,
       WorkspaceSubjectsRegistry subjectsRegistry,
+      KubernetesRuntimeStateCache runtimeStateCache,
+      CheServiceAccountTokenToggle cheServiceAccountTokenToggle,
       @Nullable @Named("che.infra.kubernetes.trust_certs") Boolean doTrustCerts,
       @Named("che.infra.kubernetes.client.http.async_requests.max") int maxConcurrentRequests,
       @Named("che.infra.kubernetes.client.http.async_requests.max_per_host")
@@ -61,6 +69,8 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
     this.envProvider = envProvider;
     this.workspaceRuntimeProvider = workspaceRuntimeProvider;
     this.subjectsRegistry = subjectsRegistry;
+    this.runtimeStateCache = runtimeStateCache;
+    this.cheServiceAccountTokenToggle = cheServiceAccountTokenToggle;
   }
 
   @Override
@@ -68,18 +78,34 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
       throws InfrastructureException {
     Subject subject = EnvironmentContext.getCurrent().getSubject();
     if (workspaceId != null) {
-      Optional<String> userIdFromWorkspaceId = getUserIdForWorkspaceId(workspaceId);
-      if (userIdFromWorkspaceId.isPresent()) {
-        if (!userIdFromWorkspaceId.get().equals(subject.getUserId())) {
+      Optional<RuntimeIdentity> runtimeIdentity = getRuntimeIdentity(workspaceId);
+      if (runtimeIdentity.isPresent()) {
+        String userIdFromWorkspaceId = runtimeIdentity.get().getOwnerId();
+        if (!userIdFromWorkspaceId.equals(subject.getUserId())) {
           try {
-            subject = subjectsRegistry.getSubject(userIdFromWorkspaceId.get());
+            subject = subjectsRegistry.getSubject(userIdFromWorkspaceId);
           } catch (NotFoundException e) {
-            LOG.warn(
-                "Current user ID ('{}') is different from the user ID ('{}') that started workspace {} "
-                    + "and subject of user that started workspace is not found in subjects cache",
-                subject.getUserId(),
-                userIdFromWorkspaceId.get(),
-                workspaceId);
+            Optional<KubernetesRuntimeState> runtimeState =
+                runtimeStateCache.get(runtimeIdentity.get());
+            if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userIdFromWorkspaceId)
+                && runtimeState.isPresent()) {
+              LOG.debug(
+                  "Current user ID ('{}') is different from the user ID ('{}') that started workspace {} "
+                      + "and subject of user that started workspace is not found in subjects cache.\n"
+                      + "Let's search inside the running workspace runtime state, if any, to find the user namespace",
+                  subject.getUserId(),
+                  userIdFromWorkspaceId,
+                  workspaceId);
+              subject =
+                  new GuessedSubject(userIdFromWorkspaceId, runtimeState.get().getNamespace());
+            } else {
+              LOG.warn(
+                  "Current user ID ('{}') is different from the user ID ('{}') that started workspace {} "
+                      + "and subject of user that started workspace is not found in subjects cache",
+                  subject.getUserId(),
+                  userIdFromWorkspaceId,
+                  workspaceId);
+            }
           }
         }
       }
@@ -87,9 +113,10 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
     return envProvider.getWorkspacesOpenshiftConfig(subject);
   }
 
-  private Optional<String> getUserIdForWorkspaceId(String workspaceId) {
+  private Optional<RuntimeIdentity> getRuntimeIdentity(String workspaceId) {
+    @SuppressWarnings("rawtypes")
     Optional<RuntimeContext> context =
         workspaceRuntimeProvider.get().getRuntimeContext(workspaceId);
-    return context.map(c -> c.getIdentity().getOwnerId());
+    return context.map(c -> c.getIdentity());
   }
 }

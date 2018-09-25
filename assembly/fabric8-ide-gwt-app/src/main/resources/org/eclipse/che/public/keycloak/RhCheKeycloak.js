@@ -191,7 +191,7 @@ function initAnalytics(writeKey){
                 reject(error);
             };
             request.onload = function() {
-                if (request.status == 200) {
+                if (this.status >= 200 && this.status < 300 || this.status === 304) {
                     resolve(this)
                 } else {
                     reject(this);
@@ -213,7 +213,7 @@ function initAnalytics(writeKey){
                 reject(error);
             };
             request.onload = function() {
-                if (request.status === 200) {
+                if (this.status >= 200 && this.status < 300 || this.status === 304) {
                     resolve(this)
                 } else {
                     reject(this);
@@ -340,7 +340,7 @@ function initAnalytics(writeKey){
             });
         } else {
             post('/api/fabric8-che-analytics/warning', "Following user accessed the Dashboard without being fully identified inside Telemetry: " + keycloak.tokenParsed.sub);
-            return true;
+            return Promise.resolve(true);
         }
     }
 
