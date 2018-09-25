@@ -251,8 +251,6 @@ objects:
             value: "${PROTOCOL}"
           - name: ROUTING_SUFFIX
             value: "${ROUTING_SUFFIX}"
-          - name: CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME
-            value: "che-workspace"
           - name: CHE_WORKSPACE_SIDECAR_DEFAULT__MEMORY__LIMIT__MB
             value: "150"
           - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT

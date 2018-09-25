@@ -131,6 +131,10 @@ minishift start --memory "5GB"
 ----
 Note however that this only takes effect when starting for the first time -- you will have to `minishift delete` the VM first.
 ====
+[NOTE]
+====
+Currently, the minishift addon supports minishift with OpenShift v3.10.0 or higher. If you have an old VM on your system it is best to `minishift delete` and `rm -rf ~/.minishift`
+====
 The simplest way to deploy locally is to use the bundled minishift addon:
 
 First, install the prerequisites -- a postgres pod and a keycloak pod, configured with the `standalone-keycloak-configurator`:
