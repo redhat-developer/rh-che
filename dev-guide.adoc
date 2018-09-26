@@ -7,7 +7,7 @@ With the exception of the dashboard component, rh-che is a straightforward maven
 
 [NOTE]
 ====
-The rh-che maven build accomodates the same parameters as the upstream maven build
+The rh-che maven build accommodates the same parameters as the upstream maven build
 ====
 [NOTE]
 ====
