@@ -1388,7 +1388,7 @@
         "default": {
           "recipe": {
             "type": "dockerimage",
-            "content": "registry.centos.org/che-stacks/spring-boot"
+            "content": "registry.devshift.net/che/spring-boot"
           },
           "machines": {
             "dev-machine": {
@@ -1400,7 +1400,8 @@
                 "org.eclipse.che.exec",
                 "org.eclipse.che.terminal",
                 "org.eclipse.che.ws-agent",
-                "org.eclipse.che.ls.camel"
+                "org.eclipse.che.ls.camel",
+                "com.redhat.oc-login"
               ],
               "servers": {
                 "tomcat8-debug": {
