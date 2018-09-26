@@ -4,10 +4,9 @@
 
 ## Table Of Contents
 
-* [What is the Red Hat Che distribution](#what-is-the-redhat-che-distribution)
+* [What is the Red Hat Che distribution](#what-is-the-red-hat-che-distribution)
 * [How to build it](#how-to-build-it)
-* [How to deploy or roll-update on OpenShift](#how-to-deploy-or-roll-update-che-on-openshift-container-platform-minishift-or-osio)
-* [Further details](#further-details)
+* [PR-Check details](#pr-check-details)
 
 ## What is the Red Hat Che distribution
 
