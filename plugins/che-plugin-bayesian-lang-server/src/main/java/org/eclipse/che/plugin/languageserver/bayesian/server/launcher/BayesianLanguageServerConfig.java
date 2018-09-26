@@ -56,9 +56,9 @@ public class BayesianLanguageServerConfig implements LanguageServerConfig {
       @Override
       public Map<String, String> getLanguageRegexes() {
         return ImmutableMap.<String, String>builder()
-            .put(BayesianLanguageServerModule.TXT_LANGUAGE_ID, ".*/requirements\\.txt$")
-            .put(JsonModule.LANGUAGE_ID, "./*package\\.json$")
-            .put("pom", ".*/pom\\.xml$")
+            .put(BayesianLanguageServerModule.TXT_LANGUAGE_ID, ".*requirements\\.txt")
+            .put(JsonModule.LANGUAGE_ID, ".*package\\.json")
+            .put("pom", ".*pom\\.xml")
             .build();
       }
 
