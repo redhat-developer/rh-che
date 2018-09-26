@@ -19,7 +19,6 @@ import org.eclipse.che.api.factory.server.FactoryParametersResolver;
 import org.eclipse.che.api.factory.shared.dto.FactoryDto;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
 import org.eclipse.che.inject.DynaModule;
-import org.eclipse.che.multiuser.keycloak.server.AbstractKeycloakFilter;
 
 /**
  * Module that allows pushing workspace events to the Segment Analytics tracking tool
@@ -54,18 +53,5 @@ public class AnalyticsWsMasterModule extends AbstractModule {
           }
         },
         startNumberSetterInterceptor);
-
-    final DisableAuthenticationInterceptor disableAuthenticationInterceptor =
-        new DisableAuthenticationInterceptor();
-    requestInjection(disableAuthenticationInterceptor);
-    bindInterceptor(
-        Matchers.subclassesOf(AbstractKeycloakFilter.class),
-        new AbstractMatcher<Method>() {
-          @Override
-          public boolean matches(Method m) {
-            return "doFilter".equals(m.getName());
-          }
-        },
-        disableAuthenticationInterceptor);
   }
 }

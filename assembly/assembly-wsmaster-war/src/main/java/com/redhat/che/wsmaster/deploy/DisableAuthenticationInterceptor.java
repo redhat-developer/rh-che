@@ -9,7 +9,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package com.redhat.che.plugin.analytics.wsmaster;
+package com.redhat.che.wsmaster.deploy;
 
 import com.google.common.annotations.Beta;
 import javax.servlet.FilterChain;

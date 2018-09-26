@@ -21,6 +21,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import org.eclipse.che.api.core.rest.Service;
 import org.eclipse.che.commons.annotation.Nullable;
+import org.eclipse.che.multiuser.machine.authentication.server.MachineAuthorized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +41,14 @@ public class AnalyticsService extends Service {
   }
 
   @GET
+  @MachineAuthorized
   @Path("segment-write-key")
   public String segmentWriteKey() {
     return segmentWriteKey == null ? "" : segmentWriteKey;
   }
 
   @GET
+  @MachineAuthorized
   @Path("woopra-domain")
   public String woopraDomain() {
     return woopraDomain == null ? "" : woopraDomain;
