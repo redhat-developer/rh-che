@@ -17,6 +17,8 @@ distribution. The Red Hat distribution powers [openshift.io](https://openshift.i
 Red Hat modifications against the upstream Che include:
 
 * [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server)
+* a different set of Che stacks than upstream. They can contain specific Red Hat configurations such as providing 'oc' on command-line
+* telemetry to follow usage of different parts
 
 ## How to build it
 
