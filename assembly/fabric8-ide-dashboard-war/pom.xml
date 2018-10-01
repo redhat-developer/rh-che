@@ -94,46 +94,7 @@
                             </target>
                         </configuration>
                     </execution>
-        <!--   3. Build dashboard as in upstream, using docker image   -->
-                    <execution>
-                        <id>build-image</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- build user dashboard with maven -->
-                                <exec dir="${basedir}" executable="docker" failonerror="true">
-                                    <arg value="build" />
-                                    <arg value="-t" />
-                                    <arg value="eclipse-che-dashboard" />
-                                    <arg value="--build-arg"/>
-                                    <arg value="SOURCES_DIR=./target/sources"/>
-                                    <arg value="." />
-                                </exec>
-                            </target>
-                        </configuration>
-                    </execution>
-        <!--   4. Get 'compiled' dashboard from dockerfile, extract to -->
-        <!--      ${project.build.directory}/dist                      -->
-        <!--      This step is identical to the upstream build         -->
-                    <execution>
-                        <id>unpack-docker-build</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- build user dashboard with docker -->
-                                <exec executable="bash">
-                                    <arg value="-c" />
-                                    <arg value="docker run --rm eclipse-che-dashboard | tar -C target/ -xf -" />
-                                </exec>
-                            </target>
-                        </configuration>
-                    </execution>
+        <!-- Note steps 3-4 occur in profiles -->
         <!--   5. Update base path for index.html to /dashboard/       -->
         <!--      This step is identical to upstream build             -->
                     <execution>
@@ -154,7 +115,7 @@
                     </execution>
                 </executions>
             </plugin>
-        <!--   6. Build war file as in upstream build                  -->
+        <!-- 6. Build war file as in upstream build. See profiles for build steps  -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -170,4 +131,124 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <!-- Default docker build. To use native build, use -Pnative -->
+            <id>docker</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+            <!--   3. Build dashboard as in upstream, using docker image   -->
+                            <execution>
+                                <id>build-image</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- build user dashboard with maven -->
+                                        <exec dir="${basedir}" executable="docker" failonerror="true">
+                                            <arg value="build" />
+                                            <arg value="-t" />
+                                            <arg value="eclipse-che-dashboard" />
+                                            <arg value="--build-arg"/>
+                                            <arg value="SOURCES_DIR=./target/sources"/>
+                                            <arg value="." />
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+            <!--   4. Get 'compiled' dashboard from dockerfile, extract to -->
+            <!--      ${project.build.directory}/dist                      -->
+            <!--      This step is identical to the upstream build         -->
+                            <execution>
+                                <id>unpack-docker-build</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- build user dashboard with docker -->
+                                        <exec executable="bash">
+                                            <arg value="-c" />
+                                            <arg value="docker run --rm eclipse-che-dashboard | tar -C target/ -xf -" />
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Upstream native build. Activate with -Pnative -->
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-dashboard</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- build user dashboard -->
+                                        <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
+                                            <arg value="install" />
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <!-- The native build will place files in ${basedir}/target/sources/target/dist    -->
+                            <!-- We need to copy these to ${basedir}/target/dist as expected by the war plugin -->
+                            <execution>
+                                <id>copy-dist-from-sources-dir</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy todir="${basedir}/target/" overwrite="true" verbose="true">
+                                            <fileset dir="${basedir}/target/sources/target/">
+                                                <include name="dist/**"/>
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>compilation</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target unless="skipTests">
+                                        <!-- Run unit tests -->
+                                        <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
+                                            <arg value="run" />
+                                            <arg value="test" />
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
