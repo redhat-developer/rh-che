@@ -189,13 +189,20 @@
             </build>
         </profile>
         <profile>
-            <!-- Upstream native build. Activate with -Pnative -->
+            <!-- Upstream native build. Activate with -Pnative             -->
+            <!-- Note there are a few differences from the upstream build  -->
+            <!-- due to the source files being in ./target/sources:        -->
+            <!-- 1. The clean step from upstream is removed, as the entire -->
+            <!--    source dir is cleaned by the default clean step        -->
+            <!-- 2. The "change href" step (Step 5 above) is skipped as it -->
+            <!--    is included in the default build step above            -->
             <id>native</id>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
+            <!--   3. Build dashboard locally using npm install            -->
                             <execution>
                                 <id>build-dashboard</id>
                                 <phase>compile</phase>
@@ -211,8 +218,11 @@
                                     </target>
                                 </configuration>
                             </execution>
-                            <!-- The native build will place files in ${basedir}/target/sources/target/dist    -->
-                            <!-- We need to copy these to ${basedir}/target/dist as expected by the war plugin -->
+            <!--   4. Native build will create 'compiled' files in ./target/sources/target/dist -->
+            <!--      since we run npm install in that directory. The remainder of the build    -->
+            <!--      (updating href and building war) assumes files are in ./target/dist so we -->
+            <!--      need to copy them from ${basedir}/target/sources/target/dist to           -->
+            <!--      ${basedir}/target/dist                                                    -->
                             <execution>
                                 <id>copy-dist-from-sources-dir</id>
                                 <phase>compile</phase>
@@ -229,6 +239,7 @@
                                     </target>
                                 </configuration>
                             </execution>
+            <!--   3.5 Run npm tests locally                                -->
                             <execution>
                                 <id>compilation</id>
                                 <phase>test</phase>
