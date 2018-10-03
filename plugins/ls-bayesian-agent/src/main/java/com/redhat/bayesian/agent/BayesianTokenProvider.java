@@ -23,7 +23,6 @@ import javax.ws.rs.core.Response;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
-import org.eclipse.che.multiuser.machine.authentication.server.MachineAuthorized;
 import org.eclipse.che.multiuser.machine.authentication.server.MachineTokenRegistry;
 import org.slf4j.Logger;
 
@@ -44,7 +43,6 @@ public class BayesianTokenProvider {
   }
 
   @GET
-  @MachineAuthorized
   @Path("/token")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getBayesianToken() throws NotFoundException {

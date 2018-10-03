@@ -14,6 +14,7 @@ package com.redhat.che.wsmaster.deploy;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.multibindings.Multibinder;
 import com.redhat.che.multitenant.Fabric8AuthServiceClient;
 import com.redhat.che.multitenant.Fabric8OAuthAPIProvider;
 import java.lang.reflect.Method;
@@ -22,6 +23,7 @@ import org.eclipse.che.multiuser.keycloak.server.AbstractKeycloakFilter;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakServiceClient;
 import org.eclipse.che.multiuser.keycloak.server.deploy.OAuthAPIProvider;
 import org.eclipse.che.multiuser.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
+import org.eclipse.che.multiuser.machine.authentication.server.MachineAuthenticatedResource;
 import org.eclipse.che.security.oauth.GitHubOAuthAuthenticator;
 
 /** @author David Festal */
@@ -46,5 +48,14 @@ public class Fabric8WsMasterModule extends AbstractModule {
           }
         },
         disableAuthenticationInterceptor);
+    
+    final Multibinder<MachineAuthenticatedResource> machineAuthenticatedResources =
+        Multibinder.newSetBinder(binder(), MachineAuthenticatedResource.class);
+    machineAuthenticatedResources
+        .addBinding()
+        .toInstance(
+            new MachineAuthenticatedResource(
+                "/fabric8-che-analytics", "segment-write-key", "woopra-domain", "warning", "error"));
+    
   }
 }
