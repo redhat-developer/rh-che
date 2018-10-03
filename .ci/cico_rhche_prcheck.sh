@@ -52,7 +52,7 @@ if [[ -z "${QUAY_USERNAME}" && -z "${QUAY_PASSWORD}" ]]; then
   CREDS_NOT_SET="true"
 fi
 
-if [[ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" || -z "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" ]]; then
+if [[ -z "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" ]]; then
   echo "RDU2C credentials not set"
   CREDS_NOT_SET="true"
 fi
@@ -70,14 +70,11 @@ else
 fi
 
 if oc login ${DEV_CLUSTER_URL} --insecure-skip-tls-verify \
-                               -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
-                               -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}";
+                               --token "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}";
 then
   echo "OpenShift login successful"
 else
   echo "OpenShift login failed"
-  echo "login: |${RH_CHE_AUTOMATION_RDU2C_USERNAME:0:1}*${RH_CHE_AUTOMATION_RDU2C_USERNAME:7:2}*${RH_CHE_AUTOMATION_RDU2C_USERNAME: -1}|"
-  echo "passwd: |${RH_CHE_AUTOMATION_RDU2C_PASSWORD:0:1}***${RH_CHE_AUTOMATION_RDU2C_PASSWORD: -1}|"
   exit 3
 fi
 
@@ -119,8 +116,7 @@ BuildTagAndPushDocker
 
 # Deploy rh-che image
 echo "Deploying nightly-${RH_TAG_DIST_SUFFIX} from ${DOCKER_IMAGE_URL}"
-if ./dev-scripts/deploy_custom_rh-che.sh -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
-                                         -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" \
+if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" \
                                          -r "${DOCKER_IMAGE_URL}" \
                                          -t "${RH_TAG_DIST_SUFFIX}"-"${RH_PULL_REQUEST_ID}" \
                                          -e prcheck-${RH_PULL_REQUEST_ID} \
@@ -135,6 +131,8 @@ else
   exit 4
 fi
 set -x
+
+oc policy add-role-to-user edit kkanova rhopp tdancs garagatyi ibuziuk amisevsk davidfestal -n prcheck-${RH_PULL_REQUEST_ID}
 
 echo "Custom che deployment successful, running che-functional tests against ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL}"
 if ./.ci/cico_run_che-functional-tests.sh;
