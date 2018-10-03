@@ -48,14 +48,21 @@ public class Fabric8WsMasterModule extends AbstractModule {
           }
         },
         disableAuthenticationInterceptor);
-    
+
     final Multibinder<MachineAuthenticatedResource> machineAuthenticatedResources =
         Multibinder.newSetBinder(binder(), MachineAuthenticatedResource.class);
     machineAuthenticatedResources
         .addBinding()
         .toInstance(
             new MachineAuthenticatedResource(
-                "/fabric8-che-analytics", "segment-write-key", "woopra-domain", "warning", "error"));
-    
+                "/fabric8-che-analytics",
+                "segment-write-key",
+                "woopra-domain",
+                "warning",
+                "error"));
+
+    machineAuthenticatedResources
+        .addBinding()
+        .toInstance(new MachineAuthenticatedResource("/bayesian", "token"));
   }
 }
