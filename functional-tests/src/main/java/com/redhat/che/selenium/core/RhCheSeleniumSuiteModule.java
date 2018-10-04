@@ -70,7 +70,7 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
 
   @Provides
   public RhCheTestWorkspaceImpl getRhCheWorkspace(
-      TestWorkspaceProvider workspaceProvider,
+      RhCheTestWorkspaceProvider workspaceProvider,
       DefaultTestUser testUser,
       @Named("workspace.default_memory_gb") int defaultMemoryGb)
       throws Exception {
