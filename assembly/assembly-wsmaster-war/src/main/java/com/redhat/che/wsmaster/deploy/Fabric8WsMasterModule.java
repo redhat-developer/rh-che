@@ -55,14 +55,10 @@ public class Fabric8WsMasterModule extends AbstractModule {
         .addBinding()
         .toInstance(
             new MachineAuthenticatedResource(
-                "/fabric8-che-analytics",
-                "segment-write-key",
-                "woopra-domain",
-                "warning",
-                "error"));
+                "/fabric8-che-analytics", "segmentWriteKey", "woopraDomain", "warning", "error"));
 
     machineAuthenticatedResources
         .addBinding()
-        .toInstance(new MachineAuthenticatedResource("/bayesian", "token"));
+        .toInstance(new MachineAuthenticatedResource("/bayesian", "getBayesianToken"));
   }
 }

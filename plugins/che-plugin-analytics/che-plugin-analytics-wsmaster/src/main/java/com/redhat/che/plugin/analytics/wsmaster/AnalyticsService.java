@@ -24,7 +24,7 @@ import org.eclipse.che.commons.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("fabric8-che-analytics")
+@Path("/fabric8-che-analytics")
 public class AnalyticsService extends Service {
   private static final Logger LOG = LoggerFactory.getLogger(AnalyticsService.class);
 
@@ -40,13 +40,13 @@ public class AnalyticsService extends Service {
   }
 
   @GET
-  @Path("segment-write-key")
+  @Path("/segment-write-key")
   public String segmentWriteKey() {
     return segmentWriteKey == null ? "" : segmentWriteKey;
   }
 
   @GET
-  @Path("woopra-domain")
+  @Path("/woopra-domain")
   public String woopraDomain() {
     return woopraDomain == null ? "" : woopraDomain;
   }
