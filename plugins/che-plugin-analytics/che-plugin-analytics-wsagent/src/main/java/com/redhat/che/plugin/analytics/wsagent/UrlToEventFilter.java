@@ -123,6 +123,14 @@ public class UrlToEventFilter implements Filter {
             userAgent);
       }
 
+      if ("POST".equals(method) && path.startsWith("/api/git/commit")) {
+        manager.onEvent(userId, COMMIT_LOCALLY, Collections.emptyMap(), ip, userAgent);
+      }
+
+      if ("POST".equals(method) && path.startsWith("/api/git/push")) {
+        manager.onEvent(userId, PUSH_TO_REMOTE, Collections.emptyMap(), ip, userAgent);
+      }
+
       manager.onActivity(userId);
     } catch (Exception e) {
       LOG.error("", e);
