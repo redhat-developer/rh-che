@@ -132,7 +132,7 @@ else
 fi
 set -x
 
-oc policy add-role-to-user edit kkanova rhopp tdancs garagatyi ibuziuk amisevsk davidfestal -n prcheck-${RH_PULL_REQUEST_ID}
+oc policy add-role-to-user edit kkanova rhopp tdancs garagatyi ibuziuk amisevsk davidfestal skabashnyuk -n prcheck-${RH_PULL_REQUEST_ID}
 
 echo "Custom che deployment successful, running che-functional tests against ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL}"
 if ./.ci/cico_run_che-functional-tests.sh;
