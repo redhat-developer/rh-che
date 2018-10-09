@@ -111,7 +111,7 @@
             }
           },
           "recipe": {
-            "content": "kind: List\nitems:\n - \n  apiVersion: v1\n  kind: Pod\n  metadata:\n   name: web\n   labels:\n    type: db\n  spec:\n   containers:\n    - \n     image: registry.devshift.net/che/centos_jdk8\n     name: main\n     ports:\n      - \n       containerPort: 8080\n       protocol: TCP\n     resources:\n      limits:\n       memory: 1536Mi\n    - \n     image: centos/mysql-57-centos7\n     name: mysql\n     ports:\n      - \n       name: mysql\n       containerPort: 3306\n       protocol: TCP\n     env:\n      - \n       name: MYSQL_USER\n       value: petclinic\n      - \n       name: MYSQL_ROOT_PASSWORD\n       value: password\n      - \n       name: MYSQL_PASSWORD\n       value: password\n      - \n       name: MYSQL_DATABASE\n       value: petclinic\n     resources:\n      limits:\n       memory: 512Mi\n - \n  apiVersion: v1\n  kind: Service\n  metadata:\n   name: db\n  spec:\n   selector:\n    type: db\n   ports:\n    - \n     name: mysql\n     port: 3306\n     protocol: TCP\n     targetPort: mysql\n",
+            "content": "kind: List\nitems:\n - \n  apiVersion: v1\n  kind: Pod\n  metadata:\n   name: web\n   labels:\n    type: db\n  spec:\n   containers:\n    - \n     image: quay.io/openshiftio/che-centos_jdk8\n     name: main\n     ports:\n      - \n       containerPort: 8080\n       protocol: TCP\n     resources:\n      limits:\n       memory: 1536Mi\n    - \n     image: centos/mysql-57-centos7\n     name: mysql\n     ports:\n      - \n       name: mysql\n       containerPort: 3306\n       protocol: TCP\n     env:\n      - \n       name: MYSQL_USER\n       value: petclinic\n      - \n       name: MYSQL_ROOT_PASSWORD\n       value: password\n      - \n       name: MYSQL_PASSWORD\n       value: password\n      - \n       name: MYSQL_DATABASE\n       value: petclinic\n     resources:\n      limits:\n       memory: 512Mi\n - \n  apiVersion: v1\n  kind: Service\n  metadata:\n   name: db\n  spec:\n   selector:\n    type: db\n   ports:\n    - \n     name: mysql\n     port: 3306\n     protocol: TCP\n     targetPort: mysql\n",
             "contentType": "application/x-yaml",
             "type": "openshift"
           }
@@ -239,7 +239,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/ubuntu_jdk8"
+      "origin": "quay.io/openshiftio/che-ubuntu_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -265,7 +265,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/ubuntu_jdk8",
+            "content": "quay.io/openshiftio/che-ubuntu_jdk8",
             "type": "dockerimage"
           }
         }
@@ -305,7 +305,7 @@
     "components": [],
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/ubuntu_jdk8"
+      "origin": "quay.io/openshiftio/che-ubuntu_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -326,7 +326,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/ubuntu_jdk8",
+            "content": "quay.io/openshiftio/che-ubuntu_jdk8",
             "type": "dockerimage"
           }
         }
@@ -363,7 +363,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/centos_dotnet20"
+      "origin": "quay.io/openshiftio/che-centos_dotnet20"
     },
     "workspaceConfig": {
       "environments": {
@@ -390,7 +390,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/centos_dotnet20",
+            "content": "quay.io/openshiftio/che-centos_dotnet20",
             "type": "dockerimage"
           }
         }
@@ -458,7 +458,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/centos_jdk8"
+      "origin": "quay.io/openshiftio/che-centos_jdk8"
     },
     "workspaceConfig": {
       "environments": {
@@ -484,7 +484,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/centos_jdk8",
+            "content": "quay.io/openshiftio/che-centos_jdk8",
             "type": "dockerimage"
           }
         }
@@ -534,7 +534,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/vertx"
+      "origin": "quay.io/openshiftio/che-vertx"
     },
     "workspaceConfig": {
       "environments": {
@@ -560,7 +560,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/vertx",
+            "content": "quay.io/openshiftio/che-vertx",
             "type": "dockerimage"
           }
         }
@@ -628,7 +628,7 @@
     ],
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/spring-boot"
+      "origin": "quay.io/openshiftio/che-spring-boot"
     },
     "workspaceConfig": {
       "name": "default",
@@ -636,7 +636,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "content": "registry.devshift.net/che/spring-boot",
+            "content": "quay.io/openshiftio/che-spring-boot",
             "type": "dockerimage"
           },
           "machines": {
@@ -713,7 +713,7 @@
     "scope": "general",
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/wildfly-swarm"
+      "origin": "quay.io/openshiftio/che-wildfly-swarm"
     },
     "tags": [
       "WildFly Swarm"
@@ -723,7 +723,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "content": "registry.devshift.net/che/wildfly-swarm",
+            "content": "quay.io/openshiftio/che-wildfly-swarm",
             "type": "dockerimage"
           },
           "machines": {
@@ -794,7 +794,7 @@
     "scope": "general",
     "source": {
       "type": "image",
-      "origin": "registry.devshift.net/che/centos-nodejs"
+      "origin": "quay.io/openshiftio/che-centos-nodejs"
     },
     "description": "CentOS Node Stack",
     "tags": [
@@ -814,7 +814,7 @@
       "environments": {
         "default": {
           "recipe": {
-            "content": "registry.devshift.net/che/centos-nodejs",
+            "content": "quay.io/openshiftio/che-centos-nodejs",
             "type": "dockerimage"
           },
           "machines": {
@@ -934,7 +934,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/centos_php",
+            "content": "quay.io/openshiftio/che-centos_php",
             "type": "dockerimage"
           }
         }
@@ -1047,7 +1047,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/centos_python",
+            "content": "quay.io/openshiftio/che-centos_python",
             "type": "dockerimage"
           }
         }
@@ -1124,7 +1124,7 @@
             }
           },
           "recipe": {
-            "content": "registry.devshift.net/che/centos_ruby",
+            "content": "quay.io/openshiftio/che-centos_ruby",
             "type": "dockerimage"
           }
         }
@@ -1388,7 +1388,7 @@
         "default": {
           "recipe": {
             "type": "dockerimage",
-            "content": "registry.devshift.net/che/spring-boot"
+            "content": "quay.io/openshiftio/che-spring-boot"
           },
           "machines": {
             "dev-machine": {

@@ -27,7 +27,7 @@ Prerequisities:
 * Working account on Openshift.io.
 * Running che-starter. Can be run as docker container like this:
 ```
-docker run -p 10000:10000 -e "GITHUB_TOKEN_URL=https://auth.openshift.io/api/token?for=https://github.com" -e "OPENSHIFT_TOKEN_URL=https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" -e "CHE_SERVER_URL=https://che.openshift.io" registry.devshift.net/almighty/che-starter:latest
+docker run -p 10000:10000 -e "GITHUB_TOKEN_URL=https://auth.openshift.io/api/token?for=https://github.com" -e "OPENSHIFT_TOKEN_URL=https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" -e "CHE_SERVER_URL=https://che.openshift.io" quay.io/openshiftio/almighty-che-starter:latest
 ```
 
 ### Run tests via maven:
@@ -45,7 +45,7 @@ docker run -p 10000:10000 \
     -e "GITHUB_TOKEN_URL=https://auth.prod-preview.openshift.io/api/token?for=https://github.com" \
     -e "OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" \
     -e "CHE_SERVER_URL=https://che.prod-preview.openshift.io" \
-    registry.devshift.net/almighty/che-starter:latest
+    quay.io/openshiftio/almighty-che-starter:latest
 
 mvn clean verify -Pfunctional-tests \
     -Dche.testuser.name=<OSIO_PROD_PREVIEW_USERNAME> \
