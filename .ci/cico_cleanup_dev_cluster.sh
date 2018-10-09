@@ -12,6 +12,9 @@
 export OC_VERSION=3.9.33
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 
+yum install --assumeyes epel-release
+yum install --assumeyes jq
+
 eval "$(./env-toolkit load -f jenkins-env.json -r ^RH_CHE)"
 curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
 if [[ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" || -z "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" ]]; then
@@ -19,19 +22,28 @@ if [[ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" || -z "${RH_CHE_AUTOMATION_RDU2C_
   exit 1
 fi
 if oc login ${DEV_CLUSTER_URL} --insecure-skip-tls-verify \
-                               -u "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" \
-                               -p "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}";
+                               --token "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}";
 then
   echo "OpenShift login successful"
 else
   echo "OpenShift login failed"
-  echo "login: |${RH_CHE_AUTOMATION_RDU2C_USERNAME:0:1}*${RH_CHE_AUTOMATION_RDU2C_USERNAME:7:2}*${RH_CHE_AUTOMATION_RDU2C_USERNAME: -1}|"
-  echo "passwd: |${RH_CHE_AUTOMATION_RDU2C_PASSWORD:0:1}***${RH_CHE_AUTOMATION_RDU2C_PASSWORD: -1}|"
   exit 2
 fi
 
 PullRequests=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[].number')
+if [ $? -eq 0 ]; then
+  echo "Getting list of open PRs successful."
+else
+  echo "Retrieving open pull requests failed with exit code $?"
+  exit $?
+fi
 OCProjects=$(oc projects -q)
+if [ $? -eq 0 ]; then
+  echo "Getting list of OC projects successful."
+else
+  echo "Retrieving openshift projects failed with exit code $?"
+  exit $?
+fi
 
 while read -r oc_project
 do
