@@ -330,6 +330,18 @@ objects:
                 name: rhche
           - name: SENTRY_RELEASE
             value: ${IMAGE_TAG}
+          - name: CHE_FABRIC8_END2END_PROTECT_SECRET__KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret-key
+                name: rhche-end2end-protection
+                optional: true
+          - name: CHE_FABRIC8_END2END_PROTECT_SITE__KEY
+            valueFrom:
+              secretKeyRef:
+                key: site-key
+                name: rhche-end2end-protection
+                optional: true
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:

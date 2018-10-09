@@ -41,8 +41,9 @@ public class DisableAuthenticationInterceptor implements MethodInterceptor {
     if (request instanceof HttpServletRequest) {
       HttpServletRequest httpServletRequest = (HttpServletRequest) request;
       String contextPath = httpServletRequest.getServletPath();
-      if (contextPath.startsWith("/fabric8-che-analytics/")) {
-        LOG.debug("Disabling authentication on path: ", contextPath);
+      if (contextPath.startsWith("/fabric8-che-analytics/")
+          || contextPath.startsWith("/fabric8-end2end/")) {
+        LOG.debug("Disabling authentication on path: {}", contextPath);
         filterChain.doFilter(request, response);
         return null;
       }

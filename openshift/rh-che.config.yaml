@@ -21,7 +21,7 @@ data:
   che-host: "che.prod-preview.openshift.io"
   che-keycloak-auth-server-url: "NULL"
   che-keycloak-client-id: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"
-  che-keycloak-js-adapter-url: "/_app/keycloak/RhCheKeycloak.js"
+  che-keycloak-js-adapter-url: "/api/fabric8-end2end/files/RhCheKeycloak.js"
   che-keycloak-oidc-provider: "https://auth.prod-preview.openshift.io/api"
   che-keycloak-realm: "NULL"
   che-keycloak-use-nonce: "false"
@@ -58,3 +58,4 @@ data:
   workspaces-memory-limit-max: "3gb"
   workspaces-pvc-storage-size: '1Gi'
   workspace-storage: "/home/user/che/workspaces"
+  

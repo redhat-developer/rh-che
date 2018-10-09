@@ -13,12 +13,12 @@ package com.redhat.che.plugin.analytics.wsmaster;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import org.eclipse.che.api.core.rest.Service;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.slf4j.Logger;
@@ -51,8 +51,11 @@ public class AnalyticsService extends Service {
     return woopraDomain == null ? "" : woopraDomain;
   }
 
-  private String getLog(String message, HttpHeaders headers) {
-    String ip = headers.getHeaderString("X-Forwarded-For");
+  private String getLog(String message, HttpServletRequest servletRequest) {
+    String ip = servletRequest.getHeader("X-Forwarded-For");
+    if (ip == null) {
+      ip = servletRequest.getRemoteAddr();
+    }
 
     return new StringBuffer("[E2E Registration Flow - IP = ")
         .append(ip == null ? "unknown" : ip)
@@ -64,14 +67,14 @@ public class AnalyticsService extends Service {
   @POST
   @Path("warning")
   @Consumes("text/plain")
-  public void warning(String message, @Context HttpHeaders headers) {
-    LOG.warn(getLog(message, headers));
+  public void warning(String message, @Context HttpServletRequest servletRequest) {
+    LOG.warn(getLog(message, servletRequest));
   }
 
   @POST
   @Path("error")
   @Consumes("text/plain")
-  public void error(String message, @Context HttpHeaders headers) {
-    LOG.error(getLog(message, headers));
+  public void error(String message, @Context HttpServletRequest servletRequest) {
+    LOG.error(getLog(message, servletRequest));
   }
 }

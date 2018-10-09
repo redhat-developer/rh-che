@@ -50,6 +50,10 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-end2end-flow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
         <dependency>

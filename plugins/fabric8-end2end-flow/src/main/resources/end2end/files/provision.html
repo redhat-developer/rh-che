@@ -1,0 +1,241 @@
+<!--
+
+    Copyright (c) 2016-2018 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<html class="" lang="en">
+<head class="at-element-marker">
+<!--[if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/ie8/0.4.1/ie8.js" ></script><![endif]-->
+<title>Welcome to Eclipse Che</title>
+
+<style id="at-mbox-default-style" type="text/css">
+.mboxDefault {
+	visibility: hidden;
+}
+</style>
+<style type="text/css">
+.at-element-marker {
+	visibility: visible;
+}
+</style>
+
+<meta name="robots" content="nofollow">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<!-- RHD css start -->
+<link rel="stylesheet" type="text/css"
+  href="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/css/app-20180411.css">
+<link rel="stylesheet"
+  href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+<!--[if lt IE 9]><script type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html
+                              <p>
+                                <b>Eclipse Che powered by OpenShift.</b>5.js"></script><![endif]-->
+<!-- RHD css end -->
+
+<link
+  href="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/css/login-v5.css?v=3.4.11"
+  rel="stylesheet">
+<link
+  href="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/css/login-oio-v1.css?v=3.4.11"
+  rel="stylesheet">
+
+<!-- Common JS -->
+<script
+  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/jquery-20180411.js?v=3.4.11"
+  type="text/javascript"></script>
+<script
+  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/modernizr-custom-20180411.js?v=3.4.11"
+  type="text/javascript"></script>
+<script
+  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/jquery.validate.min.js?v=3.4.11"
+  type="text/javascript"></script>
+<script
+  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/hideShowPassword.js?v=3.4.11"
+  type="text/javascript"></script>
+<script>
+const siteKey;
+var activationCaptcha;
+function onCaptchaLoad() {
+    try {
+        if (siteKey) {
+            activationCaptcha = grecaptcha.render('recaptcha', {
+                'sitekey': siteKey,
+                'callback': checkUser,
+                'expired-callback': captchaExpired,
+                'error-callback': captchaFailed,
+                'theme': 'dark',
+                'size': 'invisible'
+            });
+        }
+        document.getElementById('kc-login-button').disabled = false;
+    } catch(error) {
+        parent.verification_error("ReCaptcha cannot be rendered: " + error);
+    }
+}
+function osioUserName() {
+    return document.getElementById("osio-user-value").textContent;
+}
+function activateUser() {
+    if (siteKey) {
+        try {
+            grecaptcha.execute(activationCaptcha);
+        } catch(error) {
+            parent.verification_error("ReCaptcha cannot be executed: " + error);
+        }
+    } else {
+        checkUser(undefined);
+    }
+}
+function checkUser(token) {
+    parent.provision_osio(token, osioUserName(), parent.osioProvisioningURL);
+}
+function captchaExpired() {
+    grecaptcha.reset(activationCaptcha);
+}
+function captchaFailed() {
+    parent.verification_error("ReCaptcha error for user '" + osioUserName() + "'");
+}
+</script>
+<script src='https://www.google.com/recaptcha/api.js?onload=onCaptchaLoad&render=explicit' async defer></script>
+</head>
+
+<body class="home fullbleed " style="">
+  <div class="site-wrapper at-element-marker">
+    <header class="main clearfix at-element-marker">
+      <div class="row header-wrap">
+        <div class="logo-wrap">
+          <div class="logo">
+            <a href="http://www.openshift.io"
+              title="Red Hat OpenShift.io"><img
+              src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/img/OpenShift-io_logo.svg"
+              alt="Red Hat OpenShift.io"></a>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="wrapper clearfix">
+      <div class="content-wrapper">
+        <div class="row content">
+          <div class="large-24 columns">
+            <div id="kc-content" class="">
+              <div id="kc-content-wrapper" class="">
+                <div id="kc-form" class="">
+                  <div id="kc-form-wrapper" class="">
+                    <style type="text/css">
+.content-wrapper, .wrapper {
+	background-color: #f9f9f9 !important;
+}
+</style>
+                    <div class="kc-loginpage">
+                      <div class="row content login-main-row">
+                        <div class="kc-wrapper">
+                          <div class="kc-card">
+                            <h1>
+                              <div class="centered download-hide">Welcome to Eclipse Che</div>
+                            </h1>
+                            <div class="centered download-hide">
+                              <p>
+                                <b>Eclipse Che powered by OpenShift.</b>
+                                <br><br>
+                                We’re glad you are here<span id="osio-user-placeholder">, <span id="osio-user-value"></span></span>.
+                                <br><br>
+                                <b>Ready to go ?</b><br><br>
+                                Please activate your account by clicking
+                                on the link below.<br>
+                                We’ll confirm your account login again and grant you the resources to use Eclipse Che. 
+                              </p> <!-- Log in with the Red Hat account that you used when you signed up --> 
+                            </div>
+                            <div class="field">
+                                <div id="kc-form-buttons" class=" row collapse">
+                                    <div class="large-24 columns">
+                                        <button id="kc-login-button"
+                                                class="download-hide button heavy-cta large"
+                                                name="login"
+                                                onclick="return activateUser()"
+                                                disabled>Activate Account</button>
+                                        <div id="recaptcha" 
+                                             style="z-index: 999;position: fixed;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                          <span class="new-account"><a href="" onclick="return parent.osioProvisioningLogout()">Use a different account</a></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="clearfix"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- / .content-wrapper -->
+    </div>
+    <!-- / .top-page-wrap -->
+
+    <footer class="bottom">
+      <section class="footer-legal">
+        <div class="legal">
+          <div class="row">
+            <div class="medium-5 small-24 columns">
+              <a href="https://www.redhat.com/" target="_blank"
+                rel="noopener noreferrer"><img alt="Red Hat"
+                class="rh-logo"
+                src="https://developers.redhat.com/themes/custom/rhdp/images/branding/RHLogo_white.svg"></a>
+            </div>
+            <div class="medium-15 columns">
+              <ul class="inline-list">
+                <li><a class="copyright">Copyright © 2018 Red
+                    Hat Inc.</a></li>
+                <li><a
+                  href="http://www.redhat.com/en/about/privacy-policy"
+                  target="_blank" rel="noopener noreferrer">Privacy
+                    statement</a></li>
+                <li><a
+                  href="http://www.redhat.com/en/about/terms-use"
+                  target="_blank" rel="noopener noreferrer">Terms of
+                    use</a></li>
+                <li><a
+                  href="http://www.redhat.com/en/about/all-policies-guidelines"
+                  target="_blank" rel="noopener noreferrer">All
+                    policies and guidelines</a></li>
+              </ul>
+            </div>
+            <div class="medium-4 small-24 right columns">
+              <a class="summit-logo"
+                href="http://www.redhat.com/summit/" target="_blank"
+                rel="noopener noreferrer"><img
+                src="https://developers.redhat.com/themes/custom/rhdp/images/design/logo-summit.png"
+                alt="Red Hat Summit"></a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </footer>
+  </div>
+  <!--site-wrapper -->
+
+  <script
+    src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/foundation/foundation-20180411.js"
+    type="text/javascript"></script>
+  <script type="text/javascript">
+    $(document).foundation();
+</script>
+
+</body>
+</html>
