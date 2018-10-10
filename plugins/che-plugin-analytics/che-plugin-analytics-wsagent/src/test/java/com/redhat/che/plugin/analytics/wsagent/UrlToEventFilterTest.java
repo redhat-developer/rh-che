@@ -12,7 +12,9 @@
 package com.redhat.che.plugin.analytics.wsagent;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.COMMIT_LOCALLY;
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.EDITOR_USED;
+import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.PUSH_TO_REMOTE;
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_OPENED;
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.PROGRAMMING_LANGUAGE;
 import static java.util.Collections.emptyMap;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
+import java.util.Collections;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -220,5 +223,35 @@ public class UrlToEventFilterTest {
     assertEquals(filter.guessLanguage("/path/file.whatIsIt"), "unknown : .whatIsIt");
     assertEquals(filter.guessLanguage("/path/file"), "unknown");
     assertEquals(filter.guessLanguage("file.java"), "java");
+  }
+
+  @Test
+  public void sendCommitEventWhenAlreadyStarted() throws Exception {
+    when(request.getServletPath()).thenReturn("/api/git/commit");
+    when(request.getMethod()).thenReturn("POST");
+
+    filter.doFilter(request, response, filterChain);
+
+    InOrder inOrder = inOrder(filterChain, analyticsManager, request);
+    inOrder.verify(filterChain).doFilter(request, response);
+    inOrder.verify(analyticsManager).isEnabled();
+
+    verify(analyticsManager)
+        .onEvent(USER_ID, COMMIT_LOCALLY, Collections.emptyMap(), FORWARDED_FOR, USER_AGENT);
+  }
+
+  @Test
+  public void sendPushEventWhenAlreadyStarted() throws Exception {
+    when(request.getServletPath()).thenReturn("/api/git/push");
+    when(request.getMethod()).thenReturn("POST");
+
+    filter.doFilter(request, response, filterChain);
+
+    InOrder inOrder = inOrder(filterChain, analyticsManager, request);
+    inOrder.verify(filterChain).doFilter(request, response);
+    inOrder.verify(analyticsManager).isEnabled();
+
+    verify(analyticsManager)
+        .onEvent(USER_ID, PUSH_TO_REMOTE, Collections.emptyMap(), FORWARDED_FOR, USER_AGENT);
   }
 }
