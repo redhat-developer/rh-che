@@ -6,11 +6,31 @@
 
 FROM library/centos:centos7
 
-USER root
+# Install dependencies; note rh-nodejs8 is required for dashboard build to succeed
+RUN yum update --assumeyes \
+ && yum install --assumeyes \
+        docker \
+        tree \
+        git \
+        patch \
+        pcp \
+        bzip2 \
+        golang \
+        make \
+        java-1.8.0-openjdk \
+        java-1.8.0-openjdk-devel \
+        centos-release-scl \
+ && yum install --assumeyes \
+        rh-maven33 \
+        rh-nodejs8 \
+ && yum clean all \
+ && rm -rf /var/cache/yum
 
-RUN yum update --assumeyes && \
-    yum install --assumeyes docker tree git patch pcp bzip2 golang make java-1.8.0-openjdk java-1.8.0-openjdk-devel centos-release-scl && \
-    yum install --assumeyes rh-maven33 rh-nodejs4 && yum clean all && rm -rf /var/cache/yum && \
-    scl enable rh-nodejs4 "npm install --global gulp-cli bower" && \
-    cd /tmp/ && git clone https://github.com/redhat-developer/rh-che.git && \
-    scl enable rh-maven33 rh-nodejs4 "mvn -B -f /tmp/rh-che/ -Pnative clean install" && rm -rf /tmp/rh-che/
+# Bower update step won't work for root user
+RUN useradd -ms /bin/bash newuser
+USER newuser
+
+# Clone rhche and build
+RUN cd /tmp/ && git clone https://github.com/redhat-developer/rh-che.git \
+ && scl enable rh-maven33 rh-nodejs8 "mvn -B -f /tmp/rh-che/ -Pnative clean install" && rm -rf /tmp/rh-che/
+
