@@ -19,9 +19,9 @@ public enum AnalyticsEvent {
   WORKSPACE_USED("Use Workspace in Che"),
   WORKSPACE_INACTIVE("Keep Workspace Inactive in Che"),
   WORKSPACE_STOPPED("Stop Workspace in Che"),
-  EDITOR_USED("Edit Workspace File In Che", 30, new String[] {PROGRAMMING_LANGUAGE}),
-  PUSH_TO_REMOTE("Push to remote"),
-  COMMIT_LOCALLY("Commit locally");
+  EDITOR_USED("Edit Workspace File in Che", 30, new String[] {PROGRAMMING_LANGUAGE}),
+  PUSH_TO_REMOTE("Push to remote in Che", 10),
+  COMMIT_LOCALLY("Commit locally in Che", 10);
 
   private final String name;
   private final int expectedDuration;
