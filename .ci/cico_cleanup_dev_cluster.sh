@@ -17,7 +17,7 @@ yum install --assumeyes jq
 
 eval "$(./env-toolkit load -f jenkins-env.json -r ^RH_CHE)"
 curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
-if [[ -z "${RH_CHE_AUTOMATION_RDU2C_USERNAME}" || -z "${RH_CHE_AUTOMATION_RDU2C_PASSWORD}" ]]; then
+if [[ -z "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" ]]; then
   echo "RDU2C credentials not set"
   exit 1
 fi
