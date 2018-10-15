@@ -168,6 +168,10 @@ objects:
               secretKeyRef:
                   key: che.jdbc.username
                   name: rhche
+          - name: CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME
+            value: "che-workspace"
+          - name: CHE_WORKSPACE_SIDECAR_DEFAULT__MEMORY__LIMIT__MB
+            value: "256"
           - name: CHE_KEYCLOAK_AUTH__SERVER__URL
             valueFrom:
               configMapKeyRef:
