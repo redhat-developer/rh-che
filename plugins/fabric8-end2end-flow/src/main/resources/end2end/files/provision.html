@@ -77,8 +77,17 @@ function onCaptchaLoad() {
                 'theme': 'dark',
                 'size': 'invisible'
             });
+            try {
+                grecaptcha.execute(activationCaptcha);
+            } catch(error) {
+                parent.verification_error("ReCaptcha cannot be executed: " + error);
+            }
+        } else {
+            document.getElementById('checking-message').style = "display: none";
+            document.getElementById('go-message').style = "display: initial";
+            document.getElementById('kc-login-button').style = "display: initial";
+            document.getElementById('kc-login-button').disabled = false;
         }
-        document.getElementById('kc-login-button').disabled = false;
     } catch(error) {
         parent.verification_error("ReCaptcha cannot be rendered: " + error);
     }
@@ -86,26 +95,45 @@ function onCaptchaLoad() {
 function osioUserName() {
     return document.getElementById("osio-user-value").textContent;
 }
-function activateUser() {
-    if (siteKey) {
-        try {
-            grecaptcha.execute(activationCaptcha);
-        } catch(error) {
-            parent.verification_error("ReCaptcha cannot be executed: " + error);
-        }
-    } else {
-        checkUser(undefined);
-    }
-}
 function checkUser(token) {
-    parent.provision_osio(token, osioUserName(), parent.osioProvisioningURL);
+    parent.osioCheLoginFlow.post("/api/fabric8-end2end/verify", token)
+    .then((request) => {
+        var data = JSON.parse(request.responseText);
+        if (data && data.success) {
+            document.getElementById('checking-message').style = "display: none";
+            document.getElementById('go-message').style = "display: initial";
+            document.getElementById('kc-login-button').style = "display: initial";
+            document.getElementById('kc-login-button').disabled = false;
+        } else {
+            if (data) {
+                if (data['error-codes']) {
+                    parent.verification_error("Verification of user '" + userName + "' failed with errors: " + data['error-codes']);
+                } else {
+                    parent.verification_error("Verification of user '" + userName + "' failed", true);
+                }
+            } else {
+                parent.verification_error("Verification of user '" + userName + "' failed due to unexpected response: " + request.responseText);
+            }
+        }
+    },(error) => {
+        var errorDescription;
+        if (error instanceof XMLHttpRequest) {
+            errorDescription = request.status + " - " + request.responseText;
+        } else {
+            errorDescription = error;
+        }
+        var message = "Verification of user '" + userName + "' could not be submitted to the verification server: " + errorDescription;
+        parent.verification_error(message);
+    });
 }
 function captchaExpired() {
     grecaptcha.reset(activationCaptcha);
+    grecaptcha.execute(activationCaptcha);
 }
 function captchaFailed() {
-    parent.verification_error("ReCaptcha error for user '" + osioUserName() + "'");
+    parent.verification_error("ReCaptcha error for user '" + osioUserName() + "'", true);
 }
+
 </script>
 <script src='https://www.google.com/recaptcha/api.js?onload=onCaptchaLoad&render=explicit' async defer></script>
 </head>
@@ -150,19 +178,24 @@ function captchaFailed() {
                                 <br><br>
                                 We’re glad you are here<span id="osio-user-placeholder">, <span id="osio-user-value"></span></span>.
                                 <br><br>
+                                <span id="checking-message">Please wait for some seconds,<br>
+                                just the time to check you're a real user...</span>
+                                <span id="go-message" style="display: none;">
                                 <b>Ready to go ?</b><br><br>
                                 Please activate your account by clicking
                                 on the link below.<br>
                                 We’ll confirm your account login again and grant you the resources to use Eclipse Che. 
+                                </span>
                               </p> <!-- Log in with the Red Hat account that you used when you signed up --> 
                             </div>
                             <div class="field">
                                 <div id="kc-form-buttons" class=" row collapse">
                                     <div class="large-24 columns">
                                         <button id="kc-login-button"
+                                                style="display: none;"
                                                 class="download-hide button heavy-cta large"
                                                 name="login"
-                                                onclick="return activateUser()"
+                                                onclick="return parent.provision_osio()"
                                                 disabled>Activate Account</button>
                                         <div id="recaptcha" 
                                              style="z-index: 999;position: fixed;">

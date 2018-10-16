@@ -26,60 +26,22 @@ const telemetry_event_setup_namespaces = 'setup namespaces for che';
 const provisioningWaitDelay = 1000;
 const provisioningTimeout = 2 * 60 * 1000;
 
-function provision_osio(token, userName, redirect_uri) {
-    function startProvisioning() {
-        var provisioningWindow = window.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(redirect_uri), 'osio_provisioning');
-        if(! provisioningWindow) {
-            sessionStorage.setItem('osio-provisioning-failure', "User provisioning should happen in a separate window.<br/> \
-            Please enable popups, before retrying.");
-        } else {
-            osioCheLoginFlow.track(telemetry_event_enter_provisioning_page_for_che, { user: osioUserToApprove });
-            sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
-            sessionStorage.setItem('osio-provisioning', new Date().getTime());
-        }
-        window.blur();
-        window.focus();
-        window.location.reload();
+function provision_osio() {
+    var provisioningWindow = window.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(osioProvisioningURL), 'osio_provisioning');
+    if(! provisioningWindow) {
+        sessionStorage.setItem('osio-provisioning-failure', "User provisioning should happen in a separate window.<br/> \
+        Please enable popups, before retrying.");
+    } else {
+        osioCheLoginFlow.track(telemetry_event_enter_provisioning_page_for_che, { user: osioUserToApprove });
+        sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
+        sessionStorage.setItem('osio-provisioning', new Date().getTime());
     }
-    
-    if (!token) {
-        startProvisioning();
-        return;
-    }
-    
-    osioCheLoginFlow.post("/api/fabric8-end2end/verify", token)
-    .then((request) => {
-        var data = JSON.parse(request.responseText);
-        if (data && data.success) {
-            startProvisioning();
-        } else {
-            if (data) {
-                if (data['error-codes']) {
-                    verification_error("Verification of user '" + userName + "' failed with errors: " + data['error-codes']);
-                } else {
-                    verification_error("Verification of user '" + userName + "' failed", true);
-                }
-            } else {
-                verification_error("Verification of user '" + userName + "' failed due to unexpected response: " + request.responseText);
-            }
-        }
-    },(error) => {
-        var errorDescription;
-        if (request && request.status) {
-            errorDescription = request.status + " - " + request.statusText;
-        } else {
-            errorDescription = request;
-        }
-        var message = "Verification of user '" + userName + "' could not be submitted to the verification server: " + errorDescription;
-        verification_error(message);
-    });
+    window.blur();
+    window.focus();
+    window.location.reload();
 }
 function verification_error(errorMessage, warning) {
-    if (warning) {
-        osioCheLoginFlow.post('/api/fabric8-end2end/warning', errorMessage);
-    } else {
-        osioCheLoginFlow.post('/api/fabric8-end2end/error', errorMessage);
-    }
+    osioCheLoginFlow.log(errorMessage, warning);
     sessionStorage.setItem('osio-provisioning-failure', "User cannot be verified. Please contact support.");
     window.location.reload();
 }
@@ -222,7 +184,7 @@ function initAnalytics(writeKey){
         return new Promise((resolve, reject) => {
             var request = new XMLHttpRequest();
             request.onerror = request.onabort = function(error) {
-                reject(error);
+                reject(this);
             };
             request.onload = function() {
                 if (this.status >= 200 && this.status < 300 || this.status === 304) {
@@ -244,7 +206,7 @@ function initAnalytics(writeKey){
         return new Promise((resolve, reject) => {
             var request = new XMLHttpRequest();
             request.onerror = request.onabort = function(error) {
-                reject(error);
+                reject(this);
             };
             request.onload = function() {
                 if (this.status >= 200 && this.status < 300 || this.status === 304) {
@@ -271,17 +233,63 @@ function initAnalytics(writeKey){
             }
         }
     }
-    
+
+    function log(error, warning) {
+        var errorMessage;
+        if (error instanceof Error) {
+            var errorMessage = error.toString();
+            if (error.fileName) {
+                errorMessage += "\nfileName = " + error.filename;
+            }
+            if (error.lineNumber) {
+                errorMessage += "\nlineNumber = " + error.lineNumber;
+            }
+            if (error.columnNumber) {
+                errorMessage += "\ncolumnNumber = " + error.columnNumber;
+            }
+            if (error.stack) {
+                errorMessage += "\nstack = " + error.stack;
+            }
+        } else {
+            errorMessage = error;
+        }
+        
+        if (warning) {
+            post('/api/fabric8-end2end/warning', errorMessage);
+        } else {
+            post('/api/fabric8-end2end/error', errorMessage);
+        }
+    }
+
+    function logRequest(errorMessage, request) {
+        if (request instanceof XMLHttpRequest) {
+            log(errorMessage + " - status code: " + request.status + " - Response body: " + request.responseText);
+        } else if (request instanceof Error) {
+            log(errorMessage + " : " + request.toString());
+        } else if (request) {
+            log(errorMessage + " : " + request);
+        } else {
+            log(errorMessage);
+        }
+    }
+
     function performAccounkLinking(keycloak) {
         return get(osioApiURL + "/users?filter%5Busername%5D=" + encodeURIComponent(keycloak.tokenParsed.preferred_username), keycloak.token)
         .then((request) => {
-            data = JSON.parse(request.responseText).data;
-            if (data && data[0]) {
-                return data[0].attributes.cluster;
-            } else {
-                sessionStorage.removeItem('osio-provisioning-notification-message');
-                return Promise.reject("cannot find cluster for user: " + keycloak.tokenParsed.preferred_username)
-            }
+                data = JSON.parse(request.responseText).data;
+                if (data && data[0] && data[0].attributes && data[0].attributes.cluster) {
+                    return data[0].attributes.cluster;
+                } else {
+                    sessionStorage.removeItem('osio-provisioning-notification-message');
+                    var message = "Cannot find cluster for user: " + keycloak.tokenParsed.preferred_username;
+                    logRequest(message, request);
+                    return Promise.reject(message);
+                }
+        },(request) => {
+            sessionStorage.removeItem('osio-provisioning-notification-message');
+            var message = "Error while retrieving the user cluster";
+            logRequest(message, request);
+            return Promise.reject(message);
         })
         .then((cluster) => {
             return get(osioAuthURL + "/token?for=" + encodeURIComponent(cluster), keycloak.token)
@@ -307,14 +315,21 @@ function initAnalytics(writeKey){
                             return new Promise((resolve, reject) => {});
                         } else {
                             sessionStorage.removeItem('osio-provisioning-notification-message');
-                            return Promise.reject("Cannot get account linking page for user: " + keycloak.tokenParsed.preferred_username)
+                            var message = "Cannot get account linking page for user: " + keycloak.tokenParsed.preferred_username;
+                            logRequest(message, request);
+                            return Promise.reject(message)
                         }
+                    }, (request) => {
+                        sessionStorage.removeItem('osio-provisioning-notification-message');
+                        var message = "Error while retrieving the account linking URL";
+                        logRequest(message, request);
+                        return Promise.reject(message);
                     });
                 } else {
-                    console.log("Error while checking account linking", request);
-                    setStatusMessage("Error while checking account linking");
                     sessionStorage.removeItem('osio-provisioning-notification-message');
-                    return Promise.reject("Error while checking account linking: " + request.responseText);
+                    var message = "Error while checking account linking";
+                    logRequest(message, request);
+                    return Promise.reject(message);
                 }
             });
         });
@@ -322,14 +337,18 @@ function initAnalytics(writeKey){
 
     function setUpNamespaces(keycloak) {
         return get(osioApiURL + "/user/services", keycloak.token)
-        .catch(function (error) {
+        .catch((request) => {
             sessionStorage.removeItem('osio-provisioning-notification-message');
             track(telemetry_event_setup_namespaces);
             setStatusMessage(osio_msg_setting_up_namespaces);
             return get(osioApiURL + "/user", keycloak.token)
-            .then((request) => checkNamespacesCreated(keycloak, new Date().getTime() + 30000));
+            .then((request) => checkNamespacesCreated(keycloak, new Date().getTime() + 30000),
+            (request) => {
+                var message = "Error while triggering the namespace setup";
+                logRequest(message, request);
+                return Promise.reject(message);
+            });
         });
-
     }
 
     function checkNamespacesCreated(keycloak, timeLimit) {
@@ -343,7 +362,9 @@ function initAnalytics(writeKey){
                     }, 2000);
                 })
             } else {
-                return Promise.reject("Error when checking namespaces: " + request.responseText);
+                var message = "Error when checking namespaces";
+                logRequest(message, request);
+                return Promise.reject(message);
             }
         });
     }
@@ -357,33 +378,33 @@ function initAnalytics(writeKey){
                     if (json && json.data) {
                         var user = json.data;
                         var traits = {
-                                avatar: user.attributes.imageURL,
-                                email: user.attributes.email,
-                                username: user.attributes.username,
-                                website: user.attributes.url,
-                                name: user.attributes.fullName,
-                                description: user.attributes.bio
-                        }
+                            avatar: user.attributes.imageURL,
+                            email: user.attributes.email,
+                            username: user.attributes.username,
+                            website: user.attributes.url,
+                            name: user.attributes.fullName,
+                            description: user.attributes.bio
+                        };
                         if (localStorage['openshiftio.adobeMarketingCloudVisitorId']) {
                             traits.adobeMarketingCloudVisitorId = localStorage['openshiftio.adobeMarketingCloudVisitorId'];
                         }
                         analytics.identify(user.id, traits);
                         return true;
                     } else {
-                        post('/api/fabric8-end2end/error', "Invalid user data for user " + keycloak.tokenParsed.sub + "\nResponse body: " + request.responseText);
+                        log("Invalid user data for user " + keycloak.tokenParsed.sub + "\nResponse body: " + request.responseText);
                         return true;
                     }
                 } catch(err) {
-                    post('/api/fabric8-end2end/error', "Exception when parsing the user data for user " + keycloak.tokenParsed.sub + " :" + err + "\nResponse body: " + request.responseText);
+                    log("Exception when parsing the user data for user " + keycloak.tokenParsed.sub + " :" + err + "\nResponse body: " + request.responseText);
                     return true;
                 }
             })
-            .catch(function(request) {
-                post('/api/fabric8-end2end/error', "Error when getting user informations: status code: " + request.status + " - Response body: " + request.responseText);
+            .catch((request) => {
+                logRequest("Error when getting user informations", request);
                 return true;
             });
         } else {
-            post('/api/fabric8-end2end/warning', "Following user accessed the Dashboard without being fully identified inside Telemetry: " + keycloak.tokenParsed.sub);
+            log("Following user accessed the Dashboard without being fully identified inside Telemetry: " + keycloak.tokenParsed.sub, true);
             return Promise.resolve(true);
         }
     }
@@ -392,7 +413,7 @@ function initAnalytics(writeKey){
         if(window.analytics) {
             analytics.identify(keycloak.tokenParsed.sub);
         } else {
-            post('/api/fabric8-end2end/warning', "Following user accessed the Dashboard without being identified by ID inside Telemetry: " + keycloak.tokenParsed.sub);
+            log("Following user accessed the Dashboard without being identified by ID inside Telemetry: " + keycloak.tokenParsed.sub, true);
         }
     }
     
@@ -421,7 +442,8 @@ function initAnalytics(writeKey){
                     }
                 } 
             }
-        } catch(err) {
+        } catch(error) {
+            log(error);
         }
     }
     
@@ -438,6 +460,7 @@ function initAnalytics(writeKey){
     addReadonlyProp(window.osioCheLoginFlow, "get", get);
     addReadonlyProp(window.osioCheLoginFlow, "post", post);
     addReadonlyProp(window.osioCheLoginFlow, "track", track);
+    addReadonlyProp(window.osioCheLoginFlow, "log", log);
     
     var scripts = document.getElementsByTagName("script");
     var originalKeycloakScript;
@@ -538,6 +561,7 @@ function initAnalytics(writeKey){
                         var w = window.open('', 'osio_provisioning');
                         w && w.close();
                     }
+
                     if (lastProvisioningDate || lastProvisioningTimeoutFailure) {
                         track(telemetry_event_provision_user_for_che);
                     }
@@ -555,8 +579,14 @@ function initAnalytics(writeKey){
                             finalPromise.setSuccess(arg);
                         })
                     })
-                    .catch((errorMessage) => {
-                        post('/api/fabric8-end2end/error', errorMessage);
+                    .catch((error) => {
+                        var errorMessage;
+                        if (error instanceof Error) {
+                            errorMessage = "Unexpected error after user provisioning";
+                            log(error);
+                        } else {
+                            errorMessage = error;
+                        }
                         setStatusMessage(osio_msg_error_no_resources);
                         finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
                     });
@@ -580,7 +610,7 @@ function initAnalytics(writeKey){
                         }
 
                         if (provisioningTimeoutFailure) {
-                            post('/api/fabric8-end2end/error', 'Timeout while waiting for OSIO provisioning after opening the `manage.openshift.com` page for user: ' + osioUserToApprove);
+                            log('Timeout while waiting for OSIO provisioning after opening the `manage.openshift.com` page for user: ' + osioUserToApprove);
                             sessionStorage.setItem('osio-provisioning-timeout-failure', 'true');
                             sessionStorage.removeItem('osio-provisioning');
                             sessionStorage.removeItem('osio-provisioning-notification-message')
@@ -589,7 +619,7 @@ function initAnalytics(writeKey){
                         } else {
                             var provisioningFailure = sessionStorage.getItem('osio-provisioning-failure');
                             if (provisioningFailure) {
-                                post('/api/fabric8-end2end/error', "Provisioning failure: " + provisioningFailure);
+                                log("Provisioning failure: " + provisioningFailure);
                                 sessionStorage.removeItem('osio-provisioning');
                                 sessionStorage.removeItem('osio-provisioning-notification-message');
                                 sessionStorage.removeItem('osio-provisioning-failure');
@@ -608,8 +638,6 @@ function initAnalytics(writeKey){
                                         htmlContent = request.responseText.replace('<span id="osio-user-value"></span>', '<span id="osio-user-value">' + osioUserToApprove + '</span>');
                                         if (osioUserToApprove == 'unknown') {
                                             htmlContent = htmlContent.replace('<span id="osio-user-placeholder">', '<span id="osio-user-placeholder" style="display: none;">');
-                                        } else {
-                                            htmlContent = request.responseText;
                                         }
                                         var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document
                                         osioProvisioningFrameDocument.open();
@@ -618,14 +646,16 @@ function initAnalytics(writeKey){
                                         track(telemetry_event_display_provisioning_page_for_che, { user: osioUserToApprove });
                                     } else {
                                         const errorMessage = 'OSIO provisioning page loaded at URL: ' + provisioningPage + ' should be valid HTML';
-                                        post('/api/fabric8-end2end/error', errorMessage + ' for user ' + osioUserToApprove);
+                                        log(errorMessage + ' for user ' + osioUserToApprove);
                                         sessionStorage.removeItem('osio-provisioning-notification-message');
+                                        setStatusMessage(osio_msg_error_no_resources);
                                         finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
                                     }
                                 }, (request) => {
                                     const errorMessage = "OSIO provisioning page could not be loaded at URL: " + provisioningPage;
-                                    post('/api/fabric8-end2end/error', errorMessage + ' for user ' + osioUserToApprove);
+                                    logRequest(errorMessage + ' for user ' + osioUserToApprove, request);
                                     sessionStorage.removeItem('osio-provisioning-notification-message');
+                                    setStatusMessage(osio_msg_error_no_resources);
                                     finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
                                 });
                             } else {
@@ -638,12 +668,31 @@ function initAnalytics(writeKey){
                         }
                     } else {
                         var errorMessage;
+                        var warning = false;
                         if (data && data.error_description) {
                             errorMessage = data.error_description;
+                            try {
+                                var data = JSON.parse(error_description);
+                                if (data && (data.status == 401)) {
+                                    json = JSON.parse(data.response);
+                                    if (json &&
+                                        json.errors &&
+                                        json.errors[0]) {
+                                        var error = json.errors[0];
+                                        if(error.code == "unauthorized_error" &&
+                                                error.detail == "unauthorized access") {
+                                            warning = true;
+                                            errorMessage = "User is not authorized and cannot be provisioned";
+                                        }
+                                    } 
+                                }
+                            } catch(err) {
+                            }
+                            
                         } else {
-                            errorMessage = "Login to RHD failed for an unknown reason";
+                            errorMessage = "Login to RHD failed for an unknown reason: " + data;
                         }
-                        post('/api/fabric8-end2end/error', errorMessage);
+                        log(errorMessage, warning);
                         sessionStorage.removeItem('osio-provisioning');
                         sessionStorage.removeItem('osio-provisioning-failure');
                         sessionStorage.removeItem('osio-provisioning-notification-message');
@@ -655,6 +704,8 @@ function initAnalytics(writeKey){
             .catch((request) => {
                 sessionStorage.removeItem('osio-provisioning');
                 sessionStorage.removeItem('osio-provisioning-failure');
+                sessionStorage.removeItem('osio-provisioning-notification-message');
+                setStatusMessage(osio_msg_error_no_resources);
                 finalPromise.setError({ error: 'invalid_request', error_description: 'Che server API is unreachable at URL: ' + segmentWriteKeyUrl });
             })
             return finalPromise.promise;
