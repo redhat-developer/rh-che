@@ -77,6 +77,13 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
   public Config buildConfig(Config defaultConfig, @Nullable String workspaceId)
       throws InfrastructureException {
     Subject subject = EnvironmentContext.getCurrent().getSubject();
+
+    // If there is no way to get a subject, we return the default config
+    // as getting the config below will throw an error.
+    if (workspaceId == null && (subject == null || subject.isAnonymous())) {
+      return defaultConfig;
+    }
+
     if (workspaceId != null) {
       Optional<RuntimeIdentity> runtimeIdentity = getRuntimeIdentity(workspaceId);
       if (runtimeIdentity.isPresent()) {
@@ -108,12 +115,13 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
             }
           }
         }
+      } else { // !runtimeIdentity.isPresent()
+        LOG.warn(
+            "Could not get runtimeIdentity for workspace '{}', and so cannot verify "
+                + "if current subject '{}' owns workspace",
+            workspaceId,
+            subject.getUserId());
       }
-    } else if (subject == null || subject.isAnonymous()) {
-      LOG.warn(
-          "Could not get subject from cache and no workspaceId is available. "
-              + "Using default OpenShift config.");
-      return defaultConfig;
     }
     return envProvider.getWorkspacesOpenshiftConfig(subject);
   }
