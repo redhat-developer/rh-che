@@ -109,6 +109,11 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
           }
         }
       }
+    } else if (subject == null || subject.isAnonymous()) {
+      LOG.warn(
+          "Could not get subject from cache and no workspaceId is available. "
+              + "Using default OpenShift config.");
+      return defaultConfig;
     }
     return envProvider.getWorkspacesOpenshiftConfig(subject);
   }
