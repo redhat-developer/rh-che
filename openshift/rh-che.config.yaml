@@ -15,7 +15,7 @@ data:
   analytics.woopra_domain: 'NULL'
   che-api: "https://che.prod-preview.openshift.io/api"
   che-fabric8-auth-endpoint: "https://auth.prod-preview.openshift.io"
-  che-fabric8-multicluster-oso-proxy-url: "https://f8osoproxy-test-dsaas-preview.b6ff.rh-idev.openshiftapps.com"
+  che-fabric8-multicluster-oso-proxy-url: "https://osoproxy.prod-preview.openshift.io"
   che-fabric8-multitenant: "true"
   che-fabric8-user-service-endpoint: "https://api.prod-preview.openshift.io/api/user/services"
   che-host: "che.prod-preview.openshift.io"
