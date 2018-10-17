@@ -79,7 +79,7 @@ function onCaptchaLoad() {
     try {
         function provision_osio_impl() {
             provision_osio = function() {};
-            var provisioningWindow = window.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(parent.osioProvisioningURL), 'osio_provisioning');
+            var provisioningWindow = parent.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(parent.osioProvisioningURL), 'osio_provisioning');
             if (! provisioningWindow) {
                 parent.sessionStorage.setItem('osio-provisioning-failure', "User provisioning should happen in a separate window.<br/> \
                 Please enable popups, before retrying.");
