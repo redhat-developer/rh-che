@@ -108,12 +108,12 @@ function onCaptchaLoad() {
                 } else {
                     if (data) {
                         if (data['error-codes']) {
-                            parent.verification_error("Verification of user '" + userName + "' failed with errors: " + data['error-codes']);
+                            verification_error("Verification of user '" + userName + "' failed with errors: " + data['error-codes']);
                         } else {
-                            parent.verification_error("Verification of user '" + userName + "' failed", true);
+                            verification_error("Verification of user '" + userName + "' failed", true);
                         }
                     } else {
-                        parent.verification_error("Verification of user '" + userName + "' failed due to unexpected response: " + request.responseText);
+                        verification_error("Verification of user '" + userName + "' failed due to unexpected response: " + request.responseText);
                     }
                 }
             },(error) => {
@@ -124,7 +124,7 @@ function onCaptchaLoad() {
                     errorDescription = error;
                 }
                 var message = "Verification of user '" + userName + "' could not be submitted to the verification server: " + errorDescription;
-                parent.verification_error(message);
+                verification_error(message);
             });
         }
         
@@ -147,7 +147,7 @@ function onCaptchaLoad() {
             enableProvisioning();
         }
     } catch(error) {
-        parent.verification_error("ReCaptcha cannot be rendered: " + error);
+        verification_error("ReCaptcha cannot be rendered: " + error);
     }
 }
 function osioUserName() {
@@ -159,8 +159,8 @@ function captchaExpired() {
     grecaptcha.reset(activationCaptcha);
     grecaptcha.execute(activationCaptcha);
 }
-function captchaFailed() {
-    parent.verification_error("ReCaptcha error for user '" + osioUserName() + "'", true);
+function captchaFailed(error) {
+    verification_error("ReCaptcha error for user '" + osioUserName() + "': " + error, true);
 }
 
 </script>
