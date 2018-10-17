@@ -153,6 +153,8 @@ objects:
                 name: rhche
           - name: CHE_INFRASTRUCTURE_ACTIVE
             value: "openshift"
+          - name: CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE
+            value: "2000"
           - name: CHE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:
