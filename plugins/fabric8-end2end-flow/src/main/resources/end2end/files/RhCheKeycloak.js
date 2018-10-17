@@ -26,26 +26,6 @@ const telemetry_event_setup_namespaces = 'setup namespaces for che';
 const provisioningWaitDelay = 1000;
 const provisioningTimeout = 2 * 60 * 1000;
 
-function provision_osio() {
-    var provisioningWindow = window.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(osioProvisioningURL), 'osio_provisioning');
-    if(! provisioningWindow) {
-        sessionStorage.setItem('osio-provisioning-failure', "User provisioning should happen in a separate window.<br/> \
-        Please enable popups, before retrying.");
-    } else {
-        osioCheLoginFlow.track(telemetry_event_enter_provisioning_page_for_che, { user: osioUserToApprove });
-        sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
-        sessionStorage.setItem('osio-provisioning', new Date().getTime());
-    }
-    window.blur();
-    window.focus();
-    window.location.reload();
-}
-function verification_error(errorMessage, warning) {
-    osioCheLoginFlow.log(errorMessage, warning);
-    sessionStorage.setItem('osio-provisioning-failure', "User cannot be verified. Please contact support.");
-    window.location.reload();
-}
-
 var osioProvisioningLogout;
 var osioProvisioningURL;
 var osioUserToApprove;
