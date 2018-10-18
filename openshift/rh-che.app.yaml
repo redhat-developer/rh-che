@@ -173,7 +173,9 @@ objects:
           - name: CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME
             value: "che-workspace"
           - name: CHE_WORKSPACE_SIDECAR_DEFAULT__MEMORY__LIMIT__MB
-            value: "256"
+            value: "150"
+          - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT
+            value: "150mb"
           - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA__REMOTE_IMAGE
             value: "wsskeleton/che-plugin-broker:theia-broker"
           - name: CHE_KEYCLOAK_AUTH__SERVER__URL
