@@ -14,6 +14,8 @@ metadata:
 objects:
 - apiVersion: v1
   kind: ServiceAccount
+  imagePullSecrets:
+  - name: quay.io
   metadata:
     labels:
       app: rhche
