@@ -65,9 +65,9 @@
     }
   },
   {
-    "id": "che7-preview",
+    "id": "che7",
     "creator": "ide",
-    "name": "Che 7 Preview",
+    "name": "Che 7",
     "description": "Workspace.next sidecars and Theia as IDE",
     "scope": "general",
     "tags": [
@@ -141,7 +141,7 @@
   {
     "id": "che7-preview-plugin-dev",
     "creator": "ide",
-    "name": "Che 7 Plugin Development Preview",
+    "name": "Che 7 Dev",
     "description": "Workspace.next sidecars and Theia as IDE with the tooling for plugin development",
     "scope": "general",
     "tags": [
