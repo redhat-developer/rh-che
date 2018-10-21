@@ -130,7 +130,14 @@
         "plugins": "che-machine-exec-plugin:0.0.1",
         "che.server.secure_exposer": "default"
       },
-      "commands": [],
+      "commands": [
+        {
+          "commandLine": "echo ${CHE_OSO_CLUSTER//api/console}",
+          "name": "Get OpenShift Console URL",
+          "type": "",
+          "attributes": {}
+        }
+      ],
       "links": []
     },
     "stackIcon": {
@@ -204,7 +211,14 @@
         "plugins": "che-machine-exec-plugin:0.0.1",
         "che.server.secure_exposer": "default"
       },
-      "commands": [],
+      "commands": [
+        {
+          "commandLine": "echo ${CHE_OSO_CLUSTER//api/console}",
+          "name": "Get OpenShift Console URL",
+          "type": "",
+          "attributes": {}
+        }
+      ],
       "links": []
     },
     "stackIcon": {
