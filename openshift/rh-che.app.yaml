@@ -180,6 +180,8 @@ objects:
             value: "150mb"
           - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA__REMOTE_IMAGE
             value: "wsskeleton/che-plugin-broker:theia-broker"
+          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA_IMAGE
+            value: "wsskeleton/che-plugin-broker:theia-broker-2"
           - name: CHE_KEYCLOAK_AUTH__SERVER__URL
             valueFrom:
               configMapKeyRef:
