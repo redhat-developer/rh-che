@@ -1,17 +1,15 @@
 # Config used by the different scripts
 
-TARGET=${TARGET:-"centos"}
-PR_CHECK_BUILD=${PR_CHECK_BUILD:-"false"}
+export TARGET=${TARGET:-"centos"}
 
 export REGISTRY="quay.io"
 export NAMESPACE=${NAMESPACE:-"rhchestage"}
 
-if [ "$PR_CHECK_BUILD" == "true" ]; then
+if [ "$PR_CHECK_BUILD" == "true" ] || [ "$USE_CHE_LATEST_SNAPSHOT" == "true" ]; then
   export DOCKER_IMAGE="rh-che-automation"
 else
   export DOCKER_IMAGE="rh-che-server"
 fi
-
 
 if [ "$TARGET" == "rhel" ]; then
   export DOCKERFILE="Dockerfile.rhel"
@@ -23,10 +21,10 @@ else
   export PROD_IMAGE_URL="${REGISTRY}/openshiftio/che-${DOCKER_IMAGE}"
 fi
 
-KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
+export KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE="rh-che-standalone-keycloak-configurator"
 
-KEYCLOAK_DOCKER_IMAGE_URL=${REGISTRY}/openshiftio/${NAMESPACE}-${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}
-KEYCLOAK_PROD_IMAGE_URL=${REGISTRY}/openshiftio/che-${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}
+export KEYCLOAK_DOCKER_IMAGE_URL=${REGISTRY}/openshiftio/${NAMESPACE}-${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}
+export KEYCLOAK_PROD_IMAGE_URL=${REGISTRY}/openshiftio/che-${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}
 
 export RH_CHE_GIT_REPO=https://github.com/redhat-developer/rh-che
 export RH_CHE_GIT_BRANCH=master
@@ -35,7 +33,7 @@ export NPM_CONFIG_PREFIX=~/.che_node_modules
 export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
 
 export RH_DIST_SUFFIX=fabric8
-if [ "$PR_CHECK_BUILD" == "true" ]; then
+if [ "$PR_CHECK_BUILD" == "true" ] || [ "$USE_CHE_LATEST_SNAPSHOT" == "true" ]; then
   export RH_TAG_DIST_SUFFIX=rhcheautomation
   export RH_PULL_REQUEST_ID="${ghprbPullId}"
 else

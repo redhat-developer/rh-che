@@ -31,7 +31,7 @@ if [[ "$DeveloperBuild" != "true" && "$PR_CHECK_BUILD" != "true" ]]; then
   set -x
   yum -y update
   yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker
-  yum -y install rh-maven33 rh-nodejs4
+  yum -y install rh-maven33 rh-nodejs8
 
   BuildUser="chebuilder"
 

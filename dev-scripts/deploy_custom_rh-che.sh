@@ -23,6 +23,7 @@ usage="\\033[93;1m$(basename "$0") \\033[0;1m[-u <username>] [-p <passwd>] [-o <
     \\033[1m-h\\033[0m  show this help text
     \\033[1m-n\\033[0m  do not delete files after script finishes
     \\033[1m-s\\033[0m  wipe sql database (postgres)
+    \\033[1m-S\\033[0m  apply secret for oc
     \\033[1m-t\\033[0m  [\\033[1mdefault=latest\\033[0m] tag for specific build (first 7 characters of commit hash)
     \\033[1m-r\\033[0m  docker image registry from where to pull
     \\033[1m-z\\033[0m  run this script as a standalone self-contained application
@@ -219,7 +220,7 @@ else
   fi
 fi
 export RH_CHE_PROJECT_NAMESPACE=${RH_CHE_PROJECT_NAMESPACE:-$(oc whoami)-che6-automated}
-echo -e "\\033[92;1mLogin successful, creating project \\033[34m$RH_CHE_PROJECT_NAMESPACE\\033[0;38;5;238m";
+echo -e "Login successful, creating project $RH_CHE_PROJECT_NAMESPACE";
 
 # CREATE PROJECT
 if oc project "${RH_CHE_PROJECT_NAMESPACE}" > /dev/null 2>&1;

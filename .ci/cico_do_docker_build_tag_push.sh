@@ -69,6 +69,10 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
     exit 2
   fi
 
+  if [ "${USE_CHE_LATEST_SNAPSHOT}" == "true" ]; then
+  	NIGHTLY=$DOCKER_IMAGE_TAG
+  fi
+
   # lets change the tag and push it to the registry
   docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${NIGHTLY}
 

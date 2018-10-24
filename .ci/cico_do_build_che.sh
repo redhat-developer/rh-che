@@ -19,8 +19,8 @@ mvnche() {
     if [ "$(scl -l 2> /dev/null | grep rh-maven33)" != "" ]
     then
       # gulp-cli is needed to build the dashboard
-      scl enable rh-nodejs4 "npm install --global gulp-cli"
-      scl enable rh-maven33 rh-nodejs4 "mvn $*"
+      scl enable rh-nodejs8 "npm install --global gulp-cli"
+      scl enable rh-maven33 rh-nodejs8 "mvn $*"
     else
       mvn $*
     fi
