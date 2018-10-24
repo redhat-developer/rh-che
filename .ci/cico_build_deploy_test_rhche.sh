@@ -42,23 +42,31 @@ BuildTagAndPushDocker
 # Deploy rh-che image
 echo "Deploying image with tag ${DOCKER_IMAGE_TAG} from ${DOCKER_IMAGE_URL}"
 
+#create project before deployment script to be able to set policy
+if oc project "${PROJECT_NAMESPACE}" > /dev/null 2>&1;
+then
+  echo "Switched to project ${PROJECT_NAMESPACE}"
+else
+  echo "Switching to project failed, probably not exists [$?]. Creating..."
+  oc new-project "${PROJECT_NAMESPACE}" --display-name='RH-Che6 Automated Deployment' > /dev/null 2>&1
+fi
+oc policy add-role-to-user edit Katka92 ScrewTSW rhopp garagatyi ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT_NAMESPACE
+
 if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" \
                                          -r "${DOCKER_IMAGE_URL}" \
                                          -t $DOCKER_IMAGE_TAG \
-                                         -e $NAMESPACE \
+                                         -e $PROJECT_NAMESPACE \
                                          -S "$QUAY_SECRET_JSON" \
                                          -s \
                                          -U;
 then
   echo "Che successfully deployed."
-  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-$NAMESPACE.devtools-dev.ext.devshift.net/
+  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-$PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/
 else
   echo "Custom che deployment failed. Error code:$?"
   exit 4
 fi
 set -x
-
-oc policy add-role-to-user edit Katka92 ScrewTSW rhopp garagatyi ibuziuk amisevsk davidfestal skabashnyuk -n $NAMESPACE
 
 echo "Custom che deployment successful, running che-functional tests against ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL}"
 if ./.ci/cico_run_che-functional-tests.sh;

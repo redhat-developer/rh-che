@@ -28,7 +28,7 @@ echo "Installing dependencies:"
 installDependencies
 
 export DOCKER_IMAGE_TAG="upstream-check-latest"	
-export NAMESPACE=compatibility-check
+export PROJECT_NAMESPACE=compatibility-check
 
 #change version of used che
 CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}')

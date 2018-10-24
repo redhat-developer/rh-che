@@ -27,7 +27,7 @@ checkAllCreds
 echo "Installing dependencies:"
 installDependencies
 
-export NAMESPACE=prcheck-${RH_PULL_REQUEST_ID}
+export PROJECT_NAMESPACE=prcheck-${RH_PULL_REQUEST_ID}
 export DOCKER_IMAGE_TAG="${RH_TAG_DIST_SUFFIX}"-"${RH_PULL_REQUEST_ID}"
 
 echo "Running ${JOB_NAME} PR: #${RH_PULL_REQUEST_ID}, build number #${BUILD_NUMBER}"
