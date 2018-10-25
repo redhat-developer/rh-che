@@ -1,5 +1,7 @@
 # Config used by the different scripts
 
+export PR_CHECK_BUILD=${PR_CHECK_BUILD:-"false"}
+export USE_CHE_LATEST_SNAPSHOT=${USE_CHE_LATEST_SNAPSHOT:-"false"}
 export TARGET=${TARGET:-"centos"}
 
 export REGISTRY="quay.io"
