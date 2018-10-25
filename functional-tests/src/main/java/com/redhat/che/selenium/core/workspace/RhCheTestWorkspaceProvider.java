@@ -35,10 +35,11 @@ public class RhCheTestWorkspaceProvider implements TestWorkspaceProvider {
     return new RhCheTestWorkspaceImpl(owner, rhcheWorksapceClient, startAfterCreation);
   }
 
-  public ProvidedWorkspace findWorkspace(TestUser owner, String name) {
-    return new ProvidedWorkspace(owner, rhcheWorksapceClient, name);
-  }
-
   @Override
   public void shutdown() {}
+
+  @Override
+  public ProvidedWorkspace getWorkspace(String workspaceName, TestUser owner) {
+    return new ProvidedWorkspace(owner, rhcheWorksapceClient, workspaceName);
+  }
 }

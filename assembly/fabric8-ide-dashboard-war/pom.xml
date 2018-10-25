@@ -200,7 +200,23 @@
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
-                            <!--   3. Build dashboard locally using npm install            -->
+                            <!-- As of upstream 6.13, yarn is used instead of bower -->
+                            <execution>
+                                <id>install-yarn</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
+                                            <arg value="install" />
+                                            <arg value="yarn" />
+                                        </exec>>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <!--   3. Build dashboard locally using npm install    -->
                             <execution>
                                 <id>build-dashboard</id>
                                 <phase>compile</phase>
@@ -210,7 +226,7 @@
                                 <configuration>
                                     <target>
                                         <!-- build user dashboard -->
-                                        <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
+                                        <exec dir="${basedir}/target/sources" executable="node_modules/yarn/bin/yarn" failonerror="true">
                                             <arg value="install" />
                                         </exec>
                                     </target>
@@ -247,7 +263,7 @@
                                 <configuration>
                                     <target unless="skipTests">
                                         <!-- Run unit tests -->
-                                        <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
+                                        <exec dir="${basedir}/target/sources" executable="node_modules/yarn/bin/yarn" failonerror="true">
                                             <arg value="run" />
                                             <arg value="test" />
                                         </exec>

@@ -15,6 +15,9 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -130,7 +133,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
     wsAgentRouteAnnotations = new HashMap<>();
     wsAgentRouteAnnotations.put("org.eclipse.che.server.wsagent/http.path", "/api");
 
-    when(runtimeIdentity.getOwnerId()).thenReturn(USER_ID);
+    lenient().when(runtimeIdentity.getOwnerId()).thenReturn(USER_ID);
     when(openshiftUserTokenProvider.getToken(eq(SUBJECT))).thenReturn(OSO_TOKEN);
     when(tenantDataProvider.getUserCheTenantData(eq(SUBJECT), eq("user")))
         .thenReturn(new UserCheTenantData(NAMESPACE, CLUSTER_URL, null, false));
@@ -191,8 +194,9 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
   @Test
   public void shouldNotThrowExceptionIfTokenFetchingFails() throws Exception {
-    when(openshiftUserTokenProvider.getToken(eq(SUBJECT)))
-        .thenThrow(new InfrastructureException("error"));
+    doThrow(new InfrastructureException("error"))
+        .when(openshiftUserTokenProvider)
+        .getToken(eq(SUBJECT));
 
     provisioner.provision(openShiftEnvironment, runtimeIdentity);
 
@@ -203,7 +207,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
   @Test
   public void shouldNotThrowExceptionIfTokenIsNull() throws Exception {
-    when(openshiftUserTokenProvider.getToken(eq(SUBJECT))).thenReturn(null);
+    doReturn(null).when(openshiftUserTokenProvider).getToken(eq(SUBJECT));
 
     provisioner.provision(openShiftEnvironment, runtimeIdentity);
 
@@ -214,8 +218,9 @@ public class RhCheInfraEnvironmentProvisionerTest {
 
   @Test
   public void shouldNotThrowExceptionIfTenantDataFetchingFails() throws Exception {
-    when(tenantDataProvider.getUserCheTenantData(eq(SUBJECT), eq("user")))
-        .thenThrow(new InfrastructureException("error"));
+    doThrow(new InfrastructureException("error"))
+        .when(tenantDataProvider)
+        .getUserCheTenantData(eq(SUBJECT), eq("user"));
 
     provisioner.provision(openShiftEnvironment, runtimeIdentity);
 

@@ -94,7 +94,7 @@ public class RhCheSeleniumSuiteModule extends AbstractModule {
       throw new RuntimeException(
           "Variable `che.workspaceName` must be set to use ProvidedWorkspace");
     }
-    ProvidedWorkspace ws = workspaceProvider.findWorkspace(testUser, givenWorkspaceName);
+    ProvidedWorkspace ws = workspaceProvider.getWorkspace(givenWorkspaceName, testUser);
     ws.await();
     return ws;
   }

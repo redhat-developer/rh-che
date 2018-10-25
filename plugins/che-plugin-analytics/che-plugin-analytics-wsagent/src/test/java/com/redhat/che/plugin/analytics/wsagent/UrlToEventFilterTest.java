@@ -18,7 +18,9 @@ import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.PUSH_TO_REM
 import static com.redhat.che.plugin.analytics.wsagent.AnalyticsEvent.WORKSPACE_OPENED;
 import static com.redhat.che.plugin.analytics.wsagent.EventProperties.PROGRAMMING_LANGUAGE;
 import static java.util.Collections.emptyMap;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -60,13 +62,15 @@ public class UrlToEventFilterTest {
   public void setUp() throws Exception {
     when(analyticsManager.isEnabled()).thenReturn(true);
     when(request.getSession()).thenReturn(session);
-    when(request.getHeader("X-Forwarded-For")).thenReturn(FORWARDED_FOR);
-    when(request.getRemoteAddr()).thenReturn(REMOTE_ADDRESS);
-    when(request.getHeader("User-Agent")).thenReturn(USER_AGENT);
-    when(session.getAttribute("che_subject")).thenReturn(subject);
-    when(subject.getUserId()).thenReturn(USER_ID);
+
+    doReturn(FORWARDED_FOR).when(request).getHeader("X-Forwarded-For");
+    doReturn(USER_AGENT).when(request).getHeader("User-Agent");
+    lenient().doReturn(REMOTE_ADDRESS).when(request).getRemoteAddr();
     when(request.getServletPath()).thenReturn("anything");
     when(request.getMethod()).thenReturn("anything");
+
+    doReturn(subject).when(session).getAttribute("che_subject");
+    doReturn(USER_ID).when(subject).getUserId();
 
     filter = new UrlToEventFilter(analyticsManager);
     filter.startWorkspaceEventSent = true;

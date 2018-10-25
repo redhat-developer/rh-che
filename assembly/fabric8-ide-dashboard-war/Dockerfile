@@ -8,7 +8,7 @@
 # Build step: $ docker build -t eclipse-che-dashboard
 # It builds an archive file that can be used by doing later
 #  $ docker run --rm eclipse-che-dashboard | tar -C target/ -zxf -
-FROM node:6.11.2
+FROM node:8.10.0
 
 ARG SOURCES_DIR
 
@@ -17,10 +17,9 @@ RUN apt-get update && \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/*
 COPY ${SOURCES_DIR}/package.json /dashboard/
-RUN cd /dashboard && npm install
-COPY ${SOURCES_DIR}/bower.json /dashboard/
-RUN cd /dashboard && ./node_modules/.bin/bower install --allow-root
+RUN cd /dashboard && npm i yarn && npx yarn install --ignore-scripts
 COPY ${SOURCES_DIR} /dashboard/
-RUN cd /dashboard && npm run build && cd target/ && tar zcf /tmp/dashboard.tar.gz dist/
+RUN cd /dashboard && npx yarn
+RUN cd /dashboard && cd target/ && tar zcf /tmp/dashboard.tar.gz dist/
 
 CMD zcat /tmp/dashboard.tar.gz

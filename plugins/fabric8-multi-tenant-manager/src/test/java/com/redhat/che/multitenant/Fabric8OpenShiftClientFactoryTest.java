@@ -13,6 +13,8 @@ package com.redhat.che.multitenant;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
+import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.api.workspace.server.spi.RuntimeContext;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
@@ -66,14 +69,19 @@ public class Fabric8OpenShiftClientFactoryTest {
 
   @BeforeMethod
   public void setUp() throws Exception {
-    when(environmentProvider.getWorkspacesOpenshiftConfig(any(Subject.class)))
-        .thenReturn(expectedConfig);
+    lenient()
+        .doThrow(new InfrastructureException("null subject"))
+        .when(environmentProvider)
+        .getWorkspacesOpenshiftConfig(null);
+    doReturn(expectedConfig)
+        .when(environmentProvider)
+        .getWorkspacesOpenshiftConfig(any(Subject.class));
     when(workspaceRuntimeProvider.get()).thenReturn(workspaceRuntimes);
     when(workspaceRuntimes.getRuntimeContext(WS_ID)).thenReturn(Optional.of(runtimeContext));
     when(currentSubject.getUserId()).thenReturn(CURRENT_USER_ID);
     when(runtimeContext.getIdentity()).thenReturn(runtimeIdentity);
     when(runtimeIdentity.getOwnerId()).thenReturn(OWNER_USER_ID);
-    when(subjectsRegistry.getSubject(OWNER_USER_ID)).thenReturn(ownerSubject);
+    lenient().when(subjectsRegistry.getSubject(OWNER_USER_ID)).thenReturn(ownerSubject);
 
     factory =
         new Fabric8OpenShiftClientFactory(

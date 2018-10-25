@@ -100,14 +100,18 @@ public class AnalyticsManagerTest {
 
   @BeforeMethod
   public void setUp() throws Exception {
-    when(requestFactory.fromUrl(API_ENDPOINT + "/fabric8-che-analytics/segment-write-key"))
-        .thenReturn(requestToGetSegmentWriteKey);
-    when(requestFactory.fromUrl(API_ENDPOINT + "/fabric8-che-analytics/woopra-domain"))
-        .thenReturn(requestToGetWoopraDomain);
-    when(requestFactory.fromUrl(API_ENDPOINT + "/workspace/" + WORKSPACE_ID))
-        .thenReturn(requestToGetWorkspaceName);
-    when(requestFactory.fromUrl(API_ENDPOINT + "/factory/" + FACTORY_ID))
-        .thenReturn(requestToGetFactoryDetail);
+    doReturn(requestToGetSegmentWriteKey)
+        .when(requestFactory)
+        .fromUrl(API_ENDPOINT + "/fabric8-che-analytics/segment-write-key");
+    doReturn(requestToGetWoopraDomain)
+        .when(requestFactory)
+        .fromUrl(API_ENDPOINT + "/fabric8-che-analytics/woopra-domain");
+    doReturn(requestToGetWorkspaceName)
+        .when(requestFactory)
+        .fromUrl(API_ENDPOINT + "/workspace/" + WORKSPACE_ID);
+    doReturn(requestToGetFactoryDetail)
+        .when(requestFactory)
+        .fromUrl(API_ENDPOINT + "/factory/" + FACTORY_ID);
     when(requestToGetSegmentWriteKey.request()).thenReturn(segmentWriteKeyResponse);
     when(requestToGetWoopraDomain.request()).thenReturn(woopraDomainResponse);
     when(requestToGetWorkspaceName.request()).thenReturn(workspaceNameResponse);
@@ -118,9 +122,9 @@ public class AnalyticsManagerTest {
     when(factoryDetailResponse.asDto(FactoryDto.class)).thenReturn(factoryDto);
     when(workspaceDto.getConfig()).thenReturn(workspaceConfigDto);
     when(workspaceDto.getAttributes()).thenReturn(workspaceAttributes);
-    when(workspaceAttributes.get(Constants.CREATED_ATTRIBUTE_NAME)).thenReturn(CREATED_ON);
-    when(workspaceAttributes.get(Constants.UPDATED_ATTRIBUTE_NAME)).thenReturn(UPDATED_ON);
-    when(workspaceAttributes.get(Constants.STOPPED_ATTRIBUTE_NAME)).thenReturn(STOPPED_ON);
+    doReturn(CREATED_ON).when(workspaceAttributes).get(Constants.CREATED_ATTRIBUTE_NAME);
+    doReturn(UPDATED_ON).when(workspaceAttributes).get(Constants.UPDATED_ATTRIBUTE_NAME);
+    doReturn(STOPPED_ON).when(workspaceAttributes).get(Constants.STOPPED_ATTRIBUTE_NAME);
     when(workspaceConfigDto.getName()).thenReturn(WORKSPACE_NAME);
     when(factoryDto.getName()).thenReturn(FACTORY_NAME);
     when(factoryDto.getCreator()).thenReturn(authorDto);
@@ -310,7 +314,7 @@ public class AnalyticsManagerTest {
 
   @Test
   public void sendStackIdIfThere() throws Exception {
-    when(workspaceAttributes.get("stackId")).thenReturn(STACK_ID);
+    lenient().doReturn(STACK_ID).when(workspaceAttributes).get("stackId");
     manager =
         new AnalyticsManager(
             WORKSPACE_ID,
@@ -343,7 +347,7 @@ public class AnalyticsManagerTest {
 
   @Test
   public void sendFactoryInfosIfThere() throws Exception {
-    when(workspaceAttributes.get("factoryId")).thenReturn(FACTORY_ID);
+    lenient().doReturn(FACTORY_ID).when(workspaceAttributes).get("factoryId");
     manager =
         new AnalyticsManager(
             WORKSPACE_ID,
