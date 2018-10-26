@@ -11,6 +11,7 @@ DOCKER_PATH=${ABSOLUTE_PATH}/../dockerfiles/
 REGISTRY="quay.io"
 NAMESPACE=${NAMESPACE:-"rhchestage"}
 TAG="latest"
+SHORT_HASH=$(git rev-parse --short HEAD)
 
 cat jenkins-env \
     | grep -E '(QUAY)' \
@@ -45,7 +46,9 @@ if [ $? -ne 0 ]; then
 fi
 
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
+docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 docker push ${DOCKER_IMAGE_URL}:${TAG}
+docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 # Build and push functional-tests base image
@@ -61,5 +64,7 @@ if [ $? -ne 0 ]; then
 fi
 
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
+docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 docker push ${DOCKER_IMAGE_URL}:${TAG}
+docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
