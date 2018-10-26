@@ -11,7 +11,6 @@ DOCKER_PATH=${ABSOLUTE_PATH}/../dockerfiles/
 REGISTRY="quay.io"
 NAMESPACE=${NAMESPACE:-"rhchestage"}
 TAG="latest"
-SHORT_HASH=$(git rev-parse --short HEAD)
 
 cat jenkins-env \
     | grep -E '(QUAY)' \
@@ -22,7 +21,8 @@ source /tmp/export-env
 
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 yum update --assumeyes
-yum install --assumeyes docker
+yum install --assumeyes docker git
+SHORT_HASH=$(git rev-parse --short HEAD)
 systemctl start docker
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
