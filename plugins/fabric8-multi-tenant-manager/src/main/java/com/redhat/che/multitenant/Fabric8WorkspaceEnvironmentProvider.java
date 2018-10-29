@@ -119,10 +119,10 @@ public class Fabric8WorkspaceEnvironmentProvider {
     String userId = subject.getUserId();
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
       String osoProxyUrl = multiClusterOpenShiftProxy.getUrlWithIdentityIdQueryParameter(userId);
-      LOG.info("Using Che SA token for '{}'", userId);
+      LOG.debug("Using Che SA token for '{}'", userId);
       config =
           configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken).build();
-      LOG.info("Adding Impersonate Header '{}'", userId);
+      LOG.debug("Adding Impersonate Header '{}'", userId);
       config.getRequestConfig().setImpersonateUsername(userId);
     } else {
       String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
