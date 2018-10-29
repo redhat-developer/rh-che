@@ -14,6 +14,7 @@ package com.redhat.che.functional.tests;
 import com.google.inject.Inject;
 import com.redhat.che.selenium.core.client.RhCheTestWorkspaceServiceClient;
 import com.redhat.che.selenium.core.workspace.RhCheTestWorkspaceImpl;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.che.selenium.core.workspace.InjectTestWorkspace;
 import org.eclipse.che.selenium.pageobject.dashboard.workspaces.Workspaces;
 import org.slf4j.Logger;
@@ -23,18 +24,23 @@ import org.testng.annotations.Test;
 public class WorkspaceTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestTestClass.class);
+  // When creating workspace with che-starter, all others are stopped. Therefore it is better to
+  // start them in test - when both are created.
 
   @InjectTestWorkspace(startAfterCreation = false)
   private RhCheTestWorkspaceImpl workspaceToPass;
 
-  @Inject private RhCheTestWorkspaceImpl firstWorksapce;
+  @InjectTestWorkspace(startAfterCreation = false)
+  private RhCheTestWorkspaceImpl firstWorksapce;
 
   @Inject private RhCheTestWorkspaceServiceClient workspaceServiceClient;
 
   @Test
-  public void testCorrectWayOfStaring() throws Exception {
+  public void testCorrectWayOfStarting() throws Exception {
     String running = Workspaces.Status.RUNNING;
     String stopped = Workspaces.Status.STOPPED;
+
+    firstWorksapce.startWorkspace();
 
     firstWorksapce.checkStatus(running);
     workspaceToPass.checkStatus(stopped);
@@ -48,8 +54,8 @@ public class WorkspaceTest {
   }
 
   @Test
-  public void testWrongWayOfStarting() {
-    LOG.info("Try to start first one without PATCH.");
+  public void testWrongWayOfStarting() throws ExecutionException, InterruptedException {
+    LOG.info("Try to start " + firstWorksapce.getName() + " without PATCH.");
     try {
       workspaceServiceClient.startWithoutPatch(firstWorksapce.getId());
     } catch (Exception e) {

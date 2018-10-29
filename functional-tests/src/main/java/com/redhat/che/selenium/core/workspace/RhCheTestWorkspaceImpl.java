@@ -139,14 +139,23 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
         });
   }
 
-  public boolean checkStatus(String status) {
+  public void checkStatus(String status) throws Exception {
+    WorkspaceStatus actualStatus;
     try {
-      WorkspaceStatus actualStatus = workspaceServiceClient.getStatus(id.toString());
-      return status.equals(actualStatus.toString());
+      actualStatus = workspaceServiceClient.getStatus(id.toString());
     } catch (Exception e) {
       LOG.error("Could not get status of workspace named: " + workspaceName);
       e.printStackTrace();
-      return false;
+      throw e;
+    }
+    if (!status.equals(actualStatus.toString())) {
+      throw new RuntimeException(
+          "The status of worksapce: "
+              + workspaceName
+              + " should be "
+              + status
+              + " but is "
+              + actualStatus);
     }
   }
 }
