@@ -1,4 +1,9 @@
-[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-che-credentials-master)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-build-che-credentials-master/)
+| Last build        | Description           |
+| ------------- |:-------------:|
+| [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-che-credentials-master)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-build-che-credentials-master/) | master build |
+| [![Build Status](https://ci.codenvycorp.com/buildStatus/icon?job=rh-che-ci-master)](https://ci.codenvycorp.com/job/rh-che-ci-master/) | build compatibility with upstream |
+| [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/) | integration tests against latest upstream SNAPSHOT |
+
 
 # Eclipse Che on OpenShift 
 
