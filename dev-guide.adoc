@@ -59,6 +59,9 @@ mvn fmt:format
 Rh-Che `functional-tests` are based on selenium framework with Guice injection.
 These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`
 
+Readme from the repository contains further details, including instructions on how to run tests from the docker image:
+https://github.com/redhat-developer/rh-che/tree/master/functional-tests
+
 === VM options
 [source,bash]
 ----

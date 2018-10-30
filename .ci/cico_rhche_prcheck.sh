@@ -18,7 +18,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^JOB_NAME$ \
         ^ghprbPullId$ \
         ^RH_CHE)"
-        
+
 source ./config
 source .ci/prepare_env_utils.sh
 

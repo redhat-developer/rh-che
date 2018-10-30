@@ -30,7 +30,7 @@ Prerequisities:
 docker run -p 10000:10000 -e "GITHUB_TOKEN_URL=https://auth.openshift.io/api/token?for=https://github.com" -e "OPENSHIFT_TOKEN_URL=https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" -e "CHE_SERVER_URL=https://che.openshift.io" quay.io/openshiftio/almighty-che-starter:latest
 ```
 
-### Run tests via maven:
+### Run tests via maven
 By default, tests will execute against production environment (che.openshift.io).
 ```
 mvn clean verify -Pfunctional-tests \
@@ -55,6 +55,45 @@ mvn clean verify -Pfunctional-tests \
     -Dche.host=che.prod-preview.openshift.io \
     -Dche.offline.to.access.token.exchange.endpoint=https://auth.prod-preview.openshift.io/api/token/refresh
 ```
+
+### Run tests from docker container
+
+By default the docker image is using latest master sources that are embedded inside the docker image along with required dependencies.  
+It is possible to also mount local folder with alternative sources of rh-che/functional-tests  
+
+This method spins up `che-starter` container and runs `chromedriver` inside the dependency image.  
+No additional steps required.  
+
+```
+docker run --name functional-tests-dep --privileged \
+           -v /var/run/docker.sock:/var/run/docker.sock \
+           -e "RHCHE_ACC_USERNAME=<username>" \
+           -e "RHCHE_ACC_PASSWORD=<password>" \
+           -e "RHCHE_ACC_EMAIL=<email>" \
+           -e "RHCHE_ACC_TOKEN=<offline_token>" \
+           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
+```
+
+###### Optional mount for alternate sources
+If the source folder is mounted, the tests automatically run from the alternate sources.  
+This change however means, that the dependencies will not be available in the offline mode.  
+* `-v <local_functional-tests_full_path>:/root/che/`
+  
+###### Optional variables for changing target
+* ```'allowEmpty=true'
+  -e "RHCHE_OFFLINE_ACCESS_EXCHANGE=https://auth.<target>/api/token/refresh"
+  -e "RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com"
+  -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker"
+  -e "RHCHE_HOST_PROTOCOL=<http/https>"
+  -e "RHCHE_HOST_URL=che.openshift.io"
+  ```
+  
+###### Optional variables for screenshots and logs directory
+If the logs folder is mounted, the container will automatically collect logs into the specified folder.  
+* ```'allowEmpty=true'
+  -v <local_screenshofts_directory>:/root/logs # che-starter logs
+  -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots # example path for the locally mounted logs folder"
+  ```
 
 ### Full list of variables
 
