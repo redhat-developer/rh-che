@@ -9,6 +9,8 @@ export USE_CHE_LATEST_SNAPSHOT="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 export OC_VERSION=3.9.33
+CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}')
+echo "********** Running compatibility test with upstream version of che: $CHE_VERSION **********"
 
 eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^DEVSHIFT_TAG_LEN$ \
@@ -31,7 +33,6 @@ export DOCKER_IMAGE_TAG="upstream-check-latest"
 export PROJECT_NAMESPACE=compatibility-check
 
 #change version of used che
-CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}')
 echo ">>> change upstream version to: $CHE_VERSION"
 scl enable rh-maven33 rh-nodejs4 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
 
