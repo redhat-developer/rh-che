@@ -9,11 +9,13 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
+const osio_msg_relogin_or_contact_support = "<br>You may want to <a href='' onclick='return osioProvisioningLogout()'>use a different account</a><br>or <a href='https://chat.openshift.io/developers/channels/town-square'>contact support</a>.";
 const osio_msg_provisioning = "Creating your <strong>OpenShift</strong> account";
 const osio_msg_linking_account = "Linking your <strong>OpenShift</strong> account";
 const osio_msg_setting_up_namespaces = "Setting up your <strong>OpenShift.io</strong> environment";
-const osio_msg_error_no_resources = "Resources required to use <strong>Eclipse Che</strong> could not be granted to the user.<br>You may want to <a href='' onclick='return osioProvisioningLogout()'>use a different account</a><br>or contact support.";
-const osio_msg_error_authentication = "Error during authentication to <strong>Eclipse Che</strong>.<br>You may want to <a href='' onclick='return osioProvisioningLogout()'>use a different account</a><br>or contact support.";
+const osio_msg_error_no_resources = "Resources required to use <strong>Eclipse Che</strong> could not be granted to the user." + osio_msg_relogin_or_contact_support;
+const osio_msg_error_authentication = "Error during authentication to <strong>Eclipse Che</strong>." + osio_msg_relogin_or_contact_support;
+const osio_msg_error_user_verification = "User cannot be verified." + osio_msg_relogin_or_contact_support;
 const osio_msg_started = "<strong>Eclipse Che</strong> is loading";
 
 const telemetry_event_enter_che_dashboard = 'enter che dashboard';
@@ -75,7 +77,7 @@ function initAnalytics(writeKey){
     // for methods in Analytics.js so that you never have to wait
     // for it to load to actually record data. The `method` is
     // stored as the first argument, so we can replay the data.
-    analytics.factory = function(method){120000
+    analytics.factory = function(method){
         return function(){
             var args = Array.prototype.slice.call(arguments);
             args.unshift(method);
@@ -253,12 +255,19 @@ function initAnalytics(writeKey){
         }
     }
 
+    function parseJson(content) {
+        try {
+            return JSON.parse(content);
+        } catch (error) {
+        }
+    }
+    
     function performAccounkLinking(keycloak) {
         return get(osioApiURL + "/users?filter%5Busername%5D=" + encodeURIComponent(keycloak.tokenParsed.preferred_username), keycloak.token)
         .then((request) => {
-                data = JSON.parse(request.responseText).data;
-                if (data && data[0] && data[0].attributes && data[0].attributes.cluster) {
-                    return data[0].attributes.cluster;
+                var json = parseJson(request.responseText);
+                if (json && json.data && json.data[0] && json.data[0].attributes && json.data[0].attributes.cluster) {
+                    return json.data[0].attributes.cluster;
                 } else {
                     sessionStorage.removeItem('osio-provisioning-notification-message');
                     var message = "Cannot find cluster for user: " + keycloak.tokenParsed.preferred_username;
@@ -277,7 +286,7 @@ function initAnalytics(writeKey){
                 sessionStorage.removeItem('osio-provisioning-notification-message');
                 return request;
             },(request) => {
-                json = JSON.parse(request.responseText);
+                var json = parseJson(request.responseText);
                 if (request.status == 401 &&
                         json &&
                         json.errors &&
@@ -290,7 +299,7 @@ function initAnalytics(writeKey){
                         var json = JSON.parse(request.responseText);
                         if (json && json.redirect_location) {
                             track(telemetry_event_trigger_account_linking, { 'redirect location': json.redirect_location });
-                            sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_linking_account);
+                            sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_linking_account); // lgtm [js/clear-text-storage-of-sensitive-data]
                             window.location.replace(json.redirect_location);
                             return new Promise((resolve, reject) => {});
                         } else {
@@ -401,7 +410,7 @@ function initAnalytics(writeKey){
         try {
             var data = JSON.parse(error_description);
             if (data && (data.status == 403 || data.status == 401)) {
-                json = JSON.parse(data.response);
+                var json = JSON.parse(data.response);
                 if (json &&
                         json.errors &&
                         json.errors[0]) {
@@ -420,7 +429,7 @@ function initAnalytics(writeKey){
                             return "unknown";
                         }
                     }
-                } 
+                }
             }
         } catch(error) {
             log(error);
@@ -441,6 +450,9 @@ function initAnalytics(writeKey){
     addReadonlyProp(window.osioCheLoginFlow, "post", post);
     addReadonlyProp(window.osioCheLoginFlow, "track", track);
     addReadonlyProp(window.osioCheLoginFlow, "log", log);
+    addReadonlyProp(window.osioCheLoginFlow, "osio_msg_error_user_verification", osio_msg_error_user_verification);
+    addReadonlyProp(window.osioCheLoginFlow, "telemetry_event_enter_provisioning_page_for_che", telemetry_event_enter_provisioning_page_for_che);
+    addReadonlyProp(window.osioCheLoginFlow, "osio_msg_provisioning", osio_msg_provisioning);
     
     var scripts = document.getElementsByTagName("script");
     var originalKeycloakScript;
@@ -459,15 +471,15 @@ function initAnalytics(writeKey){
         throw "Cannot find current script named 'RhCheKeycloak.js'";
     }
 
-    request = new XMLHttpRequest();
+    var request = new XMLHttpRequest();
     request.open('GET', originalKeycloakScript, false);
     request.send();
 
-    source = request.responseText;
+    var source = request.responseText;
     eval(source);
     var originalKeycloak = window.Keycloak;
     window.Keycloak = function(config) {
-        kc = originalKeycloak(config);
+        var kc = originalKeycloak(config);
         if (config && !config.oidcProvider) {
             return kc;
         }
@@ -505,7 +517,7 @@ function initAnalytics(writeKey){
                 pageLoaderDiv.appendChild(statusDiv);
                 setStatusMessage = function(message) {
                     var messageToWrite;
-                    lastOSIONotificationMessage = sessionStorage.getItem('osio-provisioning-notification-message');
+                    var lastOSIONotificationMessage = sessionStorage.getItem('osio-provisioning-notification-message');
                     if (lastOSIONotificationMessage) {
                         messageToWrite = lastOSIONotificationMessage;
                     } else {
@@ -572,7 +584,6 @@ function initAnalytics(writeKey){
                     });
                 }).error((data) => {
                     sessionStorage.removeItem('osio-provisioning-timeout-failure');
-                    var keycloak = kc;
                     if (data && data.error_description) {
                         osioUserToApprove = userNeedsApproval(data.error_description);
                     }
@@ -593,7 +604,7 @@ function initAnalytics(writeKey){
                             log('Timeout while waiting for OSIO provisioning after opening the `manage.openshift.com` page for user: ' + osioUserToApprove);
                             sessionStorage.setItem('osio-provisioning-timeout-failure', 'true');
                             sessionStorage.removeItem('osio-provisioning');
-                            sessionStorage.removeItem('osio-provisioning-notification-message')
+                            sessionStorage.removeItem('osio-provisioning-notification-message');
                             setStatusMessage(osio_msg_error_no_resources);
                             finalPromise.setError({ error: 'invalid_request', error_description: 'Timeout while waiting for OSIO provisioning' });
                         } else {
@@ -619,7 +630,7 @@ function initAnalytics(writeKey){
                                         if (osioUserToApprove == 'unknown') {
                                             htmlContent = htmlContent.replace('<span id="osio-user-placeholder">', '<span id="osio-user-placeholder" style="display: none;">');
                                         }
-                                        var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document
+                                        var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document;
                                         osioProvisioningFrameDocument.open();
                                         osioProvisioningFrameDocument.write(htmlContent);
                                         osioProvisioningFrameDocument.close();
@@ -652,9 +663,9 @@ function initAnalytics(writeKey){
                         if (data && data.error_description) {
                             errorMessage = data.error_description;
                             try {
-                                var data = JSON.parse(error_description);
+                                var data = JSON.parse(errorMessage);
                                 if (data && (data.status == 401)) {
-                                    json = JSON.parse(data.response);
+                                    var json = JSON.parse(data.response);
                                     if (json &&
                                         json.errors &&
                                         json.errors[0]) {
@@ -687,7 +698,7 @@ function initAnalytics(writeKey){
                 sessionStorage.removeItem('osio-provisioning-notification-message');
                 setStatusMessage(osio_msg_error_no_resources);
                 finalPromise.setError({ error: 'invalid_request', error_description: 'Che server API is unreachable at URL: ' + segmentWriteKeyUrl });
-            })
+            });
             return finalPromise.promise;
         }
         return kc;

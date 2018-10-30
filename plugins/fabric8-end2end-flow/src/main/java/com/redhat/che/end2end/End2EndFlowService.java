@@ -13,6 +13,7 @@ package com.redhat.che.end2end;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
@@ -22,8 +23,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -58,13 +61,16 @@ public class End2EndFlowService extends Service {
 
   private final String reCaptchaSiteKey;
   private final String reCaptchaSecretKey;
+  private final boolean verifyWithIp;
 
   private final Map<String, Function<String, String>> staticFilesFilters;
 
   @Inject
   public End2EndFlowService(
       @Nullable @Named("che.fabric8.end2end.protect.site_key") String siteKey,
-      @Nullable @Named("che.fabric8.end2end.protect.secret_key") String secretKey) {
+      @Nullable @Named("che.fabric8.end2end.protect.secret_key") String secretKey,
+      @Named("che.fabric8.end2end.protect.verify_with_ip") boolean verifyWithIp) {
+    this.verifyWithIp = verifyWithIp;
     this.reCaptchaSiteKey = siteKey;
     this.reCaptchaSecretKey = secretKey;
     this.staticFilesFilters = new HashMap<>();
@@ -89,7 +95,7 @@ public class End2EndFlowService extends Service {
   @Path("verify")
   @Consumes("text/plain")
   @Produces(APPLICATION_JSON)
-  public Response verifyReCaptchaToken(String token) {
+  public Response verifyReCaptchaToken(String token, @Context HttpServletRequest servletRequest) {
     int responseCode = 500;
     try {
       URL obj = new URL("https://www.google.com/recaptcha/api/siteverify");
@@ -97,7 +103,32 @@ public class End2EndFlowService extends Service {
 
       con.setRequestMethod("POST");
 
-      String urlParameters = "secret=" + reCaptchaSecretKey + "&response=" + token;
+      String ip = retrieveClientIp(servletRequest);
+
+      String remoteIpPart = "";
+
+      if (ip != null) {
+        LOG.info("Starting reCaptcha verification for user from IP: {}", ip);
+        if (verifyWithIp) {
+          try {
+            InetAddress address = InetAddress.getByName(ip);
+            if (!address.isSiteLocalAddress()) {
+              LOG.info("Including client IP in the reCaptcha verification");
+              remoteIpPart = "&remoteip=" + address.getHostAddress();
+            } else {
+              LOG.warn(
+                  "Client IP cannot be used in the reCaptcha verification since it is a private IP: {}",
+                  ip);
+            }
+          } catch (UnknownHostException e) {
+            LOG.warn(
+                "Client IP cannot be used in the reCaptcha verification since it's invalid: {}",
+                ip);
+          }
+        }
+      }
+
+      String urlParameters = "secret=" + reCaptchaSecretKey + "&response=" + token + remoteIpPart;
 
       con.setDoOutput(true);
       try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
@@ -120,6 +151,40 @@ public class End2EndFlowService extends Service {
     }
 
     return Response.status(responseCode).build();
+  }
+
+  @VisibleForTesting
+  String retrieveClientIp(HttpServletRequest servletRequest) {
+    String ip = null;
+    String xForwardedFor = servletRequest.getHeader("X-Forwarded-For");
+    String forwarded = servletRequest.getHeader("Forwarded");
+    if (xForwardedFor != null) {
+      LOG.info(
+          "Looking for reCaptcha verification user IP into the request `X-Forwarded-For` header");
+      int index = xForwardedFor.indexOf(',');
+      if (index > 0) {
+        xForwardedFor = xForwardedFor.substring(0, index).trim();
+      }
+      ip = xForwardedFor;
+    } else if (forwarded != null) {
+      LOG.info("Looking for reCaptcha verification user IP into the request `Forwarded` header");
+      int index = forwarded.indexOf(',');
+      if (index > 0) {
+        forwarded = forwarded.substring(0, index).trim();
+      }
+      for (String part : forwarded.split(";")) {
+        part = part.trim();
+        if (part.startsWith("for=")) {
+          ip = part.substring(4);
+          break;
+        }
+      }
+    }
+    if (ip == null) {
+      LOG.info("Looking for reCaptcha verification user IP into the request remote address");
+      ip = servletRequest.getRemoteAddr();
+    }
+    return ip;
   }
 
   private String getLog(String message, HttpServletRequest servletRequest) {

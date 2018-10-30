@@ -344,6 +344,11 @@ objects:
                 name: rhche
           - name: SENTRY_RELEASE
             value: ${IMAGE_TAG}
+          - name: CHE_FABRIC8_END2END_PROTECT_VERIFY__WITH__IP
+            valueFrom:
+              configMapKeyRef:
+                key: end2end-protect-verify-with-ip
+                name: rhche
           - name: CHE_FABRIC8_END2END_PROTECT_SECRET__KEY
             valueFrom:
               secretKeyRef:

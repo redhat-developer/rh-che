@@ -64,14 +64,14 @@
   src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/hideShowPassword.js?v=3.4.11"
   type="text/javascript"></script>
 <script>
-const siteKey;
+const siteKey; // lgtm [js/syntax-error]
 var activationCaptcha;
 
 function provision_osio() {
 }
 function verification_error(errorMessage, warning) {
     parent.osioCheLoginFlow.log(errorMessage, warning);
-    parent.sessionStorage.setItem('osio-provisioning-failure', "User cannot be verified. Please contact support.");
+    parent.sessionStorage.setItem('osio-provisioning-failure', parent.osioCheLoginFlow.osio_msg_error_user_verification);
     parent.location.reload();
 }
 
@@ -84,8 +84,8 @@ function onCaptchaLoad() {
                 parent.sessionStorage.setItem('osio-provisioning-failure', "User provisioning should happen in a separate window.<br/> \
                 Please enable popups, before retrying.");
             } else {
-                parent.osioCheLoginFlow.track(parent.telemetry_event_enter_provisioning_page_for_che, { user: parent.osioUserToApprove });
-                parent.sessionStorage.setItem('osio-provisioning-notification-message', parent.osio_msg_provisioning);
+                parent.osioCheLoginFlow.track(parent.osioCheLoginFlow.telemetry_event_enter_provisioning_page_for_che, { user: osioUserName() });
+                parent.sessionStorage.setItem('osio-provisioning-notification-message', parent.osioCheLoginFlow.osio_msg_provisioning);
                 parent.sessionStorage.setItem('osio-provisioning', new Date().getTime());
             }
             parent.blur();
@@ -100,6 +100,7 @@ function onCaptchaLoad() {
             provision_osio = provision_osio_impl;
         }
         function checkUserImpl(token) {
+            checkUser = function() {};
             parent.osioCheLoginFlow.post("/api/fabric8-end2end/verify", token)
             .then((request) => {
                 var data = JSON.parse(request.responseText);
@@ -108,12 +109,12 @@ function onCaptchaLoad() {
                 } else {
                     if (data) {
                         if (data['error-codes']) {
-                            verification_error("Verification of user '" + userName + "' failed with errors: " + data['error-codes']);
+                            verification_error("Verification of user '" + osioUserName() + "' failed with errors: " + data['error-codes']);
                         } else {
-                            verification_error("Verification of user '" + userName + "' failed", true);
+                            verification_error("Verification of user '" + osioUserName() + "' failed", true);
                         }
                     } else {
-                        verification_error("Verification of user '" + userName + "' failed due to unexpected response: " + request.responseText);
+                        verification_error("Verification of user '" + osioUserName() + "' failed due to unexpected response: " + request.responseText);
                     }
                 }
             },(error) => {
@@ -123,7 +124,7 @@ function onCaptchaLoad() {
                 } else {
                     errorDescription = error;
                 }
-                var message = "Verification of user '" + userName + "' could not be submitted to the verification server: " + errorDescription;
+                var message = "Verification of user '" + osioUserName() + "' could not be submitted to the verification server: " + errorDescription;
                 verification_error(message);
             });
         }
@@ -155,12 +156,11 @@ function osioUserName() {
 }
 function checkUser(token) {
 }
-function captchaExpired() {
-    grecaptcha.reset(activationCaptcha);
-    grecaptcha.execute(activationCaptcha);
+function captchaExpired(error) {
+    verification_error("ReCaptcha expired for user '" + osioUserName() + "': " + error, true);
 }
 function captchaFailed(error) {
-    verification_error("ReCaptcha error for user '" + osioUserName() + "': " + error, true);
+    verification_error("ReCaptcha error for user '" + osioUserName() + "': " + error, false);
 }
 
 </script>
