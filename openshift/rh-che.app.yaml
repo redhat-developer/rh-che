@@ -69,6 +69,11 @@ objects:
       spec:
         containers:
         - env:
+          - name: CHE_SYSTEM_ADMIN__NAME
+            valueFrom:
+              configMapKeyRef:
+                key: che-system-admin-name
+                name: rhche
           - name: CHE_API
             valueFrom:
               configMapKeyRef:
