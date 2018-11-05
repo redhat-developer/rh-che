@@ -5,6 +5,8 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+set -e
+
 export USE_CHE_LATEST_SNAPSHOT="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
@@ -34,7 +36,7 @@ export PROJECT_NAMESPACE=compatibility-check
 
 #change version of used che
 echo ">>> change upstream version to: $CHE_VERSION"
-scl enable rh-maven33 rh-nodejs4 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
+scl enable rh-maven33 rh-nodejs8 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
 
 echo "Running compatibility check with build, deploy to dev cluster and test."
 .ci/cico_build_deploy_test_rhche.sh
