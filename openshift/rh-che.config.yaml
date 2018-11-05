@@ -32,6 +32,7 @@ data:
   che-openshift-precreate-subpaths: "false"
   che-openshift-secure-routes: "true"
   che.predefined.stacks.reload_on_start: "true"
+  che-system-admin-name: "admin"
   che-secure-external-urls: "true"
   che-server-java-opts: "-XX:MaxRAMFraction=2 -XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8"
   che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
