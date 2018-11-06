@@ -11,14 +11,16 @@ metadata:
   name: rhche
 type: Opaque
 data:
-  analytics.segment_write_key: 'NULL' 
+  analytics.segment_write_key: 'NULL'
   analytics.woopra_domain: 'NULL'
+  end2end-protect-verify-with-ip: "false"
   che-api: "https://che.prod-preview.openshift.io/api"
   che-fabric8-auth-endpoint: "https://auth.prod-preview.openshift.io"
   che-fabric8-multicluster-oso-proxy-url: "https://osoproxy.prod-preview.openshift.io"
   che-fabric8-multitenant: "true"
   che-fabric8-user-service-endpoint: "https://api.prod-preview.openshift.io/api/user/services"
   che-host: "che.prod-preview.openshift.io"
+  che-jsonrpc-max-pool-size: "2000"
   che-keycloak-auth-server-url: "NULL"
   che-keycloak-client-id: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"
   che-keycloak-js-adapter-url: "/api/fabric8-end2end/files/RhCheKeycloak.js"
@@ -32,9 +34,9 @@ data:
   che-openshift-precreate-subpaths: "false"
   che-openshift-secure-routes: "true"
   che.predefined.stacks.reload_on_start: "true"
-  che-system-admin-name: "admin"
   che-secure-external-urls: "true"
   che-server-java-opts: "-XX:MaxRAMFraction=2 -XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8"
+  che-system-admin-name: "admin"
   che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
   che.workspace.agent.dev.inactive_stop_timeout_ms: "900000"
   che-workspace-logs: "/workspace_logs"
@@ -59,5 +61,4 @@ data:
   workspaces-memory-limit-max: "3gb"
   workspaces-pvc-storage-size: '1Gi'
   workspace-storage: "/home/user/che/workspaces"
-  end2end-protect-verify-with-ip: "false"
-  
+

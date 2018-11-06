@@ -12,6 +12,7 @@ metadata:
 type: Opaque
 data:
   che-fabric8-multitenant: "true"
+  che-jsonrpc-max-pool-size: "2000"
   che-keycloak-client-id: "che-public"
   che-keycloak-oidc-provider: "NULL"
   che-keycloak-realm: "che"

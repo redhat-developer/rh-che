@@ -77,6 +77,11 @@ objects:
         - env:
           - name: CHE_API
             value: "${PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/api"
+          - name: CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: che-jsonrpc-max-pool-size
+                name: rhche
           - name: CHE_DEBUG_SERVER
             valueFrom:
               configMapKeyRef:
@@ -229,7 +234,6 @@ objects:
               configMapKeyRef:
                 key: workspace-storage
                 name: rhche
-
           - name: JAVA_OPTS
             valueFrom:
               configMapKeyRef:
@@ -247,6 +251,16 @@ objects:
             value: "${PROTOCOL}"
           - name: ROUTING_SUFFIX
             value: "${ROUTING_SUFFIX}"
+          - name: CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME
+            value: "che-workspace"
+          - name: CHE_WORKSPACE_SIDECAR_DEFAULT__MEMORY__LIMIT__MB
+            value: "150"
+          - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT
+            value: "150mb"
+          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA__REMOTE_IMAGE
+            value: "wsskeleton/che-plugin-broker:theia-broker"
+          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA_IMAGE
+            value: "wsskeleton/che-plugin-broker:theia-broker-2"
           image: ${IMAGE_RH_CHE}:${RH_CHE_VERSION}
           imagePullPolicy: "${PULL_POLICY}"
           livenessProbe:

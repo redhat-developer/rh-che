@@ -69,15 +69,15 @@ objects:
       spec:
         containers:
         - env:
-          - name: CHE_SYSTEM_ADMIN__NAME
-            valueFrom:
-              configMapKeyRef:
-                key: che-system-admin-name
-                name: rhche
           - name: CHE_API
             valueFrom:
               configMapKeyRef:
                 key: che-api
+                name: rhche
+          - name: CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: che-jsonrpc-max-pool-size
                 name: rhche
           - name: CHE_DEBUG_SERVER
             valueFrom:
@@ -99,6 +99,23 @@ objects:
               configMapKeyRef:
                 key: che-fabric8-auth-endpoint
                 name: rhche
+          - name: CHE_FABRIC8_END2END_PROTECT_VERIFY__WITH__IP
+            valueFrom:
+              configMapKeyRef:
+                key: end2end-protect-verify-with-ip
+                name: rhche
+          - name: CHE_FABRIC8_END2END_PROTECT_SECRET__KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret-key
+                name: rhche-end2end-protection
+                optional: true
+          - name: CHE_FABRIC8_END2END_PROTECT_SITE__KEY
+            valueFrom:
+              secretKeyRef:
+                key: site-key
+                name: rhche-end2end-protection
+                optional: true
           - name: CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL
             valueFrom:
               configMapKeyRef:
@@ -160,8 +177,6 @@ objects:
                 name: rhche
           - name: CHE_INFRASTRUCTURE_ACTIVE
             value: "openshift"
-          - name: CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE
-            value: "2000"
           - name: CHE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -177,16 +192,6 @@ objects:
               secretKeyRef:
                   key: che.jdbc.username
                   name: rhche
-          - name: CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME
-            value: "che-workspace"
-          - name: CHE_WORKSPACE_SIDECAR_DEFAULT__MEMORY__LIMIT__MB
-            value: "150"
-          - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT
-            value: "150mb"
-          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA__REMOTE_IMAGE
-            value: "wsskeleton/che-plugin-broker:theia-broker"
-          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA_IMAGE
-            value: "wsskeleton/che-plugin-broker:theia-broker-2"
           - name: CHE_KEYCLOAK_AUTH__SERVER__URL
             valueFrom:
               configMapKeyRef:
@@ -272,15 +277,20 @@ objects:
               secretKeyRef:
                   key: service.account.secret
                   name: rhche
-          - name: CHE_WORKSPACE_PLUGIN__REGISTRY__URL
-            valueFrom:
-              configMapKeyRef:
-                key: plugin-registry-url
-                name: rhche
           - name: CHE_PORT
             valueFrom:
               configMapKeyRef:
                 key: port
+                name: rhche
+          - name: CHE_SYSTEM_ADMIN__NAME
+            valueFrom:
+              configMapKeyRef:
+                key: che-system-admin-name
+                name: rhche
+          - name: CHE_WORKSPACE_PLUGIN__REGISTRY__URL
+            valueFrom:
+              configMapKeyRef:
+                key: plugin-registry-url
                 name: rhche
           - name: CHE_PREDEFINED_STACKS_RELOAD__ON__START
             valueFrom:
@@ -349,23 +359,16 @@ objects:
                 name: rhche
           - name: SENTRY_RELEASE
             value: ${IMAGE_TAG}
-          - name: CHE_FABRIC8_END2END_PROTECT_VERIFY__WITH__IP
-            valueFrom:
-              configMapKeyRef:
-                key: end2end-protect-verify-with-ip
-                name: rhche
-          - name: CHE_FABRIC8_END2END_PROTECT_SECRET__KEY
-            valueFrom:
-              secretKeyRef:
-                key: secret-key
-                name: rhche-end2end-protection
-                optional: true
-          - name: CHE_FABRIC8_END2END_PROTECT_SITE__KEY
-            valueFrom:
-              secretKeyRef:
-                key: site-key
-                name: rhche-end2end-protection
-                optional: true
+          - name: CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME
+            value: "che-workspace"
+          - name: CHE_WORKSPACE_SIDECAR_DEFAULT__MEMORY__LIMIT__MB
+            value: "150"
+          - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT
+            value: "150mb"
+          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA__REMOTE_IMAGE
+            value: "wsskeleton/che-plugin-broker:theia-broker"
+          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA_IMAGE
+            value: "wsskeleton/che-plugin-broker:theia-broker-2"
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:
