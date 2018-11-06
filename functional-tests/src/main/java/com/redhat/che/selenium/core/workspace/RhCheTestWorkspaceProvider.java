@@ -17,7 +17,6 @@ import com.redhat.che.selenium.core.client.RhCheTestWorkspaceServiceClient;
 import org.eclipse.che.selenium.core.user.TestUser;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspaceProvider;
-import org.eclipse.che.selenium.core.workspace.WorkspaceTemplate;
 
 @Singleton
 public class RhCheTestWorkspaceProvider implements TestWorkspaceProvider {
@@ -31,7 +30,7 @@ public class RhCheTestWorkspaceProvider implements TestWorkspaceProvider {
 
   @Override
   public TestWorkspace createWorkspace(
-      TestUser owner, int memoryGB, WorkspaceTemplate template, boolean startAfterCreation) {
+      TestUser owner, int memoryGB, String template, boolean startAfterCreation) {
     return new RhCheTestWorkspaceImpl(owner, rhcheWorksapceClient, startAfterCreation);
   }
 
