@@ -37,6 +37,7 @@ data:
   che-secure-external-urls: "true"
   che-server-java-opts: "-XX:MaxRAMFraction=2 -XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8"
   che-system-admin-name: "admin"
+  che-system-super-privileged-mode: "true"
   che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
   che.workspace.agent.dev.inactive_stop_timeout_ms: "900000"
   che-workspace-logs: "/workspace_logs"

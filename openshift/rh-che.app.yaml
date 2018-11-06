@@ -287,6 +287,11 @@ objects:
               configMapKeyRef:
                 key: che-system-admin-name
                 name: rhche
+          - name: CHE_SYSTEM_SUPER_PRIVILEGED_MODE
+            valueFrom:
+              configMapKeyRef:
+                key: che-system-super-privileged-mode
+                name: rhche
           - name: CHE_WORKSPACE_PLUGIN__REGISTRY__URL
             valueFrom:
               configMapKeyRef:
