@@ -528,6 +528,13 @@ function initAnalytics(writeKey){
                 }
             } else {
                 setStatusMessage = function(message) {}
+                var promise = originalInit(initOptions);
+                promise.success((arg) => {
+                    finalPromise.setSuccess(arg);
+                }).error((data) => {
+                    finalPromise.setError(data);
+                });
+                return finalPromise.promise;
             }
 
             setStatusMessage("");
