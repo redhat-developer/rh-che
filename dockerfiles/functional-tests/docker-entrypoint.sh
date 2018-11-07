@@ -9,14 +9,15 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -e \"RHCHE_ACC_EMAIL=<email>\" \\"
   echo -e "\t       -e \"RHCHE_ACC_TOKEN=<offline_token>\""
   echo "Optional parameters:"
-  echo -e "\t       -v <local_logs_directory>:/home/fabric8/logs # Allows logs and screenshots to be collected"
-  echo -e "\t       -v <local_functional-tests_full_path>:/home/fabric8/che/ # Allows mounting custom rh-che/functional-tests sources"
+  echo -e "\t       -v <local_logs_directory>:/root/logs # Allows logs and screenshots to be collected"
+  echo -e "\t       -v <local_functional-tests_full_path>:/root/che/ # Allows mounting custom rh-che/functional-tests sources"
   echo -e "\t       # Run tests against custom deployment:"
   echo -e "\t       -e \"RHCHE_HOST_PROTOCOL=<http/https>\" # Protocol to be used, either http or https"
   echo -e "\t       -e \"RHCHE_HOST_URL=che.openshift.io\" # Which host to run tests against. Just use host name"
   echo -e "\t       -e \"RHCHE_OFFLINE_ACCESS_EXCHANGE=https://auth.<target>/api/token/refresh\" # Exchange url for refresh token"
   echo -e "\t       -e \"RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com\" # Github API token exchange"
   echo -e "\t       -e \"RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker\" # Openshift token exchange url"
+  echo -e "\t       -e \"TEST_SUITE=<xml> # Name of xml file with testing suite"
   exit 0
 fi
 
@@ -36,6 +37,7 @@ export RHCHE_HOST_URL=${RHCHE_HOST_URL:-"che.openshift.io"}
 export RHCHE_HOST_PROTOCOL=${RHCHE_HOST_PROTOCOL:-"https"}
 export RHCHE_HOST_FULL_URL="${RHCHE_HOST_PROTOCOL}://${RHCHE_HOST_URL}/"
 export RHCHE_EXCLUDED_GROUPS=${RHCHE_EXCLUDED_GROUPS:-"github"}
+export TEST_SUITE=${TEST_SUITE:-"simpleTestSuite.xml"}
 
 export SELF_CONTAINER_ID=$(cat /etc/hostname)
 
@@ -70,6 +72,7 @@ scl enable rh-maven33 rh-nodejs8 "mvn clean --projects functional-tests -Pfuncti
   -DexcludedGroups=${RHCHE_EXCLUDED_GROUPS} \
   -DcheStarterUrl=http://che-starter.localnetwork:10000 \
   -Dtests.screenshots_dir=${RHCHE_SCREENSHOTS_DIR} \
+  -Dtest.suite=${TEST_SUITE} \
   test install"
 
 if [ -d "/root/logs/" ]; then

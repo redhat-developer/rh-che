@@ -95,6 +95,12 @@ If the logs folder is mounted, the container will automatically collect logs int
   -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots # example path for the locally mounted logs folder"
   ```
 
+###### Optional variable for test suite
+The test suite can be changed by setting the name. The suite must be place in ```${project.basedir}/src/test/resources/suites/```.
+* ```'allowEmpty=true'
+  -e "TEST_SUITE=simpleTestSuite.xml"
+  ```
+  
 ### Full list of variables
 
 These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`.
