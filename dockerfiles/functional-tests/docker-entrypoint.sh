@@ -85,4 +85,3 @@ fi
 echo "Stopping che-starter"
 docker container kill che-starter
 docker container rm che-starter
-docker network rm localnetwork
