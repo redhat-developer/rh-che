@@ -43,6 +43,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -217,6 +218,9 @@ public class End2EndFlowService extends Service {
   @GET
   @Path("{path: files\\/.*}")
   public Response staticResources(@PathParam("path") final String path) {
+    if (path.contains("../")) {
+      return Response.noContent().build();
+    }
     URL resource = Thread.currentThread().getContextClassLoader().getResource("end2end/" + path);
     MediaType mediaType;
     if (path.endsWith(".js")) {
@@ -270,7 +274,9 @@ public class End2EndFlowService extends Service {
             }
           };
 
-      return Response.ok(stream, mediaType).build();
+      CacheControl cacheControl = new CacheControl();
+      cacheControl.getCacheExtension().put("max-age", "120");
+      return Response.ok(stream, mediaType).cacheControl(cacheControl).build();
     }
 
     return Response.status(Status.NOT_FOUND).build();
