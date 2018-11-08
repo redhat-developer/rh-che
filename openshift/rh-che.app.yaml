@@ -287,7 +287,7 @@ objects:
               configMapKeyRef:
                 key: che-system-admin-name
                 name: rhche
-          - name: CHE_SYSTEM_SUPER_PRIVILEGED_MODE
+          - name: CHE_SYSTEM_SUPER__PRIVILEGED__MODE
             valueFrom:
               configMapKeyRef:
                 key: che-system-super-privileged-mode
