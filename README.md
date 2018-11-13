@@ -37,6 +37,6 @@ DEP IMAGE: [![Build Status](https://ci.centos.org/view/Devtools/job/devtools-rh-
 
 [![PR-Check sequence diagram](https://raw.githubusercontent.com/redhat-developer/rh-che/master/documentation/rh-che-prcheck/pr_check_general_squence_diagram.svg)](https://raw.githubusercontent.com/redhat-developer/rh-che/master/documentation/rh-che-prcheck/pr_check_general_squence_diagram.plantuml)
 
-- This diagram shows the general logic of PR-Check workflow from opening a PR to merge.
+- This diagram shows the general logic of PR-Check workflow from opening a PR to merge
 - PR_Check job : https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/buildTimeTrend
 - Dependency image build job: https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-build-dep/buildTimeTrend
