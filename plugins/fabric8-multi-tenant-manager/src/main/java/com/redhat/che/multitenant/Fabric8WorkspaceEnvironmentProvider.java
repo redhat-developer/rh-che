@@ -118,11 +118,11 @@ public class Fabric8WorkspaceEnvironmentProvider {
 
     String userId = subject.getUserId();
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
-      String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
+      String osoProxyUrl = multiClusterOpenShiftProxy.getUrlWithIdentityIdQueryParameter(userId);
       LOG.debug("Using Che SA token for '{}'", userId);
       config =
           configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken).build();
-      LOG.info("Adding Impersonate Header '{}'", userId);
+      LOG.debug("Adding Impersonate Header '{}'", userId);
       config.getRequestConfig().setImpersonateUsername(userId);
       // hot-fix to avoid NPE in ImpersonatorInterceptor when optional `Impersonate-Group` is not
       // set - https://github.com/fabric8io/kubernetes-client/issues/1266
