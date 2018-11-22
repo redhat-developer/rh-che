@@ -118,7 +118,7 @@ public class Fabric8WorkspaceEnvironmentProvider {
 
     String userId = subject.getUserId();
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
-      String osoProxyUrl = multiClusterOpenShiftProxy.getUrlWithIdentityIdQueryParameter(userId);
+      String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
       LOG.debug("Using Che SA token for '{}'", userId);
       config =
           configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken).build();
