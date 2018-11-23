@@ -30,6 +30,7 @@ Red Hat modifications against the upstream Che include:
 ![Interaction of Red Hat Che with other openshift.io services](https://user-images.githubusercontent.com/1461122/48473793-8213aa80-e7f9-11e8-8bc1-75549c771438.png)
 
 1. Opening `Codebases UI` in browser
+2. `fabric8-ui` sends request to `fabric8-wit`
 
 ## How to build it
 
