@@ -7,15 +7,13 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -e \"RHCHE_ACC_USERNAME=<username>\" \\"
   echo -e "\t       -e \"RHCHE_ACC_PASSWORD=<password>\" \\"
   echo -e "\t       -e \"RHCHE_ACC_EMAIL=<email>\" \\"
-  echo -e "\t       -e \"RHCHE_ACC_TOKEN=<offline_token>\""
   echo "Optional parameters:"
   echo -e "\t       -v <local_logs_directory>:/root/logs # Allows logs and screenshots to be collected"
   echo -e "\t       -v <local_functional-tests_full_path>:/root/che/ # Allows mounting custom rh-che/functional-tests sources"
   echo -e "\t       # Run tests against custom deployment:"
   echo -e "\t       -e \"RHCHE_HOST_PROTOCOL=<http/https>\" # Protocol to be used, either http or https"
   echo -e "\t       -e \"RHCHE_HOST_URL=che.openshift.io\" # Which host to run tests against. Just use host name"
-  echo -e "\t       -e \"RHCHE_OFFLINE_ACCESS_EXCHANGE=https://auth.<target>/api/token/refresh\" # Exchange url for refresh token"
-  echo -e "\t       -e \"RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com\" # Github API token exchange"
+  echo -e "\t       -e \"CHE_OSIO_AUTH_ENDPOINT=<endpoint>\" # endpoint for auth e.g. https://auth.prod-preview.openshift.io "
   echo -e "\t       -e \"RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker\" # Openshift token exchange url"
   echo -e "\t       -e \"TEST_SUITE=<xml> # Name of xml file with testing suite"
   exit 0
@@ -30,8 +28,9 @@ echo "Preparing environment"
 export CHE_INFRASTRUCTURE=openshift
 export CHE_MULTIUSER=true
 export RHCHE_SCREENSHOTS_DIR=${RHCHE_SCREENSHOTS_DIR:-"/home/fabric8/rh-che/functional-tests/target/screenshots"}
-export RHCHE_OFFLINE_ACCESS_EXCHANGE=${RHCHE_OFFLINE_ACCESS_EXCHANGE:-"https://auth.openshift.io/api/token/refresh"}
-export RHCHE_GITHUB_EXCHANGE=${RHCHE_GITHUB_EXCHANGE:-"https://auth.openshift.io/api/token?for=https://github.com"}
+export CHE_OSIO_AUTH_ENDPOINT=${CHE_OSIO_AUTH_ENDPOINT:-"https://auth.openshift.io"}
+export RHCHE_OFFLINE_ACCESS_EXCHANGE=${RHCHE_OFFLINE_ACCESS_EXCHANGE:-"${CHE_OSIO_AUTH_ENDPOINT}/api/token/refresh"}
+export RHCHE_GITHUB_EXCHANGE=${RHCHE_GITHUB_EXCHANGE:-"${CHE_OSIO_AUTH_ENDPOINT}/api/token?for=https://github.com"}
 export RHCHE_OPENSHIFT_TOKEN_URL=${RHCHE_OPENSHIFT_TOKEN_URL:-"https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token"}
 export RHCHE_HOST_URL=${RHCHE_HOST_URL:-"che.openshift.io"}
 export RHCHE_HOST_PROTOCOL=${RHCHE_HOST_PROTOCOL:-"https"}
@@ -68,12 +67,14 @@ scl enable rh-maven33 rh-nodejs8 "mvn clean --projects functional-tests -Pfuncti
   -Dche.testuser.offline_token=${RHCHE_ACC_TOKEN} \
   -Dche.testuser.password=${RHCHE_ACC_PASSWORD} \
   -Dche.host=${RHCHE_HOST_URL} \
+  -Dche.osio.auth.endpoint=${CHE_OSIO_AUTH_ENDPOINT} \
   -Dche.offline.to.access.token.exchange.endpoint=${RHCHE_OFFLINE_ACCESS_EXCHANGE} \
   -DexcludedGroups=${RHCHE_EXCLUDED_GROUPS} \
   -DcheStarterUrl=http://che-starter.localnetwork:10000 \
   -Dtests.screenshots_dir=${RHCHE_SCREENSHOTS_DIR} \
   -Dtest.suite=${TEST_SUITE} \
   test install"
+RETURN_CODE=$?
 
 if [ -d "/root/logs/" ]; then
   echo "Logs folder mounted, grabbing logs."
@@ -88,3 +89,5 @@ fi
 echo "Stopping che-starter"
 docker container kill che-starter
 docker container rm che-starter
+
+exit $RETURN_CODE

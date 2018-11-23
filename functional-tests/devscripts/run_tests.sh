@@ -50,18 +50,20 @@ fi
 
 if [[ "$HOST_URL" == "che.openshift.io" ]]; then
 	echo "Running test with user $USERNAME against production environment."
+	CHE_OSIO_AUTH_ENDPOINT="https://auth.openshift.io"
 
 	docker run --name functional-tests-dep --privileged \
 	           -v /var/run/docker.sock:/var/run/docker.sock \
 	           -e "RHCHE_ACC_USERNAME=$USERNAME" \
 	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
 	           -e "RHCHE_ACC_EMAIL=$EMAIL" \
-	           -e "RHCHE_ACC_TOKEN=$OFFLINE_TOKEN" \
+	           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
 	           -e "RHCHE_HOST_URL=$HOST_URL" \
            quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
     RESULT=$?
 else
 	echo "Running test with user $USERNAME against prod-preview environment."
+	CHE_OSIO_AUTH_ENDPOINT="https://auth.prod-preview.openshift.io"
 
 	docker run --name functional-tests-dep --privileged \
 	           -v /var/run/docker.sock:/var/run/docker.sock \
@@ -69,8 +71,7 @@ else
 	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
 	           -e "RHCHE_ACC_EMAIL=$EMAIL" \
 	           -e "RHCHE_ACC_TOKEN=$OFFLINE_TOKEN" \
-	           -e "RHCHE_OFFLINE_ACCESS_EXCHANGE=https://auth.prod-preview.openshift.io/api/token/refresh" \
-	           -e "RHCHE_GITHUB_EXCHANGE=https://auth.prod-preview.openshift.io/api/token?for=https://github.com" \
+	           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
 	           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
 	           -e "RHCHE_HOST_URL=$HOST_URL" \
            quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
