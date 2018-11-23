@@ -25,7 +25,7 @@ echo "Running Xvfb"
 nohup /usr/bin/Xvfb :99 -screen 0 1920x1080x24 +extension RANDR > /dev/null 2>&1 &
 echo "Preparing environment"
 
-export CHE_INFRASTRUCTURE=openshift
+export CHE_INFRASTRUCTURE=OSIO
 export CHE_MULTIUSER=true
 export RHCHE_SCREENSHOTS_DIR=${RHCHE_SCREENSHOTS_DIR:-"/home/fabric8/rh-che/functional-tests/target/screenshots"}
 export CHE_OSIO_AUTH_ENDPOINT=${CHE_OSIO_AUTH_ENDPOINT:-"https://auth.openshift.io"}
