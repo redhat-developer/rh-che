@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_ACC_EMAIL}" || -z "${RHCHE_ACC_TOKEN}" ]]; then
+if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_ACC_EMAIL}" ]]; then
   echo "Test credentials not set."
   echo "Usage:"
   echo -e "\tdocker run --name functional-tests-dep --privileged -v /var/run/docker.sock:/var/run/docker.sock \\"
@@ -16,7 +16,7 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -e \"CHE_OSIO_AUTH_ENDPOINT=<endpoint>\" # endpoint for auth e.g. https://auth.prod-preview.openshift.io "
   echo -e "\t       -e \"RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker\" # Openshift token exchange url"
   echo -e "\t       -e \"TEST_SUITE=<xml> # Name of xml file with testing suite"
-  exit 0
+  exit 1
 fi
 
 echo "Starting chromedriver"
@@ -64,7 +64,6 @@ echo "Running tests"
 scl enable rh-maven33 rh-nodejs8 "mvn clean --projects functional-tests -Pfunctional-tests -B \
   -Dche.testuser.name=${RHCHE_ACC_USERNAME} \
   -Dche.testuser.email=${RHCHE_ACC_EMAIL} \
-  -Dche.testuser.offline_token=${RHCHE_ACC_TOKEN} \
   -Dche.testuser.password=${RHCHE_ACC_PASSWORD} \
   -Dche.host=${RHCHE_HOST_URL} \
   -Dche.osio.auth.endpoint=${CHE_OSIO_AUTH_ENDPOINT} \
