@@ -332,6 +332,11 @@ objects:
               configMapKeyRef:
                 key: che-workspace-logs
                 name: rhche
+          - name: CHE_WORKSPACE_SERVER_PING__INTERVAL__MILLISECONDS
+            valueFrom:
+              configMapKeyRef:
+                key: che-workspace-server-ping-interval-milliseconds
+                name: rhche
           - name: CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD
             valueFrom:
               configMapKeyRef:
