@@ -70,7 +70,6 @@ docker run --name functional-tests-dep --privileged \
            -e "RHCHE_ACC_USERNAME=<username>" \
            -e "RHCHE_ACC_PASSWORD=<password>" \
            -e "RHCHE_ACC_EMAIL=<email>" \
-           -e "RHCHE_ACC_TOKEN=<offline_token>" \
            quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
 ```
 
@@ -81,8 +80,7 @@ This change however means, that the dependencies will not be available in the of
   
 ###### Optional variables for changing target
 * ```'allowEmpty=true'
-  -e "RHCHE_OFFLINE_ACCESS_EXCHANGE=https://auth.<target>/api/token/refresh"
-  -e "RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com"
+  -e "CHE_OSIO_AUTH_ENDPOINT=https://auth.<target>"
   -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker"
   -e "RHCHE_HOST_PROTOCOL=<http/https>"
   -e "RHCHE_HOST_URL=che.openshift.io"
@@ -101,6 +99,25 @@ The test suite can be changed by setting the name. The suite must be place in ``
   -e "TEST_SUITE=simpleTestSuite.xml"
   ```
   
+  
+##### Running E2E test
+There is one test EETest.java for end-to-end purposes. This test runs as a part of e2eTestSuite.xml. You need to set the name of running workspace and pass it as a parameter. 
+Following example shows how to run this test against production environment.
+```
+docker run -it --name functional-tests-dep --privileged \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	-e "RHCHE_ACC_USERNAME=<username>" \
+	-e "RHCHE_ACC_PASSWORD=<password>" \ 
+	-e "RHCHE_ACC_EMAIL=<email>" \
+	-e "CHE_OSIO_AUTH_ENDPOINT=https://auth.openshift.io" \
+	-e "RHCHE_HOST_URL=che.openshift.io" 
+	-e "RUNNING_WORKSPACE=<workspace_name>" 
+	-e "TEST_SUITE=e2eTestSuite.xml" 
+	quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
+```
+This test expects vert-x project ```vertx-http-booster``` in running workspace. Test changes a 14th line in HttpApplication.java to ```protected static final String template = \"Bonjour, %s!\";```. 
+Changes are committed and pushed. Test verifies if push was successfull.
+
 ### Full list of variables
 
 These tests require TestNG profile and listener must be set to `com.redhat.che.selenium.core.RhCheSeleniumTestHandler`.

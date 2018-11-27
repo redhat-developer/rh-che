@@ -16,6 +16,7 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -e \"CHE_OSIO_AUTH_ENDPOINT=<endpoint>\" # endpoint for auth e.g. https://auth.prod-preview.openshift.io "
   echo -e "\t       -e \"RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker\" # Openshift token exchange url"
   echo -e "\t       -e \"TEST_SUITE=<xml> # Name of xml file with testing suite"
+  echo -e "\t		-e \"RUNNING_WORKSPACE=<name> # Name of running workspace to be used in test"
   exit 1
 fi
 
@@ -61,7 +62,7 @@ docker run -d -p 10000:10000 --name che-starter --network localnetwork \
 
 echo "Running tests"
 
-scl enable rh-maven33 rh-nodejs8 "mvn clean --projects functional-tests -Pfunctional-tests -B \
+MVN_COMMAND="mvn clean --projects functional-tests -Pfunctional-tests -B \
   -Dche.testuser.name=${RHCHE_ACC_USERNAME} \
   -Dche.testuser.email=${RHCHE_ACC_EMAIL} \
   -Dche.testuser.password=${RHCHE_ACC_PASSWORD} \
@@ -71,8 +72,13 @@ scl enable rh-maven33 rh-nodejs8 "mvn clean --projects functional-tests -Pfuncti
   -DexcludedGroups=${RHCHE_EXCLUDED_GROUPS} \
   -DcheStarterUrl=http://che-starter.localnetwork:10000 \
   -Dtests.screenshots_dir=${RHCHE_SCREENSHOTS_DIR} \
-  -Dtest.suite=${TEST_SUITE} \
-  test install"
+  -Dtest.suite=${TEST_SUITE}"
+
+if [[ -n $RUNNING_WORKSPACE ]]; then
+	MVN_COMMAND="${MVN_COMMAND} -Dche.workspaceName=${RUNNING_WORKSPACE}"
+fi
+
+scl enable rh-maven33 rh-nodejs8 "$MVN_COMMAND test install"
 RETURN_CODE=$?
 
 if [ -d "/root/logs/" ]; then
