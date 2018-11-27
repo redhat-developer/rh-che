@@ -264,7 +264,9 @@ oc port-forward $(oc get pods --selector="deploymentconfig=rhche" --no-headers=t
 === Debugging wsagent pods (workspaces)
 _See also_: link:https://github.com/eclipse/che/wiki/Development-Workflow#debugging-workspace-agent[upstream docs]
 
-By default workspace pods expose a JDPA debug port. The easiest way to connect to a workspace pod is again by using `oc port-forward`:
+To enable debugging of workspace pods, you need to set the env var `WSAGENT_DEBUG=true` in the workspace config dashboard. Additionally, you can optionally set env var `WSAGENT_DEBUG_SUSPEND=true` to suspend wsagent start until a debugger is connected
+
+Once the env var is set, workspace pods are started with wsagent listening on a JPDA debug port (4403 by default). The easiest way to connect to a workspace pod is again by using `oc port-forward`:
 
 [source,bash]
 ----
@@ -278,6 +280,10 @@ A shortcut, if _only a single workspace is running_, is to use a selector to aut
 oc port-forward $(oc get pods --selector="che.workspace_id" --no-headers=true -o custom-columns=:metadata.name) 4403
 ----
 
+[NOTE]
+====
+On older versions of OpenShift, it may be also necessary to create a server in the workspace config (in the dashboard) that exposes your JPDA debug port. This is because the JPDA debug server is by default removed from workspaces. It seems that, at least on OpenShift 3.11, you can port-forward to non-exposed ports on a Pod. 
+====
 
 == All-in-one build and update commands
 These commands will do a full build (skipping tests) of rh-che and rollout a new deployment. They assume that they are being executed from this repositorys root directory, and that environment variables
