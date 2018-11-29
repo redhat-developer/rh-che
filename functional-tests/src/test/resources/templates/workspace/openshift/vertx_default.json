@@ -1,0 +1,87 @@
+{
+  "defaultEnv": "replaced_name",
+  "name": "replaced_name",
+  "attributes": {},
+  "environments": {
+    "replaced_name": {
+      "machines": {
+        "dev-machine": {
+          "attributes": {
+            "memoryLimitBytes": "desired_memory_value"
+          },
+          "servers": {
+            "8080/tcp": {
+              "attributes": {},
+              "port": "8080",
+              "protocol": "http"
+            }
+          },
+          "volumes": {},
+          "installers": [
+            "org.eclipse.che.terminal",
+            "org.eclipse.che.exec",
+            "org.eclipse.che.ws-agent",
+            "com.redhat.bayesian.lsp",
+            "com.redhat.oc-login"
+          ],
+          "env": {}
+        }
+      },
+      "recipe": {
+        "type": "dockerimage",
+        "content": "registry.devshift.net/che/vertx"
+      }
+    }
+  },
+  "projects": [
+    {
+      "links": [],
+      "name": "vertx-http-booster",
+      "attributes": {
+        "language": [
+          "java"
+        ]
+      },
+      "type": "maven",
+      "source": {
+        "location": "https://github.com/openshiftio-vertx-boosters/vertx-http-booster",
+        "type": "git",
+        "parameters": {}
+      },
+      "path": "/vertx-http-booster",
+      "description": "HTTP Vert.x Booster",
+      "problems": [],
+      "mixins": []
+    }
+  ],
+  "commands": [
+    {
+      "commandLine": "scl enable rh-maven33 'mvn clean install -f ${current.project.path}'",
+      "name": "build",
+      "attributes": {
+        "goal": "Build",
+        "previewUrl": ""
+      },
+      "type": "mvn"
+    },
+    {
+      "commandLine": "scl enable rh-maven33 'mvn compile vertx:run -f ${current.project.path} -Dvertx.disableDnsResolver=true'",
+      "name": "run",
+      "attributes": {
+        "goal": "Run",
+        "previewUrl": "${server.8080/tcp}"
+      },
+      "type": "custom"
+    },
+    {
+      "commandLine": "scl enable rh-maven33 'mvn compile vertx:debug -f ${current.project.path} -Dvertx.disableDnsResolver=true'",
+      "name": "debug",
+      "attributes": {
+        "goal": "Debug",
+        "previewUrl": "${server.8080/tcp}"
+      },
+      "type": "custom"
+    }
+  ],
+  "links": []
+}

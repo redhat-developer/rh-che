@@ -30,8 +30,9 @@ public class RhCheTestWorkspaceProvider implements TestWorkspaceProvider {
 
   @Override
   public TestWorkspace createWorkspace(
-      TestUser owner, int memoryGB, String template, boolean startAfterCreation) {
-    return new RhCheTestWorkspaceImpl(owner, rhcheWorksapceClient, startAfterCreation);
+      TestUser owner, int memoryGB, String templateFileName, boolean startAfterCreation) {
+    return new RhCheTestWorkspaceImpl(
+        owner, rhcheWorksapceClient, templateFileName, startAfterCreation);
   }
 
   @Override

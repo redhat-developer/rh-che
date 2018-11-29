@@ -32,7 +32,7 @@ public class TestTestClass {
   @Test
   public void dummyTestCase() throws Exception {
     // Get required resources
-    String createWorkspaceRequestJson = "/requests/workspace/osio/create-workspace-request.json";
+    String createWorkspaceRequestJson = "/templates/workspace/che-starter/che-starter_vertx.json";
     String token = defaultTestUser.obtainAuthToken();
 
     // Verify che-starter running

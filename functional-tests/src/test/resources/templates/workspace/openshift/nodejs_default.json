@@ -1,0 +1,93 @@
+{
+  "defaultEnv": "replaced_name",
+  "name": "replaced_name",
+  "attributes": {},
+  "environments": {
+    "replaced_name": {
+      "machines": {
+        "dev-machine": {
+          "attributes": {
+            "memoryLimitBytes": "desired_memory_value"
+          },
+          "servers": {
+            "5000/tcp": {
+              "attributes": {},
+              "port": "5000",
+              "protocol": "http"
+            },
+            "3000/tcp": {
+              "attributes": {},
+              "port": "3000",
+              "protocol": "http"
+            },
+            "8080/tcp": {
+              "attributes": {},
+              "port": "8080",
+              "protocol": "http"
+            },
+            "9000/tcp": {
+              "attributes": {},
+              "port": "9000",
+              "protocol": "http"
+            }
+          },
+          "volumes": {},
+          "installers": [
+            "org.eclipse.che.exec",
+            "org.eclipse.che.terminal",
+            "org.eclipse.che.ws-agent",
+            "com.redhat.bayesian.lsp",
+            "com.redhat.oc-login"
+          ],
+          "env": {}
+        }
+      },
+      "recipe": {
+        "type": "dockerimage",
+        "content": "registry.devshift.net/che/centos-nodejs"
+      }
+    }
+  },
+  "projects": [
+    {
+      "links": [],
+      "name": "nodejs-hello-world",
+      "attributes": {
+        "language": [
+          "javascript"
+        ]
+      },
+      "type": "node-js",
+      "source": {
+        "location": "https://github.com/che-samples/web-nodejs-sample.git",
+        "type": "git",
+        "parameters": {}
+      },
+      "path": "/nodejs-hello-world",
+      "description": "Simple NodeJS Project.",
+      "problems": [],
+      "mixins": []
+    }
+  ],
+  "commands": [
+    {
+      "commandLine": "cd ${current.project.path} && node app/app.js",
+      "name": "run",
+      "attributes": {
+        "goal": "Run",
+        "previewUrl": "${server.8080/tcp}"
+      },
+      "type": "custom"
+    },
+    {
+      "commandLine": "cd ${current.project.path} \nnode app/app.js",
+      "name": "nodejs-hello-world:run",
+      "attributes": {
+        "goal": "Run",
+        "previewUrl": "${server.3000/tcp}"
+      },
+      "type": "custom"
+    }
+  ],
+  "links": []
+}

@@ -1,0 +1,6 @@
+{
+  "branch": "master",
+  "description": "mycustomdescription",
+  "repo": "https://github.com/che-samples/web-nodejs-sample.git",
+  "stackId": "nodejs-centos"
+}

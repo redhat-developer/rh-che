@@ -39,12 +39,10 @@ import org.slf4j.LoggerFactory;
 public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServiceClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(RhCheTestWorkspaceServiceClient.class);
-  private static final String CREATE_WORKSPACE_REQUEST_JSON_PATH =
-      "/configs/create-workspace-request.json";
 
-  private TestUser owner = null;
-  private String token = null;
-  private CheStarterWrapper cheStarterWrapper = null;
+  private TestUser owner;
+  private String token;
+  private CheStarterWrapper cheStarterWrapper;
 
   @Inject
   public RhCheTestWorkspaceServiceClient(
@@ -73,23 +71,30 @@ public class RhCheTestWorkspaceServiceClient extends AbstractTestWorkspaceServic
     this.token = this.owner.obtainAuthToken();
   }
 
-  public Workspace createWorkspaceWithCheStarter() throws Exception {
-    return createWorkspace(null, 0, null, null);
-  }
-
-  @Override
-  public Workspace createWorkspace(
-      String workspaceName, int memory, MemoryMeasure memoryUnit, WorkspaceConfigDto workspace)
-      throws Exception {
+  public Workspace createWorkspaceWithCheStarter(String templateFileName) throws Exception {
     if (owner == null) {
       throw new IllegalStateException("Workspace does not have an owner.");
     }
     this.cheStarterWrapper.checkIsRunning(this.token);
-    String name = this.cheStarterWrapper.createWorkspace(CREATE_WORKSPACE_REQUEST_JSON_PATH, token);
     return requestFactory
-        .fromUrl(getNameBasedUrl(name, owner.getName()))
+        .fromUrl(
+            getNameBasedUrl(
+                this.cheStarterWrapper.createWorkspace(
+                    "/templates/workspace/che-starter/" + templateFileName, token),
+                owner.getName()))
         .request()
         .asDto(WorkspaceDto.class);
+  }
+
+  @Override
+  public Workspace createWorkspace(
+      String workspaceName, int memory, MemoryMeasure memoryUnit, WorkspaceConfigDto workspace) {
+    throw new UnsupportedOperationException(
+        "This method is never supposed to be called. "
+            + "Workspace name:"
+            + workspaceName
+            + " for user:"
+            + owner.getEmail());
   }
 
   @Override

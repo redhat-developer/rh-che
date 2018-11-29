@@ -14,7 +14,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Simple test suite"
        verbose="10"
-       parallel="none"
+       parallel="classes"
        thread-count="1">
 
     <test name="all">
@@ -24,7 +24,7 @@
             <!--<class name="org.eclipse.che.selenium.dashboard.CreateAndDeleteProjectsTest"/>-->
             <!--<class name="org.eclipse.che.selenium.dashboard.RenameWorkspaceTest"/>-->
             <class name="org.eclipse.che.selenium.miscellaneous.DialogAboutTest"/>
-            <!--<class name="com.redhat.che.functional.tests.WorkspaceTest"/>-->
+            <class name="com.redhat.che.functional.tests.WorkspaceTest"/>
             <!--<class name="com.redhat.che.functional.tests.BayesianPomXml"/>-->
         </classes>
     </test>

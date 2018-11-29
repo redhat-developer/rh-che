@@ -42,6 +42,7 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
   public RhCheTestWorkspaceImpl(
       TestUser owner,
       RhCheTestWorkspaceServiceClient testWorkspaceServiceClient,
+      String workspaceFileName,
       boolean startAfterCreation) {
     this.startAfterCreation = startAfterCreation;
     this.id = new AtomicReference<>();
@@ -57,7 +58,8 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
             () -> {
               try {
                 LOG.info("Creating new workspace with che-starter.");
-                final Workspace ws = workspaceServiceClient.createWorkspaceWithCheStarter();
+                final Workspace ws =
+                    workspaceServiceClient.createWorkspaceWithCheStarter(workspaceFileName);
                 this.id.set(ws.getId());
                 this.workspaceName = ws.getConfig().getName();
                 long start = System.currentTimeMillis();
