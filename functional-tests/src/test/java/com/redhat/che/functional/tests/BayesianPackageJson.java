@@ -30,11 +30,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class BayesianPomXml {
+public class BayesianPackageJson {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestTestClass.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BayesianPackageJson.class);
 
-  @InjectTestWorkspace(template = RhCheWorkspaceTemplate.RH_VERTX)
+  @InjectTestWorkspace(template = RhCheWorkspaceTemplate.RH_NODEJS)
   private TestWorkspace workspace;
 
   @Inject private NavigateToFile navigateToFile;
@@ -45,18 +45,13 @@ public class BayesianPomXml {
   @Inject private ProjectExplorer projectExplorer;
   @Inject private TestApiEndpointUrlProvider testApiEndpointUrlProvider;
 
-  private static final Integer POM_EXPECTED_ERROR_LINE = 40;
-  private static final Integer POM_INJECTION_ENTRY_POINT = 37;
-  private static final String PROJECT_FILE = "pom.xml";
+  private static final Integer JSON_EXPECTED_ERROR_LINE = 12;
+  private static final Integer JSON_INJECTION_ENTRY_POINT = 12;
+  private static final String PROJECT_FILE = "package.json";
+  private static final String PROJECT_NAME = "nodejs-hello-world";
+  private static final String PROJECT_DEPENDENCY = "\"serve-static\": \"1.7.1\" ,\n";
   private static final String ERROR_MESSAGE =
-      "Package ch.qos.logback:logback-core-1.1.10 is vulnerable: CVE-2017-5929";
-  private static final String PROJECT_NAME = "vertx-http-booster";
-  private static final String PROJECT_DEPENDENCY =
-      "<dependency>\n"
-          + "<groupId>ch.qos.logback</groupId>\n"
-          + "<artifactId>logback-core</artifactId>\n"
-          + "<version>1.1.10</version>\n"
-          + "</dependency>\n";
+      "Package serve-static-1.7.1 is vulnerable: CVE-2015-1164. Recommendation: use version 1.7.2";
   private static final String CHE_PROD_PREVIEW_URL = "che.prod-preview.openshift.io";
 
   @BeforeClass
@@ -107,8 +102,8 @@ public class BayesianPomXml {
   public void checkErrorPresentAfterReopenFile() {
     editor.closeAllTabs();
     openDefinedClass();
-    editor.setCursorToLine(POM_EXPECTED_ERROR_LINE);
-    editor.moveCursorToText("1.1.10");
+    editor.setCursorToLine(JSON_EXPECTED_ERROR_LINE);
+    editor.moveCursorToText("1.7.1");
     if (editorCheckBayesianError()) {
       return;
     }
@@ -125,19 +120,15 @@ public class BayesianPomXml {
   }
 
   private void appendDependency() {
-    editor.setCursorToLine(POM_INJECTION_ENTRY_POINT);
+    editor.setCursorToLine(JSON_INJECTION_ENTRY_POINT);
     editor.typeTextIntoEditor(PROJECT_DEPENDENCY);
     editor.waitTabFileWithSavedStatus(PROJECT_FILE);
-    editor.setCursorToLine(POM_EXPECTED_ERROR_LINE);
-    editor.moveCursorToText("1.1.10");
+    editor.setCursorToLine(JSON_EXPECTED_ERROR_LINE);
+    editor.moveCursorToText("1.7.1");
   }
 
   private void removeDependency() {
-    editor.setCursorToLine(POM_INJECTION_ENTRY_POINT);
-    editor.deleteCurrentLine();
-    editor.deleteCurrentLine();
-    editor.deleteCurrentLine();
-    editor.deleteCurrentLine();
+    editor.setCursorToLine(JSON_INJECTION_ENTRY_POINT);
     editor.deleteCurrentLine();
   }
 
