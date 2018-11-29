@@ -25,6 +25,7 @@
             <!--<class name="org.eclipse.che.selenium.dashboard.RenameWorkspaceTest"/>-->
             <class name="org.eclipse.che.selenium.miscellaneous.DialogAboutTest"/>
             <class name="com.redhat.che.functional.tests.WorkspaceTest"/>
+            <class name="com.redhat.che.functional.tests.BuildAndRunProjectTest"/>
             <!--<class name="com.redhat.che.functional.tests.BayesianPomXml"/>-->
         </classes>
     </test>
