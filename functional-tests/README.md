@@ -36,7 +36,6 @@ By default, tests will execute against production environment (che.openshift.io)
 mvn clean verify -Pfunctional-tests \
     -Dche.testuser.name=<OSIO_USERNAME> \
     -Dche.testuser.email=<OSIO_EMAIL> \
-    -Dche.testuser.offline_token=<OSIO_OFFLINE_TOKEN> \
     -Dche.testuser.password=<OSIO_PASSWORD>
 ```
 If you need to run tests against another environment (for example prod-preview), few more variables have to be set (and che-starter has to be started with different parameters). For example, running tests against `prod-preview` will look like this:
@@ -50,10 +49,9 @@ docker run -p 10000:10000 \
 mvn clean verify -Pfunctional-tests \
     -Dche.testuser.name=<OSIO_PROD_PREVIEW_USERNAME> \
     -Dche.testuser.email=<OSIO_PROD_PREVIEW__EMAIL> \
-    -Dche.testuser.offline_token=<OSIO_PROD_PREVIEW__OFFLINE_TOKEN> \
     -Dche.testuser.password=<OSIO_PROD_PREVIEW__PASSWORD> \
     -Dche.host=che.prod-preview.openshift.io \
-    -Dche.offline.to.access.token.exchange.endpoint=https://auth.prod-preview.openshift.io/api/token/refresh
+    -Dche.osio.auth.endpoint=https://auth.prod-preview.openshift.io
 ```
 
 ### Run tests from docker container
@@ -89,7 +87,7 @@ This change however means, that the dependencies will not be available in the of
 ###### Optional variables for screenshots and logs directory
 If the logs folder is mounted, the container will automatically collect logs into the specified folder.  
 * ```'allowEmpty=true'
-  -v <local_screenshofts_directory>:/root/logs # che-starter logs
+  -v <local_logs_directory>:/root/logs # logs and screenshots 
   -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots # example path for the locally mounted logs folder"
   ```
 
@@ -110,13 +108,13 @@ docker run --name functional-tests-dep --privileged \
 	-e "RHCHE_ACC_PASSWORD=<password>" \ 
 	-e "RHCHE_ACC_EMAIL=<email>" \
 	-e "CHE_OSIO_AUTH_ENDPOINT=https://auth.openshift.io" \
-	-e "RHCHE_HOST_URL=che.openshift.io" 
-	-e "RUNNING_WORKSPACE=<workspace_name>" 
-	-e "TEST_SUITE=e2eTestSuite.xml" 
+	-e "RHCHE_HOST_URL=che.openshift.io" \
+	-e "RUNNING_WORKSPACE=<workspace_name>" \
+	-e "TEST_SUITE=e2eTestSuite.xml" \
 	quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
 ```
 This test expects vert-x project ```vertx-http-booster``` in running workspace. Test changes a 14th line in HttpApplication.java to ```protected static final String template = \"Bonjour, %s!\";```. 
-Changes are committed and pushed. Test verifies if push was successfull.
+Changes are committed and pushed. Test verifies if push was successful.
 
 ### Full list of variables
 
@@ -128,8 +126,8 @@ VM options (Mandatory parameters in __bold__)
 |----------|---------| --- |
 | __che.testuser.email__ | Openshift.io e-mail |  |
 | __che.testuser.name__ | Openshift.io username |  |
-| __che.testuser.offline_token__ | Openshift.io offline token |  |
 | __che.testuser.password__ | Openshift.io password |  |
+| che.osio.auth.endpoint | Authentication endpoint | `https://auth.openshift.io` |
 | che.threads | Thread count| `1` |
 | che.workspace_pool_size | Amount of workspace to be used while testing | `1` |
 | che.host | Host where Che runs | `che.openshift.io` |
