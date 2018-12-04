@@ -14,9 +14,12 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -e \"RHCHE_HOST_PROTOCOL=<http/https>\" # Protocol to be used, either http or https"
   echo -e "\t       -e \"RHCHE_HOST_URL=che.openshift.io\" # Which host to run tests against. Just use host name"
   echo -e "\t       -e \"CHE_OSIO_AUTH_ENDPOINT=<endpoint>\" # endpoint for auth e.g. https://auth.prod-preview.openshift.io "
+  echo -e "\t       -e \"RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com\" # Github API token exchange"
   echo -e "\t       -e \"RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker\" # Openshift token exchange url"
   echo -e "\t       -e \"TEST_SUITE=<xml> # Name of xml file with testing suite"
   echo -e "\t		-e \"RUNNING_WORKSPACE=<name> # Name of running workspace to be used in test"
+  echo -e "\t       -e \"OPENSHIFT_URL=<url> # Url of openshift - used only in tests where manipulation with OpenShift environment is needed"
+  echo -e "\t       -e \"OPENSHIFT_TOKEN=<token> # Token for login to OpenShift - used only in tests where manipulation with OpenShift environment is needed"
   exit 1
 fi
 
@@ -53,7 +56,6 @@ if [ -d "/root/che" ]; then
 fi
 
 echo "Running che-starter against ${RHCHE_HOST_FULL_URL}"
-
 docker run -d -p 10000:10000 --name che-starter --network localnetwork \
   -e "GITHUB_TOKEN_URL=${RHCHE_GITHUB_EXCHANGE}" \
   -e "OPENSHIFT_TOKEN_URL=${RHCHE_OPENSHIFT_TOKEN_URL}" \
@@ -76,6 +78,19 @@ MVN_COMMAND="mvn clean --projects functional-tests -Pfunctional-tests -B \
 
 if [[ -n $RUNNING_WORKSPACE ]]; then
 	MVN_COMMAND="${MVN_COMMAND} -Dche.workspaceName=${RUNNING_WORKSPACE}"
+fi
+
+if [[ "$TEST_SUITE" == "rolloutTest.xml" ]]; then
+	export OPENSHIFT_URL=$OPENSHIFT_URL
+	export OPENSHIFT_TOKEN=$OPENSHIFT_TOKEN
+		
+	MVN_COMMAND="{$MVN_COMMAND} \
+	  -Dche.admin.name=${RHCHE_ACC_USERNAME} \
+  	  -Dche.admin.email=${RHCHE_ACC_EMAIL} \
+	  -Dche.admin.password=${RHCHE_ACC_PASSWORD} \
+	  -Dche.protocol=${RHCHE_HOST_PROTOCOL} \
+	  -Dche.port=80 \
+	  -Dche.openshift.project=${OPENSHIFT_PROJECT}"
 fi
 
 scl enable rh-maven33 rh-nodejs8 "$MVN_COMMAND test install"

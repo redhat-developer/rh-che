@@ -61,7 +61,7 @@ public class RhCheTestWorkspaceImpl implements TestWorkspace {
                 this.id.set(ws.getId());
                 this.workspaceName = ws.getConfig().getName();
                 long start = System.currentTimeMillis();
-                if (startAfterCreation) {
+                if (this.startAfterCreation) {
                   workspaceServiceClient.start(this.id.get(), this.workspaceName, this.owner);
                   LOG.info(
                       "Workspace name='{}' id='{}' started in {} sec.",
