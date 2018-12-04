@@ -26,6 +26,7 @@ import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.languageserver.DefaultInstanceProvider;
 import org.eclipse.che.api.languageserver.LanguageServerConfig;
 import org.eclipse.che.api.languageserver.ProcessCommunicationProvider;
+import org.eclipse.che.api.project.server.impl.RootDirPathProvider;
 import org.eclipse.che.plugin.json.inject.JsonModule;
 import org.eclipse.che.plugin.languageserver.bayesian.BayesianLanguageServerModule;
 import org.slf4j.Logger;
@@ -40,14 +41,23 @@ public class BayesianLanguageServerConfig implements LanguageServerConfig {
 
   private final Path launchScript;
   private final HttpJsonRequestFactory httpJsonFactory;
+  private final RootDirPathProvider rootDirPathProvider;
   private final String apiEndpoint;
 
   @Inject
   public BayesianLanguageServerConfig(
-      HttpJsonRequestFactory httpJsonFactory, @Named("che.api") String apiEndpoint) {
+      RootDirPathProvider rootDirPathProvider,
+      HttpJsonRequestFactory httpJsonFactory,
+      @Named("che.api") String apiEndpoint) {
     this.httpJsonFactory = httpJsonFactory;
+    this.rootDirPathProvider = rootDirPathProvider;
     this.apiEndpoint = apiEndpoint;
     launchScript = Paths.get(System.getenv("HOME"), "che/ls-bayesian/launch.sh");
+  }
+
+  @Override
+  public String getProjectsRoot() {
+    return rootDirPathProvider.get();
   }
 
   @Override
