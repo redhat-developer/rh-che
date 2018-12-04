@@ -104,7 +104,7 @@ The test suite can be changed by setting the name. The suite must be place in ``
 There is one test EETest.java for end-to-end purposes. This test runs as a part of e2eTestSuite.xml. You need to set the name of running workspace and pass it as a parameter. 
 Following example shows how to run this test against production environment.
 ```
-docker run -it --name functional-tests-dep --privileged \
+docker run --name functional-tests-dep --privileged \
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	-e "RHCHE_ACC_USERNAME=<username>" \
 	-e "RHCHE_ACC_PASSWORD=<password>" \ 
