@@ -25,8 +25,6 @@ import org.testng.annotations.Test;
 public class WorkspaceTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestTestClass.class);
-  // When creating workspace with che-starter, all others are stopped. Therefore it is better to
-  // start them in test - when both are created.
 
   @InjectTestWorkspace(
       startAfterCreation = false,
