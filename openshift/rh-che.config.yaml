@@ -31,6 +31,7 @@ data:
   che.logs.dir: "/data/logs"
   che-logs-sentry-dsn: 'NULL'
   che-logs-sentry-level: 'WARN'
+  che-metrics-enabled: "false"
   che-openshift-precreate-subpaths: "false"
   che-openshift-secure-routes: "true"
   che.predefined.stacks.reload_on_start: "true"

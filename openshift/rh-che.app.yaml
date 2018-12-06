@@ -262,6 +262,11 @@ objects:
               configMapKeyRef:
                 key: che-logs-sentry-level
                 name: rhche
+          - name: CHE_METRICS_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: che-metrics-enabled
+                name: rhche
           - name: CHE_MULTIUSER
             valueFrom:
               configMapKeyRef:
