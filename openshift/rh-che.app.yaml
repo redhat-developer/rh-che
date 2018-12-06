@@ -391,10 +391,6 @@ objects:
             value: "150"
           - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT
             value: "150mb"
-          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA__REMOTE_IMAGE
-            value: "wsskeleton/che-plugin-broker:theia-broker"
-          - name: CHE_WORKSPACE_PLUGIN__BROKER_THEIA_IMAGE
-            value: "wsskeleton/che-plugin-broker:theia-broker-2"
           image: ${IMAGE}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           livenessProbe:

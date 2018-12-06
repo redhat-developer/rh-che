@@ -12,12 +12,9 @@
 package com.redhat.che.wsmaster.deploy;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
 import com.redhat.che.multitenant.Fabric8AuthServiceClient;
 import com.redhat.che.multitenant.Fabric8OAuthAPIProvider;
 import java.lang.reflect.Method;
@@ -63,15 +60,5 @@ public class Fabric8WsMasterModule extends AbstractModule {
     machineAuthenticatedResources
         .addBinding()
         .toInstance(new MachineAuthenticatedResource("/bayesian", "getBayesianToken"));
-
-    MapBinder<String, String> pluginBrokers =
-        MapBinder.newMapBinder(
-            binder(),
-            String.class,
-            String.class,
-            Names.named("che.workspace.plugin_broker.images"));
-    pluginBrokers
-        .addBinding("Theia plugin")
-        .to(Key.get(String.class, Names.named("che.workspace.plugin_broker.theia.image")));
   }
 }
