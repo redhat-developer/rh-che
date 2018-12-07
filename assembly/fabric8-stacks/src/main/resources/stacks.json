@@ -106,7 +106,7 @@
                 }
               },
               "volumes": {
-                "postgresData":{
+                "postgresdata":{
                   "path": "/var/lib/pgsql/data"
                 }
               },
