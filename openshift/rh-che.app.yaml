@@ -32,6 +32,10 @@ objects:
       port: 8080
       protocol: TCP
       targetPort: 8080
+    - name: metrics
+      port: 8087
+      protocol: TCP
+      targetPort: 8087
     selector:
       app: rhche
 - apiVersion: v1
@@ -47,6 +51,8 @@ objects:
     to:
       kind: Service
       name: rhche-host
+    port:
+      targetPort: http
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -397,6 +403,8 @@ objects:
           ports:
           - containerPort: 8080
             name: http
+          - containerPort: 8087
+            name: metrics
           - containerPort: 8000
             name: http-debug
           readinessProbe:
