@@ -15,6 +15,7 @@ data:
   analytics.woopra_domain: 'NULL'
   end2end-protect-verify-with-ip: "false"
   che-api: "https://che.prod-preview.openshift.io/api"
+  che-cors-enabled: "true"
   che-fabric8-auth-endpoint: "https://auth.prod-preview.openshift.io"
   che-fabric8-multicluster-oso-proxy-url: "https://osoproxy.prod-preview.openshift.io"
   che-fabric8-multitenant: "true"
@@ -40,6 +41,7 @@ data:
   che-system-admin-name: "admin"
   che-system-super-privileged-mode: "true"
   che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
+  che-wsagent-cors-allowed-origins: "*"
   che.workspace.agent.dev.inactive_stop_timeout_ms: "900000"
   che-workspace-logs: "/workspace_logs"
   che-workspace-server-ping-interval-milliseconds: "500"
@@ -64,4 +66,3 @@ data:
   workspaces-memory-limit-max: "3gb"
   workspaces-pvc-storage-size: '1Gi'
   workspace-storage: "/home/user/che/workspaces"
-

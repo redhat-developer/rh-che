@@ -85,6 +85,11 @@ objects:
               configMapKeyRef:
                 key: che-jsonrpc-max-pool-size
                 name: rhche
+          - name: CHE_CORS_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: che-cors-enabled
+                name: rhche
           - name: CHE_DEBUG_SERVER
             valueFrom:
               configMapKeyRef:
@@ -357,6 +362,11 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: workspace-storage
+                name: rhche
+          - name: CHE_WSAGENT_CORS_ALLOWED__ORIGINS
+            valueFrom:
+              configMapKeyRef:
+                key: che-wsagent-cors-allowed-origins
                 name: rhche
           - name: JAVA_OPTS
             valueFrom:
