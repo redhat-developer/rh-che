@@ -52,12 +52,13 @@ function checkAllCreds() {
 	  CREDS_NOT_SET="true"
 	fi
 	
-	if [[ -z "${KEYCLOAK_TOKEN}" || -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" || -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD}" ]]; then
+	if [[ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" ]] ||
+	   [[ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD}" ]]; then
 	  echo "Prod-preview credentials not set."
 	  CREDS_NOT_SET="true"
 	fi
 	
-	if [ "${CREDS_NOT_SET}" = "true" ]; then
+	if [[ "${CREDS_NOT_SET}" = "true" ]]; then
 	  echo "Failed to parse jenkins secure store credentials"
 	  exit 2
 	else
