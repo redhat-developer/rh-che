@@ -84,7 +84,7 @@ if [[ "$TEST_SUITE" == "rolloutTest.xml" ]]; then
 	export OPENSHIFT_URL=$OPENSHIFT_URL
 	export OPENSHIFT_TOKEN=$OPENSHIFT_TOKEN
 		
-	MVN_COMMAND="{$MVN_COMMAND} \
+	MVN_COMMAND="${MVN_COMMAND} \
 	  -Dche.admin.name=${RHCHE_ACC_USERNAME} \
   	  -Dche.admin.email=${RHCHE_ACC_EMAIL} \
 	  -Dche.admin.password=${RHCHE_ACC_PASSWORD} \
