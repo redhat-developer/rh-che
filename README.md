@@ -33,6 +33,7 @@ Red Hat modifications against the upstream Che include:
 
 1. Opening `Codebases UI` in browser
 2. `fabric8-ui` sends request to `fabric8-wit`
+3. `fabric8-wit` sends request to `che-starter` in order to initiate workspace creation 
 
 ## How to build it
 
