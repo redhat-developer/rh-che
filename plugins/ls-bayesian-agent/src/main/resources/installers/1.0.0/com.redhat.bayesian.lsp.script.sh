@@ -148,7 +148,7 @@ fi
 # Payload is tared and base64 encoded representation of `lsp/server/out`
 echo "Deploying com.redhat.bayesian.lsp server"
 cd ${LS_DIR}
-curl -sSL ${AGENT_BINARIES_URI} | tar vxj
+curl -sSL ${AGENT_BINARIES_URI} | tar xj
 
 touch ${LS_LAUNCHER}
 chmod +x ${LS_LAUNCHER}
