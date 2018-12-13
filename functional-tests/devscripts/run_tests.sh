@@ -4,7 +4,7 @@
 #   checkAllCreds
 #   installDependencies
 #   archiveArtifacts
-source .ci/functinoal_tests_utils.sh
+source .ci/functional_tests_utils.sh
 
 function printHelp {
 	YELLOW="\\033[93;1m"
