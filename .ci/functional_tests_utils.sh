@@ -42,7 +42,7 @@ function checkAllCreds() {
 	CREDS_NOT_SET="false"
 	curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
 
-	if [[ -z "${QUAY_USERNAME}" && -z "${QUAY_PASSWORD}" ]]; then
+	if [[ -z "${QUAY_USERNAME}" || -z "${QUAY_PASSWORD}" ]]; then
 	  echo "Docker registry credentials not set"
 	  CREDS_NOT_SET="true"
 	fi
@@ -51,8 +51,9 @@ function checkAllCreds() {
 	  echo "RDU2C credentials not set"
 	  CREDS_NOT_SET="true"
 	fi
-	
-	if [[ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" ]] ||
+
+	if [[ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_EMAIL}" ]] ||
+	   [[ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}" ]] ||
 	   [[ -z "${RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD}" ]]; then
 	  echo "Prod-preview credentials not set."
 	  CREDS_NOT_SET="true"
@@ -67,7 +68,13 @@ function checkAllCreds() {
 	set +x
 }
 
-
-
-
-
+function archiveArtifacts() {
+  echo "Archiving artifacts from ${DATE} for ${JOB_NAME}/${BUILD_NUMBER}"
+  ls -la ./artifacts.key
+  chmod 600 ./artifacts.key
+  chown $(whoami) ./artifacts.key
+  mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/surefire-reports
+  cp ./logs/*.log ./rhche/${JOB_NAME}/${BUILD_NUMBER}/
+  cp -R ./logs/artifacts/screenshots/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/
+  rsync --password-file=./artifacts.key -PHva --relative ./rhche/${JOB_NAME}/${BUILD_NUMBER} devtools@artifacts.ci.centos.org::devtools/
+}

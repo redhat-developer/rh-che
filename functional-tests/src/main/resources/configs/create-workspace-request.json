@@ -1,6 +1,0 @@
-{
-  "branch": "master",
-  "description": "mycustomdescription",
-  "repo": "https://github.com/osiotest/vertx-http-booster",
-  "stackId": "vert.x"
-}

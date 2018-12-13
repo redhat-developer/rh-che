@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Provides methods:
+#   checkAllCreds
+#   installDependencies
+#   archiveArtifacts
+source .ci/functinoal_tests_utils.sh
+
 function printHelp {
 	YELLOW="\\033[93;1m"
 	WHITE="\\033[0;1m"
@@ -54,6 +60,8 @@ if [[ "$HOST_URL" == "che.openshift.io" ]]; then
 
 	docker run --name functional-tests-dep --privileged \
 	           -v /var/run/docker.sock:/var/run/docker.sock \
+	           -v /root/payload/logs:/root/logs \
+	           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
 	           -e "RHCHE_ACC_USERNAME=$USERNAME" \
 	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
 	           -e "RHCHE_ACC_EMAIL=$EMAIL" \
@@ -67,6 +75,8 @@ else
 
 	docker run --name functional-tests-dep --privileged \
 	           -v /var/run/docker.sock:/var/run/docker.sock \
+	           -v /root/payload/logs:/root/logs \
+	           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
 	           -e "RHCHE_ACC_USERNAME=$USERNAME" \
 	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
 	           -e "RHCHE_ACC_EMAIL=$EMAIL" \
@@ -77,6 +87,8 @@ else
            quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
     RESULT=$?
 fi
+
+archiveArtifacts
 
 if [[ $RESULT == 0 ]]; then
 	echo "Tests result: SUCCESS"
