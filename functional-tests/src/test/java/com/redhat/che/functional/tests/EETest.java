@@ -13,30 +13,25 @@ package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
 import com.redhat.che.selenium.core.workspace.ProvidedWorkspace;
-import java.util.concurrent.ExecutionException;
 import org.eclipse.che.selenium.core.constant.TestGitConstants;
 import org.eclipse.che.selenium.core.constant.TestMenuCommandsConstants;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
-import org.eclipse.che.selenium.pageobject.Ide;
 import org.eclipse.che.selenium.pageobject.InformationDialog;
 import org.eclipse.che.selenium.pageobject.Loader;
 import org.eclipse.che.selenium.pageobject.Menu;
 import org.eclipse.che.selenium.pageobject.NavigateToFile;
 import org.eclipse.che.selenium.pageobject.git.Git;
 import org.eclipse.che.selenium.pageobject.git.GitCompare;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 // class for trying ProvidedWorkspace functionality
-public class EETest {
+public class EETest extends RhCheAbstractTestClass {
 
   @Inject private ProvidedWorkspace workspace;
   @Inject private NavigateToFile navigateToFile;
   @Inject private Loader loader;
   @Inject private CodenvyEditor editor;
-  @Inject private Ide ide;
   @Inject private Git git;
   @Inject private Menu menu;
   @Inject private InformationDialog dialog;
@@ -44,7 +39,6 @@ public class EETest {
   private String text = "protected static final String template = \"Bonjour, %s!\";";
   private String fileName = "HttpApplication", extension = ".java";
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestTestClass.class);
   private static final String GIT = "gwt-debug-MenuItem/git-true";
   private static final String COMPARE_TOP = "gwt-debug-topmenu/Git/gitCompareGroup";
   private static final String COMPARE_WITH_BRANCH =
@@ -52,23 +46,7 @@ public class EETest {
 
   @BeforeClass
   public void checkWorkspace() throws Exception {
-    try {
-      LOG.info(
-          "Workspace with name: "
-              + workspace.getName()
-              + " and id: "
-              + workspace.getId()
-              + " was successfully injected. ");
-      ide.open(workspace);
-      ide.waitOpenedWorkspaceIsReadyToUse();
-    } catch (ExecutionException | InterruptedException e) {
-      LOG.error(
-          "Could not obtain workspace name and id - worskape was probably not successfully injected.");
-      throw e;
-    } catch (Exception e) {
-      LOG.error("Could not open workspace IDE.");
-      throw e;
-    }
+    checkWorkspace(workspace);
   }
 
   @Test(priority = 1)

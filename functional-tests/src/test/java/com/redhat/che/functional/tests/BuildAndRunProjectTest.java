@@ -13,53 +13,24 @@ package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
 import com.redhat.che.selenium.core.workspace.RhCheWorkspaceTemplate;
-import java.util.concurrent.ExecutionException;
 import org.eclipse.che.selenium.core.workspace.InjectTestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.Consoles;
-import org.eclipse.che.selenium.pageobject.Ide;
-import org.eclipse.che.selenium.pageobject.NotificationsPopupPanel;
-import org.eclipse.che.selenium.pageobject.ProjectExplorer;
 import org.eclipse.che.selenium.pageobject.intelligent.CommandsPalette;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class BuildAndRunProjectTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(BuildAndRunProjectTest.class);
+public class BuildAndRunProjectTest extends RhCheAbstractTestClass {
 
   @InjectTestWorkspace(template = RhCheWorkspaceTemplate.RH_VERTX)
   private TestWorkspace workspace;
 
-  @Inject private Ide ide;
   @Inject private CommandsPalette commandsPalette;
   @Inject private Consoles consoles;
-  @Inject private ProjectExplorer projectExplorer;
-  @Inject private NotificationsPopupPanel notificationsPopupPanel;
 
   @BeforeClass
   public void checkWorkspace() throws Exception {
-    try {
-      LOG.info(
-          "Workspace with name: "
-              + workspace.getName()
-              + " and id: "
-              + workspace.getId()
-              + " was successfully injected. ");
-      ide.open(workspace);
-      ide.waitOpenedWorkspaceIsReadyToUse();
-      projectExplorer.waitProjectExplorer();
-      notificationsPopupPanel.waitProgressPopupPanelClose();
-    } catch (ExecutionException | InterruptedException e) {
-      LOG.error(
-          "Could not obtain workspace name and id - worskape was probably not successfully injected.");
-      throw e;
-    } catch (Exception e) {
-      LOG.error("Could not open workspace IDE.");
-      throw e;
-    }
+    checkWorkspace(workspace);
   }
 
   @Test
