@@ -12,13 +12,12 @@ function printHelp {
 	GREEN="\\033[32;1m"
 	NC='\033[0m' # No Color
 	
-	echo -e "${YELLOW}$(basename "$0") ${WHITE}[-u <username>] [-p <passwd>] [-o <token>] [-m <email>] [-r <url>]" 
+	echo -e "${YELLOW}$(basename "$0") ${WHITE}[-u <username>] [-p <passwd>] [-m <email>] [-r <url>]" 
 	echo -e "\n${NC}Script for running functional tests against production or prod-preview environment."
 	echo -e "${GREEN}where:${WHITE}"
 	echo -e "-u    username for openshift account"
 	echo -e "-p    password for openshift account"
 	echo -e "-m    email for openshift account"
-	echo -e "-o    openshift offline token"
 	echo -e "-r    URL of Rh-che"
 	echo -e "${NC}All paramters are mandatory.\n"
 }
@@ -49,7 +48,7 @@ while getopts "hu:p:m:o:r:" opt; do
   esac
 done
 
-if [[ -z $USERNAME || -z $PASSWORD || -z $EMAIL || -z $OFFLINE_TOKEN || -z $HOST_URL ]]; then
+if [[ -z $USERNAME || -z $PASSWORD || -z $EMAIL || -z $HOST_URL ]]; then
 	echo "Please check if all credentials for user are set."
 	exit 1
 fi

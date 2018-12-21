@@ -70,7 +70,6 @@ MVN_COMMAND="mvn clean --projects functional-tests -Pfunctional-tests -B \
   -Dche.testuser.password=${RHCHE_ACC_PASSWORD} \
   -Dche.host=${RHCHE_HOST_URL} \
   -Dche.osio.auth.endpoint=${CHE_OSIO_AUTH_ENDPOINT} \
-  -Dche.offline.to.access.token.exchange.endpoint=${RHCHE_OFFLINE_ACCESS_EXCHANGE} \
   -DexcludedGroups=${RHCHE_EXCLUDED_GROUPS} \
   -DcheStarterUrl=http://che-starter.localnetwork:10000 \
   -Dtests.screenshots_dir=${RHCHE_SCREENSHOTS_DIR} \
