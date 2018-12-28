@@ -15,6 +15,10 @@ maven-eclipse.xml
 instance/
 config/
 
+# JDT.LS #
+##################
+.factorypath
+
 # Idea #
 ##################
 *.iml
