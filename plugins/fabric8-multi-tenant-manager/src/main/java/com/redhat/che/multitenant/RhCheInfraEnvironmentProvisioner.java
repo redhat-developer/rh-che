@@ -28,6 +28,7 @@ import org.eclipse.che.api.workspace.server.spi.provision.env.EnvVarProvider;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerServersPortProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
@@ -84,6 +85,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       ImagePullSecretProvisioner imagePullSecretProvisioner,
       ProxySettingsProvisioner proxySettingsProvisioner,
       ServiceAccountProvisioner serviceAccountProvisioner,
+      CertificateProvisioner certificateProvisioner,
       @Named("che.infra.kubernetes.trust_certs") boolean trustCerts,
       @Named("che.fabric8.wsagent_routing_timeout") String wsAgentRoutingTimeout) {
     super(
@@ -100,7 +102,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         podTerminationGracePeriodProvisioner,
         imagePullSecretProvisioner,
         proxySettingsProvisioner,
-        serviceAccountProvisioner);
+        serviceAccountProvisioner,
+        certificateProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;

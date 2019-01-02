@@ -41,7 +41,6 @@ data:
   che-system-admin-name: "admin"
   che-system-super-privileged-mode: "true"
   che-websocket-endpoint: "wss://che.prod-preview.openshift.io/api/websocket"
-  che-wsagent-cors-allowed-origins: "*"
   che.workspace.agent.dev.inactive_stop_timeout_ms: "900000"
   che-workspace-logs: "/workspace_logs"
   che-workspace-server-ping-interval-milliseconds: "500"
