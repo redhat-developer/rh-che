@@ -25,9 +25,18 @@ It is found by PR title, which should look like ```Update to <VERSIOn>``` e.g. `
 If there isn't such a pull request, changes are pushed (if there are any) and new PR is created. 
 
 ### Testing phase
+<<<<<<< HEAD
 The docker image is build from current version of code. The docker image is pushed to quay.io with two tags. Tag ```upstream-check-latest``` is for running test. Another tag 
 ```upstream-check-{upstream_hash}-{downastream_hash}``` should serve for developers to found exact version in easy way by knowing commits short hashes. 
 ```upstream-hash``` is the short hash of last commit to upstream that was used in that SNAPSHOT.
 ```downstream-hash``` is the short hash of last commit to downstream. That should ease the investigation if the compatibility test fails.
 
 If test fails, it sends comment to related PR with link to the job console output on Jenkins.
+=======
+
+The docker image is build from current version of code. The docker image is pushed to quay.io with two tags. Tag ```upstream-check-latest``` is for running test. Another tag 
+```upstream-check-{upstream_hash}-{downastream_hash}``` is mainly for testing purposes. ```upstream-hash``` is the short hash of last commit to upstream that was used in that SNAPSHOT.
+```downstream-hash``` is the short hash of last commit to downstream. That should ease the investigation if the compatibility test fails.
+
+If test fails, it sends comment to related PR with link to the related job run.
+>>>>>>> Enhancing compatibility test.

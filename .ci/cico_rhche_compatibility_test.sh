@@ -52,13 +52,18 @@ else
 	
   #change version of used che
   echo ">>> change upstream version to: $CHE_VERSION"
-  scl enable rh-maven33 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
+  scl enable rh-maven33 rh-nodejs8 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
 fi
 
-echo "Setting image tags for pushing to quay."
 #Get last commit short hash from upstream che
-longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/master | jq .sha)
-shortHashUpstream=${longHashUpstream:1:7}
+upstream_branch=$(echo "$CHE_VERSION" | cut -d"." -f 1,2).x
+longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/$upstream_branch | jq .sha)
+if [ "$longHashUpstream" == "null" ]; then
+  echo "The upstream version has changed to $CHE_VERSION, but there has been no SNAPSHOT yet. Skipping tests."
+  exit 1
+else
+  shortHashUpstream=${longHashUpstream:1:7}
+fi
 
 #Get last commit short hash from rh-che branch 
 longHashDownstream=$(git log | grep -m 1 commit | head -1 | cut -d" " -f 2)
