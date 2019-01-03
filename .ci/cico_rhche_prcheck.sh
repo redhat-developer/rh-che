@@ -8,7 +8,6 @@
 export PR_CHECK_BUILD="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
-export OC_VERSION=3.10.85
 
 eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^DEVSHIFT_TAG_LEN$ \

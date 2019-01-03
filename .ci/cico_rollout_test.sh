@@ -50,19 +50,13 @@ else
 fi
 
 # --- INSTALLING NEEDED SOFTWARE ---
-yum install epel-release --assumeyes
-yum update --assumeyes
-yum install python-pip --assumeyes
-yum install --assumeyes \
-            docker \
-            jq 
+source ./functional-tests-utils.sh
+instalEpelRelease
+installJQ
+installOC
+installYQ
+installStartDocker
 
-systemctl start docker
-pip install yq
-
-
-export OC_VERSION=3.9.33
-curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
 ln -s /usr/local/bin/oc /tmp
 
 # --- DEPLOY RH-CHE ON DEVCLUSTER ---

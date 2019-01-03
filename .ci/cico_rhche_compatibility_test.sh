@@ -10,7 +10,6 @@ set -e
 export USE_CHE_LATEST_SNAPSHOT="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
-export OC_VERSION=3.9.33
 CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}')
 if [[ -z $CHE_VERSION ]]; then
 	echo "FAILED to get che version. Finishing script."

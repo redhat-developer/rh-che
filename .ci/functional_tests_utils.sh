@@ -6,25 +6,45 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
-function installDependencies() {
-# Getting core repos ready
-	yum install --assumeyes epel-release
+function installOC() {
+	OC_VERSION=3.10.90
+	curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
+}
+
+function installJQ() {
+	yum install --assumeyes -q jq
+}
+
+function installEpelRelease() {
+	yum install epel-release --assumeyes
 	yum update --assumeyes
-	yum install --assumeyes python-pip
-	
-	# Test and show version
-	pip -V
+}
+
+function installYQ() {
+	yum install python-pip --assumeyes
+	pip install yq
+}
+
+function installStartDocker() {
+	yum install --assumeyes docker
+	systemctl start docker
+}
+
+function installDependencies() {
+	installEpelRelease
+	installYQ
+	installStartDocker
+	installJQ
+	installOC
 	
 	# Getting dependencies ready
 	yum install --assumeyes \
-	            docker \
 	            git \
 	            patch \
 	            pcp \
 	            bzip2 \
 	            golang \
 	            make \
-	            jq \
 	            java-1.8.0-openjdk \
 	            java-1.8.0-openjdk-devel \
 	            centos-release-scl
@@ -32,15 +52,11 @@ function installDependencies() {
 	yum install --assumeyes \
 	            rh-maven33 \
 	            rh-nodejs8
-	
-	systemctl start docker
-	pip install yq	
 }
 
 function checkAllCreds() {
 	set -x
 	CREDS_NOT_SET="false"
-	curl -s "https://mirror.openshift.com/pub/openshift-v3/clients/${OC_VERSION}/linux/oc.tar.gz" | tar xvz -C /usr/local/bin
 
 	if [[ -z "${QUAY_USERNAME}" || -z "${QUAY_PASSWORD}" ]]; then
 	  echo "Docker registry credentials not set"
