@@ -19,7 +19,7 @@ import org.eclipse.che.selenium.pageobject.CodenvyEditor;
 import org.eclipse.che.selenium.pageobject.InformationDialog;
 import org.eclipse.che.selenium.pageobject.Loader;
 import org.eclipse.che.selenium.pageobject.Menu;
-import org.eclipse.che.selenium.pageobject.NavigateToFile;
+import org.eclipse.che.selenium.pageobject.ProjectExplorer;
 import org.eclipse.che.selenium.pageobject.git.Git;
 import org.eclipse.che.selenium.pageobject.git.GitCompare;
 import org.testng.annotations.BeforeClass;
@@ -29,20 +29,23 @@ import org.testng.annotations.Test;
 public class EETest extends RhCheAbstractTestClass {
 
   @Inject private ProvidedWorkspace workspace;
-  @Inject private NavigateToFile navigateToFile;
   @Inject private Loader loader;
   @Inject private CodenvyEditor editor;
   @Inject private Git git;
   @Inject private Menu menu;
   @Inject private InformationDialog dialog;
   @Inject private GitCompare gitCompare;
+  @Inject private ProjectExplorer projectExplorer;
   private String text = "protected static final String template = \"Bonjour, %s!\";";
-  private String fileName = "HttpApplication", extension = ".java";
+  private String fileName = "HttpApplication";
 
   private static final String GIT = "gwt-debug-MenuItem/git-true";
   private static final String COMPARE_TOP = "gwt-debug-topmenu/Git/gitCompareGroup";
   private static final String COMPARE_WITH_BRANCH =
       "gwt-debug-topmenu/Git/Compare/gitCompareWithBranch";
+  private static final String PATH_TO_FILE =
+      "vertx-http-booster/src/main/java/io.openshift.booster";
+  private static final String PROJECT_FILE = "HttpApplication.java";
 
   @BeforeClass
   public void checkWorkspace() throws Exception {
@@ -50,25 +53,15 @@ public class EETest extends RhCheAbstractTestClass {
   }
 
   @Test(priority = 1)
-  public void openClass() throws Exception {
-    navigateToFile.launchNavigateToFileByKeyboard();
-    navigateToFile.waitFormToOpen();
-    loader.waitOnClosed();
-    navigateToFile.typeSymbolInFileNameField(fileName);
-    navigateToFile.selectFileByName(fileName + extension);
-    loader.waitOnClosed();
-    editor.waitActive();
-  }
-
-  @Test(priority = 2)
-  public void changeLineText() {
+  public void openClassAndWriteChange() throws Exception {
+    projectExplorer.expandPathInProjectExplorerAndOpenFile(PATH_TO_FILE, PROJECT_FILE);
     editor.selectLineAndDelete(14);
     editor.typeTextIntoEditor(text);
     editor.waitTabFileWithSavedStatus(fileName);
     editor.closeAllTabs();
   }
 
-  @Test(priority = 3)
+  @Test(priority = 2)
   public void gitCommit() {
     // Add file to index
     menu.runCommand(TestMenuCommandsConstants.Git.GIT, TestMenuCommandsConstants.Git.ADD_TO_INDEX);
@@ -88,7 +81,7 @@ public class EETest extends RhCheAbstractTestClass {
     git.waitGitStatusBarWithMess(TestGitConstants.COMMIT_MESSAGE_SUCCESS);
   }
 
-  @Test(priority = 4)
+  @Test(priority = 3)
   public void gitPush() throws Exception {
     git.pushChanges(false);
     git.waitPushFormToClose();
