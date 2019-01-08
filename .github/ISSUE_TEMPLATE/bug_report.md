@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: kind/bug
+assignees: ''
+
+---
+
 **Issue problem:** 
 <!--- 
 Replace this comment with a description of the problem.
@@ -21,6 +30,5 @@ runtime used:
    - [ ] minishift (include output of `minishift version`)
    - [ ] OpenShift.io
    - [ ] Openshift Container Platform (include output of `oc version`)
-   - [ ] k8s (include output of `kubectl version`)
 
 <!-- paste output of the runtime here -->
