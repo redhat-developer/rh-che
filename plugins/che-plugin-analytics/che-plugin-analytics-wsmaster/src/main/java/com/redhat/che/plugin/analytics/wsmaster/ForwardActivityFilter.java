@@ -168,20 +168,7 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
             server -> {
               try {
                 URI uri = UriBuilder.fromUri(server.getUrl()).path(targetEndpoint).build();
-
-                int port;
-                if (uri.getPort() == -1) {
-                  if ("http".equals(uri.getScheme())) {
-                    port = 80;
-                  } else {
-                    port = 443;
-                  }
-                } else {
-                  port = uri.getPort();
-                }
-
                 LOG.debug("{} on workspace {} to {} for user {}", action, workspaceId, uri, userId);
-
                 HttpURLConnection httpURLConnection =
                     (HttpURLConnection) uri.toURL().openConnection();
                 httpURLConnection.setRequestProperty(
