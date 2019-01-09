@@ -40,6 +40,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
+import org.eclipse.che.api.core.model.workspace.Runtime;
 import org.eclipse.che.api.core.model.workspace.WorkspaceStatus;
 import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.core.notification.EventSubscriber;
@@ -92,9 +93,18 @@ public class ForwardActivityFilter implements Filter, EventSubscriber<WorkspaceS
     if (WorkspaceStatus.STOPPING.equals(event.getStatus())) {
       try {
         final WorkspaceImpl workspace = workspaceManager.getWorkspace(workspaceId);
-        String userId = workspace.getRuntime().getOwner();
-        callWorkspaceAnalyticsEndpoint(
-            userId, workspaceId, "/fabric8-che-analytics/stopped", "notify stop", workspace);
+        Runtime runtime = workspace.getRuntime();
+        if (runtime != null) {
+          String userId = runtime.getOwner();
+          callWorkspaceAnalyticsEndpoint(
+              userId, workspaceId, "/fabric8-che-analytics/stopped", "notify stop", workspace);
+        } else {
+          LOG.warn(
+              "Received stopping event for workspace {}/{} with id {} but runtime is null",
+              workspace.getNamespace(),
+              workspace.getConfig().getName(),
+              workspaceId);
+        }
       } catch (NotFoundException | ServerException e) {
         LOG.warn("", e);
         return;
