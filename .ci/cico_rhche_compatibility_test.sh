@@ -56,14 +56,8 @@ else
 fi
 
 #Get last commit short hash from upstream che
-upstream_branch=$(echo "$CHE_VERSION" | cut -d"." -f 1,2).x
-longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/$upstream_branch | jq .sha)
-if [ "$longHashUpstream" == "null" ]; then
-  echo "The upstream version has changed to $CHE_VERSION, but there has been no SNAPSHOT yet. Skipping tests."
-  exit 1
-else
-  shortHashUpstream=${longHashUpstream:1:7}
-fi
+longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/master | jq .sha)
+shortHashUpstream=${longHashUpstream:1:7}
 
 #Get last commit short hash from rh-che branch 
 longHashDownstream=$(git log | grep -m 1 commit | head -1 | cut -d" " -f 2)
@@ -97,7 +91,6 @@ done <<< "$PULL_REQUESTS"
 #if PR does not exist, create it
 if [[ $PR_EXISTS -eq 1 ]]; then
   echo "Pull request for tracking changes of version $CHE_VERSION was not found - creating new one."
-	
   #add changes (if there are some) and push branch
   if ( git diff --exit-code ); then
     echo "Nothing to commit, continue."
