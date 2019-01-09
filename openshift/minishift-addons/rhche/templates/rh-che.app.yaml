@@ -77,25 +77,10 @@ objects:
         - env:
           - name: CHE_API
             value: "${PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/api"
-          - name: CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE
-            valueFrom:
-              configMapKeyRef:
-                key: che-jsonrpc-max-pool-size
-                name: rhche
-          - name: CHE_DEBUG_SERVER
-            valueFrom:
-              configMapKeyRef:
-                key: remote-debugging-enabled
-                name: rhche
           - name: CHE_FABRIC8_AUTH_ENDPOINT
             value: ${CHE_FABRIC8_AUTH_ENDPOINT}
           - name: CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL
             value: ${CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL}
-          - name: CHE_FABRIC8_MULTITENANT
-            valueFrom:
-              configMapKeyRef:
-                key: che-fabric8-multitenant
-                name: rhche
           - name: CHE_FABRIC8_STANDALONE
             value: "true"
           - name: CHE_FABRIC8_USER__SERVICE_ENDPOINT
@@ -104,91 +89,16 @@ objects:
             value: "rhche-${NAMESPACE}.${ROUTING_SUFFIX}"
           - name: CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL
             value: "${PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
-          - name: CHE_INFRA_KUBERNETES_MACHINE__START__TIMEOUT__MIN
-            valueFrom:
-              configMapKeyRef:
-                key: infra-machine-start-timeout
-                name: rhche
-          - name: CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS
-            valueFrom:
-              configMapKeyRef:
-                key: che-openshift-precreate-subpaths
-                name: rhche
-          - name: CHE_INFRA_KUBERNETES_PVC_STRATEGY
-            valueFrom:
-              configMapKeyRef:
-                key: infra-pvc-strategy
-                name: rhche
-          - name: CHE_INFRA_KUBERNETES_TRUST__CERTS
-            valueFrom:
-              configMapKeyRef:
-                key: infra-trust-certs
-                name: rhche
           - name: CHE_INFRA_OPENSHIFT_PROJECT
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-          - name: CHE_INFRA_OPENSHIFT_TLS__ENABLED
-            valueFrom:
-              configMapKeyRef:
-                key: che-openshift-secure-routes
-                name: rhche
           - name: CHE_INFRASTRUCTURE_ACTIVE
             value: "openshift"
           - name: CHE_KEYCLOAK_AUTH__SERVER__URL
             value: "${CHE_KEYCLOAK_AUTH__SERVER__URL}"
-          - name: CHE_KEYCLOAK_CLIENT__ID
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-client-id
-                name: rhche
           - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
             value: ${CHE_KEYCLOAK_AUTH__SERVER__URL}/realms/che/broker/github/token
-          - name: CHE_KEYCLOAK_OIDC__PROVIDER
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-oidc-provider
-                name: rhche
-          - name: CHE_KEYCLOAK_REALM
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-realm
-                name: rhche
-          - name: CHE_KEYCLOAK_USE__NONCE
-            valueFrom:
-              configMapKeyRef:
-                key: che-keycloak-use-nonce
-                name: rhche
-          - name: CHE_LIMITS_USER_WORKSPACES_RUN_COUNT
-            valueFrom:
-              configMapKeyRef:
-                key: che-limits-user-workspaces-run-count
-                name: rhche
-          - name: CHE_LIMITS_WORKSPACE_ENV_RAM
-            valueFrom:
-              configMapKeyRef:
-                key: workspaces-memory-limit-max
-                name: rhche
-          - name: CHE_LOCAL_CONF_DIR
-            valueFrom:
-              configMapKeyRef:
-                key: local-conf-dir
-                name: rhche
-          - name: CHE_LOG_LEVEL
-            valueFrom:
-              configMapKeyRef:
-                key: log-level
-                name: rhche
-          - name: CHE_LOGS_DIR
-            valueFrom:
-              configMapKeyRef:
-                key: che.logs.dir
-                name: rhche
-          - name: CHE_MULTIUSER
-            valueFrom:
-              configMapKeyRef:
-                key: multi-user
-                name: rhche
           - name: CHE_OAUTH_SERVICE__MODE
             value: "embedded"
           - name: CHE_OPENSHIFT_SERVICE__ACCOUNT_ID
@@ -199,51 +109,6 @@ objects:
             value: "8080"
           - name: CHE_WEBSOCKET_ENDPOINT
             value: "${WS_PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/api/websocket"
-          - name: CHE_WORKSPACE_AGENT_DEV_INACTIVE__STOP__TIMEOUT__MS
-            valueFrom:
-              configMapKeyRef:
-                key: che.workspace.agent.dev.inactive_stop_timeout_ms
-                name: rhche
-          - name: CHE_WORKSPACE_AUTO__START
-            valueFrom:
-              configMapKeyRef:
-                key: enable-workspaces-autostart
-                name: rhche
-          - name: CHE_WORKSPACE_DEFAULT__MEMORY__MB
-            valueFrom:
-              configMapKeyRef:
-                key: workspaces-memory-limit
-                name: rhche
-          - name: CHE_WORKSPACE_JAVA__OPTIONS
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspaces-java-opts
-                name: rhche
-          - name: CHE_WORKSPACE_LOGS_ROOT__DIR
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-logs
-                name: rhche
-          - name: CHE_WORKSPACE_SERVER_PING__INTERVAL__MILLISECONDS
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-server-ping-interval-milliseconds
-                name: rhche
-          - name: CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD
-            valueFrom:
-              configMapKeyRef:
-                key: che-workspace-server-ping-success-threshold
-                name: rhche
-          - name: CHE_WORKSPACE_STORAGE
-            valueFrom:
-              configMapKeyRef:
-                key: workspace-storage
-                name: rhche
-          - name: JAVA_OPTS
-            valueFrom:
-              configMapKeyRef:
-                key: che-server-java-opts
-                name: rhche
           - name: NAMESPACE
             valueFrom:
               fieldRef:
@@ -260,6 +125,9 @@ objects:
             value: "150"
           - name: CHE_SERVER_SECURE__EXPOSER_JWTPROXY_MEMORY__LIMIT
             value: "150mb"
+          envFrom:
+          - configMapRef:
+              name: rhche
           image: ${IMAGE_RH_CHE}:${RH_CHE_VERSION}
           imagePullPolicy: "${PULL_POLICY}"
           livenessProbe:

@@ -164,7 +164,7 @@ while getopts ':hnu:szUS:b:e:r:t:o:p:' option; do
     b) export RH_CHE_GITHUB_BRANCH=$OPTARG
        ;;
     z) export RH_CHE_RUNNING_STANDALONE_SCRIPT="true"
-       ;; 
+       ;;
     U) export RH_CHE_USE_TLS="false"
        ;;
     S) export RH_CHE_APPLY_SECRET="true"
@@ -295,27 +295,26 @@ else
 fi
 
 # APPLY CHE CONFIGMAP
-CHE_CONFIG_YAML=$(yq ".\"data\".\"che-keycloak-realm\" = \"NULL\" | 
-                      .\"data\".\"che-keycloak-auth-server-url\" = \"NULL\" | 
-                      .\"data\".\"che-keycloak-use-nonce\" = \"false\" | 
-                      .\"data\".\"che-keycloak-client-id\" = \"740650a2-9c44-4db5-b067-a3d1b2cd2d01\" | 
-                      .\"data\".\"che-keycloak-oidc-provider\" = \"https://auth.prod-preview.openshift.io/api\" | 
-                      .\"data\".\"keycloak-github-endpoint\" = \"https://auth.prod-preview.openshift.io/api/token?for=https://github.com\" | 
-                      .\"data\".\"service.account.secret\" = \"\" | 
-                      .\"data\".\"service.account.id\" = \"\" | 
-                      .\"data\".\"che.jdbc.username\" = \"$RH_CHE_JDBC_USERNAME\" | 
-                      .\"data\".\"che.jdbc.password\" = \"$RH_CHE_JDBC_PASSWORD\" | 
-                      .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" | 
-                      .\"data\".\"logs-encoding\" = \"plaintext\" " ${RH_CHE_CONFIG})
+CHE_CONFIG_YAML=$(yq ".\"data\".\"CHE_KEYCLOAK_REALM\" = \"NULL\" |
+                      .\"data\".\"CHE_KEYCLOAK_AUTH__SERVER__URL\" = \"NULL\" |
+                      .\"data\".\"CHE_KEYCLOAK_USE__NONCE\" = \"false\" |
+                      .\"data\".\"CHE_KEYCLOAK_CLIENT__ID\" = \"740650a2-9c44-4db5-b067-a3d1b2cd2d01\" |
+                      .\"data\".\"CHE_KEYCLOAK_OIDC__PROVIDER\" = \"https://auth.prod-preview.openshift.io/api\" |
+                      .\"data\".\"CHE_KEYCLOAK_GITHUB_ENDPOINT\" = \"https://auth.prod-preview.openshift.io/api/token?for=https://github.com\" |
+                      .\"data\".\"service.account.secret\" = \"\" |
+                      .\"data\".\"service.account.id\" = \"\" |
+                      .\"data\".\"che.jdbc.username\" = \"$RH_CHE_JDBC_USERNAME\" |
+                      .\"data\".\"che.jdbc.password\" = \"$RH_CHE_JDBC_PASSWORD\" |
+                      .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" |
+                      .\"data\".\"CHE_LOG_LEVEL\" = \"plaintext\" " ${RH_CHE_CONFIG})
 
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                  yq ".\"data\".\"che-host\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net\" |
-                      .\"data\".\"infra-bootstrapper-binary-url\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
-                      .\"data\".\"che-api\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api\" |
-                      .\"data\".\"che-websocket-endpoint\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket\" |
+                  yq ".\"data\".\"CHE_HOST\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net\" |
+                      .\"data\".\"CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
+                      .\"data\".\"CHE_API\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api\" |
+                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket\" |
                       .\"metadata\".\"name\" = \"rhche\" |
-                      .\"data\".\"che-openshift-secure-routes\" = \"$RH_CHE_USE_TLS\" |
-                      .\"data\".\"che-secure-external-urls\" = \"$RH_CHE_USE_TLS\" ")
+                      .\"data\".\"CHE_INFRA_OPENSHIFT_TLS__ENABLED\" = \"$RH_CHE_USE_TLS\" ")
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
   echo -e "\\033[91;1mFailed to apply configmap [$?].\\033[0m"
@@ -327,7 +326,7 @@ echo -e "\\033[92;1mChe config deployed on \\033[34m${RH_CHE_PROJECT_NAMESPACE}\
 CHE_APP_CONFIG_YAML=$(yq "" ${RH_CHE_APP})
 CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
                       yq "(.parameters[] | select(.name == \"IMAGE\").value) |= \"$RH_CHE_DOCKER_REPOSITORY\" |
-                          (.parameters[] | select(.name == \"IMAGE_TAG\").value) |= \"$RH_CHE_DOCKER_IMAGE_TAG\" | 
+                          (.parameters[] | select(.name == \"IMAGE_TAG\").value) |= \"$RH_CHE_DOCKER_IMAGE_TAG\" |
                           (.objects[] | select(.kind == \"DeploymentConfig\").spec.template.spec.containers[0].imagePullPolicy) |= \"Always\"")
 
 CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
@@ -345,7 +344,6 @@ CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | \
 if [ "${RH_CHE_USE_TLS}" != "true" ]; then
   CHE_APP_CONFIG_YAML=$(echo "$CHE_APP_CONFIG_YAML" | yq "del (.objects[] | select(.kind == \"Route\").spec.tls)")
 fi
-
 
 if ! (echo "$CHE_APP_CONFIG_YAML" | oc process -f - | oc apply -f - > /dev/null 2>&1); then
   echo -e "\\033[91;1mFailed to process che config [$?]\\033[0m"
