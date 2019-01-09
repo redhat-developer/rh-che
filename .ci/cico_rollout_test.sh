@@ -50,7 +50,7 @@ else
 fi
 
 # --- INSTALLING NEEDED SOFTWARE ---
-source ./functional_tests_utils.sh
+source ./.ci/functional_tests_utils.sh
 instalEpelRelease
 installJQ
 installOC
