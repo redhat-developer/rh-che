@@ -55,14 +55,8 @@ else
 fi
 
 #Get last commit short hash from upstream che
-upstream_branch=$(echo "$CHE_VERSION" | cut -d"." -f 1,2).x
-longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/$upstream_branch | jq .sha)
-if [ "$longHashUpstream" == "null" ]; then
-  echo "The upstream version has changed to $CHE_VERSION, but there has been no SNAPSHOT yet. Skipping tests."
-  exit 1
-else
-  shortHashUpstream=${longHashUpstream:1:7}
-fi
+longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/master | jq .sha)
+shortHashUpstream=${longHashUpstream:1:7}
 
 #Get last commit short hash from rh-che branch 
 longHashDownstream=$(git log | grep -m 1 commit | head -1 | cut -d" " -f 2)
@@ -81,12 +75,6 @@ PR_HEAD="$BRANCH"
 PR_BASE="master"
 
 PULL_REQUESTS=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[].title')
-if [ $? -eq 0 ]; then
-  echo "Getting list of open PRs successful. Searching for PR with title $RELATED_PR_TITLE"
-else
-  echo "Retrieving open pull requests failed with exit code $?"
-  exit $?
-fi
 
 #check if pull request exists
 PR_EXISTS=1
@@ -104,8 +92,7 @@ if [[ $PR_EXISTS -eq 1 ]]; then
   echo "Pull request for tracking changes of version $CHE_VERSION was not found - creating new one."
 	
   #add changes and push branch
-  git diff --exit-code
-  if [ $? == 0 ]; then
+  if ( git diff --exit-code ); then
     echo "Nothing to commit, continue."
   else
     echo "Changes found. Commit and push them before creating PR."
