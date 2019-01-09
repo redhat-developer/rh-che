@@ -272,7 +272,7 @@ fi
 
 echo -e "\\033[92;1mGetting deployment scripts done.\\033[0m"
 
-# DEPLOY POSTRES
+# DEPLOY POSTGRES
 if [ "$RH_CHE_WIPE_SQL" == "true" ]; then
   if (oc get dc postgres > /dev/null 2>&1); then
     waitForPostgresToBeDeleted
@@ -366,6 +366,8 @@ while [[ "${RH_CHE_STATUS_PROGRESS}" != "\"True\"" || "${RH_CHE_STATUS_AVAILABLE
 done
 if [ ${CHE_STARTUP_TIMEOUT} == 0 ]; then
   echo -e "\\033[91;1mFailed to start che-server: timed out\\033[0m"
+  echo -e "Getting events from deployment:"
+  oc get events -n ${RH_CHE_PROJECT_NAMESPACE}
   exit 1
 fi
 
