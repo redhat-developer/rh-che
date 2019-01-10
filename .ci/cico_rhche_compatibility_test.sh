@@ -55,6 +55,7 @@ else
   scl enable rh-maven33 rh-nodejs8 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
 fi
 
+echo "Setting image tags for pushing to quay."
 #Get last commit short hash from upstream che
 longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/master | jq .sha)
 shortHashUpstream=${longHashUpstream:1:7}
@@ -69,7 +70,8 @@ export DOCKER_IMAGE_TAG="upstream-check-latest"
 export DOCKER_IMAGE_TAG_WITH_SHORTHASHES="upstream-check-$shortHashUpstream-$shortHashDownstream"
 export PROJECT_NAMESPACE=compatibility-check
 
-#set values needed for checking/creating PR
+echo "Setting PR attributes."
+#set values needed for creating PR
 RELATED_PR_TITLE="Update to $(echo $CHE_VERSION | cut -d'-' -f 1)"
 PR_BODY="Tracking changes for fixing compatibility with upstream $CHE_VERSION. This PR was created automatically by Jenkins from job $JOB_NAME"
 PR_HEAD="$BRANCH"
@@ -129,3 +131,4 @@ if [ $RETURN_CODE != 0 ]; then
 fi
 
 exit $RETURN_CODE
+
