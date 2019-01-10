@@ -5,6 +5,9 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+#REMOVE BEFORE MERGE!!!
+./.ci/cico_rhche_compatibility_test.sh
+
 export PR_CHECK_BUILD="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
