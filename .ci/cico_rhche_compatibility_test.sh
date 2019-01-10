@@ -98,7 +98,8 @@ if [[ $PR_EXISTS -eq 1 ]]; then
     echo "Changes found. Commit and push them before creating PR."
     git add -u
     git commit -m"Changing version of parent che to $CHE_VERSION" || echo "No changes found to commit."
-    curl -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" https://api.github.com/repos/redhat-developer/rh-che/
+#    curl -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" https://api.github.com/repos/redhat-developer/rh-che/
+    git remote set-url --push origin "https://$(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)@github.com/redhat-developer/rh-che.git"
     git push origin "$BRANCH"
   fi
   #creating PR inspired in fabric8-services/fabric8-tenant cico_setup.sh
@@ -106,20 +107,20 @@ if [[ $PR_EXISTS -eq 1 ]]; then
 else
   echo "Pull request for tracking changes of version $CHE_VERSION was found."
 fi
-
-set +e
-echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
-.ci/cico_build_deploy_test_rhche.sh
-RETURN_CODE=$?
-set -e
-
-#if test fails, send comment to PR
-if [ $RETURN_CODE != 0 ]; then
-  url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[] | select(.title == "$RELATED_PR_TITLE") | .url' | sed 's/pulls/issues/g')
-  url="${url}/comments"
-  job_url="https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console"
-  message="Periodic compatibility check failed. See more details here: $job_url"
-  curl -X POST -s -L -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" $url -d "{\"body\": \"$message\"}"
-fi
-
-exit $RETURN_CODE
+#
+#set +e
+#echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
+#.ci/cico_build_deploy_test_rhche.sh
+#RETURN_CODE=$?
+#set -e
+#
+##if test fails, send comment to PR
+#if [ $RETURN_CODE != 0 ]; then
+#  url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[] | select(.title == "$RELATED_PR_TITLE") | .url' | sed 's/pulls/issues/g')
+#  url="${url}/comments"
+#  job_url="https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console"
+#  message="Periodic compatibility check failed. See more details here: $job_url"
+#  curl -X POST -s -L -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" $url -d "{\"body\": \"$message\"}"
+#fi
+#
+#exit $RETURN_CODE

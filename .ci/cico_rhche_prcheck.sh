@@ -7,6 +7,7 @@
 
 #REMOVE BEFORE MERGE!!!
 ./.ci/cico_rhche_compatibility_test.sh
+exit 1
 
 export PR_CHECK_BUILD="true"
 export BASEDIR=$(pwd)
