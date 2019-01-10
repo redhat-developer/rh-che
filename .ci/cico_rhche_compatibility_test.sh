@@ -98,6 +98,7 @@ if [[ $PR_EXISTS -eq 1 ]]; then
     echo "Changes found. Commit and push them before creating PR."
     git add -u
     git commit -m"Changing version of parent che to $CHE_VERSION" || echo "No changes found to commit."
+    curl -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" https://api.github.com/repos/redhat-developer/rh-che/
     git push origin "$BRANCH"
   fi
   #creating PR inspired in fabric8-services/fabric8-tenant cico_setup.sh
