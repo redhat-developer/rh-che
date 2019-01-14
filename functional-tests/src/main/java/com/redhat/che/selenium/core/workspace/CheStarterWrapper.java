@@ -22,6 +22,7 @@ import com.redhat.che.selenium.core.model.request.CheStarterCreateWorkspaceReque
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import javax.ws.rs.HttpMethod;
 import okhttp3.MediaType;
@@ -29,6 +30,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
@@ -105,7 +107,9 @@ public class CheStarterWrapper {
     BufferedReader jsonRequestReader;
     try {
       jsonRequestReader =
-          new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(pathToJson)));
+          new BufferedReader(
+              new InputStreamReader(
+                  getClass().getResourceAsStream(pathToJson), Charset.forName("UTF-8")));
     } catch (Exception e) {
       LOG.error("File with json was not found on address: " + pathToJson, e);
       throw e;
@@ -208,12 +212,16 @@ public class CheStarterWrapper {
 
     try {
       response = client.newCall(request).execute();
-      if (response.isSuccessful()) {
+      boolean responseSuccessful = response.isSuccessful();
+      int responseCode = response.code();
+      ResponseBody responseBody = response.body();
+      response.close();
+      if (responseSuccessful) {
         LOG.info(
             "Prepare workspace request send. Starting workspace named: " + workspaceName + ".");
       } else {
         throw new RuntimeException(
-            "Workspace failed to start [" + response.code() + "]:" + response.body().string());
+            "Workspace failed to start [" + responseCode + "]:" + responseBody.string());
       }
     } catch (IOException e) {
       LOG.error("Failed to set environment before workspace start: " + e.getMessage(), e);

@@ -10,7 +10,7 @@ function printHelp {
 	YELLOW="\\033[93;1m"
 	WHITE="\\033[0;1m"
 	GREEN="\\033[32;1m"
-	NC='\033[0m' # No Color
+	NC="\\033[0m" # No Color
 	
 	echo -e "${YELLOW}$(basename "$0") ${WHITE}[-u <username>] [-p <passwd>] [-m <email>] [-r <url>]" 
 	echo -e "\n${NC}Script for running functional tests against production or prod-preview environment."

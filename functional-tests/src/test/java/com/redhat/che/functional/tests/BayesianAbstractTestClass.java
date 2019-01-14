@@ -99,7 +99,7 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   }
 
   @AfterClass
-  public void closeBrowser() {
+  public void closeBrowserAfterTest() {
     super.closeBrowser();
   }
 
