@@ -51,7 +51,7 @@ fi
 
 # --- INSTALLING NEEDED SOFTWARE ---
 source ./.ci/functional_tests_utils.sh
-instalEpelRelease
+installEpelRelease
 installJQ
 installOC
 installYQ
