@@ -13,6 +13,7 @@ package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
 import com.redhat.che.selenium.core.workspace.ProvidedWorkspace;
+import org.eclipse.che.selenium.core.client.TestProjectServiceClient;
 import org.eclipse.che.selenium.core.constant.TestGitConstants;
 import org.eclipse.che.selenium.core.constant.TestMenuCommandsConstants;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
@@ -36,25 +37,29 @@ public class EETest extends RhCheAbstractTestClass {
   @Inject private InformationDialog dialog;
   @Inject private GitCompare gitCompare;
   @Inject private ProjectExplorer projectExplorer;
+  @Inject private TestProjectServiceClient projectServiceClient;
+
   private String text = "protected static final String template = \"Bonjour, %s!\";";
   private String fileName = "HttpApplication";
+  private String fullPath;
 
   private static final String GIT = "gwt-debug-MenuItem/git-true";
   private static final String COMPARE_TOP = "gwt-debug-topmenu/Git/gitCompareGroup";
   private static final String COMPARE_WITH_BRANCH =
       "gwt-debug-topmenu/Git/Compare/gitCompareWithBranch";
-  private static final String PATH_TO_FILE =
-      "vertx-http-booster/src/main/java/io.openshift.booster";
+  private static final String PATH_TO_FILE = "/src/main/java/io.openshift.booster";
   private static final String PROJECT_FILE = "HttpApplication.java";
 
   @BeforeClass
   public void checkWorkspace() throws Exception {
     checkWorkspace(workspace);
+    String projectName = projectServiceClient.getFirstProject(workspace.getId()).getName();
+    fullPath = projectName + PATH_TO_FILE;
   }
 
   @Test(priority = 1)
   public void openClassAndWriteChange() throws Exception {
-    projectExplorer.expandPathInProjectExplorerAndOpenFile(PATH_TO_FILE, PROJECT_FILE);
+    projectExplorer.expandPathInProjectExplorerAndOpenFile(fullPath, PROJECT_FILE);
     editor.selectLineAndDelete(14);
     editor.typeTextIntoEditor(text);
     editor.waitTabFileWithSavedStatus(fileName);
