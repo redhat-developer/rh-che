@@ -103,6 +103,7 @@ if [[ $PR_EXISTS -eq 1 ]]; then
   fi
   #push everytime - with commited changes or with rebased branch
   git remote set-url --push origin "https://$(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)@github.com/redhat-developer/rh-che.git"
+
   #force push because of possible rebase
   git push origin "$BRANCH" -f 
 
