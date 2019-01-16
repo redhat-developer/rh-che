@@ -114,6 +114,7 @@ fi
 
 echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
 set +e
+
 .ci/cico_build_deploy_test_rhche.sh
 RETURN_CODE=$?
 set -e
@@ -132,4 +133,3 @@ if [ $RETURN_CODE != 0 ]; then
 fi
 
 exit $RETURN_CODE
-
