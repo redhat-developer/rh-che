@@ -33,7 +33,9 @@ public class RhCheSeleniumTestHandler extends SeleniumTestHandler {
   @Override
   public List<Module> getChildModules() {
     List<Module> modules = new ArrayList<>();
-    modules.add(new CheSeleniumWebDriverRelatedModule());
+    modules.add(
+        Modules.override(new CheSeleniumWebDriverRelatedModule())
+            .with(new RhCheSeleniumWebDriverRelatedModule()));
     return modules;
   }
 }
