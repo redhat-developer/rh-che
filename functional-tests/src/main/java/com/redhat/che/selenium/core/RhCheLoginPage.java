@@ -21,18 +21,16 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** @author Katerina Foniok */
 public class RhCheLoginPage implements LoginPage {
 
   @Inject private SeleniumWebDriverHelper seleniumWebDriverHelper;
 
-  final private String USERNAME_INPUT_NAME = "username";
-  final private String PASSWORD_INPUT_NAME = "password";
-  final private String LOGIN_BUTTON_NAME = "login";
-  final private String NEXT_BUTTON_ID = "login-show-step2";
+  private final String USERNAME_INPUT_NAME = "username";
+  private final String PASSWORD_INPUT_NAME = "password";
+  private final String LOGIN_BUTTON_NAME = "login";
+  private final String NEXT_BUTTON_ID = "login-show-step2";
 
   @FindBy(name = USERNAME_INPUT_NAME)
   private WebElement usernameInput;
