@@ -27,7 +27,6 @@ import static org.testng.Assert.assertTrue;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.openshift.api.model.Route;
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.commons.subject.SubjectImpl;
+import org.eclipse.che.workspace.infrastructure.kubernetes.environment.KubernetesEnvironment.PodData;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
@@ -124,8 +124,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
             false,
             WSAGENT_ROUTER_TIMEOUT);
 
-    Pod pod1 = mock(Pod.class);
-    Pod pod2 = mock(Pod.class);
+    PodData podData1 = mock(PodData.class);
+    PodData podData2 = mock(PodData.class);
     PodSpec podSpec1 = mock(PodSpec.class);
     PodSpec podSpec2 = mock(PodSpec.class);
     Container container1 = mock(Container.class);
@@ -140,10 +140,11 @@ public class RhCheInfraEnvironmentProvisionerTest {
     when(openshiftUserTokenProvider.getToken(eq(SUBJECT))).thenReturn(OSO_TOKEN);
     when(tenantDataProvider.getUserCheTenantData(eq(SUBJECT), eq("user")))
         .thenReturn(new UserCheTenantData(NAMESPACE, CLUSTER_URL, null, false));
-    when(openShiftEnvironment.getPodsCopy()).thenReturn(of("pod1", pod1, "pod2", pod2));
+    when(openShiftEnvironment.getPodsData())
+        .thenReturn(of("podData1", podData1, "podData2", podData2));
     when(openShiftEnvironment.getRoutes()).thenReturn(of("routeName", wsAgentRoute));
-    when(pod1.getSpec()).thenReturn(podSpec1);
-    when(pod2.getSpec()).thenReturn(podSpec2);
+    when(podData1.getSpec()).thenReturn(podSpec1);
+    when(podData2.getSpec()).thenReturn(podSpec2);
     when(podSpec1.getContainers()).thenReturn(singletonList(container1));
     when(podSpec2.getContainers()).thenReturn(asList(container2, container3));
     when(container1.getEnv()).thenReturn(con1EnvVars);

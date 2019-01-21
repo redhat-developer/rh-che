@@ -15,7 +15,6 @@ import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.Pod;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +26,7 @@ import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.api.workspace.server.spi.provision.env.EnvVarProvider;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.workspace.infrastructure.kubernetes.environment.KubernetesEnvironment.PodData;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
@@ -175,7 +175,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
   }
 
   private void injectEnvVars(OpenShiftEnvironment osEnv, Map<String, String> envVars) {
-    Collection<Pod> pods = osEnv.getPodsCopy().values();
+    Collection<PodData> pods = osEnv.getPodsData().values();
     pods.forEach(
         pod ->
             pod.getSpec()
