@@ -140,7 +140,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
     when(openshiftUserTokenProvider.getToken(eq(SUBJECT))).thenReturn(OSO_TOKEN);
     when(tenantDataProvider.getUserCheTenantData(eq(SUBJECT), eq("user")))
         .thenReturn(new UserCheTenantData(NAMESPACE, CLUSTER_URL, null, false));
-    when(openShiftEnvironment.getPods()).thenReturn(of("pod1", pod1, "pod2", pod2));
+    when(openShiftEnvironment.getPodsCopy()).thenReturn(of("pod1", pod1, "pod2", pod2));
     when(openShiftEnvironment.getRoutes()).thenReturn(of("routeName", wsAgentRoute));
     when(pod1.getSpec()).thenReturn(podSpec1);
     when(pod2.getSpec()).thenReturn(podSpec2);

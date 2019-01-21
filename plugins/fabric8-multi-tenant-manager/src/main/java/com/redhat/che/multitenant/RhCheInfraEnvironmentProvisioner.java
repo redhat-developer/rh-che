@@ -175,7 +175,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
   }
 
   private void injectEnvVars(OpenShiftEnvironment osEnv, Map<String, String> envVars) {
-    Collection<Pod> pods = osEnv.getPods().values();
+    Collection<Pod> pods = osEnv.getPodsCopy().values();
     pods.forEach(
         pod ->
             pod.getSpec()
