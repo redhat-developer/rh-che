@@ -70,3 +70,4 @@ data:
   CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME: "che-workspace"
   CHE_WORKSPACE_STORAGE: "/home/user/che/workspaces"
   CHE_WORKSPACE_PLUGIN__BROKER_INIT_IMAGE: "eclipse/che-init-plugin-broker:v0.7.1"
+  CHE_FABRIC8_CDN_PREFETCH_EDITOR: 'NULL'

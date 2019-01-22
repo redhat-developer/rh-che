@@ -30,5 +30,6 @@
         <module>fabric8-multi-tenant-manager</module>
         <module>che-plugin-analytics</module>
         <module>fabric8-end2end-flow</module>
+        <module>fabric8-cdn-support</module>
     </modules>
 </project>

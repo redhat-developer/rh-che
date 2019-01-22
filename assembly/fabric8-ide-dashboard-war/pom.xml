@@ -212,7 +212,7 @@
                                         <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
                                             <arg value="install" />
                                             <arg value="yarn" />
-                                        </exec>>
+                                        </exec>
                                     </target>
                                 </configuration>
                             </execution>

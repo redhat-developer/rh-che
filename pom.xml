@@ -61,6 +61,12 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
+                <artifactId>fabric8-cdn-support</artifactId>
+                <version>${rh.che.plugins.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-end2end-flow</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>

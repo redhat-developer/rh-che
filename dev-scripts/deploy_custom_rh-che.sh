@@ -306,7 +306,8 @@ CHE_CONFIG_YAML=$(yq ".\"data\".\"CHE_KEYCLOAK_REALM\" = \"NULL\" |
                       .\"data\".\"che.jdbc.username\" = \"$RH_CHE_JDBC_USERNAME\" |
                       .\"data\".\"che.jdbc.password\" = \"$RH_CHE_JDBC_PASSWORD\" |
                       .\"data\".\"che.jdbc.url\" = \"$RH_CHE_JDBC_URL\" |
-                      .\"data\".\"CHE_LOG_LEVEL\" = \"plaintext\" " ${RH_CHE_CONFIG})
+                      .\"data\".\"CHE_LOG_LEVEL\" = \"INFO\" |
+                      .\"data\".\"CHE_LOGS_APPENDERS_IMPL\" = \"plaintext\" " ${RH_CHE_CONFIG})
 
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                   yq ".\"data\".\"CHE_HOST\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net\" |
