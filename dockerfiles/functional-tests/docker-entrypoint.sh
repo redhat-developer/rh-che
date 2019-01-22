@@ -12,6 +12,7 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -v <local_functional-tests_full_path>:/root/che/ # Allows mounting custom rh-che/functional-tests sources"
   echo -e "\t       # Run tests against custom deployment:"
   echo -e "\t       -e \"RHCHE_HOST_PROTOCOL=<http/https>\" # Protocol to be used, either http or https"
+  echo -e "\t       -e \"RHCHE_PORT=<port_number>\" # Rh-che port"
   echo -e "\t       -e \"RHCHE_HOST_URL=che.openshift.io\" # Which host to run tests against. Just use host name"
   echo -e "\t       -e \"CHE_OSIO_AUTH_ENDPOINT=<endpoint>\" # endpoint for auth e.g. https://auth.prod-preview.openshift.io "
   echo -e "\t       -e \"RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com\" # Github API token exchange"
@@ -79,6 +80,14 @@ if [[ -n $RUNNING_WORKSPACE ]]; then
 	MVN_COMMAND="${MVN_COMMAND} -Dche.workspaceName=${RUNNING_WORKSPACE}"
 fi
 
+if [[ -n $RHCHE_HOST_PROTOCOL ]]; then
+	MVN_COMMAND="${MVN_COMMAND} -Dche.protocol=${RHCHE_HOST_PROTOCOL}"
+fi
+
+if [[ -n $RHCHE_PORT ]]; then
+	MVN_COMMAND="${MVN_COMMAND} -Dche.port=${RHCHE_PORT}"
+fi
+
 if [[ "$TEST_SUITE" == "rolloutTest.xml" ]]; then
 	export OPENSHIFT_URL=$OPENSHIFT_URL
 	export OPENSHIFT_TOKEN=$OPENSHIFT_TOKEN
@@ -87,7 +96,6 @@ if [[ "$TEST_SUITE" == "rolloutTest.xml" ]]; then
 	  -Dche.admin.name=${RHCHE_ACC_USERNAME} \
   	  -Dche.admin.email=${RHCHE_ACC_EMAIL} \
 	  -Dche.admin.password=${RHCHE_ACC_PASSWORD} \
-	  -Dche.protocol=${RHCHE_HOST_PROTOCOL} \
 	  -Dche.port=80 \
 	  -Dche.openshift.project=${OPENSHIFT_PROJECT}"
 fi
