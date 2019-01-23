@@ -11,7 +11,7 @@
 
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 
-source ./functional_tests_utils.sh
+source ./.ci/functional_tests_utils.sh
 installJQ
 installOC
 
