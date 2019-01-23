@@ -17,10 +17,10 @@ if [[ -z "${RHCHE_ACC_USERNAME}" || -z "${RHCHE_ACC_PASSWORD}" || -z "${RHCHE_AC
   echo -e "\t       -e \"CHE_OSIO_AUTH_ENDPOINT=<endpoint>\" # endpoint for auth e.g. https://auth.prod-preview.openshift.io "
   echo -e "\t       -e \"RHCHE_GITHUB_EXCHANGE=https://auth.<target>/api/token?for=https://github.com\" # Github API token exchange"
   echo -e "\t       -e \"RHCHE_OPENSHIFT_TOKEN_URL=https://sso.<target>/auth/realms/fabric8/broker\" # Openshift token exchange url"
-  echo -e "\t       -e \"TEST_SUITE=<xml> # Name of xml file with testing suite"
-  echo -e "\t		-e \"RUNNING_WORKSPACE=<name> # Name of running workspace to be used in test"
-  echo -e "\t       -e \"OPENSHIFT_URL=<url> # Url of openshift - used only in tests where manipulation with OpenShift environment is needed"
-  echo -e "\t       -e \"OPENSHIFT_TOKEN=<token> # Token for login to OpenShift - used only in tests where manipulation with OpenShift environment is needed"
+  echo -e "\t       -e \"TEST_SUITE=<xml>\" # Name of xml file with testing suite (in format suite.xml)"
+  echo -e "\t		-e \"RUNNING_WORKSPACE=<name>\" # Name of running workspace to be used in test"
+  echo -e "\t       -e \"OPENSHIFT_URL=<url>\" # Url of openshift - used only in tests where manipulation with OpenShift environment is needed"
+  echo -e "\t       -e \"OPENSHIFT_TOKEN=<token>\" # Token for login to OpenShift - used only in tests where manipulation with OpenShift environment is needed"
   exit 1
 fi
 

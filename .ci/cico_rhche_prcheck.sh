@@ -19,10 +19,6 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^RH_CHE)"
 
 source ./config
-# Provides methods:
-#   checkAllCreds
-#   installDependencies
-#   archiveArtifacts
 source .ci/functional_tests_utils.sh
 
 echo "Checking credentials:"

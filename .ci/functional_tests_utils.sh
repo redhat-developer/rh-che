@@ -30,6 +30,14 @@ function installStartDocker() {
 	systemctl start docker
 }
 
+function installMvn() {
+	yum install --assumeyes rh-maven33
+}
+
+function installNodejs() {
+	yum install --assumeyes rh-nodejs8
+}
+
 function installDependencies() {
 	installEpelRelease
 	installYQ
@@ -48,10 +56,8 @@ function installDependencies() {
 	            java-1.8.0-openjdk \
 	            java-1.8.0-openjdk-devel \
 	            centos-release-scl
-	
-	yum install --assumeyes \
-	            rh-maven33 \
-	            rh-nodejs8
+	installNodejs
+	installMvn
 }
 
 function checkAllCreds() {

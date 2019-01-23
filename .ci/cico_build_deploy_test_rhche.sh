@@ -68,8 +68,8 @@ else
 fi
 set -x
 
-echo "Custom che deployment successful, running che-functional tests against ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL}"
-if ./.ci/cico_run_che-functional-tests.sh;
+echo "Custom che deployment successful, running Rh-che tests against ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL}"
+if ./functional-tests/devscripts/run_tests.sh
 then
   echo "Functional tests finished without errors."
 else

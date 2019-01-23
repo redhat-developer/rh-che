@@ -74,7 +74,7 @@ docker run --name functional-tests-dep --privileged \
 ###### Optional mount for alternate sources
 If the source folder is mounted, the tests automatically run from the alternate sources.  
 This change however means, that the dependencies will not be available in the offline mode.  
-* `-v <local_functional-tests_full_path>:/root/che/`
+* `-v <local_rhche_full_path>:/root/che/`
   
 ###### Optional variables for changing target
 * ```'allowEmpty=true'
