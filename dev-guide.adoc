@@ -312,3 +312,57 @@ mvn -Pfast -Dskip-enforce -Dskip-validate-sources clean install && \
 docker push ${DOCKER_IMAGE}:${DOCKER_TAG} && \
 oc rollout latest rhche
 ----
+
+== che-plugin-registry
+
+https://github.com/eclipse/che-plugin-registry[che-plugin-registry] is a standalone service which provides metadata about the available Che plugins:
+
+.plugins.json
+[source,json]
+----
+[
+{
+"id":"che-dummy-plugin","version":"0.0.1","type":"Che Plugin","name":"Che Samples Hello World Plugin","description":"A hello world theia plug-in wrapped into a Che Plug-in", "links": {"self":"/plugins/che-dummy-plugin/0.0.1/meta.yaml" }
+}
+,{
+"id":"che-machine-exec-plugin","version":"0.0.1","type":"Che Plugin","name":"Che machine-exec Service","description":"Che Plug-in with che-machine-exec service to provide creation terminal or tasks for Eclipse CHE workspace machines.", "links": {"self":"/plugins/che-machine-exec-plugin/0.0.1/meta.yaml" }
+}
+,{
+"id":"che-service-plugin","version":"0.0.1","type":"Che Plugin","name":"Che Samples REST API Sidecar Plugin","description":"Che Plug-in with Theia plug-in and container definition providing a service", "links": {"self":"/plugins/che-service-plugin/0.0.1/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.editor.dirigible","version":"1.0.0","type":"Che Editor","name":"dirigible-che-editor-plugin","description":"Eclipse Dirigible as App Development Platform for Eclipse Che", "links": {"self":"/plugins/org.eclipse.che.editor.dirigible/1.0.0/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.editor.eclipseide","version":"0.0.1","type":"Che Editor","name":"eclipse-ide","description":"Eclipse IDE", "links": {"self":"/plugins/org.eclipse.che.editor.eclipseide/0.0.1/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.editor.gwt","version":"1.0.0","type":"Che Editor","name":"gwt-ide","description":"Eclipse GWT IDE", "links": {"self":"/plugins/org.eclipse.che.editor.gwt/1.0.0/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.editor.jupyter","version":"1.0.0","type":"Che Editor","name":"jupyter-notebook","description":"Jupyter Notebook as Editor for Eclipse Che", "links": {"self":"/plugins/org.eclipse.che.editor.jupyter/1.0.0/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.editor.theia","version":"1.0.0","type":"Che Editor","name":"theia-ide","description":"Eclipse Theia", "links": {"self":"/plugins/org.eclipse.che.editor.theia/1.0.0/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.samples.container-fortune","version":"0.0.1","type":"Theia plugin","name":"Che-Samples-Fortune","description":"Fortune plug-in running in its own container that provides the fortune tool", "links": {"self":"/plugins/org.eclipse.che.samples.container-fortune/0.0.1/meta.yaml" }
+}
+,{
+"id":"org.eclipse.che.theia.dev","version":"0.0.1","type":"Che Plugin","name":"Che Theia Dev Plugin","description":"Che Theia Dev Plugin", "links": {"self":"/plugins/org.eclipse.che.theia.dev/0.0.1/meta.yaml" }
+}
+]
+----
+
+This metadata is consumed and exposed by the UD (User Dashboard) for choosing the plugins during workspace creation:
+
+image::documentation/images/plugins.png[]
+
+`che-plugin-registry` is deployed on `dsaas-stg / dsaas` (prod-preview / prod) separately from `rh-che` and has its own deployment cycle (which is pretty much the same for all the `openshift.io` services):
+
+- deployment on `dsaas-stg` (prod-preview) happens automatically after each commit to the master branch of the https://github.com/eclipse/che-plugin-registry[che-plugin-registry] repository.
+- deployment on `dsaas` (prod) is powered by the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yam[saas-openshiftio]. In order to update the production, one needs to change the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yaml#L2[hash], which corresponds to https://github.com/eclipse/che-plugin-registry/commits/master[commit] hash from the master branch of the original https://github.com/eclipse/che-plugin-registry[che-plugin-registry] repository. Once the hash is changed and the corresponding commit is merged to the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yaml#L2[saas-openshiftio], new `che-plugin-registry` deployment will be rollout to production.
+
+[NOTE]
+====
+The same https://github.com/eclipse/che-plugin-registry/blob/master/openshift/che-plugin-registry.yml[che-plugin-registry.yml] openshift template, defined in the original repository, is used for `che-plugin-registry` deployment on both `dsaas-stg / dsaas` (prod-preview / prod). One should be really carefull with the template update, since it would affect production regardless of the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yaml#L2[hash] commit defined in the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yam[saas-openshiftio] (each time during the rollout update, the template is used directly from the master branch of the original repository).
