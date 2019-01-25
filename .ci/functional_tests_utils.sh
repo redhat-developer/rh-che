@@ -61,7 +61,6 @@ function installDependencies() {
 }
 
 function checkAllCreds() {
-	set -x
 	CREDS_NOT_SET="false"
 
 	if [[ -z "${QUAY_USERNAME}" || -z "${QUAY_PASSWORD}" ]]; then
@@ -87,7 +86,6 @@ function checkAllCreds() {
 	else
 	  echo "Credentials set successfully."
 	fi
-	set +x
 }
 
 function archiveArtifacts() {

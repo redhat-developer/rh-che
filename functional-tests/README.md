@@ -147,7 +147,7 @@ page fragments and all tests from upstream. Projects are taken directly from ups
 ## When are tests running
 
 There are periodical jobs running everyday at 2am and 2pm (server time). Logs are saved as artifacts and sent to zabbix. You can find link to them at the
-begining of this README.
+beginning of this README.
 
 ### Related tests not included in this repo
 

@@ -16,7 +16,7 @@ if [[ -z $CHE_VERSION ]]; then
 	exit 1
 fi
 
-echo "********** Running compatibility test with upstream version of che: $CHE_VERSION **********"
+echo "********** Prepare environment for running compatibility test with upstream version of che: $CHE_VERSION **********"
 
 eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^DEVSHIFT_TAG_LEN$ \
@@ -25,22 +25,109 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^BUILD_NUMBER$ \
         ^JOB_NAME$ \
         ^ghprbPullId$ \
-        ^RH_CHE)"
+        ^RH_CHE \
+        ^FABRIC8_HUB_TOKEN)"
         
 source ./config
-source .ci/functional_tests_utils.sh
+source ./.ci/functional_tests_utils.sh
 
 echo "Checking credentials:"
 checkAllCreds
 echo "Installing dependencies:"
 installDependencies
 
+#Check branch for tracking changes/Create new branch
+BRANCH="upstream-check-$CHE_VERSION"
+echo "Checking if branch $BRANCH exists."
+set +e
+git checkout "$BRANCH"
+return_code=$?
+set -e
+if [ $return_code -eq 0 ]; then 
+  echo "Branch $BRANCH found - rebasing."
+  git rebase origin/master "$BRANCH"
+else 
+  echo "Branch $BRANCH not found - creating new one."
+  git checkout -b "$BRANCH"
+	
+  #change version of used che
+  echo ">>> change upstream version to: $CHE_VERSION"
+  scl enable rh-maven33 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
+fi
+
+echo "Setting image tags for pushing to quay."
+#Get last commit short hash from upstream che
+longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/master | jq .sha)
+shortHashUpstream=${longHashUpstream:1:7}
+
+#Get last commit short hash from rh-che branch 
+longHashDownstream=$(git log | grep -m 1 commit | head -1 | cut -d" " -f 2)
+shortHashDownstream=${longHashDownstream:0:7}
+
+#DOCKER_IMAGE_TAG is used for running tests
+#DOCKER_IMAGE_TAG_WITH_SHORTHASHES is used for tracking changes
 export DOCKER_IMAGE_TAG="upstream-check-latest"	
+export DOCKER_IMAGE_TAG_WITH_SHORTHASHES="upstream-check-$shortHashUpstream-$shortHashDownstream"
 export PROJECT_NAMESPACE=compatibility-check
 
-#change version of used che
-echo ">>> change upstream version to: $CHE_VERSION"
-scl enable rh-maven33 rh-nodejs8 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
+#set values needed for checking/creating PR
+RELATED_PR_TITLE="Update to $(echo $CHE_VERSION | cut -d'-' -f 1)"
+PR_BODY="Tracking changes for fixing compatibility with upstream $CHE_VERSION. This PR was created automatically by Jenkins from job $JOB_NAME"
+PR_HEAD="$BRANCH"
+PR_BASE="master"
 
-echo "Running compatibility check with build, deploy to dev cluster and test."
+PULL_REQUESTS=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[].title')
+
+echo "Checking if PR exists."
+PR_EXISTS=1
+while read -r pr_title
+do
+  if [[ "$pr_title" == "\"$RELATED_PR_TITLE\"" ]]; then
+    echo "Pull request for tracking changes of version $CHE_VERSION has been already created."
+    PR_EXISTS=0
+    break
+  fi
+done <<< "$PULL_REQUESTS"
+
+#if PR does not exist, create it
+if [[ $PR_EXISTS -eq 1 ]]; then
+  echo "Pull request for tracking changes of version $CHE_VERSION was not found - creating new one."
+	
+  #add changes (if there are some) and push branch
+  if ( git diff --exit-code ); then
+    echo "Nothing to commit, continue."
+  else
+    echo "Changes found. Commit and push them before creating PR."
+    git add -u
+    git commit -m"Changing version of parent che to $CHE_VERSION" || echo "No changes found to commit."
+  fi
+  #push everytime - with commited changes or with rebased branch
+  git remote set-url --push origin "https://$(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)@github.com/redhat-developer/rh-che.git"
+  #force push because of possible rebase
+  git push origin "$BRANCH" -f 
+
+  curl -X POST -s -L -H "Content-Type: application/json" -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" --data "{\"title\":\"$RELATED_PR_TITLE\", \"head\":\"$PR_HEAD\", \"base\":\"$PR_BASE\", \"body\":\"$PR_BODY\"}" https://api.github.com/repos/redhat-developer/rh-che/pulls
+else
+  echo "Pull request for tracking changes of version $CHE_VERSION was found."
+fi
+
+echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
+set +e
 .ci/cico_build_deploy_test_rhche.sh
+RETURN_CODE=$?
+set -e
+
+echo " --- After build-deploy-test phase. Result status is: $RETURN_CODE --- "
+
+#if test fails, send comment to PR
+if [ $RETURN_CODE != 0 ]; then
+  echo "There were some problems and compatibility check failed. Sending comment to related PR."
+  url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"$RELATED_PR_TITLE\") | .url" | sed 's/pulls/issues/g')
+  url=$(echo $url | cut -d"\"" -f 2)
+  url="${url}/comments"
+  job_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console"
+  message="Periodic compatibility check failed. See more details here: $job_url"
+  curl -X POST -s -L -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" $url -d "{\"body\": \"$message\"}"
+fi
+
+exit $RETURN_CODE

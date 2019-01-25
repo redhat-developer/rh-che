@@ -70,17 +70,23 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
   fi
 
   if [ "${USE_CHE_LATEST_SNAPSHOT}" == "true" ]; then
-  	NIGHTLY=$DOCKER_IMAGE_TAG
+    docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG_WITH_SHORTHASHES}
+    docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG}
+    dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG_WITH_SHORTHASHES}"
+  else
+    # lets change the tag and push it to the registry
+    docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${NIGHTLY}
+    dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}"
   fi
-
-  # lets change the tag and push it to the registry
-  docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${NIGHTLY}
-
-  dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${DOCKER_IMAGE}:${TAG}"
-
-  if [ "$DeveloperBuild" != "true" ]; then
+  
+  if [ "${USE_CHE_LATEST_SNAPSHOT}" == "true" ]; then
+    docker push ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG_WITH_SHORTHASHES}
+    docker push ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG}
+  else
+    if [ "$DeveloperBuild" != "true" ]; then
       docker push ${DOCKER_IMAGE_URL}:${NIGHTLY}
       docker push ${DOCKER_IMAGE_URL}:${TAG}
+    fi
   fi
 
   if [ "${NIGHTLY}" != "*-no-dashboard" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
