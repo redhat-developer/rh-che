@@ -313,6 +313,56 @@ docker push ${DOCKER_IMAGE}:${DOCKER_TAG} && \
 oc rollout latest rhche
 ----
 
+== Updating `Template` and `ConfigMap` for deployment on various infrastructures
+
+`rh-che` can be deployed on various infrastructures (`minishift`, `dev-cluster`, `dsaas-stg`, `dsaas`). Different set rules are applied for modifying `Template` / `ConfigMap` depending on the target infrastructure.
+
+=== minishift-addon
+
+The `rhche` minishift-addon is currently the only possible way of deploying `rh-che` locally. The `rh-che.app.yaml` / `rh-che.config.yaml` files from https://github.com/redhat-developer/rh-che/tree/master/openshift/minishift-addons/rhche/templates[./openshift/minishift-addons/rhche/templates] are used for deployment. In order to change the default values, one needs to modify the dedicated `rh-che.app.yaml` / `rh-che.config.yaml` files before applying the addon. Another option would be using `--addon-env` option during applying the `rhche` addon: 
+
+[source,bash]
+----
+minishift addons apply rhche \
+  --addon-env RH_CHE_DOCKER_IMAGE=[*server image to deploy*] \
+  --addon-env RH_CHE_VERSION=[*server tag to deploy*]
+----
+
+More details about `rhche` minishift addon can be found in the https://github.com/redhat-developer/rh-che/blob/master/dev-guide.adoc#deploying-on-minishift-locally["Deploying on minishift locally"] section.
+
+=== dev-cluster
+
+`rh-che.app.yaml` / `rh-che.config.yaml` files from the https://github.com/redhat-developer/rh-che/tree/master/openshift[./openshift] folder are used for deployment against the `dev-cluster`. Modifying `rh-che.app.yaml` / `rh-che.config.yaml` files is the easiest way of chaning the default values before executing the deployment script:
+
+[source,bash]
+----
+./dev-scripts/deploy_custom_rh-che.sh \
+    -o $(oc whoami -t) \
+    -e [openshift-project-name] \
+    -r [docker image] \
+    -t [docker tag]
+----
+
+
+More details can be found in the https://github.com/redhat-developer/rh-che/blob/master/dev-guide.adoc#deploying-to-dev-cluster["Deploying to dev-cluster"] section.
+
+[NOTE]
+====
+CI job for PR verification, which is triggered via the `[test]` comment, uses the same `rh-che.app.yaml` / `rh-che.config.yaml` files from the https://github.com/redhat-developer/rh-che/tree/master/openshift[./openshift] folder for deployment against the https://dev.rdu2c.fabric8.io:8443/console/[dev-cluster] and further test execution.
+====
+
+=== dsaas / dsaas-stg (prod / prod-preview)
+
+`rh-che` has the following deployment cycle on `dsaas` / `dsaas-stg` (prod / prod-preview), which is pretty much the same for all the `openshift.io` services:
+
+- deployment on `dsaas-stg` (prod-preview) happens automatically after each commit to the master branch of the https://github.com/redhat-developer/rh-che[rh-che] repository.
+- deployment on `dsaas` (prod) is powered by the https://github.com/openshiftio/saas-openshiftio[saas-openshiftio]. In order to update the production, one needs to change the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/rh-che6.yaml#L2[hash], which corresponds to the https://github.com/redhat-developer/rh-che/commits/master[commit] hash from the master branch of the https://github.com/redhat-developer/rh-che[rh-che] repository. Once the hash is changed and the corresponding commit is merged to the https://github.com/openshiftio/saas-openshiftio/[saas-openshiftio], new `rhche` deployment will be rollout to production.
+
+[NOTE]
+====
+The same https://github.com/redhat-developer/rh-che/blob/master/openshift/rh-che.app.yaml[rh-che.app.yaml] openshift template, defined in the original repository, is used for `rh-che` deployment on both `dsaas-stg / dsaas` (prod-preview / prod). One should be really carefull with the template update, since it would affect production regardless of the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/rh-che6.yaml#L2[hash] commit defined in the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/rh-che6.yaml[saas-openshiftio] (each time during the rollout update, the template is used directly from the master branch of the original repository). However, `ConfigMap` https://github.com/redhat-developer/rh-che/blob/master/openshift/rh-che.config.yaml[rh-che.config.yaml] is `NOT` used for deployment on `dsaas-stg / dsaas` (prod-preview / prod). In order to update the `ConfigMap` one needs to create a dedicated HK (housekeping) issue and ask someone from SD (Service Delivery) team to apply those new values on `dsaas-stg / dsaas`. Example of the HK https://gitlab.cee.redhat.com/dtsd/housekeeping/issues/2527[issue].
+====
+
 == che-plugin-registry
 
 https://github.com/eclipse/che-plugin-registry[che-plugin-registry] is a standalone service which provides metadata about the available Che plugins:
