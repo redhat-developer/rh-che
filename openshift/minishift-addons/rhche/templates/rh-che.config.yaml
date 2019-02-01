@@ -19,7 +19,7 @@ data:
   CHE_KEYCLOAK_USE__NONCE: "false"
   CHE_LIMITS_USER_WORKSPACES_RUN_COUNT: "1"
   CHE_LOGS_DIR: "/data/logs"
-  CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS: "false"
+  CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS: "true"
   CHE_INFRA_OPENSHIFT_TLS__ENABLED: "false"
   JAVA_OPTS: "-XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Xmx180m -Dfile.encoding=UTF8"
   CHE_WORKSPACE_AGENT_DEV_INACTIVE__STOP__TIMEOUT__MS: "900000"

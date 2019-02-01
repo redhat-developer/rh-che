@@ -33,7 +33,7 @@ data:
   SENTRY_DSN: 'NULL'
   CHE_LOGS_SENTRY_LEVEL: 'WARN'
   CHE_METRICS_ENABLED: "false"
-  CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS: "false"
+  CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS: "true"
   CHE_INFRA_OPENSHIFT_TLS__ENABLED: "true"
   CHE_PREDEFINED_STACKS_RELOAD__ON__START: "true"
   JAVA_OPTS: "-XX:MaxRAMFraction=2 -XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true"
