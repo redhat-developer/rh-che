@@ -9,7 +9,7 @@ class WSLocustClient(object):
         self.ws = websocket.WebSocket()
         self.connected = False
 
-    def connect(self, uuid, uri):
+    def connect(self, uuid, uri, task):
         start_time = time.time()
         try:
             self.ws.connect(uri)
@@ -17,7 +17,7 @@ class WSLocustClient(object):
             print('Client [' + uuid + '] failed to connect to websocket.')
             total_time = int((time.time() - start_time) * 1000)
             events.request_failure.fire(request_type="connect",
-                                        name="Connect_to_websocket",
+                                        name="Connect_to_websocket_"+task,
                                         response_time=total_time,
                                         exception=e)
             self.ws.close()
@@ -25,32 +25,33 @@ class WSLocustClient(object):
         else:
             total_time = int((time.time() - start_time) * 1000)
             events.request_success.fire(request_type="connect",
-                                        name="Connect_to_websocket",
+                                        name="Connect_to_websocket_"+task,
                                         response_time=total_time,
                                         response_length=0)
             self.connected = True
 
-    def send_json_rpc(self, payload):
+    def send_json_rpc(self, payload, task):
         start_time = time.time()
         if not self.connected:
             print("Client is not connected, cannot send request")
             events.request_failure.fire(request_type="send_payload",
-                                        name="Send_payload",
+                                        name="Send_payload_"+task,
                                         response_time=0,
                                         exception="Not connected.")
-            pass
         try:
             self.ws.send(payload)
         except Exception as e:
+            print(e)
             total_time = int((time.time() - start_time) * 1000)
             events.request_failure.fire(request_type="send_payload",
-                                        name="Send_payload",
+                                        name="Send_payload_"+task,
                                         response_time=total_time,
                                         exception=e)
+            raise e
         else:
             total_time = int((time.time() - start_time) * 1000)
             events.request_success.fire(request_type="send_payload",
-                                        name="Send_payload",
+                                        name="Send_payload_"+task,
                                         response_time=total_time,
                                         response_length=len(payload))
 
@@ -60,5 +61,5 @@ class WSLocustClient(object):
 
 class WSLocust(Locust):
     def __init__(self, *args, **kwargs):
-        super(Locust, self).__init__(*args, **kwargs)
+        super(Locust, self)
         self.client = WSLocustClient()
