@@ -13,7 +13,7 @@ echo [CHE] Deploying Postgres
 oc new-app -f templates/postgres-template.yaml -n #{NAMESPACE}
 
 echo [CHE] Adding Minishift certificate as a secret
-ssh /var/lib/minishift/bin/oc create secret generic openshift-identity-provider -n rhche --from-literal=username='-' --from-literal=password='-' --from-file=ca.crt=/var/lib/minishift/base/openshift-apiserver/ca.crt --type=kubernetes.io/basic-auth
+ssh /var/lib/minishift/bin/oc --config='/var/lib/minishift/base/openshift-apiserver/admin.kubeconfig' --namespace='rhche' create secret generic openshift-identity-provider --type=kubernetes.io/basic-auth --from-literal=username=- --from-literal=password=- --from-file=ca.crt=/var/lib/minishift/base/openshift-apiserver/ca.crt
 
 echo [CHE] Deploying Keycloak
 oc new-app -f templates/keycloak-template.yaml -p IMAGE_KEYCLOAK=#{KEYCLOAK_DOCKER_IMAGE} -p ROUTING_SUFFIX=#{routing-suffix} -p NAMESPACE=#{NAMESPACE} -p PROTOCOL=http -p KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE=#{KEYCLOAK_CONFIGURATOR_DOCKER_IMAGE} -p RH_CHE_VERSION=#{RH_CHE_VERSION} -p PROVIDER_BASE_URL=https://#{ip}:8443 -n #{NAMESPACE}
