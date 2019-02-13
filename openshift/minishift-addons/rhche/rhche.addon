@@ -11,6 +11,7 @@ oc apply -f templates/rh-che.app.yaml -n openshift
 echo [CHE] Deploying Che (rh-che)
 oc apply -f templates/rh-che.config.yaml -n #{NAMESPACE}
 oc new-app -p IMAGE_RH_CHE=#{RH_CHE_DOCKER_IMAGE} -p RH_CHE_VERSION=#{RH_CHE_VERSION} -p ROUTING_SUFFIX=#{routing-suffix} rhche -n #{NAMESPACE}
+oc new-app -f templates/che-workspace-service-account.yaml -p SERVICE_ACCOUNT_NAME=che-workspace -p SERVICE_ACCOUNT_NAMESPACE=#{NAMESPACE}
 
 echo Please wait while the pods all startup!
 echo You can watch in the OpenShift console via:
