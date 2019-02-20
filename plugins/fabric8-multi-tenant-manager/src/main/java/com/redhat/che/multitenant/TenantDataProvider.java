@@ -69,7 +69,7 @@ public class TenantDataProvider {
         CacheBuilder.newBuilder()
             .maximumSize(CONCURRENT_USERS)
             .expireAfterWrite(CACHE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
-            .build(CacheLoader.from(this::loadUserCheTenantData));
+            .build(new TenantDataLoader());
   }
 
   /**
@@ -96,67 +96,6 @@ public class TenantDataProvider {
     }
   }
 
-  private UserCheTenantData loadUserCheTenantData(CacheKey cacheKey) {
-
-    if (standalone) {
-      String namespaceType = cacheKey.namespaceType;
-      String namespaceToUse;
-      switch (namespaceType) {
-        case "che":
-          namespaceToUse = cheNamespace;
-          break;
-        default:
-          namespaceToUse = "myproject";
-      }
-      return new UserCheTenantData(
-          namespaceToUse, "https://kubernetes.default.svc", "dummy.prefix.unused", false);
-    }
-
-    String responseBody;
-    try {
-      responseBody = getResponseBody(fabric8UserServiceEndpoint, cacheKey.keycloakToken);
-    } catch (ServerException
-        | UnauthorizedException
-        | ForbiddenException
-        | NotFoundException
-        | ConflictException
-        | BadRequestException
-        | IOException e) {
-      throw new RuntimeException("Exception during the user tenant data retrieval", e);
-    }
-    try {
-      final JsonArray namespaces =
-          new JsonParser()
-              .parse(responseBody)
-              .getAsJsonObject()
-              .get("data")
-              .getAsJsonObject()
-              .get("attributes")
-              .getAsJsonObject()
-              .get("namespaces")
-              .getAsJsonArray();
-      for (JsonElement e : namespaces) {
-        JsonObject namespace = e.getAsJsonObject();
-        if (cacheKey.namespaceType.equals(namespace.get("type").getAsString())) {
-          String name = namespace.get("name").getAsString();
-          String suffix = namespace.get("cluster-app-domain").getAsString();
-          String cluster = namespace.get("cluster-url").getAsString();
-          boolean clusterCapacityExhausted =
-              namespace.get("cluster-capacity-exhausted").getAsBoolean();
-
-          UserCheTenantData cheTenantData =
-              new UserCheTenantData(name, cluster, suffix, clusterCapacityExhausted);
-          UserCheTenantDataValidator.validate(cheTenantData);
-          return cheTenantData;
-        }
-      }
-    } catch (NullPointerException | IllegalStateException e) {
-      throw new RuntimeException("Invalid response from Fabric8 user services:" + responseBody, e);
-    }
-    throw new RuntimeException(
-        format("No namespace with type '%s' was found in the user tenant", cacheKey.namespaceType));
-  }
-
   private void checkSubject(Subject subject) throws InfrastructureException {
     if (subject == null) {
       throw new InfrastructureException("No Subject is found to perform this action");
@@ -177,6 +116,72 @@ public class TenantDataProvider {
             .setAuthorizationHeader("Bearer " + keycloakToken)
             .request();
     return response.asString();
+  }
+
+  private class TenantDataLoader extends CacheLoader<CacheKey, UserCheTenantData> {
+
+    @Override
+    public UserCheTenantData load(CacheKey cacheKey) throws InfrastructureException {
+      if (standalone) {
+        String namespaceType = cacheKey.namespaceType;
+        String namespaceToUse;
+        switch (namespaceType) {
+          case "che":
+            namespaceToUse = cheNamespace;
+            break;
+          default:
+            namespaceToUse = "myproject";
+        }
+        return new UserCheTenantData(
+            namespaceToUse, "https://kubernetes.default.svc", "dummy.prefix.unused", false);
+      }
+
+      String responseBody;
+      try {
+        responseBody = getResponseBody(fabric8UserServiceEndpoint, cacheKey.keycloakToken);
+      } catch (ServerException
+          | UnauthorizedException
+          | ForbiddenException
+          | NotFoundException
+          | ConflictException
+          | BadRequestException
+          | IOException e) {
+        throw new InfrastructureException("Exception during the user tenant data retrieval", e);
+      }
+      try {
+        final JsonArray namespaces =
+            new JsonParser()
+                .parse(responseBody)
+                .getAsJsonObject()
+                .get("data")
+                .getAsJsonObject()
+                .get("attributes")
+                .getAsJsonObject()
+                .get("namespaces")
+                .getAsJsonArray();
+        for (JsonElement e : namespaces) {
+          JsonObject namespace = e.getAsJsonObject();
+          if (cacheKey.namespaceType.equals(namespace.get("type").getAsString())) {
+            String name = namespace.get("name").getAsString();
+            String suffix = namespace.get("cluster-app-domain").getAsString();
+            String cluster = namespace.get("cluster-url").getAsString();
+            boolean clusterCapacityExhausted =
+                namespace.get("cluster-capacity-exhausted").getAsBoolean();
+
+            UserCheTenantData cheTenantData =
+                new UserCheTenantData(name, cluster, suffix, clusterCapacityExhausted);
+            UserCheTenantDataValidator.validate(cheTenantData);
+            return cheTenantData;
+          }
+        }
+      } catch (NullPointerException | IllegalStateException e) {
+        throw new InfrastructureException(
+            "Invalid response from Fabric8 user services:" + responseBody, e);
+      }
+      throw new InfrastructureException(
+          format(
+              "No namespace with type '%s' was found in the user tenant", cacheKey.namespaceType));
+    }
   }
 
   private static class CacheKey {
