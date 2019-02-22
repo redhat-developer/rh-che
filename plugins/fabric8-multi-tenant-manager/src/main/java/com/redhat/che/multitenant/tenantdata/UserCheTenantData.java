@@ -9,7 +9,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package com.redhat.che.multitenant;
+package com.redhat.che.multitenant.tenantdata;
 
 public class UserCheTenantData {
   private String namespace;

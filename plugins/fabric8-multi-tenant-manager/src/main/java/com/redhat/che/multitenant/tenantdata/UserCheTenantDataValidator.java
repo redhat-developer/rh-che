@@ -9,9 +9,10 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package com.redhat.che.multitenant;
+package com.redhat.che.multitenant.tenantdata;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.che.api.core.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,19 +21,19 @@ public final class UserCheTenantDataValidator {
 
   private UserCheTenantDataValidator() {}
 
-  public static void validate(final UserCheTenantData data) {
+  public static void validate(final UserCheTenantData data) throws ValidationException {
     if (data == null) {
       LOG.error("'UserCheTenantData' can not be null");
-      throw new NullPointerException("'UserCheTenantData' can not be null");
+      throw new ValidationException("'UserCheTenantData' can not be null");
     } else if (StringUtils.isBlank(data.getClusterUrl())) {
       LOG.error("'ClusterUrl' can not be blank: {}", data);
-      throw new IllegalArgumentException("'ClusterUrl' can not be blank");
+      throw new ValidationException("'ClusterUrl' can not be blank");
     } else if (StringUtils.isBlank(data.getRouteBaseSuffix())) {
       LOG.error("'RouteBaseSuffix' can not be blank: {}", data);
-      throw new IllegalArgumentException("'RouteBaseSuffix' can not be blank");
+      throw new ValidationException("'RouteBaseSuffix' can not be blank");
     } else if (StringUtils.isBlank(data.getNamespace())) {
       LOG.error("'Namespace' can not be blank: {}", data);
-      throw new IllegalArgumentException("'Namespace' can not be blank");
+      throw new ValidationException("'Namespace' can not be blank");
     }
   }
 }

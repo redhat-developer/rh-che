@@ -15,6 +15,8 @@ import static org.eclipse.che.multiuser.keycloak.shared.KeycloakConstants.OIDC_P
 
 import com.google.gson.JsonParser;
 import com.redhat.che.multitenant.multicluster.MultiClusterOpenShiftProxy;
+import com.redhat.che.multitenant.tenantdata.TenantDataProvider;
+import com.redhat.che.multitenant.tenantdata.UserCheTenantData;
 import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;

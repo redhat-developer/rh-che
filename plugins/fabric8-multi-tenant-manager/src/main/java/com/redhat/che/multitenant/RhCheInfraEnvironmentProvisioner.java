@@ -14,6 +14,8 @@ package com.redhat.che.multitenant;
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.redhat.che.multitenant.tenantdata.TenantDataProvider;
+import com.redhat.che.multitenant.tenantdata.UserCheTenantData;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import java.util.Collection;
 import java.util.HashMap;
