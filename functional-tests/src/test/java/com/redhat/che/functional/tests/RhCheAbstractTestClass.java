@@ -43,6 +43,9 @@ public abstract class RhCheAbstractTestClass {
       ide.waitOpenedWorkspaceIsReadyToUse();
       projectExplorer.waitProjectExplorer();
       notificationsPopupPanel.waitProgressPopupPanelClose();
+      // refreshing project to workaround issue
+      // https://github.com/openshiftio/openshift.io/issues/4695
+      projectExplorer.clickOnRefreshTreeButton();
     } catch (ExecutionException | InterruptedException e) {
       LOG.error(
           "Could not obtain workspace name and id - worskape was probably not successfully injected.");
