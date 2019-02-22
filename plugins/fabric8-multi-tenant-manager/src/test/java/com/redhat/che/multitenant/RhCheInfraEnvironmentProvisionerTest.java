@@ -24,6 +24,8 @@ import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.redhat.che.multitenant.tenantdata.TenantDataProvider;
+import com.redhat.che.multitenant.tenantdata.UserCheTenantData;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
