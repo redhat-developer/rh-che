@@ -139,13 +139,7 @@ public class TenantDataProvider {
       String responseBody;
       try {
         responseBody = getResponseBody(fabric8UserServiceEndpoint, cacheKey.keycloakToken);
-      } catch (ServerException
-          | UnauthorizedException
-          | ForbiddenException
-          | NotFoundException
-          | ConflictException
-          | BadRequestException
-          | IOException e) {
+      } catch (Exception e) {
         throw new InfrastructureException("Exception during the user tenant data retrieval", e);
       }
       try {
