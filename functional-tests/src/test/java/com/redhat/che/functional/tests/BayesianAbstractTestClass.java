@@ -43,7 +43,8 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   private String PROJECT_NAME;
   private String PROJECT_DEPENDENCY;
   private String ERROR_MESSAGE;
-  private static final String CHE_PROD_PREVIEW_URL = "che.prod-preview.openshift.io";
+  public static final String CHE_PROD_PREVIEW_URL = "che.prod-preview.openshift.io";
+  public static final String CHE_PROD_URL = "che.openshift.io";
 
   public void setExpectedErrorLine(Integer expectedErrorLine) {
     EXPECTED_ERROR_LINE = expectedErrorLine;
@@ -136,9 +137,14 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
       editor.waitTextInToolTipPopup(ERROR_MESSAGE);
     } catch (TimeoutException e) {
       if (testApiEndpointUrlProvider.get().getHost().equals(CHE_PROD_PREVIEW_URL)) {
-        throw new SkipException("Skipping test for prod-preview - known issue.");
+        throw new SkipException(
+            "Skipping test for prod-preview - known issue: https://github.com/openshiftio/openshift.io/issues/2063.");
       }
       throw e;
     }
+  }
+
+  protected TestApiEndpointUrlProvider getTestApiEndpointUrlProvider() {
+    return this.testApiEndpointUrlProvider;
   }
 }

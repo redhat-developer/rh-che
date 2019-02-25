@@ -16,6 +16,8 @@ import com.redhat.che.selenium.core.workspace.RhCheWorkspaceTemplate;
 import org.eclipse.che.selenium.core.workspace.InjectTestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
+import org.openqa.selenium.TimeoutException;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 
 public class BayesianPomXml extends BayesianAbstractTestClass {
@@ -64,5 +66,20 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
     editor.deleteCurrentLine();
     editor.deleteCurrentLine();
     editor.waitTabFileWithSavedStatus(PROJECT_FILE);
+  }
+
+  @Override // when bug is fixed remove this method
+  protected void editorCheckBayesianError() {
+    editor.setCursorToLine(POM_EXPECTED_ERROR_LINE);
+    editor.moveCursorToText(POM_EXPECTED_ERROR_TEXT);
+    try {
+      editor.waitTextInToolTipPopup(ERROR_MESSAGE);
+    } catch (TimeoutException e) {
+      if (getTestApiEndpointUrlProvider().get().getHost().equals(CHE_PROD_URL)) {
+        throw new SkipException(
+            "Skipping test for prod - known issue: https://github.com/redhat-developer/rh-che/issues/1256.");
+      }
+      throw e;
+    }
   }
 }
