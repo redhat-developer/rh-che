@@ -19,11 +19,8 @@
 
     <test name="all">
         <classes>
-        <!-- temporary changes to check if workaround works -->
-<!--             <class name="com.redhat.che.functional.tests.WorkspaceTest"/> -->
+            <class name="com.redhat.che.functional.tests.WorkspaceTest"/>
             <class name="com.redhat.che.functional.tests.BuildAndRunProjectTest"/>
-            <class name="com.redhat.che.functional.tests.BayesianPomXml"/>
-            <class name="com.redhat.che.functional.tests.BayesianPackageJson"/>
         </classes>
     </test>
 </suite>

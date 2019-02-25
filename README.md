@@ -45,8 +45,19 @@ Red Hat modifications against the upstream Che include:
 
 DEP IMAGE: [![Build Status](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-build-dep/badge/icon)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-build-dep/)
 
-[![PR-Check sequence diagram](https://raw.githubusercontent.com/redhat-developer/rh-che/master/documentation/rh-che-prcheck/pr_check_general_squence_diagram.svg)](https://raw.githubusercontent.com/redhat-developer/rh-che/master/documentation/rh-che-prcheck/pr_check_general_squence_diagram.plantuml)
+[![PR-Check sequence diagram](https://raw.githubusercontent.com/redhat-developer/rh-che/master/documentation/rh-che-prcheck/pr_check_general_squence_diagram.svg?sanitize=true)](https://raw.githubusercontent.com/redhat-developer/rh-che/master/documentation/rh-che-prcheck/pr_check_general_squence_diagram.svg?sanitize=true)
 
 - This diagram shows the general logic of PR-Check workflow from opening a PR to merge
 - PR_Check job : https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/buildTimeTrend
 - Dependency image build job: https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-build-dep/buildTimeTrend
+
+While deploying rh-che to ```devtools-dev.ext.devshift.net```, the Postgre is deployed too. There is service account doing the deploy. 
+A special test suite is used for PR check. It contains basic tests to ensure workspaces are working and the project can be build and run. You can find 
+that suite [here](https://github.com/redhat-developer/rh-che/blob/master/functional-tests/src/test/resources/suites/prcheck.xml).
+
+Testing account for that test is on ```us-east-2a``` cluster.
+
+### Clean up job [![Build Status](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-cleanup/badge/icon)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-cleanup/)
+
+For each PR the deployment on dev cluster is created. Therefore there is a job running once a day that checks current open PRs and remove deployments of closed ones.
+The job can be found [here](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-cleanup/).
