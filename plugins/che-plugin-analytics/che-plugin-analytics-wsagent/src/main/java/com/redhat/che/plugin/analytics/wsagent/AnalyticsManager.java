@@ -359,7 +359,6 @@ public class AnalyticsManager {
     } catch (ExecutionException e) {
       LOG.warn("", e);
     }
-    ;
   }
 
   @VisibleForTesting

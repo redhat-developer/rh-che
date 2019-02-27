@@ -514,10 +514,21 @@ public class AnalyticsManagerTest {
     verify(analytics, timeout(AnalyticsManager.pingTimeout).atLeast(2))
         .enqueue(argCaptor.capture());
 
+    List<TrackMessage.Builder> stoppedEvents =
+        argCaptor
+            .getAllValues()
+            .stream()
+            .filter(ev -> ev.build().event().equals(WORKSPACE_STOPPED.toString()))
+            .collect(Collectors.toList());
+
     assertEquals(
-        capturedEventNames(argCaptor),
-        Arrays.asList(WORKSPACE_STARTED.toString(), WORKSPACE_STOPPED.toString()));
-    assertEquals(argCaptor.getAllValues().get(1).build().userId(), USER_ID);
+        stoppedEvents.size(),
+        1,
+        String.format("Workspace stop should send one %s event", WORKSPACE_STOPPED.toString()));
+    assertEquals(
+        stoppedEvents.iterator().next().build().userId(),
+        USER_ID,
+        "Stop event should have user id");
   }
 
   @Test
