@@ -12,6 +12,7 @@ function installOC() {
 }
 
 function installJQ() {
+	installEpelRelease
 	yum install --assumeyes -q jq
 }
 
@@ -21,6 +22,7 @@ function installEpelRelease() {
 }
 
 function installYQ() {
+	installEpelRelease
 	yum install python-pip --assumeyes
 	pip install yq
 }

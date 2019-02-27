@@ -12,7 +12,6 @@
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 
 source ./.ci/functional_tests_utils.sh
-installEpelRelease
 installJQ
 installOC
 
@@ -32,18 +31,20 @@ else
 fi
 
 PullRequests=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[].number')
-if [ $? -eq 0 ]; then
+result=$?
+if [ $result -eq 0 ]; then
   echo "Getting list of open PRs successful."
 else
-  echo "Retrieving open pull requests failed with exit code $?"
-  exit $?
+  echo "Retrieving open pull requests failed with exit code $result"
+  exit $result
 fi
 OCProjects=$(oc projects -q)
+result=$?
 if [ $? -eq 0 ]; then
   echo "Getting list of OC projects successful."
 else
-  echo "Retrieving openshift projects failed with exit code $?"
-  exit $?
+  echo "Retrieving openshift projects failed with exit code $result"
+  exit $result
 fi
 
 while read -r oc_project
