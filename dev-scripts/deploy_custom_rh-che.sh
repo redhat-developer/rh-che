@@ -250,6 +250,14 @@ if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che/master/deploy/ope
   echo -e "\\033[93;1mFile postgres-template.yaml is missing.\\033[0m"
   rm postgres-template.yaml
 fi
+
+# Due to bug in dev-cluster, volume must be changed to emptyDir
+# https://gitlab.cee.redhat.com/dtsd/housekeeping/issues/2570
+if [ "$RH_CHE_OPENSHIFT_URL" == "https://devtools-dev.ext.devshift.net:8443" ]; then
+  cp postgres-template.yaml postgres-template_tmp.yaml
+  yq -y 'del(.objects[0].spec.template.spec.volumes[0].persistentVolumeClaim) | .objects[0].spec.template.spec.volumes[0] += {"emptyDir":{}}' postgres-template_tmp.yaml > postgres-template.yaml
+fi
+
 cd ../ || exit 1
 
 # GET CHE-APP CONFIGS
