@@ -13,6 +13,7 @@ package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
 import com.redhat.che.selenium.core.workspace.RhCheWorkspaceTemplate;
+import org.eclipse.che.selenium.core.SeleniumWebDriver;
 import org.eclipse.che.selenium.core.workspace.InjectTestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.Consoles;
@@ -27,10 +28,14 @@ public class BuildAndRunProjectTest extends RhCheAbstractTestClass {
 
   @Inject private CommandsPalette commandsPalette;
   @Inject private Consoles consoles;
+  @Inject private SeleniumWebDriver seleniumWebDriver;
 
   @BeforeClass
   public void checkWorkspace() throws Exception {
     checkWorkspace(workspace);
+    // add hard refresh of the page to fix issue with importing project:
+    // https://github.com/openshiftio/openshift.io/issues/4695
+    seleniumWebDriver.get(seleniumWebDriver.getCurrentUrl());
   }
 
   @Test
