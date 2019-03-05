@@ -177,7 +177,6 @@ public class CheStarterWrapper {
               .setMethod(HttpMethod.POST)
               .request();
     } catch (ApiException e) {
-      LOG.error("Workspace failed to start because of a server error:" + e.getMessage(), e);
       throw e;
     }
     if (response.getResponseCode() == 200) {
