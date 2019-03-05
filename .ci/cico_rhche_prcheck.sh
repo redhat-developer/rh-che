@@ -5,6 +5,9 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+.ci/cico_build_prcheck_dep.sh
+exit 1
+
 export PR_CHECK_BUILD="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
