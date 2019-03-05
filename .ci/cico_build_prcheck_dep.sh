@@ -33,6 +33,24 @@ else
   exit 1
 fi
 
+# Build and push functional-tests base image
+
+DOCKERFILE="functional-tests/"
+DOCKER_IMAGE="rh-che-functional-tests-dep"
+DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
+
+docker build -t ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_PATH}${DOCKERFILE}
+if [ $? -ne 0 ]; then
+  echo 'Docker Build Failed'
+  exit 2
+fi
+
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
+docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${SHORT_HASH}
+docker push ${DOCKER_IMAGE_URL}:${TAG}
+docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
+date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
+
 # Build and push PR-Check base image
 
 DOCKERFILE="pr-check/"
@@ -51,20 +69,3 @@ docker push ${DOCKER_IMAGE_URL}:${TAG}
 docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
-# Build and push functional-tests base image
-
-DOCKERFILE="functional-tests/"
-DOCKER_IMAGE="rh-che-functional-tests-dep"
-DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
-
-docker build -t ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_PATH}${DOCKERFILE}
-if [ $? -ne 0 ]; then
-  echo 'Docker Build Failed'
-  exit 2
-fi
-
-date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
-docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${SHORT_HASH}
-docker push ${DOCKER_IMAGE_URL}:${TAG}
-docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
-date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
