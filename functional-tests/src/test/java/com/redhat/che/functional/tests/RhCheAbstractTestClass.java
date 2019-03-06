@@ -48,7 +48,11 @@ public abstract class RhCheAbstractTestClass {
           "Could not obtain workspace name and id - worskape was probably not successfully injected.");
       throw e;
     } catch (Exception e) {
-      LOG.error("Could not open workspace IDE.");
+      if (e.getMessage().contains("popup")) {
+        LOG.error("Timeout when waiting for all popups to be closed.");
+      } else {
+        LOG.error("Could not open workspace IDE.");
+      }
       throw e;
     }
   }

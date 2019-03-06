@@ -17,15 +17,21 @@ import org.eclipse.che.selenium.core.SeleniumWebDriver;
 import org.eclipse.che.selenium.core.workspace.InjectTestWorkspace;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.Consoles;
+import org.eclipse.che.selenium.pageobject.ProjectExplorer;
 import org.eclipse.che.selenium.pageobject.intelligent.CommandsPalette;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class BuildAndRunProjectTest extends RhCheAbstractTestClass {
 
+  private static final Logger LOG = LoggerFactory.getLogger(BuildAndRunProjectTest.class);
+
   @InjectTestWorkspace(template = RhCheWorkspaceTemplate.RH_VERTX)
   private TestWorkspace workspace;
 
+  @Inject private ProjectExplorer projectExplorer;
   @Inject private CommandsPalette commandsPalette;
   @Inject private Consoles consoles;
   @Inject private SeleniumWebDriver seleniumWebDriver;
@@ -33,9 +39,22 @@ public class BuildAndRunProjectTest extends RhCheAbstractTestClass {
   @BeforeClass
   public void checkWorkspace() throws Exception {
     checkWorkspace(workspace);
-    // add hard refresh of the page to fix issue with importing project:
+    int maxTries = 5, counter = 0;
+
+    // This while loop is a workaround for issue:
     // https://github.com/openshiftio/openshift.io/issues/4695
-    seleniumWebDriver.get(seleniumWebDriver.getCurrentUrl());
+    // If project is not imported, refresh whole page. Try for <maxTires> attempts.
+    while (projectExplorer.getNamesOfAllOpenItems().get(0).equals("There are no projects")) {
+      counter++;
+      LOG.warn(
+          "Project was not imported. Trying to refresh the page to import the project. Attempt " + counter + "/5");
+      seleniumWebDriver.get(seleniumWebDriver.getCurrentUrl());
+      checkWorkspace(workspace);
+      if (counter == maxTries) {
+        LOG.error("Project was not imported in " + maxTries + " tries.");
+        throw new RuntimeException("Project was not imported to the workspace.");
+      }
+    }
   }
 
   @Test
