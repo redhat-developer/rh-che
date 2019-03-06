@@ -47,7 +47,8 @@ public class BuildAndRunProjectTest extends RhCheAbstractTestClass {
     while (projectExplorer.getNamesOfAllOpenItems().get(0).equals("There are no projects")) {
       counter++;
       LOG.warn(
-          "Project was not imported. Trying to refresh the page to import the project. Attempt " + counter + "/5");
+          "Project was not imported. Trying to refresh the page to import the project. Attempt {}/5",
+          counter);
       seleniumWebDriver.get(seleniumWebDriver.getCurrentUrl());
       checkWorkspace(workspace);
       if (counter == maxTries) {
