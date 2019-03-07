@@ -19,7 +19,6 @@
 
     <test name="all">
         <classes>
-            <class name="com.redhat.che.functional.tests.WorkspaceTest"/>
             <class name="com.redhat.che.functional.tests.BuildAndRunProjectTest"/>
         </classes>
     </test>
