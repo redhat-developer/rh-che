@@ -199,6 +199,9 @@ The dev-cluster deployment script uses the yaml files (`rh-che.app.yaml`, `rh-ch
 === Deploying to OpenShift in general
 To be completed
 
+== Monitoring in production
+See link:./documentation/monitoring/monitoring.adoc[Monitoring docs].
+
 == Roll-updating running deployments
 Once rh-che has been deployed (whether it's to minishift or the dev-cluster), making changes is done by:
 
