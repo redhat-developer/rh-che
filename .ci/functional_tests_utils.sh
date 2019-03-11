@@ -98,5 +98,6 @@ function archiveArtifacts() {
   mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/surefire-reports
   cp ./logs/*.log ./rhche/${JOB_NAME}/${BUILD_NUMBER}/
   cp -R ./logs/artifacts/screenshots/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/
+	cp -R ./logs/artifacts/failsafe-reports/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/
   rsync --password-file=./artifacts.key -PHva --relative ./rhche/${JOB_NAME}/${BUILD_NUMBER} devtools@artifacts.ci.centos.org::devtools/
 }
