@@ -174,7 +174,7 @@ export class CreateWorkspaceController {
     this.displayPlugins = false;
 
     if (!this.workspaceConfig || !this.workspaceConfig.attributes || !this.workspaceConfig.persistVolumes) {
-      this.isEphemeralMode = false;
+      this.isEphemeralMode = true;
     } else {
       this.isEphemeralMode = JSON.parse(this.workspaceConfig.attributes.persistVolumes);
     }
