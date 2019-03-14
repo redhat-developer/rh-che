@@ -173,11 +173,13 @@ export class CreateWorkspaceController {
     this.hideLoader = false;
     this.displayPlugins = false;
 
+    /** Begin rhche specific changes */
     if (!this.workspaceConfig || !this.workspaceConfig.attributes || !this.workspaceConfig.persistVolumes) {
-      this.isEphemeralMode = true;
+      this.isEphemeralMode = false;
     } else {
       this.isEphemeralMode = JSON.parse(this.workspaceConfig.attributes.persistVolumes);
     }
+    /** End rhche specific changes */
 
     // header toolbar
     // dropdown button config
@@ -237,6 +239,12 @@ export class CreateWorkspaceController {
       this.stackMachines = [];
       return;
     }
+
+    /** Begin rhche specific changes */
+    // Set persistVolumes: false (ephemeral mode)
+    this.isEphemeralMode = true;
+    this.onEphemeralModeChange();
+    /** End rhche specific changes */
 
     const environmentName = this.stack.workspaceConfig.defaultEnv;
     const environment = this.stack.workspaceConfig.environments[environmentName];
