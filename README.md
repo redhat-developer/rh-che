@@ -1,4 +1,15 @@
-#### Periodic jobs:
+# Eclipse Che on OpenShift 
+
+## Table Of Contents
+
+* [Job statuses](#job-statuses)
+* [What is the Red Hat Che distribution](#what-is-the-red-hat-che-distribution)
+* [How to build it](#how-to-build-it)
+* [PR-Check details](#pr-check-details)
+
+## Job statuses
+
+#### Periodic jobs
 
 | Cluster       | Status    |
 | ------------- |-------------|
@@ -8,7 +19,7 @@
 | us-east-1b | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-1b)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-prod-1b/) |
 | us-east-2a preview | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-preview-2a/)](https://ci.centos.org/job/devtools-rh-che-periodic-prod-preview-2a/) |
 
-#### PR check for rh-che:
+#### PR check for rh-che
 
 | Job       | Status    |
 | ------------- |-------------|
@@ -17,7 +28,7 @@
 
 Job ```cleanup``` cleans projects on dev cluster which are created as part of verifying PR changes.
 
-#### Dependency image build:
+#### Dependency image build
 
 | Job       | Status    |
 | ------------- |-------------|
@@ -29,21 +40,15 @@ Job ```cleanup``` cleans projects on dev cluster which are created as part of ve
 Job ```build che credentials master``` runs after PR check is merged. Job ```tests after rh-che build``` is dependent on it and is executed right after it. Job ```prcheck build-dep```
 is dependent on building che credentials master too and is executed right after it finishes (in parallel with testing job). 
 
-#### Compatibility check:
+#### Compatibility check
 
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io)](https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io)
 
-#### Rollout job:
+#### Rollout job
 
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)](https://ci.centos.org/job/devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)
 
-# Eclipse Che on OpenShift 
 
-## Table Of Contents
-
-* [What is the Red Hat Che distribution](#what-is-the-red-hat-che-distribution)
-* [How to build it](#how-to-build-it)
-* [PR-Check details](#pr-check-details)
 
 ## What is the Red Hat Che distribution
 
