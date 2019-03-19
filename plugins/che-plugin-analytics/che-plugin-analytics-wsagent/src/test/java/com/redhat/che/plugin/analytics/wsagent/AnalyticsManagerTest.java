@@ -39,7 +39,6 @@ import org.eclipse.che.api.factory.shared.dto.FactoryDto;
 import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceConfigDto;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
-import org.junit.Ignore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -446,8 +445,7 @@ public class AnalyticsManagerTest {
         Arrays.asList(WORKSPACE_OPENED.toString(), WORKSPACE_USED.toString()));
   }
 
-  @Ignore("Ignored due to https://github.com/redhat-developer/rh-che/issues/938")
-  @Test
+  @Test(enabled = false) // Ignored due to https://github.com/redhat-developer/rh-che/issues/938
   public void sendWorkspaceUsedOnActivityAfterInactivity() throws Exception {
     manager =
         new AnalyticsManager(
