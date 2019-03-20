@@ -33,7 +33,6 @@ Job ```cleanup``` cleans projects on dev cluster which are created as part of ve
 | Job       | Status    |
 | ------------- |-------------|
 | build che credentials master | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-che-credentials-master)](https://ci.centos.org/job/devtools-rh-che-build-che-credentials-master) |
-| tests after rh-che build | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-che-functional-tests-after-rh-che-build-prod-preview.openshift.io)](https://ci.centos.org/job/devtools-che-functional-tests-after-rh-che-build-prod-preview.openshift.io) |
 | prcheck build-dep | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-prcheck-build-dep)](https://ci.centos.org/job/devtools-rh-che-prcheck-build-dep) |
 
 
