@@ -21,7 +21,6 @@ data:
   CHE_FABRIC8_MULTITENANT: "true"
   CHE_FABRIC8_USER__SERVICE_ENDPOINT: "https://api.prod-preview.openshift.io/api/user/services"
   CHE_HOST: "che.prod-preview.openshift.io"
-  CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE: "2000"
   CHE_KEYCLOAK_AUTH__SERVER__URL: "NULL"
   CHE_KEYCLOAK_CLIENT__ID: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"
   CHE_KEYCLOAK_JS__ADAPTER__URL: "/api/fabric8-end2end/files/RhCheKeycloak.js"
@@ -71,3 +70,5 @@ data:
   CHE_INFRA_KUBERNETES_SERVICE__ACCOUNT__NAME: "che-workspace"
   CHE_WORKSPACE_STORAGE: "/home/user/che/workspaces"
   CHE_FABRIC8_CDN_PREFETCH_EDITOR: 'NULL'
+  che.core.jsonrpc.processor.major.max.pool.size: 120
+  che.core.jsonrpc.processor.major.queue.capacity: 40000
