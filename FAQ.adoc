@@ -1,0 +1,12 @@
+= Frequently Asked Questions (FAQs) and Troubleshooting
+:toc:
+:toc-title:
+
+== FAQs
+
+=== Where I can see the up-to-date status of the che.openshift.io?
+
+There is a dedicated status page - https://che.statuspage.io/
+
+== Troubleshooting
+
