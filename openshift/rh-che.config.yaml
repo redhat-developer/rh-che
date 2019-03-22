@@ -40,6 +40,7 @@ data:
   CHE_SYSTEM_ADMIN__NAME: "admin"
   CHE_SYSTEM_SUPER__PRIVILEGED__MODE: "true"
   CHE_WEBSOCKET_ENDPOINT: "wss://che.prod-preview.openshift.io/api/websocket"
+  CHE_WEBSOCKET_ENDPOINT__MINOR: "wss://che.prod-preview.openshift.io/api/websocket-minor"
   CHE_WORKSPACE_WSAGENT__JAVA__OPTIONS: "-XX:MaxRAM=600m -XX:MaxRAMFraction=1 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8 -Djava.security.egd=file:/dev/./urandom -Djava.net.preferIPv4Stack=true"
   CHE_WORKSPACE_AGENT_DEV_INACTIVE__STOP__TIMEOUT__MS: "900000"
   CHE_WORKSPACE_LOGS_ROOT__DIR: "/workspace_logs"
