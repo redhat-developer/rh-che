@@ -18,6 +18,7 @@ import org.eclipse.che.dto.server.JsonSerializable;
 
 public class CheServerStartWorkspaceRequest implements JsonSerializable {
 
+  private static final long serialVersionUID = 1L;
   private static final Gson GSON = new Gson();
 
   @Override

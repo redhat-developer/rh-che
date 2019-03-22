@@ -19,10 +19,7 @@ There are some jobs running periodically on clusters us-east-2, us-east-2a and f
 ## How to run it
 Prerequisities:
 * Working account on Openshift.io.
-* Running che-starter. Can be run as docker container like this:
-```
-docker run -p 10000:10000 -e "GITHUB_TOKEN_URL=https://auth.openshift.io/api/token?for=https://github.com" -e "OPENSHIFT_TOKEN_URL=https://sso.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" -e "CHE_SERVER_URL=https://che.openshift.io" quay.io/openshiftio/almighty-che-starter:latest
-```
+* Running chromedriver.
 
 ### Run tests via maven
 By default, tests will execute against production environment (che.openshift.io).
@@ -32,14 +29,8 @@ mvn clean verify -Pfunctional-tests \
     -Dche.testuser.email=<OSIO_EMAIL> \
     -Dche.testuser.password=<OSIO_PASSWORD>
 ```
-If you need to run tests against another environment (for example prod-preview), few more variables have to be set (and che-starter has to be started with different parameters). For example, running tests against `prod-preview` will look like this:
+If you need to run tests against another environment (for example prod-preview), few more variables have to be set. For example, running tests against `prod-preview` will look like this:
 ```
-docker run -p 10000:10000 \
-    -e "GITHUB_TOKEN_URL=https://auth.prod-preview.openshift.io/api/token?for=https://github.com" \
-    -e "OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token" \
-    -e "CHE_SERVER_URL=https://che.prod-preview.openshift.io" \
-    quay.io/openshiftio/almighty-che-starter:latest
-
 mvn clean verify -Pfunctional-tests \
     -Dche.testuser.name=<OSIO_PROD_PREVIEW_USERNAME> \
     -Dche.testuser.email=<OSIO_PROD_PREVIEW__EMAIL> \
@@ -53,7 +44,7 @@ mvn clean verify -Pfunctional-tests \
 By default the docker image is using latest master sources that are embedded inside the docker image along with required dependencies.  
 It is possible to also mount local folder with alternative sources of rh-che/functional-tests  
 
-This method spins up `che-starter` container and runs `chromedriver` inside the dependency image.  
+This method runs `chromedriver` inside the dependency image.  
 No additional steps required.  
 
 ```
@@ -131,7 +122,6 @@ VM options (Mandatory parameters in __bold__)
 | browser | browser for selenium tests | `GOOGLE_CHROME` |
 | driver.port | port of driver | `9515` |
 | excludedGroups | Group of tests to be excluded |  |
-| cheStarterUrl | URL of running che starter | `http://localhost:10000` |
 
 ## Further details
 

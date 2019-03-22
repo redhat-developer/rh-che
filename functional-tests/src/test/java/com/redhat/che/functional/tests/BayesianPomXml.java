@@ -34,7 +34,6 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
   private static final String PATH_TO_FILE = "vertx-http-booster";
   private static final String ERROR_MESSAGE =
       "Package ch.qos.logback:logback-core-1.1.10 is vulnerable: CVE-2017-5929";
-  private static final String PROJECT_NAME = "vertx-http-booster";
   private static final String PROJECT_DEPENDENCY =
       "<dependency>\n"
           + "<groupId>ch.qos.logback</groupId>\n"
@@ -44,6 +43,12 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
 
   @BeforeClass
   public void setUp() throws Exception {
+    // Bayesian is not working on prod-preview environment. Remove that SkipException once this
+    // issues is fixed.
+    // Issue: https://github.com/redhat-developer/rh-che/issues/524
+    if (cheHost.equals(CHE_PROD_PREVIEW_URL)) {
+      throw new SkipException("Skipping bayesian test on prod-preview.");
+    }
     setPathToFile(PATH_TO_FILE);
     setExpectedErrorLine(POM_EXPECTED_ERROR_LINE);
     setExpectedErrorText(POM_EXPECTED_ERROR_TEXT);
@@ -51,7 +56,6 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
     setProjectFile(PROJECT_FILE);
     setPathToFile(PATH_TO_FILE);
     setErrorMessage(ERROR_MESSAGE);
-    setProjectName(PROJECT_NAME);
     setProjectDependency(PROJECT_DEPENDENCY);
     setWorksapce(workspace);
     openTestFile();
@@ -68,7 +72,9 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
     editor.waitTabFileWithSavedStatus(PROJECT_FILE);
   }
 
-  @Override // when bug is fixed remove this method
+  // This method skips test for bayesian on reopening file. When issue is fixed, remove this method.
+  // Issue: https://github.com/redhat-developer/rh-che/issues/1256
+  @Override
   protected void editorCheckBayesianError() {
     editor.setCursorToLine(POM_EXPECTED_ERROR_LINE);
     editor.moveCursorToText(POM_EXPECTED_ERROR_TEXT);
@@ -77,7 +83,7 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
     } catch (TimeoutException e) {
       if (getTestApiEndpointUrlProvider().get().getHost().equals(CHE_PROD_URL)) {
         throw new SkipException(
-            "Skipping test for prod - known issue: https://github.com/redhat-developer/rh-che/issues/1256.");
+            "Bayesian error not present - known issue: https://github.com/redhat-developer/rh-che/issues/1256.");
       }
       throw e;
     }

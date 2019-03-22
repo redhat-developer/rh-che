@@ -21,6 +21,8 @@
         <classes>
             <class name="org.eclipse.che.selenium.miscellaneous.DialogAboutTest"/>
             <class name="com.redhat.che.functional.tests.BuildAndRunProjectTest"/>
+            <class name="com.redhat.che.functional.tests.BayesianPackageJson"/>
+            <class name="com.redhat.che.functional.tests.BayesianPomXml"/>
         </classes>
     </test>
 </suite>

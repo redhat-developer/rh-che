@@ -16,8 +16,4 @@ public final class RhCheWorkspaceTemplate {
   // Upstream way
   public static final String RH_VERTX = "vertx_default.json";
   public static final String RH_NODEJS = "nodejs_default.json";
-
-  // Che-starter way
-  public static final String RH_STARTER_VERTX = "che-starter_vertx.json";
-  public static final String RH_STARTER_NODEJS = "che-starter_nodejs.json";
 }

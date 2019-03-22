@@ -12,14 +12,13 @@
 package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.eclipse.che.selenium.core.provider.TestApiEndpointUrlProvider;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
 import org.eclipse.che.selenium.pageobject.ProjectExplorer;
-import org.openqa.selenium.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -35,12 +34,15 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   @Inject private ProjectExplorer projectExplorer;
   @Inject private TestApiEndpointUrlProvider testApiEndpointUrlProvider;
 
+  @Inject
+  @Named("che.host")
+  String cheHost;
+
   private Integer EXPECTED_ERROR_LINE;
   private Integer INJECTION_ENTRY_POINT;
   private String EXPECTED_ERROR_TEXT;
   private String PROJECT_FILE;
   private String PATH_TO_FILE;
-  private String PROJECT_NAME;
   private String PROJECT_DEPENDENCY;
   private String ERROR_MESSAGE;
   public static final String CHE_PROD_PREVIEW_URL = "che.prod-preview.openshift.io";
@@ -66,10 +68,6 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
     PATH_TO_FILE = pathToFile;
   }
 
-  public void setProjectName(String projectName) {
-    PROJECT_NAME = projectName;
-  }
-
   public void setProjectDependency(String projectDependency) {
     PROJECT_DEPENDENCY = projectDependency;
   }
@@ -83,8 +81,11 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   }
 
   public void openTestFile() throws Exception {
+    LOG.info("Waiting for workspace to be ready.");
     checkWorkspace(workspace);
-    projectExplorer.waitItem(PROJECT_NAME);
+    LOG.info("Waiting for project to be imported.");
+    importWorkaround(workspace, 5);
+    LOG.info("Project imported, running tests.");
   }
 
   @BeforeMethod
@@ -133,15 +134,7 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   protected void editorCheckBayesianError() {
     editor.setCursorToLine(EXPECTED_ERROR_LINE);
     editor.moveCursorToText(EXPECTED_ERROR_TEXT);
-    try {
-      editor.waitTextInToolTipPopup(ERROR_MESSAGE);
-    } catch (TimeoutException e) {
-      if (testApiEndpointUrlProvider.get().getHost().equals(CHE_PROD_PREVIEW_URL)) {
-        throw new SkipException(
-            "Skipping test for prod-preview - known issue: https://github.com/openshiftio/openshift.io/issues/2063.");
-      }
-      throw e;
-    }
+    editor.waitTextInToolTipPopup(ERROR_MESSAGE);
   }
 
   protected TestApiEndpointUrlProvider getTestApiEndpointUrlProvider() {

@@ -56,13 +56,6 @@ if [ -d "/root/che" ]; then
   cd /root/rh-che/
 fi
 
-echo "Running che-starter against ${RHCHE_HOST_FULL_URL}"
-docker run -d -p 10000:10000 --name che-starter --network localnetwork \
-  -e "GITHUB_TOKEN_URL=${RHCHE_GITHUB_EXCHANGE}" \
-  -e "OPENSHIFT_TOKEN_URL=${RHCHE_OPENSHIFT_TOKEN_URL}" \
-  -e "CHE_SERVER_URL=${RHCHE_HOST_FULL_URL}" \
-  quay.io/openshiftio/almighty-che-starter:latest
-
 echo "Running tests"
 
 MVN_COMMAND="mvn clean --projects functional-tests -Pfunctional-tests -B \
@@ -72,13 +65,8 @@ MVN_COMMAND="mvn clean --projects functional-tests -Pfunctional-tests -B \
   -Dche.host=${RHCHE_HOST_URL} \
   -Dche.osio.auth.endpoint=${CHE_OSIO_AUTH_ENDPOINT} \
   -DexcludedGroups=${RHCHE_EXCLUDED_GROUPS} \
-  -DcheStarterUrl=http://che-starter.localnetwork:10000 \
   -Dtests.screenshots_dir=${RHCHE_SCREENSHOTS_DIR} \
   -Dtest.suite=${TEST_SUITE}"
-
-if [[ -n $RUNNING_WORKSPACE ]]; then
-	MVN_COMMAND="${MVN_COMMAND} -Dche.workspaceName=${RUNNING_WORKSPACE}"
-fi
 
 if [[ -n $RHCHE_HOST_PROTOCOL ]]; then
 	MVN_COMMAND="${MVN_COMMAND} -Dche.protocol=${RHCHE_HOST_PROTOCOL}"
@@ -105,16 +93,10 @@ RETURN_CODE=$?
 
 if [ -d "/root/logs/" ]; then
   echo "Logs folder mounted, grabbing logs."
-  echo "Saving che-starter logs to /root/logs/che-starter.log"
-  docker logs che-starter > /root/logs/che-starter.log
   echo "Saving test run logs to /root/logs/functional-tests.log"
   docker logs "${SELF_CONTAINER_ID}" > /root/logs/functional-tests.log
   echo "Archiving artifacts to /root/logs/artifacts/"
   cp -r ./functional-tests/target/ /root/logs/artifacts/
 fi
-
-echo "Stopping che-starter"
-docker container kill che-starter
-docker container rm che-starter
 
 exit $RETURN_CODE
