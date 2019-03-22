@@ -50,6 +50,11 @@
                 <version>${che.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.eclipse.che.core</groupId>
+                <artifactId>che-core-commons-lang</artifactId>
+                <version>${che.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.eclipse.che.selenium</groupId>
                 <artifactId>che-selenium-core</artifactId>
                 <version>${che.version}</version>
@@ -108,6 +113,10 @@
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-api-workspace-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-commons-lang</artifactId>
         </dependency>
         <!-- TEST DEPENDENCIES -->
         <dependency>
