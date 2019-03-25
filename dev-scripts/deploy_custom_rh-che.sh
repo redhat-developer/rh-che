@@ -2,6 +2,107 @@
 # Copyright (c) 2018 Red Hat, Inc.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
+1
+#!/bin/bash
+2
+# Copyright (c) 2018 Red Hat, Inc.
+3
+# All rights reserved. This program and the accompanying materials
+4
+# are made available under the terms of the Eclipse Public License v1.0
+5
+# which accompanies this distribution, and is available at
+6
+# http://www.eclipse.org/legal/epl-v10.html
+7
+​
+8
+# ERROR CODES:
+9
+# 1 - general error
+10
+# 2 - missing file
+11
+# 3 - missing credentials
+12
+# 4 - OpenShift login failed
+13
+# 5 - command execution failed
+14
+​
+15
+usage="\\033[93;1m$(basename "$0") \\033[0;1m[-u <username>] [-p <passwd>] [-o <token>] \\033[90m{-t <tag>} {-r <registry>} {-e <namespace>} {-b <rh-che branch>} {-n} {-s} {-h} \\033[0m-- Login to dev cluster and deploy che with specific build tag
+16
+​
+17
+\\033[32;1mwhere:\\033[0m
+18
+    \\033[1m-u\\033[0m  \\033[93musername for openshift account\\033[0m
+19
+    \\033[1m-p\\033[0m  \\033[93mpassword for openshift account\\033[0m
+20
+    \\033[1m-o\\033[0m  \\033[93mopenshift token - \\033[31;1meither token or username and password must be provided\\033[0m
+21
+    \\033[1m-e\\033[0m  use specified namespace instead of the default one
+22
+    \\033[1m-b\\033[0m  use specified rh-che github branch
+23
+    \\033[1m-h\\033[0m  show this help text
+24
+    \\033[1m-n\\033[0m  do not delete files after script finishes
+25
+    \\033[1m-s\\033[0m  wipe sql database (postgres)
+26
+    \\033[1m-S\\033[0m  apply secret for oc
+27
+    \\033[1m-t\\033[0m  [\\033[1mdefault=latest\\033[0m] tag for specific build (first 7 characters of commit hash)
+28
+    \\033[1m-r\\033[0m  docker image registry from where to pull
+29
+    \\033[1m-z\\033[0m  run this script as a standalone self-contained application
+30
+    \\033[1m-U\\033[0m  use unsecure route (do not annotate route)
+31
+​
+32
+\\033[32;1mrequirements\\033[0m:
+33
+    \\033[1moc\\033[0m  openshift origin CLI admin (dnf install origin-clients)
+34
+    \\033[1mjq\\033[0m  json CLI processor (dnf install jq (fedora) or brew install jq (macos))
+35
+    \\033[1myq\\033[0m  yaml CLI processor based on jq (pip install yq)"
+36
+​
+37
+export RH_CHE_DEPLOY_SCRIPT_CLEANUP="true";
+38
+export RH_CHE_WIPE_SQL="false";
+39
+export RH_CHE_IS_V_FIVE="false";
+40
+export RH_CHE_OPENSHIFT_USE_TOKEN="false";
+41
+export RH_CHE_OPENSHIFT_URL=https://devtools-dev.ext.devshift.net:8443;
+42
+export RH_CHE_JDBC_USERNAME=pgche;
+43
+export RH_CHE_JDBC_PASSWORD=pgchepassword;
+44
+export RH_CHE_JDBC_URL=jdbc:postgresql://postgres:5432/dbche;
+45
+export RH_CHE_RUNNING_STANDALONE_SCRIPT="false";
+46
+export RH_CHE_USE_TLS="true"
+47
+export RH_CHE_APPLY_SECRET="false"
+48
+​
+49
+export RH_CHE_DOCKER_IMAGE_TAG="latest";
+50
+export RH_CHE_DOCKER_REPOSITORY="quay.io/openshiftio/che-rh-che-server";
+
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
@@ -322,6 +423,7 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                       .\"data\".\"CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
                       .\"data\".\"CHE_API\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api\" |
                       .\"data\".\"CHE_WEBSOCKET_ENDPOINT\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket\" |
+                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT__MINOR\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket-minor\" |
                       .\"metadata\".\"name\" = \"rhche\" |
                       .\"data\".\"CHE_INFRA_OPENSHIFT_TLS__ENABLED\" = \"$RH_CHE_USE_TLS\" ")
 
