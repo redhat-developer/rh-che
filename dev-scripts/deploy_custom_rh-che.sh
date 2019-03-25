@@ -322,6 +322,7 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                       .\"data\".\"CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/agent-binaries/linux_amd64/bootstrapper/bootstrapper\" |
                       .\"data\".\"CHE_API\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api\" |
                       .\"data\".\"CHE_WEBSOCKET_ENDPOINT\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket\" |
+                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT__MINOR\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket-minor\" |
                       .\"metadata\".\"name\" = \"rhche\" |
                       .\"data\".\"CHE_INFRA_OPENSHIFT_TLS__ENABLED\" = \"$RH_CHE_USE_TLS\" ")
 
