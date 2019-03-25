@@ -82,24 +82,28 @@ The test suite can be changed by setting the name. The suite must be place in ``
   -e "TEST_SUITE=simpleTestSuite.xml"
   ```
   
-  
-##### Running E2E test
-There is one test EETest.java for end-to-end purposes. This test runs as a part of e2eTestSuite.xml. You need to set the name of running workspace and pass it as a parameter. 
-Following example shows how to run this test against production environment.
-```
-docker run --name functional-tests-dep --privileged \
-	-v /var/run/docker.sock:/var/run/docker.sock \
-	-e "RHCHE_ACC_USERNAME=<username>" \
-	-e "RHCHE_ACC_PASSWORD=<password>" \ 
-	-e "RHCHE_ACC_EMAIL=<email>" \
-	-e "CHE_OSIO_AUTH_ENDPOINT=https://auth.openshift.io" \
-	-e "RHCHE_HOST_URL=che.openshift.io" \
-	-e "RUNNING_WORKSPACE=<workspace_name>" \
-	-e "TEST_SUITE=e2eTestSuite.xml" \
-	quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
-```
-This test expects vert-x project ```vertx-http-booster``` in running workspace. Test changes a 14th line in HttpApplication.java to ```protected static final String template = \"Bonjour, %s!\";```. 
-Changes are committed and pushed. Test verifies if push was successful.
+### Docker images used in jobs
+
+There are several images used for different purposes.
+
+#### quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep 
+
+*Purpose and description*: Running periodic tests. Statuses of these jobs are showed in main README.
+
+*What does the image contain*: Image contains only functional tests and dependencies of functional tests. 
+
+*When is image built*: When PR is merged and build of master credentials is finished. 
+
+#### quay.io/openshiftio/rhchestage-rh-che-automation-dep 
+
+*Purpose and description*: Will be used for running PR checks. 
+
+*What does the image contain*: Image contains only pre-built dependencies. Source code have to be mounted to `/root/che/`. 
+
+*When is image built*: When PR is merged and build of master credentials is finished. 
+
+This image is pushed with tag {shorthash} too - it is being used to mark older images to tie the build to a specific PR.
+
 
 ### Full list of variables
 
