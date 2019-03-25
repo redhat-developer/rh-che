@@ -120,16 +120,6 @@ objects:
             value: "openshift"
           - name: SENTRY_RELEASE
             value: ${IMAGE_TAG}
-          - name: CHE_CORE_JSONRPC_PROCESSOR__MAX__POOL__SIZE
-            valueFrom:
-              configMapKeyRef:
-                key: che.core.jsonrpc.processor.major.max.pool.size
-                name: rhche
-          - name: CHE_CORE_JSONRPC_PROCESSOR__QUEUE__CAPACITY
-            valueFrom:
-              configMapKeyRef:
-                key: che.core.jsonrpc.processor.major.queue.capacity
-                name: rhche
           envFrom:
           - configMapRef:
               name: rhche
