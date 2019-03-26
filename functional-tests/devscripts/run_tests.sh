@@ -48,6 +48,12 @@ while getopts "hu:p:m:o:r:" opt; do
   esac
 done
 
+if [[ "$JOB_NAME" == *"flaky"* ]]; then
+	TEST_SUITE="flaky.xml"
+else
+	TEST_SUITE="simpleTestSuite.xml"
+fi
+
 #PR CHECK
 if [[ "$PR_CHECK_BUILD" == "true" ]]; then
 	HOST_URL=$(echo ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL} | cut -d"/" -f 3)
@@ -79,20 +85,21 @@ else
 	
 	#PRODUCTION
 	if [[ "$HOST_URL" == "che.openshift.io" ]]; then
-	echo "Running test with user $USERNAME against production environment."
-	CHE_OSIO_AUTH_ENDPOINT="https://auth.openshift.io"
+		echo "Running test with user $USERNAME against production environment."
+		CHE_OSIO_AUTH_ENDPOINT="https://auth.openshift.io"
 
-	docker run --name functional-tests-dep --privileged \
-	           -v /var/run/docker.sock:/var/run/docker.sock \
-	           -v /root/payload/logs:/root/logs \
-	           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
-	           -e "RHCHE_ACC_USERNAME=$USERNAME" \
-	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
-	           -e "RHCHE_ACC_EMAIL=$EMAIL" \
-	           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
-	           -e "RHCHE_HOST_URL=$HOST_URL" \
-           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
-    RESULT=$?
+		docker run --name functional-tests-dep --privileged \
+	    	       -v /var/run/docker.sock:/var/run/docker.sock \
+	        	   -v /root/payload/logs:/root/logs \
+		           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
+		           -e "RHCHE_ACC_USERNAME=$USERNAME" \
+	    	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
+	        	   -e "RHCHE_ACC_EMAIL=$EMAIL" \
+		           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
+		           -e "RHCHE_HOST_URL=$HOST_URL" \
+	    	           -e "TEST_SUITE=$TEST_SUITE" \
+	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
+    	RESULT=$?
     
 	#PROD-PREVIEW
 	else
@@ -109,6 +116,7 @@ else
 		           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
 		           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
 		           -e "RHCHE_HOST_URL=$HOST_URL" \
+		           -e "TEST_SUITE=$TEST_SUITE" \
 	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
 	    RESULT=$?
 	fi
