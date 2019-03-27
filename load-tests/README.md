@@ -6,11 +6,11 @@ It is recommended to do python-pip installations in a separate python virtual-en
 
 ### Installing dependencies
 
-    ```{allowEmpy=true}
-    yum install python-pip --assumeyes \
-    pip install locust \
-    pip install websocket-client
-    ```
+```{allowEmpty=true}
+yum install python-pip --assumeyes \
+pip install locust \
+pip install websocket-client
+```
 
 ## Running the tests
 
@@ -19,6 +19,7 @@ cd rh-che/load-tests && \
 LOCUST_RHCHE_ACTIVE_TOKEN="<active_token>" \
 LOCUST_RHCHE_PROTOCOL="<http|https>" \
 LOCUST_RHCHE_BASE_URI="rhche-rhche.192.168.99.100.nip.io" \
+LOCUST_RHCHE_WEBSOCKET_ENDPOINT="<websocket|websocket-minor>"
 locust -f simple.py
 ```
 
@@ -29,6 +30,7 @@ docker run -p 8089:8089 \
 -e "TOKEN=<active_token>" \
 -e "BASEURL=rhche-rhche.192.168.99.100.nip.io" \
 -e "PROTOCOL=<http|https>" \
+-e "WEBSOCKET=<websocket|websocket-minor>"
 quay.io/tdancs/rhche-locust-load-tests
 ```
 

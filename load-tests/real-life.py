@@ -18,10 +18,14 @@ class GetWorkspacesTasks (TaskSet):
     token = os.environ.get("LOCUST_RHCHE_ACTIVE_TOKEN")
     base_uri = os.environ.get("LOCUST_RHCHE_BASE_URI")
     protocol = os.environ.get("LOCUST_RHCHE_PROTOCOL")
+    endpoint = os.environ.get("LOCUST_RHCHE_WEBSOCKET_ENDPOINT")
 
     if base_uri == None:
         raise ValueError('LOCUST_RHCHE_BASE_URI env variable not set. '
                          'Must contain url in format \'che.openshift.io\'')
+    if endpoint == None:
+        raise ValueError('LOCUST_RHCHE_WEBSOCKET_ENDPOINT env variable '
+                         'not set. Must contain name of websocket endpoint')
 
     def on_start(self):
         self.uuid = str(uuid.uuid4())
@@ -33,11 +37,11 @@ class GetWorkspacesTasks (TaskSet):
             raise ValueError('LOCUST_RHCHE_PROTOCOL env variable not set. '
                              'Must contain either \'http\' or \'https\'')
         if self.token != None:
-            self.websocket_uri = self.uri_prefix + self.base_uri + '/api/websocket?token=' + self.token
-            self.wsmaster_uri = self.uri_prefix + self.base_uri + '/api/wsmaster?token=' + self.token
+            self.websocket_uri = self.uri_prefix + self.base_uri + '/api/' + self.endpoint + '?token=' + self.token
+            self.wsmaster_uri = self.uri_prefix + self.base_uri + '/api/' + self.endpoint + '?token=' + self.token
         else:
-            self.websocket_uri = self.uri_prefix + self.base_uri + '/api/websocket'
-            self.wsmaster_uri = self.uri_prefix + self.base_uri + '/api/wsmaster'
+            self.websocket_uri = self.uri_prefix + self.base_uri + '/api/' + self.endpoint
+            self.wsmaster_uri = self.uri_prefix + self.base_uri + '/api/' + self.endpoint
 
     def parse_json_and_send_websocket(self, json_file, task):
         LAST_TIMESTAMP : datetime.datetime
