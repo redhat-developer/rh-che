@@ -18,6 +18,9 @@
 | us-east-1a | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-1a)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-prod-1a/) |
 | us-east-1b | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-1b)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-prod-1b/) |
 | us-east-2a preview | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-preview-2a/)](https://ci.centos.org/job/devtools-rh-che-periodic-prod-preview-2a/) |
+| us-east-2 flaky | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-flaky-prod-2/)](https://ci.centos.org/job/devtools-rh-che-flaky-prod-2/) | 
+
+
 
 #### PR check for rh-che
 
