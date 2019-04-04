@@ -23,18 +23,16 @@ import org.eclipse.che.selenium.pageobject.dashboard.NewWorkspace;
 import org.eclipse.che.selenium.pageobject.dashboard.ProjectSourcePage;
 import org.eclipse.che.selenium.pageobject.dashboard.workspaces.Workspaces;
 import org.eclipse.che.selenium.pageobject.theia.TheiaIde;
-import org.eclipse.che.selenium.pageobject.theia.TheiaProjectTree;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class Che7TestOpenIDE {
+public class Che7DialogAbout {
 
-  private static final Logger LOG = LoggerFactory.getLogger(Che7TestOpenIDE.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Che7DialogAbout.class);
 
   private static final String WORKSPACE_NAME = NameGenerator.generate("wksp-", 5);
 
@@ -42,7 +40,6 @@ public class Che7TestOpenIDE {
   @Inject private TheiaIde theiaIde;
   @Inject private DefaultTestUser defaultTestUser;
   @Inject private TestWorkspaceServiceClient workspaceServiceClient;
-  @Inject private TheiaProjectTree theiaProjectTree;
 
   @Inject private Workspaces workspaces;
   @Inject private NewWorkspace newWorkspace;
@@ -50,27 +47,33 @@ public class Che7TestOpenIDE {
   @Inject private ProjectSourcePage projectSourcePage;
   @Inject private TestWorkspaceProvider testWorkspaceProvider;
 
-  @FindBy(id = "theia-app-shell")
-  WebElement theia;
-
   @AfterClass
   public void tearDown() throws Exception {
     workspaceServiceClient.delete(WORKSPACE_NAME, defaultTestUser.getName());
   }
 
+  @BeforeClass
+  public void createAndOpenWorkspace() {
+    LOG.info("Creating workspace " + WORKSPACE_NAME);
+    dashboard.open();
+    createChe7Workspace();
+
+    LOG.info("Opening workspace " + WORKSPACE_NAME);
+    theiaIde.switchToIdeFrame();
+    theiaIde.waitTheiaIde();
+    theiaIde.waitLoaderInvisibility();
+    theiaIde.waitTheiaIde();
+    theiaIde.waitTheiaIdeTopPanel();
+  }
+
   @Test
-  public void workspaceShouldBeStarted() {
+  public void openDialogAbout() {
+    LOG.info("Opening Dialog About");
     try {
-      dashboard.open();
-      createChe7Workspace();
-      theiaIde.switchToIdeFrame();
+      theiaIde.clickOnMenuItemInMainMenu("Help");
+      theiaIde.clickOnSubmenuItem("About");
+      theiaIde.waitAboutDialogIsOpen();
 
-      theiaIde.waitTheiaIde();
-      theiaIde.waitLoaderInvisibility();
-      theiaIde.waitTheiaIde();
-
-      theiaIde.waitTheiaIdeTopPanel();
-      theiaProjectTree.waitFilesTab();
     } catch (Exception e) {
       LOG.error(e.getMessage());
       throw e;

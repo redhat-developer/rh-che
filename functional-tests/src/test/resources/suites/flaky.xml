@@ -19,7 +19,7 @@
 
     <test name="all">
         <classes>
-            <class name="com.redhat.che.functional.tests.Che7TestOpenIDE"/>
+            <class name="com.redhat.che.functional.tests.Che7DialogAbout"/>
         </classes>
     </test>
 </suite>
