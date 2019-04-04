@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class MultiClusterOpenShiftProxy {
   private static final Logger LOG = LoggerFactory.getLogger(MultiClusterOpenShiftProxy.class);
-
   private String url;
 
   @Inject
@@ -33,9 +32,5 @@ public class MultiClusterOpenShiftProxy {
 
   public String getUrl() {
     return this.url;
-  }
-
-  public String getUrlWithIdentityIdQueryParameter(String identityId) {
-    return this.url + "?identity_id=" + identityId;
   }
 }

@@ -110,36 +110,38 @@ public class Fabric8WorkspaceEnvironmentProvider {
     checkSubject(subject);
     UserCheTenantData cheTenantData = getUserCheTenantData(subject);
     checkClusterCapacity(cheTenantData);
+    String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
+    String namespace = cheTenantData.getNamespace();
 
-    ConfigBuilder configBuilder =
-        new ConfigBuilder().withNamespace(cheTenantData.getNamespace()).withTrustCerts(true);
+    ConfigBuilder configBuilder = new ConfigBuilder().withNamespace(namespace).withTrustCerts(true);
 
     if (standalone) {
       return configBuilder.build();
     }
 
     String userId = subject.getUserId();
+    LOG.debug("The namespace '{}' is used by user '{}'", namespace, userId);
     if (cheServiceAccountTokenToggle.useCheServiceAccountToken(userId)) {
-      String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
       LOG.debug("Using Che SA token for '{}'", userId);
       config =
           configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(cheServiceAccountToken).build();
-      LOG.debug("Adding Impersonate Header '{}'", userId);
+      LOG.debug("Adding Impersonate Header: '{}'", userId);
       config.getRequestConfig().setImpersonateUsername(userId);
       // hot-fix to avoid NPE in ImpersonatorInterceptor when optional `Impersonate-Group` is not
       // set - https://github.com/fabric8io/kubernetes-client/issues/1266
+      // Need to update kubernetes-client to 4.1.1 version in upstream che -
+      // https://github.com/eclipse/che/issues/11981
+      LOG.debug("Adding Impersonate Group: 'dummyGroup'");
       config.getRequestConfig().setImpersonateGroups("dummyGroup");
     } else {
-      String osoProxyUrl = multiClusterOpenShiftProxy.getUrl();
+      LOG.debug("Using OSIO user token for '{}'", userId);
       config = configBuilder.withMasterUrl(osoProxyUrl).withOauthToken(subject.getToken()).build();
     }
-
     return config;
   }
 
   public String getWorkspacesOpenshiftNamespace(Subject subject) throws InfrastructureException {
     checkSubject(subject);
-
     return getUserCheTenantData(subject).getNamespace();
   }
 
