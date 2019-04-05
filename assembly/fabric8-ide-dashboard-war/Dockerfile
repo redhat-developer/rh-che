@@ -15,6 +15,7 @@
 FROM node:8.15.1
 
 ARG SOURCES_DIR
+ARG UPSTREAM_VERSION
 
 RUN apt-get update && \
     apt-get install -y git \
@@ -22,11 +23,11 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 RUN yarn global upgrade yarn@1.13.0
 COPY  ${SOURCES_DIR}/package.json /dashboard/
-COPY  ${SOURCES_DIR}/yarn.lock /dashboard/
+RUN wget https://raw.githubusercontent.com/eclipse/che/${UPSTREAM_VERSION}/dashboard/yarn.lock -P /dashboard
 COPY  ${SOURCES_DIR}/typings.json /dashboard/
 WORKDIR /dashboard
-RUN yarn install --ignore-optional
 COPY ${SOURCES_DIR} /dashboard/
+RUN yarn install --ignore-optional
 RUN yarn build && yarn test
 RUN cd /dashboard/target/ && tar zcf /tmp/dashboard.tar.gz dist/
 

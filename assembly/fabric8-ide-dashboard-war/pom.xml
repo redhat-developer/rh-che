@@ -157,6 +157,8 @@
                                             <arg value="eclipse-che-dashboard" />
                                             <arg value="--build-arg" />
                                             <arg value="SOURCES_DIR=./target/sources" />
+                                            <arg value="--build-arg" />
+                                            <arg value="UPSTREAM_VERSION=${che.version}" />
                                             <arg value="." />
                                         </exec>
                                     </target>
