@@ -198,9 +198,20 @@
             <build>
                 <plugins>
                     <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${basedir}/target/sources/node_modules</directory>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
-                            <!-- As of upstream 6.13, yarn is used instead of bower -->
+                            <!-- Use yarn to get dependencies -->
                             <execution>
                                 <id>install-yarn</id>
                                 <phase>compile</phase>
@@ -209,14 +220,14 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <exec dir="${basedir}/target/sources" executable="npm" failonerror="true">
+                                        <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
                                             <arg value="install" />
-                                            <arg value="yarn" />
+                                            <arg value="--ignore-optional" />
                                         </exec>
                                     </target>
                                 </configuration>
                             </execution>
-                            <!--   3. Build dashboard locally using npm install    -->
+                            <!--   3. Build dashboard locally using yarn build    -->
                             <execution>
                                 <id>build-dashboard</id>
                                 <phase>compile</phase>
@@ -226,9 +237,15 @@
                                 <configuration>
                                     <target>
                                         <!-- build user dashboard -->
-                                        <exec dir="${basedir}/target/sources" executable="node_modules/yarn/bin/yarn" failonerror="true">
-                                            <arg value="install" />
+                                        <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
+                                            <arg value="build" />
                                         </exec>
+                                        <!-- Change base HREF of the application that will be hosted on /dashboard
+                                        <replace file="${basedir}/target/dist/index.html">
+                                            <replacetoken><![CDATA[<base href="/">]]></replacetoken>
+                                            <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
+                                        </replace> -->
+
                                     </target>
                                 </configuration>
                             </execution>
@@ -255,7 +272,7 @@
                             </execution>
                             <!--   3.5 Run npm tests locally                                -->
                             <execution>
-                                <id>compilation</id>
+                                <id>test-dashboard</id>
                                 <phase>test</phase>
                                 <goals>
                                     <goal>run</goal>
@@ -263,8 +280,7 @@
                                 <configuration>
                                     <target unless="skipTests">
                                         <!-- Run unit tests -->
-                                        <exec dir="${basedir}/target/sources" executable="node_modules/yarn/bin/yarn" failonerror="true">
-                                            <arg value="run" />
+                                        <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
                                             <arg value="test" />
                                         </exec>
                                     </target>
