@@ -1,25 +1,34 @@
-# Copyright (c) 2012-2018 Red Hat, Inc
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Public License v1.0
-# which accompanies this distribution, and is available at
-# http://www.eclipse.org/legal/epl-v10.html
+# Copyright (c) 2015-2019 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Contributors:
+#   Red Hat, Inc. - initial API and implementation
 
 # This is a Dockerfile allowing to build dashboard by using a docker container.
-# Build step: $ docker build -t eclipse-che-dashboard
+# Build step: $ docker build -t eclipse-che-dashboard .
 # It builds an archive file that can be used by doing later
 #  $ docker run --rm eclipse-che-dashboard | tar -C target/ -zxf -
 FROM node:8.15.1
 
 ARG SOURCES_DIR
+ARG UPSTREAM_VERSION
 
 RUN apt-get update && \
     apt-get install -y git \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/*
-COPY ${SOURCES_DIR}/package.json /dashboard/
-RUN cd /dashboard && npm i yarn && npx yarn install --ignore-scripts
+RUN yarn global upgrade yarn@1.13.0
+COPY  ${SOURCES_DIR}/package.json /dashboard/
+RUN wget https://raw.githubusercontent.com/eclipse/che/${UPSTREAM_VERSION}/dashboard/yarn.lock -P /dashboard
+COPY  ${SOURCES_DIR}/typings.json /dashboard/
+WORKDIR /dashboard
 COPY ${SOURCES_DIR} /dashboard/
-RUN cd /dashboard && npx yarn
-RUN cd /dashboard && cd target/ && tar zcf /tmp/dashboard.tar.gz dist/
+RUN yarn install --ignore-optional
+RUN yarn build && yarn test
+RUN cd /dashboard/target/ && tar zcf /tmp/dashboard.tar.gz dist/
 
 CMD zcat /tmp/dashboard.tar.gz
