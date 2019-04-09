@@ -54,6 +54,10 @@ else
 	TEST_SUITE="simpleTestSuite.xml"
 fi
 
+#This format allows us to see username even if it is placed in Jenkins credential store. 
+USERNAME_TO_PRINT="${USERNAME:0:3} ${USERNAME:3:${#USERNAME}}"
+echo "User name printed in format: 3 first letters, space, the rest of letters.    $USERNAME_TO_PRINT"
+
 #PR CHECK
 if [[ "$PR_CHECK_BUILD" == "true" ]]; then
 	HOST_URL=$(echo ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL} | cut -d"/" -f 3)
