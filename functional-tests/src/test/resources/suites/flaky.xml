@@ -19,7 +19,11 @@
 
     <test name="all">
         <classes>
-            <class name="com.redhat.che.functional.tests.Che7DialogAbout"/>
+<!--         Temporarily changed to be same as simpleTestSuite because we have broken test on cluster 2.  https://github.com/redhat-developer/che-functional-tests/issues/473#issuecomment-483152260 -->
+            <class name="org.eclipse.che.selenium.miscellaneous.DialogAboutTest"/>
+            <class name="com.redhat.che.functional.tests.BuildAndRunProjectTest"/>
+            <class name="com.redhat.che.functional.tests.BayesianPackageJson"/>
+            <class name="com.redhat.che.functional.tests.BayesianPomXml"/>
         </classes>
     </test>
 </suite>
