@@ -15,11 +15,18 @@ ARG SOURCES_DIR
 RUN apt-get update && \
     apt-get install -y git \
     && apt-get -y clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && yarn global upgrade yarn@1.13.0
+
+# Copy only 3 files and run yarn with them to allow caching in case dependencies hasn't changed
 COPY ${SOURCES_DIR}/package.json /dashboard/
-RUN cd /dashboard && npm i yarn && npx yarn install --ignore-scripts
+COPY ${SOURCES_DIR}/yarn.lock /dashboard/
+COPY ${SOURCES_DIR}/typings.json /dashboard/
+WORKDIR /dashboard
+RUN yarn install --ignore-optional
+# Copy all the files (including previously copied) for simplicity of the Dockerfile
 COPY ${SOURCES_DIR} /dashboard/
-RUN cd /dashboard && npx yarn
-RUN cd /dashboard && cd target/ && tar zcf /tmp/dashboard.tar.gz dist/
+RUN yarn build && yarn test
+RUN cd /dashboard/target/ && tar zcf /tmp/dashboard.tar.gz dist/
 
 CMD zcat /tmp/dashboard.tar.gz
