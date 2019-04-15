@@ -22,12 +22,13 @@ RUN apt-get update && \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/*
 RUN yarn global upgrade yarn@1.13.0
-COPY  ${SOURCES_DIR}/package.json /dashboard/
-RUN wget https://raw.githubusercontent.com/eclipse/che/${UPSTREAM_VERSION}/dashboard/yarn.lock -P /dashboard
-COPY  ${SOURCES_DIR}/typings.json /dashboard/
+# Copy only necessary files and run yarn with them to allow caching in case dependencies hasn't changed
+COPY ["${SOURCES_DIR}/package.json", "${SOURCES_DIR}/typings.json", "/dashboard/"]
+RUN wget https://raw.githubusercontent.com/eclipse/che/${UPSTREAM_VERSION}/dashboard/yarn.lock -P /dashboard/
 WORKDIR /dashboard
+RUN yarn install --ignore-optional --ignore-scripts
+# Copy all the files (including previously copied) for simplicity of the Dockerfile
 COPY ${SOURCES_DIR} /dashboard/
-RUN yarn install --ignore-optional
 #RUN yarn build && yarn test
 RUN yarn build
 RUN cd /dashboard/target/ && tar zcf /tmp/dashboard.tar.gz dist/
