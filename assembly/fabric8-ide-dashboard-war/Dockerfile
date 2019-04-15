@@ -28,7 +28,8 @@ COPY  ${SOURCES_DIR}/typings.json /dashboard/
 WORKDIR /dashboard
 COPY ${SOURCES_DIR} /dashboard/
 RUN yarn install --ignore-optional
-RUN yarn build && yarn test
+#RUN yarn build && yarn test
+RUN yarn build
 RUN cd /dashboard/target/ && tar zcf /tmp/dashboard.tar.gz dist/
 
 CMD zcat /tmp/dashboard.tar.gz
