@@ -26,7 +26,7 @@ RUN yarn global upgrade yarn@1.13.0
 COPY ["${SOURCES_DIR}/package.json", "${SOURCES_DIR}/typings.json", "/dashboard/"]
 RUN wget https://raw.githubusercontent.com/eclipse/che/${UPSTREAM_VERSION}/dashboard/yarn.lock -P /dashboard/
 WORKDIR /dashboard
-RUN yarn install --ignore-optional --ignore-scripts
+RUN yarn install --ignore-optional
 # Copy all the files (including previously copied) for simplicity of the Dockerfile
 COPY ${SOURCES_DIR} /dashboard/
 #RUN yarn build && yarn test

@@ -257,12 +257,6 @@
                                         <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
                                             <arg value="build" />
                                         </exec>
-                                        <!-- Change base HREF of the application that will be hosted on /dashboard
-                                        <replace file="${basedir}/target/dist/index.html">
-                                            <replacetoken><![CDATA[<base href="/">]]></replacetoken>
-                                            <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
-                                        </replace> -->
-
                                     </target>
                                 </configuration>
                             </execution>
