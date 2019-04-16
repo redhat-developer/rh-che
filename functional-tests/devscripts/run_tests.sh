@@ -50,6 +50,8 @@ done
 
 if [[ "$JOB_NAME" == *"flaky"* ]]; then
 	TEST_SUITE="flaky.xml"
+elif [[ "$JOB_NAME" == *"saas"* ]]; then
+	TEST_SUITE="saasPrCheck.xml"
 else
 	TEST_SUITE="simpleTestSuite.xml"
 fi
