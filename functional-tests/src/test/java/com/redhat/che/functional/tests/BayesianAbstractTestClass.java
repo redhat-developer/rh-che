@@ -83,9 +83,6 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   public void openTestFile() throws Exception {
     LOG.info("Waiting for workspace to be ready.");
     checkWorkspace(workspace);
-    LOG.info("Waiting for project to be imported.");
-    importWorkaround(workspace, 5);
-    LOG.info("Project imported, running tests.");
   }
 
   @BeforeMethod

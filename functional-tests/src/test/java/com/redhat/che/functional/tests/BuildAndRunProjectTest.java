@@ -35,7 +35,6 @@ public class BuildAndRunProjectTest extends RhCheAbstractTestClass {
   @BeforeClass
   public void checkWorkspace() throws Exception {
     checkWorkspace(workspace);
-    importWorkaround(workspace, 5);
   }
 
   @Test

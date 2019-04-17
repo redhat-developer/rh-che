@@ -45,6 +45,7 @@ public abstract class RhCheAbstractTestClass {
       ide.waitOpenedWorkspaceIsReadyToUse();
       projectExplorer.waitProjectExplorer();
       notificationsPopupPanel.waitProgressPopupPanelClose();
+      checkProjectPresent(workspace);
     } catch (ExecutionException | InterruptedException e) {
       LOG.error(
           "Could not obtain workspace name and id - worskape was probably not successfully injected.");
@@ -59,25 +60,11 @@ public abstract class RhCheAbstractTestClass {
     }
   }
 
-  // This method is a workaround for issue:
-  // https://github.com/openshiftio/openshift.io/issues/4695
-  // If project is not imported, refresh whole page. Try for <maxTires> attempts.
-  public void importWorkaround(TestWorkspace workspace, int maxTries) throws Exception {
-    int counter = 0;
-
-    while (projectExplorer.getNamesOfAllOpenItems().get(0).equals("There are no projects")) {
-      counter++;
-      LOG.warn(
-          "Project was not imported. Trying to refresh the page to import the project. Attempt {}/5",
-          counter);
-      seleniumWebDriver.get(seleniumWebDriver.getCurrentUrl());
-      checkWorkspace(workspace);
-      if (counter == maxTries) {
-        LOG.error("Project was not imported in " + maxTries + " tries.");
-        throw new RuntimeException("Project was not imported to the workspace.");
-      }
+  public void checkProjectPresent(TestWorkspace workspace) throws Exception {
+    if (projectExplorer.getNamesOfAllOpenItems().get(0).equals("There are no projects")) {
+      LOG.error("Project was not imported.");
+      throw new RuntimeException("Project was not imported to the workspace.");
     }
-    LOG.info(String.format("Project successfully imported after %d attempts.", counter + 1));
   }
 
   public void closeFilesAndProject() {
