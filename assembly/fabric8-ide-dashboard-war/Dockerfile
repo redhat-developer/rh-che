@@ -15,7 +15,6 @@
 FROM node:8.15.1
 
 ARG SOURCES_DIR
-ARG UPSTREAM_VERSION
 
 RUN apt-get update && \
     apt-get install -y git \
@@ -24,7 +23,6 @@ RUN apt-get update && \
 RUN yarn global upgrade yarn@1.13.0
 # Copy only necessary files and run yarn with them to allow caching in case dependencies hasn't changed
 COPY ["${SOURCES_DIR}/package.json", "${SOURCES_DIR}/typings.json", "/dashboard/"]
-RUN wget https://raw.githubusercontent.com/eclipse/che/${UPSTREAM_VERSION}/dashboard/yarn.lock -P /dashboard/
 WORKDIR /dashboard
 RUN yarn install --ignore-optional
 # Copy all the files (including previously copied) for simplicity of the Dockerfile

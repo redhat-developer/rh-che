@@ -157,8 +157,6 @@
                                             <arg value="eclipse-che-dashboard" />
                                             <arg value="--build-arg" />
                                             <arg value="SOURCES_DIR=./target/sources" />
-                                            <arg value="--build-arg" />
-                                            <arg value="UPSTREAM_VERSION=${che.version}" />
                                             <arg value="." />
                                         </exec>
                                     </target>
@@ -213,21 +211,6 @@
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
-                            <!-- Get upstream yarn.lock file -->
-                            <execution>
-                                <id>get-yarn-lock</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <exec dir="${basedir}/target/sources" executable="wget" failonerror="true">
-                                            <arg value="https://raw.githubusercontent.com/eclipse/che/${che.version}/dashboard/yarn.lock"/>
-                                        </exec>
-                                    </target>
-                                </configuration>
-                            </execution>
                             <!-- Use yarn to get dependencies -->
                             <execution>
                                 <id>install-yarn</id>
