@@ -12,8 +12,10 @@
 package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
+import java.io.IOException;
 import org.eclipse.che.commons.lang.NameGenerator;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClient;
+import org.eclipse.che.selenium.core.executor.OpenShiftCliCommandExecutor;
 import org.eclipse.che.selenium.core.user.DefaultTestUser;
 import org.eclipse.che.selenium.core.webdriver.SeleniumWebDriverHelper;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
@@ -46,6 +48,7 @@ public class Che7DialogAbout {
   @Inject private SeleniumWebDriverHelper seleniumWebDriverHelper;
   @Inject private ProjectSourcePage projectSourcePage;
   @Inject private TestWorkspaceProvider testWorkspaceProvider;
+  @Inject private OpenShiftCliCommandExecutor cli;
 
   @AfterClass
   public void tearDown() throws Exception {
@@ -53,17 +56,28 @@ public class Che7DialogAbout {
   }
 
   @BeforeClass
-  public void createAndOpenWorkspace() {
+  public void createAndOpenWorkspace() throws IOException {
     LOG.info("Creating workspace " + WORKSPACE_NAME);
     dashboard.open();
     createChe7Workspace();
 
     LOG.info("Opening workspace " + WORKSPACE_NAME);
-    theiaIde.switchToIdeFrame();
-    theiaIde.waitTheiaIde();
-    theiaIde.waitLoaderInvisibility();
-    theiaIde.waitTheiaIde();
-    theiaIde.waitTheiaIdeTopPanel();
+    try {
+      theiaIde.switchToIdeFrame();
+      theiaIde.waitTheiaIde();
+      theiaIde.waitLoaderInvisibility();
+      theiaIde.waitTheiaIde();
+      theiaIde.waitTheiaIdeTopPanel();
+    } catch (Exception e) {
+      String switchProject = "project " + defaultTestUser.getName() + "-che";
+      cli.execute(switchProject);
+      try {
+        LOG.info(cli.execute("get all"));
+      } catch (Exception ex) {
+        String[] log = ex.getCause().getMessage().split("(Output: |;)");
+        LOG.info("\n" + log[1]);
+      }
+    }
   }
 
   @Test
