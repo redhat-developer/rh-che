@@ -29,7 +29,7 @@ public class BayesianPackageJson extends BayesianAbstractTestClass {
   private static final String PATH_TO_FILE = "nodejs-hello-world";
   private static final String PROJECT_DEPENDENCY = "\"serve-static\": \"1.7.1\" ,\n";
   private static final String ERROR_MESSAGE =
-      "Package serve-static-1.7.1 is vulnerable: CVE-2015-1164. Recommendation: use version 1.7.2";
+      "Package serve-static-1.7.1 is vulnerable: CVE-2015-1164. Recommendation: use version";
 
   @BeforeClass
   public void setUp() throws Exception {
