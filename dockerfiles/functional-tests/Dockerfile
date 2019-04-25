@@ -28,7 +28,7 @@ RUN groupadd docker -g 1000 && \
         rh-nodejs8 && \
     yum clean all --assumeyes && \
     rm -rf /var/cache/yum && \
-    chrome_version=$(google-chrome --version | grep -oiE "[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}") && \
+    chrome_version=$(google-chrome --version | grep -oiE "[0-9]*\.[0-9]*\.[0-9]*") && \
     chromedriver_version=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${chrome_version}) && \
     $(curl -sS https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip > chromedriver_linux64.zip) && \
     unzip chromedriver_linux64.zip && mv chromedriver /usr/bin/chromedriver && chmod +x /usr/bin/chromedriver && rm chromedriver_linux64.zip && \
