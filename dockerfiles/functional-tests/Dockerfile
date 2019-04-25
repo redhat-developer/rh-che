@@ -14,13 +14,13 @@ COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
 RUN groupadd docker -g 1000 && \
     yum update --assumeyes && \
     yum install --assumeyes epel-release && \
-    yum install --assumeyes chromedriver && \
     yum install --assumeyes google-chrome-stable && \
     yum install --assumeyes \
         xorg-x11-server-Xvfb \
         java-1.8.0-openjdk \
         java-1.8.0-openjdk-devel \
         git \
+        unzip \
         docker \
         centos-release-scl && \
     yum install --assumeyes \
@@ -28,6 +28,10 @@ RUN groupadd docker -g 1000 && \
         rh-nodejs8 && \
     yum clean all --assumeyes && \
     rm -rf /var/cache/yum && \
+    chrome_version=$(google-chrome --version | grep -oiE "[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}") && \
+    chromedriver_version=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${chrome_version}) && \
+    $(curl -sS https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip > chromedriver_linux64.zip) && \
+    unzip chromedriver_linux64.zip && mv chromedriver /usr/bin/chromedriver && chmod +x /usr/bin/chromedriver && rm chromedriver_linux64.zip && \
     git clone https://github.com/redhat-developer/rh-che.git /root/rh-che && \
     scl enable rh-nodejs8 rh-maven33 "mvn clean install -B -f /root/rh-che/ --projects functional-tests -Pnative -DskipTests=true"
 
