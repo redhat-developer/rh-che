@@ -419,3 +419,34 @@ image::documentation/images/plugins.png[]
 [NOTE]
 ====
 The same https://github.com/eclipse/che-plugin-registry/blob/master/openshift/che-plugin-registry.yml[che-plugin-registry.yml] openshift template, defined in the original repository, is used for `che-plugin-registry` deployment on both `dsaas-stg / dsaas` (prod-preview / prod). One should be really carefull with the template update, since it would affect production regardless of the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yaml#L2[hash] commit defined in the https://github.com/openshiftio/saas-openshiftio/blob/master/dsaas-services/che-plugin-registry.yam[saas-openshiftio] (each time during the rollout update, the template is used directly from the master branch of the original repository).
+====
+
+== How to get edit right in the *-che namespace
+Users created by standard way don't have write access to the ``<username>-che`` namespace. To obtain these rights, add the user ID to the Toggle and update tenant.
+
+=== Add user to Toggle
+Send a request to ```https://api.openshift.io/api/users``` to obtain an information about the user. It is recommended to search for user by username.
+The exact command can then seem like that:
+```
+curl -s --header 'Accept: application/json' -X GET "https://api.openshift.io/api/users?filter[username]=<username>" | jq .data[0].id
+```
+Add this to prod / prod-preview feature toggle to the ``che.edit.rights`` toggle. 
+
+=== Update tenant
+For updating the tenant of specific user you need users Bearer token. The refresh have to be done by API call. The description of API can be found here: http://swagger.goa.design/?url=github.com%2Ffabric8-services%2Ffabric8-wit%2Fdesign#
+For the update of tenant use this request:
+```
+curl -s -X PATCH --header 'Content-Type: application/json' --header 'Authorization: Bearer <token>' https://api.openshift.io/api/user/services
+```
+
+The update of tenant should be enough to obtain edit right. It is possible to reset tenant by running clean and update commands:
+```
+curl -s -X DELETE --header 'Content-Type: application/json' --header 'Authorization: Bearer <token>' https://api.openshift.io/api/user/services
+curl -s -X PATCH --header 'Content-Type: application/json' --header 'Authorization: Bearer <token>' https://api.openshift.io/api/user/services
+
+```
+
+[NOTE]
+====
+If the user is provisioned on prod-preview, use ```https://api.prod-preview.openshift.io``` instead the production one.
+====
