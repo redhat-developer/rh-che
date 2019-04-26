@@ -62,6 +62,8 @@ public class Che7DialogAbout {
     createChe7Workspace();
 
     LOG.info("Opening workspace " + WORKSPACE_NAME);
+    // following try/catch is there only for debugging issue https://github.com/redhat-developer/che-functional-tests/issues/476
+    // once that issue is solved, this try/catch can be deleted
     try {
       theiaIde.switchToIdeFrame();
       theiaIde.waitTheiaIde();
@@ -69,14 +71,19 @@ public class Che7DialogAbout {
       theiaIde.waitTheiaIde();
       theiaIde.waitTheiaIdeTopPanel();
     } catch (Exception e) {
+      // when exception is caught, we want to gather all info about pods, routes etc.
       String switchProject = "project " + defaultTestUser.getName() + "-che";
       cli.execute(switchProject);
       try {
+    	// the command "get all" fails, but all info we need is in its message
+    	// so the hack here is to get the result of "get all" and not throw this exception
         LOG.info(cli.execute("get all"));
       } catch (Exception ex) {
         String[] log = ex.getCause().getMessage().split("(Output: |;)");
         LOG.info("\n" + log[1]);
       }
+      // throw the exception from the test
+      throw e;
     }
   }
 
