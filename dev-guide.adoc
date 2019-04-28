@@ -374,36 +374,70 @@ https://github.com/eclipse/che-plugin-registry[che-plugin-registry] is a standal
 [source,json]
 ----
 [
-{
-"id":"che-dummy-plugin","version":"0.0.1","type":"Che Plugin","name":"Che Samples Hello World Plugin","description":"A hello world theia plug-in wrapped into a Che Plug-in", "links": {"self":"/plugins/che-dummy-plugin/0.0.1/meta.yaml" }
-}
-,{
-"id":"che-machine-exec-plugin","version":"0.0.1","type":"Che Plugin","name":"Che machine-exec Service","description":"Che Plug-in with che-machine-exec service to provide creation terminal or tasks for Eclipse CHE workspace machines.", "links": {"self":"/plugins/che-machine-exec-plugin/0.0.1/meta.yaml" }
-}
-,{
-"id":"che-service-plugin","version":"0.0.1","type":"Che Plugin","name":"Che Samples REST API Sidecar Plugin","description":"Che Plug-in with Theia plug-in and container definition providing a service", "links": {"self":"/plugins/che-service-plugin/0.0.1/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.editor.dirigible","version":"1.0.0","type":"Che Editor","name":"dirigible-che-editor-plugin","description":"Eclipse Dirigible as App Development Platform for Eclipse Che", "links": {"self":"/plugins/org.eclipse.che.editor.dirigible/1.0.0/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.editor.eclipseide","version":"0.0.1","type":"Che Editor","name":"eclipse-ide","description":"Eclipse IDE", "links": {"self":"/plugins/org.eclipse.che.editor.eclipseide/0.0.1/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.editor.gwt","version":"1.0.0","type":"Che Editor","name":"gwt-ide","description":"Eclipse GWT IDE", "links": {"self":"/plugins/org.eclipse.che.editor.gwt/1.0.0/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.editor.jupyter","version":"1.0.0","type":"Che Editor","name":"jupyter-notebook","description":"Jupyter Notebook as Editor for Eclipse Che", "links": {"self":"/plugins/org.eclipse.che.editor.jupyter/1.0.0/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.editor.theia","version":"1.0.0","type":"Che Editor","name":"theia-ide","description":"Eclipse Theia", "links": {"self":"/plugins/org.eclipse.che.editor.theia/1.0.0/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.samples.container-fortune","version":"0.0.1","type":"Theia plugin","name":"Che-Samples-Fortune","description":"Fortune plug-in running in its own container that provides the fortune tool", "links": {"self":"/plugins/org.eclipse.che.samples.container-fortune/0.0.1/meta.yaml" }
-}
-,{
-"id":"org.eclipse.che.theia.dev","version":"0.0.1","type":"Che Plugin","name":"Che Theia Dev Plugin","description":"Che Theia Dev Plugin", "links": {"self":"/plugins/org.eclipse.che.theia.dev/0.0.1/meta.yaml" }
-}
+  {
+    "publisher": "che-incubator",
+    "name": "theia",
+    "version": "1.0.0",
+    "id": "che-incubator/theia/1.0.0",
+    "type": "Che Editor",
+    "displayName": "Eclipse Theia",
+    "description": "Eclipse Theia",
+    "links": {
+      "self": "/plugins/che-incubator/theia/1.0.0"
+    }
+  },
+  {
+    "publisher": "che-incubator",
+    "name": "theia",
+    "version": "next",
+    "id": "che-incubator/theia/next",
+    "type": "Che Editor",
+    "displayName": "Eclipse Theia",
+    "description": "Eclipse Theia",
+    "links": {
+      "self": "/plugins/che-incubator/theia/next"
+    }
+  },
+  {
+    "publisher": "ws-skeleton",
+    "name": "che-service-plugin",
+    "version": "0.0.1",
+    "id": "ws-skeleton/che-service-plugin/0.0.1",
+    "type": "Che Plugin",
+    "displayName": "Che Service",
+    "description": "Che Plug-in with Theia plug-in and container definition providing a service",
+    "links": {
+      "self": "/plugins/ws-skeleton/che-service-plugin/0.0.1"
+    }
+  },
+  {
+    "publisher": "",
+    "name": "che-dummy-plugin",
+    "version": "0.0.1",
+    "deprecate": {
+      "migrateTo": "ws-skeleton/che-dummy-plugin/0.0.1",
+      "autoMigrate": true
+    },
+    "id": "che-dummy-plugin/0.0.1",
+    "type": "Che Plugin",
+    "displayName": "Che dummy plugin",
+    "description": "A hello world theia plug-in wrapped into a Che Plug-in",
+    "links": {
+      "self": "/plugins/che-dummy-plugin/0.0.1"
+    }
+  },
+  {
+    "publisher": "ws-skeleton",
+    "name": "che-dummy-plugin",
+    "version": "0.0.1",
+    "id": "ws-skeleton/che-dummy-plugin/0.0.1",
+    "type": "Che Plugin",
+    "displayName": "Che dummy plugin",
+    "description": "A hello world theia plug-in wrapped into a Che Plug-in",
+    "links": {
+      "self": "/plugins/ws-skeleton/che-dummy-plugin/0.0.1"
+    }
+  }
 ]
 ----
 
