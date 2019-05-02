@@ -33,13 +33,13 @@ else
   exit 1
 fi
 
-# Build and push PR-Check base image
+# Build and push functional-tests base image
 
-DOCKERFILE="pr-check/"
-DOCKER_IMAGE="rh-che-automation-dep"
+DOCKERFILE="functional-tests/"
+DOCKER_IMAGE="rh-che-functional-tests-dep"
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
-echo "Building docker image for PR check."
+echo "Building docker image for functional tests (used e.g. in periodic tests)."
 docker build -t ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_PATH}${DOCKERFILE}
 if [ $? -ne 0 ]; then
   echo 'Docker Build Failed'
@@ -52,4 +52,3 @@ docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 docker push ${DOCKER_IMAGE_URL}:${TAG}
 docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
-
