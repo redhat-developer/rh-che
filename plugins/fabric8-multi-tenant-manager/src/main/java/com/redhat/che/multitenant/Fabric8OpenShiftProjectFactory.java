@@ -32,7 +32,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       @Nullable @Named("che.infra.openshift.project") String projectName,
       OpenShiftClientFactory clientFactory,
       Fabric8WorkspaceEnvironmentProvider envProvider) {
-    super(projectName, null, clientFactory);
+    super(projectName, null, null, clientFactory);
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
