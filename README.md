@@ -9,7 +9,7 @@
 
 ## Job statuses
 
-#### Periodic jobs
+#### Periodic functional tests
 
 | Cluster       | Status    |
 | ------------- |-------------|
@@ -20,7 +20,14 @@
 | us-east-2a preview | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-preview-2a/)](https://ci.centos.org/job/devtools-rh-che-periodic-prod-preview-2a/) |
 | us-east-2 flaky | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-flaky-prod-2/)](https://ci.centos.org/job/devtools-rh-che-flaky-prod-2/) | 
 
+#### Periodic route tests
 
+| Cluster       | Status    |
+| ------------- |-------------|
+| us-east-2 | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-route-2)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-route-2) |
+| us-east-2a | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-route-2a)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-route-2a/) |
+| us-east-1a | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-route-1a)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-route-1a/) |
+| us-east-1b | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-route-1b)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-route-1b/) |
 
 #### PR check for rh-che
 

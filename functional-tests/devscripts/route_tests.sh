@@ -38,6 +38,10 @@ if [[ -z $FILE ]]; then
 	exit 1
 fi
 
+yum install epel-release --assumeyes
+yum update --assumeyes
+yum install --assumeyes -q jq
+	
 echo ---------- Get cluster for user --------------------
 
 if [[ $USERNAME = *"preview"* ]]; then
