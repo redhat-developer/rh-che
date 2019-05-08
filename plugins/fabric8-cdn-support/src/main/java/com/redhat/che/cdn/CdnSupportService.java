@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +36,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +46,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.UriBuilder;
 import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
@@ -56,9 +55,9 @@ import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.core.util.ListLineConsumer;
 import org.eclipse.che.api.core.util.ProcessUtil;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
-import org.eclipse.che.api.workspace.server.wsplugins.PluginMetaRetriever;
+import org.eclipse.che.api.workspace.server.wsplugins.PluginFQNParser;
+import org.eclipse.che.api.workspace.server.wsplugins.model.PluginFQN;
 import org.eclipse.che.api.workspace.server.wsplugins.model.PluginMeta;
-import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,30 +82,40 @@ public class CdnSupportService extends Service {
   private static final String TEMP_DIR_PREFIX = "che-plugin-archive-dir";
   private static final String LABEL_NAME = "che-plugin.cdn.artifacts";
 
+  private static final String REGISTRY_URL_FORMAT = "%s/%s/meta.yaml";
+
   private static final CompletableFuture<?>[] FUTURE_ARRAY = new CompletableFuture<?>[0];
   private static final CommandRunner RUNNER = new CommandRunner();
 
   private final String editorToPrefetch;
+  private final UriBuilder pluginRegistry;
   private final CommandRunner commandRunner;
-  private final PluginMetaRetriever pluginMetaRetriever;
+  private final PluginFQNParser pluginFQNParser;
+  private final HttpYamlDownloader yamlDownloader;
   @VisibleForTesting String editorDefinitionUrl = null;
   @VisibleForTesting String dockerImage = null;
 
   @Inject
   public CdnSupportService(
-      PluginMetaRetriever pluginMetaRetriever,
+      PluginFQNParser pluginFQNParser,
+      HttpYamlDownloader yamlDownloader,
+      @Named("che.workspace.plugin_registry_url") String registryUrl,
       @Nullable @Named("che.fabric8.cdn.prefetch.editor") String editorToPrefetch) {
-    this(RUNNER, pluginMetaRetriever, editorToPrefetch);
+    this(RUNNER, pluginFQNParser, yamlDownloader, registryUrl, editorToPrefetch);
   }
 
   @VisibleForTesting
   CdnSupportService(
       CommandRunner commandRunner,
-      PluginMetaRetriever pluginMetaRetriever,
+      PluginFQNParser pluginFQNParser,
+      HttpYamlDownloader yamlDownloader,
+      @Named("che.workspace.plugin_registry_url") String registryUrl,
       @Nullable @Named("che.fabric8.cdn.prefetch.editor") String editorToPrefetch) {
-    this.pluginMetaRetriever = pluginMetaRetriever;
     this.editorToPrefetch = editorToPrefetch;
     this.commandRunner = commandRunner;
+    this.pluginFQNParser = pluginFQNParser;
+    this.yamlDownloader = yamlDownloader;
+    this.pluginRegistry = UriBuilder.fromUri(registryUrl).path("v2").path("plugins");
 
     // Test that the skopeo process is available
 
@@ -189,21 +198,10 @@ public class CdnSupportService extends Service {
     return json;
   }
 
-  private String retrieveEditorPluginUrl()
-      throws InfrastructureException, NotFoundException, ServerException {
+  private String retrieveEditorPluginUrl() throws InfrastructureException, ServerException {
     LOG.debug("Searching the editor plugin entry in the plugin registry");
 
-    Collection<PluginMeta> plugins =
-        pluginMetaRetriever.get(
-            ImmutableMap.of(Constants.WORKSPACE_TOOLING_EDITOR_ATTRIBUTE, editorToPrefetch));
-    if (plugins.size() != 1) {
-      throw new NotFoundException("Editor '" + editorToPrefetch + "' is unknown");
-    }
-
-    PluginMeta editor = plugins.toArray(new PluginMeta[] {})[0];
-    if (editor == null) {
-      throw new NotFoundException("Editor '" + editorToPrefetch + "' is unknown");
-    }
+    PluginMeta editor = getEditorMeta();
 
     LOG.debug("Retrieving editor URL");
 
@@ -259,6 +257,24 @@ public class CdnSupportService extends Service {
         .findFirst()
         .map(node -> node.path("image").asText())
         .orElse(null);
+  }
+
+  private PluginMeta getEditorMeta() throws InfrastructureException {
+    PluginFQN pluginFQN = pluginFQNParser.parsePluginFQN(editorToPrefetch);
+    UriBuilder uriBuilder =
+        pluginFQN.getRegistry() == null
+            ? pluginRegistry.clone()
+            : UriBuilder.fromUri(pluginFQN.getRegistry());
+
+    URI editorURI = uriBuilder.path(pluginFQN.getId()).build();
+    try {
+      return yamlDownloader.getYamlResponseAndParse(editorURI);
+    } catch (IOException e) {
+      throw new InfrastructureException(
+          String.format(
+              "Failed to download editor meta.yaml for '%s': Error: %s",
+              editorToPrefetch, e.getMessage()));
+    }
   }
 
   @VisibleForTesting
