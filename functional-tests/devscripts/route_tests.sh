@@ -15,6 +15,32 @@ function printHelp {
 	echo -e "   $WHITE -f $NC file with route definition in yml format"
 }
 
+function checkPrereq {
+	if [[ -z $USERNAME || -z $PASSWORD ]]; then
+		echo "Username and password must be set."
+		exit 1
+	fi
+	if [[ -z $FILE ]]; then
+		echo "Specify file with route definition."
+		exit 1
+	fi
+
+	# Install dependecies if needed
+	CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+	if ! command -v jq; then
+		if ! type installJQ; then
+			source $CURRENT_DIR/../../.ci/functional_tests_utils.sh
+		fi
+		installJQ
+	fi
+	if ! command -v oc; then
+		if ! type installOC; then
+			source $CURRENT_DIR/../../.ci/functional_tests_utils.sh
+		fi
+		installOC
+	fi
+}
+
 # Parse commandline flags
 while getopts ':f:hp:u:' option; do
     case "$option" in
@@ -29,19 +55,8 @@ while getopts ':f:hp:u:' option; do
     esac
 done
 
-if [[ -z $USERNAME || -z $PASSWORD ]]; then
-	echo "Username and password must be set."
-	exit 1
-fi
-if [[ -z $FILE ]]; then
-	echo "Specify file with route definition."
-	exit 1
-fi
+checkPrereq
 
-yum install epel-release --assumeyes
-yum update --assumeyes
-yum install --assumeyes -q jq
-	
 echo ---------- Get cluster for user --------------------
 
 if [[ $USERNAME = *"preview"* ]]; then
