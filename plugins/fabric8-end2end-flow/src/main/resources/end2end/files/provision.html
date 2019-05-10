@@ -11,59 +11,71 @@
       Red Hat, Inc. - initial API and implementation
 
 -->
-<html class="" lang="en">
-<head class="at-element-marker">
-<!--[if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/ie8/0.4.1/ie8.js" ></script><![endif]-->
+<html class="" lang="en" dir="ltr">
+<head>
 <title>Welcome to Eclipse Che</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://redhat.com/">
+  <meta property="og:determiner" content="the">
+  <meta property="og:site_name" content="Red Hat">
+  <meta property="og:title" content="Red Hat">
 
-<style id="at-mbox-default-style" type="text/css">
-.mboxDefault {
-	visibility: hidden;
-}
-</style>
-<style type="text/css">
-.at-element-marker {
-	visibility: visible;
-}
-</style>
+  <link rel="icon" href="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/img/favicon.ico?v=3.4.30">
 
-<meta name="robots" content="nofollow">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- RHD css start -->
+  <link href="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/css/rhd-20190502.css?v=3.4.30" rel="stylesheet" />
+  <!-- RHD css end -->
+  <link href="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/css/login-20190502.css?v=3.4.30" rel="stylesheet" />
 
-
-<!-- RHD css start -->
-<link rel="stylesheet" type="text/css"
-  href="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/css/app-20180411.css">
-<link rel="stylesheet"
-  href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-<!--[if lt IE 9]><script type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html
-                              <p>
-                                <b>Eclipse Che powered by OpenShift.</b>5.js"></script><![endif]-->
-<!-- RHD css end -->
-
-<link
-  href="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/css/login-v5.css?v=3.4.11"
-  rel="stylesheet">
-<link
-  href="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/css/login-oio-v1.css?v=3.4.11"
-  rel="stylesheet">
-
-<!-- Common JS -->
-<script
-  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/jquery-20180411.js?v=3.4.11"
-  type="text/javascript"></script>
-<script
-  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/modernizr-custom-20180411.js?v=3.4.11"
-  type="text/javascript"></script>
-<script
-  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/jquery.validate.min.js?v=3.4.11"
-  type="text/javascript"></script>
-<script
-  src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/vendor/hideShowPassword.js?v=3.4.11"
-  type="text/javascript"></script>
-<script>
+  <!-- Common JS -->
+  <script type="text/javascript">
+    rhd = {
+        config: {
+            user_profile_level: "openshiftio",
+            form_fields_visible: {"newsletter": true,"firstName": true,"lastName": true,"country": true,"password": true,"newsletterOpenShiftOnline": true,"termsOpenShiftIoSignIn": true,"company": true,"email": true},
+            form_fields_required: {"firstName": true,"lastName": true,"country": true,"password": true,"termsOpenShiftIoSignIn": true,"email": true},
+            website_current: "openShiftIo",
+            email_strict_check: true
+        }
+    }
+  </script>
+  <script defer src="https://developers.redhat.com/use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
+        <script src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/js/vendor/jquery-20180411.js?v=3.4.30" type="text/javascript"></script>
+        <script src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/js/vendor/jquery.validate.min.js?v=3.4.30" type="text/javascript"></script>
+        <script src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/js/vendor/hideShowPassword.js?v=3.4.30" type="text/javascript"></script>
+  <script>
+    jQuery.extend( jQuery.validator.messages, {
+        required: "This field is required",
+        remote: "Please fix this field",
+        email: "Please enter a valid email address",
+        url: "Please enter a valid URL",
+        date: "Please enter a valid date",
+        dateISO: "Please enter a valid date (ISO)",
+        number: "Please enter a valid number",
+        digits: "Please enter only digits",
+        equalTo: "Please enter the same value again",
+        maxlength: jQuery.validator.format( "Please enter no more than {0} characters" ),
+        minlength: jQuery.validator.format( "Please enter at least {0} characters" ),
+        rangelength: jQuery.validator.format( "Please enter a value between {0} and {1} characters long" ),
+        range: jQuery.validator.format( "Please enter a value between {0} and {1}" ),
+        max: jQuery.validator.format( "Please enter a value less than or equal to {0}" ),
+        min: jQuery.validator.format( "Please enter a value greater than or equal to {0}" ),
+        step: jQuery.validator.format( "Please enter a multiple of {0}" )
+    } );
+    jQuery.extend( jQuery.validator.messages, {
+        bannedCharsEmail: "Email field cannot contain the following special characters ($) (^) (|) (%) (\\) (~) (*) (=).",
+        phone: "This field may only contain the following characters (0-9) (+) (-) (space) (.).",
+        bannedChars: "This field cannot contain the following special characters (&quot;) ($) (^) (&lt;) (&gt;) (|) (+) (%) (\\).",
+        bannedCharsUsername: "Red Hat Login ID cannot contain spaces, national characters or the following special characters (&quot;) ($) (^) (&lt;) (&gt;) (|) (+) (%) (/) (;) (:) (,) () (*) (=) (~) (#) (() ())",
+        remoteCustom: "Please fix this field"
+    } );
+  </script>
+  <script src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/js/login-account-20181211.js?v=3.4.30" type="text/javascript"></script>
+  <script>
 const siteKey; // lgtm [js/syntax-error]
 var activationCaptcha;
 
@@ -79,7 +91,7 @@ function onCaptchaLoad() {
     try {
         function provision_osio_impl() {
             provision_osio = function() {};
-            var provisioningWindow = parent.open('https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(parent.osioProvisioningURL), 'osio_provisioning');
+            var provisioningWindow = parent.open(parent.osioProvisioningURL, 'osio_provisioning');
             if (! provisioningWindow) {
                 parent.sessionStorage.setItem('osio-provisioning-failure', "User provisioning should happen in a separate window.<br/> \
                 Please enable popups, before retrying.");
@@ -167,137 +179,103 @@ function captchaFailed(error) {
 <script src='https://www.google.com/recaptcha/api.js?onload=onCaptchaLoad&render=explicit' async defer></script>
 </head>
 
-<body class="home fullbleed " style="">
-  <div class="site-wrapper at-element-marker">
-    <header class="main clearfix at-element-marker">
-      <div class="row header-wrap">
-        <div class="logo-wrap">
-          <div class="logo">
-            <a href="http://www.openshift.io"
-              title="Red Hat OpenShift.io"><img
-              src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/img/OpenShift-io_logo.svg"
-              alt="Red Hat OpenShift.io"></a>
-          </div>
+<body class="home  page">
+  <div class="layout-container">
+    <header role="banner">
+      <div class="rhd-masthead front-nav">
+        <div class="rh-universal-header">
+            <a class="rh-logo-wrapper" href="https://www.redhat.com/" title="Red Hat"><img class="rh-header-logo" alt="Red Hat Logo" src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/img/RHLogo_white.svg?v=3.4.30"></a>
         </div>
       </div>
     </header>
-    <div class="wrapper clearfix">
-      <div class="content-wrapper">
-        <div class="row content">
-          <div class="large-24 columns">
-            <div id="kc-content" class="">
-              <div id="kc-content-wrapper" class="">
-                <div id="kc-form" class="">
-                  <div id="kc-form-wrapper" class="">
-                    <style type="text/css">
-.content-wrapper, .wrapper {
-	background-color: #f9f9f9 !important;
-}
-</style>
-                    <div class="kc-loginpage">
-                      <div class="row content login-main-row">
-                        <div class="kc-wrapper">
-                          <div class="kc-card">
-                            <h1>
-                              <div class="centered download-hide">Welcome to Eclipse Che</div>
-                            </h1>
-                            <div class="centered download-hide">
-                              <p>
-                                <b>Eclipse Che powered by OpenShift.</b>
-                                <br><br>
-                                We’re glad you are here<span id="osio-user-placeholder">, <span id="osio-user-value"></span></span>.
-                                <br><br>
-                                <span id="checking-message">Please wait for some seconds,<br>
-                                just the time to check you're a real user...</span>
-                                <span id="go-message" style="display: none;">
-                                <b>Ready to go ?</b><br><br>
-                                Please activate your account by clicking
-                                on the link below.<br>
-                                We’ll confirm your account login again and grant you the resources to use Eclipse Che. 
-                                </span>
-                              </p> <!-- Log in with the Red Hat account that you used when you signed up --> 
-                            </div>
-                            <div class="field">
-                                <div id="kc-form-buttons" class=" row collapse">
-                                    <div class="large-24 columns">
-                                        <button id="kc-login-button"
-                                                style="display: none;"
-                                                class="download-hide button heavy-cta large"
-                                                name="login"
-                                                onclick="return provision_osio()"
-                                                disabled>Activate Account</button>
-                                        <div id="recaptcha" 
-                                             style="z-index: 999;position: fixed;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                          </div>
-                          <span class="new-account"><a href="" onclick="return parent.osioProvisioningLogout()">Use a different account</a></span>
+    <div class="rhd-mobile-overlay"></div>
+
+    <main role="main">
+      <div class="container">
+        <div class="content">
+          <div class="kc-wrapper">
+            <div class="kc-card">
+              <div class="rh-logo-page">
+                <img alt="Red Hat Logo" src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/img/RHLogo.svg?v=3.4.30">
+              </div>
+              <div class="kc-loginpage">
+                <div class="row content login-main-row">
+                  <h1>
+                    <div class="centered download-hide">Welcome to Eclipse Che</div>
+                  </h1>
+                  <div class="centered download-hide">
+                    <p>
+                      <b>Eclipse Che powered by OpenShift.</b>
+                      <br><br>
+                      We’re glad you are here<span id="osio-user-placeholder">, <span id="osio-user-value"></span></span>.
+                      <br><br>
+                      <span id="checking-message">Please wait for some seconds,<br>
+                      just the time to check you're a real user...</span>
+                      <span id="go-message" style="display: none;">
+                      <b>Ready to go ?</b><br><br>
+                      Please activate your account by clicking
+                      on the link below.<br>
+                      We’ll confirm your account login again and grant you the resources to use Eclipse Che. 
+                      </span>
+                    </p>
+                  </div>
+                  <div class="centered field">
+                    <div id="kc-form-buttons" class=" row collapse">
+                      <div class="large-24 columns">
+                        <button id="kc-login-button"
+                                style="display: none;"
+                                class="download-hide button heavy-cta large"
+                                name="login"
+                                onclick="return provision_osio()"
+                                disabled>Activate Account</button>
+                        <div id="recaptcha" 
+                              style="z-index: 999;position: fixed;">
                         </div>
                       </div>
                     </div>
-
-                    <div class="clearfix"></div>
                   </div>
                 </div>
+              </div>
+              <div class="centered">
+                <span class="new-account"><a href="" onclick="return parent.osioProvisioningLogout()">Use a different account</a></span>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- / .content-wrapper -->
-    </div>
-    <!-- / .top-page-wrap -->
-
-    <footer class="bottom">
-      <section class="footer-legal">
-        <div class="legal">
-          <div class="row">
-            <div class="medium-5 small-24 columns">
-              <a href="https://www.redhat.com/" target="_blank"
-                rel="noopener noreferrer"><img alt="Red Hat"
-                class="rh-logo"
-                src="https://developers.redhat.com/themes/custom/rhdp/images/branding/RHLogo_white.svg"></a>
-            </div>
-            <div class="medium-15 columns">
-              <ul class="inline-list">
-                <li><a class="copyright">Copyright © 2018 Red
-                    Hat Inc.</a></li>
-                <li><a
-                  href="http://www.redhat.com/en/about/privacy-policy"
-                  target="_blank" rel="noopener noreferrer">Privacy
-                    statement</a></li>
-                <li><a
-                  href="http://www.redhat.com/en/about/terms-use"
-                  target="_blank" rel="noopener noreferrer">Terms of
-                    use</a></li>
-                <li><a
-                  href="http://www.redhat.com/en/about/all-policies-guidelines"
-                  target="_blank" rel="noopener noreferrer">All
-                    policies and guidelines</a></li>
-              </ul>
-            </div>
-            <div class="medium-4 small-24 right columns">
-              <a class="summit-logo"
-                href="http://www.redhat.com/summit/" target="_blank"
-                rel="noopener noreferrer"><img
-                src="https://developers.redhat.com/themes/custom/rhdp/images/design/logo-summit.png"
-                alt="Red Hat Summit"></a>
-            </div>
+        <div id="kc-info" class="">
+          <div id="kc-info-wrapper" class="">
           </div>
         </div>
+      </div>
+    </main>
+
+    <footer role="contentinfo">
+      <section class="rc-footer-traditional">
+          <div class="footer-container rc-footer-traditional-container">
+              <section class="rc-footer-traditional-section">
+                  <div class="rc-footer-traditional-logo">
+                      <div class="row">
+                          <h3>Red Hat</h3>
+                      </div>
+                  </div>
+                  <div id="legal" class="rc-footer-traditional-legal">
+                      <div class="row">
+                          <div class="copyright">Copyright ©2019 Red Hat, Inc.</div>
+                          <ul class="menu"><li class="first leaf"><a href="https://www.redhat.com/en/about/privacy-policy">Privacy statement</a></li>
+                              <li class="leaf"><a href="https://www.redhat.com/en/about/terms-use">Terms of use</a></li>
+                              <li class="last leaf"><a href="https://www.redhat.com/en/about/all-policies-guidelines">All policies and guidelines</a></li>
+                          </ul>
+                      </div>
+                  </div>
+                  <div class="rc-footer-traditional-event-logo">
+                      <div id="block-block-5" class="block block-block block-footer-promote">
+                          <a href="http://www.redhat.com/summit/"><img src="https://developers.redhat.com/auth/resources/3.4.3.final/login/redhat/img/logo-summit.png?v=3.4.30" alt="Red Hat Summit" style="float: right;"></a>
+                      </div>
+                  </div>
+              </section>
+          </div>
       </section>
     </footer>
   </div>
-  <!--site-wrapper -->
-
-  <script
-    src="https://developers.redhat.com/auth/resources/3.4.3.final/login/openshift-io/js/foundation/foundation-20180411.js"
-    type="text/javascript"></script>
-  <script type="text/javascript">
-    $(document).foundation();
-</script>
-
 </body>
 </html>
