@@ -56,6 +56,16 @@ else
 	TEST_SUITE="simpleTestSuite.xml"
 fi
 
+#Get cluster to be able to get logs. Related to issue: https://github.com/redhat-developer/che-functional-tests/issues/476
+if [[ $USERNAME = *"preview"* ]]; then
+  API_SERVER_URL="https://api.prod-preview.openshift.io"
+else
+  API_SERVER_URL="https://api.openshift.io"
+fi
+
+OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$USERNAME" | jq '.data[0].attributes.cluster')
+OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
+
 #This format allows us to see username even if it is placed in Jenkins credential store. 
 USERNAME_TO_PRINT="${USERNAME:0:3} ${USERNAME:3:${#USERNAME}}"
 echo "User name printed in format: 3 first letters, space, the rest of letters.    $USERNAME_TO_PRINT"
@@ -81,6 +91,9 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
 	           -e "RHCHE_PORT=80" \
 	           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
 	           -e "TEST_SUITE=prcheck.xml" \
+	           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
+	           -e "OPENSHIFT_USERNAME=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME"  \
+	           -e "OPENSHIFT_PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD" \
            quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
     RESULT=$?
 else
@@ -99,11 +112,14 @@ else
 	        	   -v /root/payload/logs:/root/logs \
 		           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
 		           -e "RHCHE_ACC_USERNAME=$USERNAME" \
-	    	           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
+		           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
 	        	   -e "RHCHE_ACC_EMAIL=$EMAIL" \
 		           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
 		           -e "RHCHE_HOST_URL=$HOST_URL" \
-	    	           -e "TEST_SUITE=$TEST_SUITE" \
+		           -e "TEST_SUITE=$TEST_SUITE" \
+		           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
+		           -e "OPENSHIFT_USERNAME=$USERNAME"  \
+		           -e "OPENSHIFT_PASSWORD=$PASSWORD" \
 	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
     	RESULT=$?
     
@@ -123,6 +139,9 @@ else
 		           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
 		           -e "RHCHE_HOST_URL=$HOST_URL" \
 		           -e "TEST_SUITE=$TEST_SUITE" \
+		           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
+		           -e "OPENSHIFT_USERNAME=$USERNAME"  \
+		           -e "OPENSHIFT_PASSWORD=$PASSWORD" \
 	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
 	    RESULT=$?
 	fi
