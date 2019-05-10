@@ -137,6 +137,7 @@ echo ---------- Remove route ----------------------
 echo "oc delete -f $FILE"
 oc delete -f $FILE
 
-if $failed || $flaping_found; then
+if $failed || $flapping_found; then
+	echo "Tests failed. See output above."
 	exit 1
 fi
