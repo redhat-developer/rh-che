@@ -44,6 +44,7 @@ Job ```cleanup``` cleans projects on dev cluster which are created as part of ve
 | ------------- |-------------|
 | build che credentials master | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-che-credentials-master)](https://ci.centos.org/job/devtools-rh-che-build-che-credentials-master) |
 | prcheck build-dep | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-prcheck-build-dep)](https://ci.centos.org/job/devtools-rh-che-prcheck-build-dep) |
+| functional build-dep | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-func-dep)](https://ci.centos.org/job/devtools-rh-che-build-func-dep) |
 
 
 Job ```build che credentials master``` runs after PR check is merged. Job ```tests after rh-che build``` is dependent on it and is executed right after it. Job ```prcheck build-dep```

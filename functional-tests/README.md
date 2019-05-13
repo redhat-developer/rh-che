@@ -137,11 +137,19 @@ page fragments and all tests from upstream. Projects are taken directly from ups
 There are periodical jobs running everyday at 2am and 2pm (server time). Logs are saved as artifacts and sent to zabbix. You can find link to them at the
 beginning of this README.
 
-### Related tests not included in this repo
+## Route tests
+There were several issues related to route flapping or long route exposure time. To track this, tests for routes are running every hour. 
 
-There are two more tests for Che on Openshift, but their coverage is very small and serves mostly as a monitoring. They run on private jenkins and report
-results to zabbix. These tests are located in [che-functional-tests repo](https://github.com/redhat-developer/che-functional-tests).
+### Running route tests
+To run route tests, execute ``` ./route_tests.sh ``` from devscripts directory. You have to set username, password and yml file with definition of a route. You can write your own
+route yml file or you can re-use existing file from ``` devscripts/resources/route.yml ```.
+```
+./route_tests.sh -u $USERNAME -p $PASSWORD -f ./functional-tests/devscripts/resources/route.yml'
 
-**Performance tests** are testing if user can correctly create/start/stop/remove workspaces. You can find more detail information in [performance tests repo](https://github.com/redhat-developer/che-functional-tests/tree/master/che-start-workspace).
+```
+
+## Related tests not included in this repo
+
+They run on private jenkins and report results to zabbix. These tests are located in [che-functional-tests repo](https://github.com/redhat-developer/che-functional-tests).
 
 **Test for mounting volume** verify if it is possible to mount volume in non-che namespace in openshift.io. Tests are creating/starting/stopping/removing pods. More detail information can be found in [tests repo](https://github.com/redhat-developer/che-functional-tests/tree/master/mount-volume).
