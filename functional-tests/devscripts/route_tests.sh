@@ -93,27 +93,31 @@ echo "Route URL is " $ROUTE_URL
 echo ---------- Wait for route to be available ----------------------
 # do stop the script when any command fails
 set +e
-failed=false
+hard_failed=true
+soft_failed=true
 function wait_for_route {
     i=1
-    max=300
-    while [ $i -le $max ]; do
+    hard_timeout=150 #in seconds
+    soft_timeout=30  #in seconds
+    current=$(date +%s)
+    hard_endtime=$((current + hard_timeout))
+    soft_endtime=$((current + soft_timeout))
+    while [ $(date +%s) -lt $hard_endtime ]; do
         RESPONSE_CODE=`curl -sL -w "%{http_code}" -I $ROUTE_URL -o /dev/null`
         if [ ! $RESPONSE_CODE -eq 200 ]; then
-            if [ $i -eq $max ]; then
-                echo "Route was not available in more than 5 minutes"
-                failed=true
-            fi
             sleep 1
-            ((i++))
         else
+            if [ $(date +%s) -lt $soft_endtime ]; then
+                soft_failed=false
+            fi
+            hard_failed=false
             break
         fi
     done
 }
 time wait_for_route
 
-if ! $failed; then
+if ! $hard_failed; then
 	echo ---------- Test route flapping ----------------------
 	i=0
 	max=20
@@ -127,17 +131,28 @@ if ! $failed; then
 		((i++))
 		sleep 1
 	done
-	
-	if $flapping_found; then 
-		echo "Route flapping was found."
-	fi
 fi
 
 echo ---------- Remove route ----------------------
 echo "oc delete -f $FILE"
 oc delete -f $FILE
 
-if $failed || $flapping_found; then
-	echo "Tests failed. See output above."
+if $hard_failed; then
+	echo
+	echo "---------------- HARD FAIL ---------------------"
+	echo "Route was not available. Waiting for $hard_timeout seconds."
 	exit 1
 fi
+if $soft_failed; then
+	echo
+	echo "------------------- SOFT FAIL ---------------------"
+	echo "It took more than $soft_timeout seconds for the route to start."
+	exit 1
+fi
+if $flapping_found; then
+	echo
+	echo "------------------- FLAPPING FAIL ---------------------------"
+	echo "The route flapping was present after the route was available."
+	exit 1
+fi
+

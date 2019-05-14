@@ -134,8 +134,7 @@ page fragments and all tests from upstream. Projects are taken directly from ups
 
 ## When are tests running
 
-There are periodical jobs running everyday at 2am and 2pm (server time). Logs are saved as artifacts and sent to zabbix. You can find link to them at the
-beginning of this README.
+There are periodical jobs running everyday at 2am and 2pm (server time). Logs are saved as artifacts. You can find link to them at the RH-Che README.
 
 ## Route tests
 There were several issues related to route flapping or long route exposure time. To track this, tests for routes are running every hour. 
