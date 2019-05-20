@@ -4,9 +4,30 @@
 
 == FAQs
 
+=== Is che.openshift.io running on OpenShift?
+
+Yes, che.openshift.io is the https://www.eclipse.org/che/[Eclipse Che] hosted by Red Hat. Che server is running on OpenShift Dedicated and user base is spread across multiple OpenShift Online clusters where workspaces are created.
+
+=== How do I figure out where my workspace is running?
+
+In order to do this, one needs to execute the following `curl` request using `username` or `email` as a parameter:
+
+----
+curl -sgSL "https://api.openshift.io/api/users?filter[username]=<username>" | jq -r ".data[0].attributes.cluster"
+----
+
+Or
+
+----
+curl -sgSL "https://api.openshift.io/api/users?filter[email]=<email>" | jq -r ".data[0].attributes.cluster"
+----
+
+The result of the request will be the OpenShift Online cluster URL e.g. https://api.starter-us-east-2.openshift.com/
+
+Once user login to the underlying cluster he will get the `view` access in the `<username>-che` namespace where all workspace related pods are created.
+
 === Where I can see the up-to-date status of the che.openshift.io?
 
 There is a dedicated status page - https://che.statuspage.io/
 
 == Troubleshooting
-
