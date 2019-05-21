@@ -327,6 +327,90 @@
     }
   },
   {
+    "id": "java-maven",
+    "creator": "ide",
+    "name": "Java Maven",
+    "description": "Default Java Stack with OpenJDK 11 and Maven 3.6",
+    "scope": "general",
+    "tags": [
+      "Java",
+      "OpenJDK",
+      "Maven",
+      "Spring Boot v2",
+      "Vert.x",
+      "Debian"
+    ],
+    "components": [
+      {
+        "name": "Debian",
+        "version": "9.8"
+      },
+      {
+        "name": "OpenJDK",
+        "version": "11.0.2"
+      },
+      {
+        "name": "Maven",
+        "version": "3.6.0"
+      }
+    ],
+    "workspaceConfig": {
+      "environments": {
+        "default": {
+          "machines": {
+            "maven-container": {
+              "servers": {
+                "8080/tcp": {
+                  "port": "8080",
+                  "protocol": "http"
+                }
+              },
+              "attributes": {
+                "memoryLimitBytes": "512000000",
+                "containerCommand": "['sleep']",
+                "containerArgs": "['infinity']"
+              },
+              "volumes": {
+                "m2": {
+                  "path": "/home/user/.m2"
+                },
+                "projects": {
+                  "path": "/projects"
+                }
+              },
+              "env": {
+                "MAVEN_CONFIG": "/home/user/.m2",
+                "MAVEN_OPTS": "-XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom",
+                "JAVA_OPTS": "-XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom",
+                "JAVA_TOOL_OPTIONS": "-XX:MaxRAMPercentage=50 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom",
+                "PS1": "$(echo ${0})\\$ ",
+                "HOME": "/home/user"
+              }
+            }
+          },
+          "recipe": {
+            "content": "maven:3.6.0-jdk-11",
+            "type": "dockerimage"
+          }
+        }
+      },
+      "name": "default",
+      "defaultEnv": "default",
+      "description": null,
+      "attributes": {
+        "plugins": "eclipse/che-machine-exec-plugin/0.0.1,redhat/java/0.38.0",
+        "editor": "eclipse/che-theia/next",
+        "sidecar.redhat/java.memory_limit": "1500Mi",
+        "sidecar.eclipse/che-theia.memory_limit": "512Mi"
+      },
+      "commands": []
+    },
+    "stackIcon": {
+      "name": "type-che7.svg",
+      "mediaType": "image/svg+xml"
+    }
+  },
+  {
     "id": "openshift-sql",
     "name": "Java + MySQL DB",
     "description": "Multi Container Workspace: Java + MySQL",
