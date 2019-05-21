@@ -10,9 +10,13 @@ function printHelp {
 	
 	echo -e "${WHITE}Script for testing route time exposure and route flapping. "
 	echo -e "${GREEN}Mandatory parameters:"
-	echo -e "	$WHITE -u $NC username for login to openshift"
-	echo -e "	$WHITE -p $NC password for login to openshift"
+	echo -e "   $WHITE -u $NC username for login to openshift"
+	echo -e "   $WHITE -p $NC password for login to openshift"
 	echo -e "   $WHITE -f $NC file with route definition in yml format"
+	echo -e "${YELLOW}Optional parameters:"
+	echo -e "   $WHITE -z $NC send data to zabbix, default set to true"
+	echo -e "   $WHITE -s $NC set zabbix server, default zabbix.devshift.net"
+	echo -e "   $WHITE -t $NC set zabbix host, default set by cluster"
 }
 
 function checkPrereq {
@@ -39,7 +43,18 @@ function checkPrereq {
 		fi
 		installOC
 	fi
+	
+	yum install -y bc
+	
+	if $SEND_TO_ZABBIX; then
+		rpm -ivh https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/zabbix-release-3.0-1.el7.noarch.rpm
+		yum install -y zabbix-sender
+	fi
 }
+
+# Setting default ZABBIX values
+SEND_TO_ZABBIX=true
+ZABBIX_SERVER="zabbix.devshift.net"
 
 # Parse commandline flags
 while getopts ':f:hp:u:' option; do
@@ -52,6 +67,13 @@ while getopts ':f:hp:u:' option; do
         p) PASSWORD=$OPTARG
            ;;
         f) FILE=$OPTARG
+           ;;
+        s) ZABBIX_SERVER=$OPTARG
+           ;;
+        t) ZABBIX_HOST=$OPTARG
+           ;;
+        z) SEND_TO_ZABBIX=$OPTARG
+           ;;
     esac
 done
 
@@ -67,7 +89,6 @@ fi
 
 OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$USERNAME" | jq '.data[0].attributes.cluster')
 OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
-
 echo "Using cluster $OC_CLUSTER_URL"
 
 echo ---------- Login -----------------------------------
@@ -95,6 +116,7 @@ echo ---------- Wait for route to be available ----------------------
 set +e
 hard_failed=true
 soft_failed=true
+
 function wait_for_route {
     i=1
     hard_timeout=150 #in seconds
@@ -115,9 +137,15 @@ function wait_for_route {
         fi
     done
 }
-time wait_for_route
+
+ZABBIX_TIMESTAMP=$(date +%s) # time when test starts
+start_time=$(date +%s.%N)
+wait_for_route
+end_time=$(date +%s.%N)
+exposure_time=$(echo "$end_time - $start_time" | bc)
 
 if ! $hard_failed; then
+	printf "Time taken for route to be available: %.3f seconds. \n" $exposure_time
 	echo ---------- Test route flapping ----------------------
 	i=0
 	max=20
@@ -133,26 +161,51 @@ if ! $hard_failed; then
 	done
 fi
 
+if ! $hard_failed && $SEND_TO_ZABBIX; then
+    echo "--------------- Send time to Zabbix -----------------"
+    ZABBIX_HOST=""
+    case "$OC_CLUSTER_URL" in
+        *"2a"*) ZABBIX_HOST="qa-starter-us-east-2a"
+                ;;
+        *"1a"*) ZABBIX_HOST="qa-starter-us-east-1a"
+	            ;;
+        *"1b"*) ZABBIX_HOST="qa-starter-us-east-1b"
+                ;;
+        *"2.") ZABBIX_HOST="qa-starter-us-east-2"
+	           ;;
+        *) echo "WARNING - DATA NOT SENT: can not send data to zabbix: can not extract ZABBIX_HOST from OC_CLUSTER_URL. OC_CLUSTER_URL: $OC_CLUSTER_URL"
+	       ;;
+    esac
+    if [ ! -z $ZABBIX_HOST ]; then
+        touch report.txt
+        echo "$ZABBIX_HOST route_exposure_time $ZABBIX_TIMESTAMP $exposure_time" > report.txt
+        zabbix_sender -vv -T -i report.txt -z $ZABBIX_SERVER
+    fi
+fi
+
 echo ---------- Remove route ----------------------
 echo "oc delete -f $FILE"
 oc delete -f $FILE
+
 
 if $hard_failed; then
 	echo
 	echo "---------------- HARD FAIL ---------------------"
 	echo "Route was not available. Waiting for $hard_timeout seconds."
-	exit 1
 fi
 if $soft_failed; then
 	echo
 	echo "------------------- SOFT FAIL ---------------------"
 	echo "It took more than $soft_timeout seconds for the route to start."
-	exit 1
+	echo "Route was available after $exposure_time seconds."
 fi
 if $flapping_found; then
 	echo
 	echo "------------------- FLAPPING FAIL ---------------------------"
 	echo "The route flapping was present after the route was available."
-	exit 1
+	echo "For more information see section \"Test route flapping\" above."
 fi
 
+if $hard_failed || $soft_failed || $flapping_found; then
+	exit 1
+fi
