@@ -171,7 +171,7 @@ if ! $hard_failed && $SEND_TO_ZABBIX; then
 	            ;;
         *"1b"*) ZABBIX_HOST="qa-starter-us-east-1b"
                 ;;
-        *"2.") ZABBIX_HOST="qa-starter-us-east-2"
+        *"2."*) ZABBIX_HOST="qa-starter-us-east-2"
 	           ;;
         *) echo "WARNING - DATA NOT SENT: can not send data to zabbix: can not extract ZABBIX_HOST from OC_CLUSTER_URL. OC_CLUSTER_URL: $OC_CLUSTER_URL"
 	       ;;
