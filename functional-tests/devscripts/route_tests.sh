@@ -161,7 +161,7 @@ if ! $hard_failed; then
 	done
 fi
 
-if ! $hard_failed && $SEND_TO_ZABBIX; then
+if $SEND_TO_ZABBIX; then
     echo "--------------- Send time to Zabbix -----------------"
     ZABBIX_HOST=""
     case "$OC_CLUSTER_URL" in
@@ -178,7 +178,24 @@ if ! $hard_failed && $SEND_TO_ZABBIX; then
     esac
     if [ ! -z $ZABBIX_HOST ]; then
         touch report.txt
-        echo "$ZABBIX_HOST route_exposure_time $ZABBIX_TIMESTAMP $exposure_time" > report.txt
+        if $hard_failed; then
+            echo "$ZABBIX_HOST hard_fail $ZABBIX_TIMESTAMP 1" > report.txt
+            echo "$ZABBIX_HOST flapping_fail $ZABBIX_TIMESTAMP 0" >> report.txt
+            echo "$ZABBIX_HOST soft_fail $ZABBIX_TIMESTAMP 0" >> report.txt
+        else
+            echo "$ZABBIX_HOST route_exposure_time $ZABBIX_TIMESTAMP $exposure_time" > report.txt
+	        echo "$ZABBIX_HOST hard_fail $ZABBIX_TIMESTAMP 0" >> report.txt
+            if $soft_failed; then
+                echo "$ZABBIX_HOST soft_fail $ZABBIX_TIMESTAMP 1" >> report.txt
+            else
+                echo "$ZABBIX_HOST soft_fail $ZABBIX_TIMESTAMP 0" >> report.txt
+            fi
+            if $flapping_found; then
+                echo "$ZABBIX_HOST flapping_fail $ZABBIX_TIMESTAMP 1" >> report.txt
+            else 
+                echo "$ZABBIX_HOST flapping_fail $ZABBIX_TIMESTAMP 0" >> report.txt
+            fi
+        fi
         zabbix_sender -vv -T -i report.txt -z $ZABBIX_SERVER
     fi
 fi
