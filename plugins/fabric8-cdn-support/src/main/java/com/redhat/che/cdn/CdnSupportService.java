@@ -115,7 +115,7 @@ public class CdnSupportService extends Service {
     this.commandRunner = commandRunner;
     this.pluginFQNParser = pluginFQNParser;
     this.yamlDownloader = yamlDownloader;
-    this.pluginRegistry = UriBuilder.fromUri(registryUrl).path("v2").path("plugins");
+    this.pluginRegistry = UriBuilder.fromUri(registryUrl).path("plugins");
 
     // Test that the skopeo process is available
 

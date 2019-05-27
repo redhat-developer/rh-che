@@ -40,13 +40,13 @@ import org.testng.annotations.Test;
 
 @Listeners(MockitoTestNGListener.class)
 public class CdnSupportServiceTest {
-  private static final String EDITOR_REF = "editor/v1.0";
+  private static final String EDITOR_REF = "eclipse/che-theia/next";
   private static final String EDITOR_URL = "http://editorURL";
   private static final String IMAGE_REF = "imageRef";
-  private static final String DEFAULT_REGISTRY_URL = "http://registry.com";
+  private static final String DEFAULT_REGISTRY_URL = "https://che-plugin-registry.openshift.io/v2";
   private static final String DOWNLOAD_ERROR = "Error downloading";
   private static final URI PLUGIN_URL =
-      UriBuilder.fromUri(DEFAULT_REGISTRY_URL + "/v2/plugins/" + EDITOR_REF).build();
+      UriBuilder.fromUri(DEFAULT_REGISTRY_URL + "/plugins/" + EDITOR_REF).build();
   private static final ExtendedPluginFQN PLUGIN_FQN =
       new ExtendedPluginFQN(null, EDITOR_REF, "publisher", "name", "version");
 
