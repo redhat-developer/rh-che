@@ -62,14 +62,19 @@ public class Che7DialogAbout {
     createChe7Workspace();
 
     LOG.info("Opening workspace " + WORKSPACE_NAME);
-    // following try/catch is there only for debugging issue
+    // following try/catch and logs are there for debugging issue
     // https://github.com/redhat-developer/che-functional-tests/issues/476
     // once that issue is solved, this try/catch can be deleted
     try {
+      LOG.info("Switching to IDE frame.");
       theiaIde.switchToIdeFrame();
+      LOG.info("Waiting for theia-app-shell for 240 seconds.");
       theiaIde.waitTheiaIde();
+      LOG.info("Wait for loader invisibility.");
       theiaIde.waitLoaderInvisibility();
+      LOG.info("Waiting for theia-app-shell for 240 seconds.");
       theiaIde.waitTheiaIde();
+      LOG.info("Waiting for theia-top-panel for 10 seconds.");
       theiaIde.waitTheiaIdeTopPanel();
     } catch (Exception e) {
       // when exception is caught, we want to gather all info about pods, routes etc.
@@ -83,7 +88,7 @@ public class Che7DialogAbout {
         String[] log = ex.getCause().getMessage().split("(Output: |;)");
         LOG.info("\n" + log[1]);
       }
-      // throw the exception from the test
+      //    throw the exception from the test
       throw e;
     }
   }
@@ -111,14 +116,18 @@ public class Che7DialogAbout {
 
   private void prepareWorkspace(String stack, String workspaceName, Double machineRam) {
     dashboard.waitDashboardToolbarTitle();
+    LOG.info("Opening Workspaces from left menu...");
     dashboard.selectWorkspacesItemOnDashboard();
     workspaces.clickOnAddWorkspaceBtn();
     newWorkspace.waitToolbar();
+    LOG.info("Selecting stack...");
     newWorkspace.clickOnAllStacksTab();
     selectStack();
+    LOG.info("Setting workspace name...");
     newWorkspace.typeWorkspaceName(workspaceName);
 
     if (machineRam != null) {
+      LOG.info("Setting RAM...");
       newWorkspace.setMachineRAM("dev-machine", machineRam);
     }
   }

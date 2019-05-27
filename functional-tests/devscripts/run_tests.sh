@@ -57,14 +57,21 @@ else
 fi
 
 #Get cluster to be able to get logs. Related to issue: https://github.com/redhat-developer/che-functional-tests/issues/476
-if [[ $USERNAME = *"preview"* ]]; then
+if [[ "$USERNAME" == *"preview"* ]] || [[ "$PR_CHECK_BUILD" == "true" ]]; then
   API_SERVER_URL="https://api.prod-preview.openshift.io"
 else
   API_SERVER_URL="https://api.openshift.io"
 fi
 
-OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$USERNAME" | jq '.data[0].attributes.cluster')
+if [[ "$PR_CHECK_BUILD" == "true" ]]; then
+  OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME" | jq '.data[0].attributes.cluster')
+else
+  OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$USERNAME" | jq '.data[0].attributes.cluster')
+fi
 OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
+
+echo "API_SERVER_URL=$API_SERVER_URL"
+echo "OPENSHIFT_URL=$OC_CLUSTER_URL"
 
 #This format allows us to see username even if it is placed in Jenkins credential store. 
 USERNAME_TO_PRINT="${USERNAME:0:3} ${USERNAME:3:${#USERNAME}}"
