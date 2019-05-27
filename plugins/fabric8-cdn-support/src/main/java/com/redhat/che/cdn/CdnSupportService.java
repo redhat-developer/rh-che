@@ -265,8 +265,8 @@ public class CdnSupportService extends Service {
         pluginFQN.getRegistry() == null
             ? pluginRegistry.clone()
             : UriBuilder.fromUri(pluginFQN.getRegistry());
-
-    URI editorURI = uriBuilder.path(pluginFQN.getId()).build();
+    // slash after 'id' is required to avoid '301 permanently moved' http error
+    URI editorURI = uriBuilder.path(pluginFQN.getId() + "/").build();
     try {
       return yamlDownloader.getYamlResponseAndParse(editorURI);
     } catch (IOException e) {
