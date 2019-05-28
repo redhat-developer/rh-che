@@ -20,16 +20,28 @@ import org.eclipse.che.api.workspace.server.wsplugins.model.PluginMeta;
 import org.testng.annotations.Test;
 
 public class HttpYamlDownloaderTest {
-  private final String EDITOR_PLUGIN_URL =
-      "https://che-plugin-registry.openshift.io/v2/plugins/eclipse/che-theia/next/";
+  private final String EDITOR_PLUGIN_URL_ON_PROD =
+      "https://che-plugin-registry.openshift.io/v2/plugins/eclipse/che-theia/next/meta.yaml";
+  private final String EDITOR_PLUGIN_URL_ON_PROD_PREVIEW =
+      "https://che-plugin-registry.prod-preview.openshift.io/v2/plugins/eclipse/che-theia/next/meta.yaml";
   private final String EDITOR_PLUGIN_VERSION = "next";
   private final String EDITOR_PLUGIN_REPOSITORY = "https://github.com/eclipse/che-theia";
   private final String EDITOR_PLUGIN_CATEGORY = "Editor";
 
   @Test
-  public void getYamlResponseAndParse() throws URISyntaxException, IOException {
+  public void getYamlResponseAndParseOnProd() throws URISyntaxException, IOException {
+    getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD);
+  }
+
+  @Test
+  public void getYamlResponseAndParseOnProdPreview() throws URISyntaxException, IOException {
+    getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD_PREVIEW);
+  }
+
+  private void getYamlResponseAndParse(final String editorPluginUrl)
+      throws URISyntaxException, IOException {
     HttpYamlDownloader httpYamlDownloader = new HttpYamlDownloader();
-    PluginMeta pluginMeta = httpYamlDownloader.getYamlResponseAndParse(new URI(EDITOR_PLUGIN_URL));
+    PluginMeta pluginMeta = httpYamlDownloader.getYamlResponseAndParse(new URI(editorPluginUrl));
     assertEquals(pluginMeta.getCategory(), EDITOR_PLUGIN_CATEGORY, "Plugin category is incorrect");
     assertEquals(pluginMeta.getVersion(), EDITOR_PLUGIN_VERSION, "Plugin version is incorrect");
     assertEquals(

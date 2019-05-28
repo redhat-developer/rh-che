@@ -46,7 +46,7 @@ public class CdnSupportServiceTest {
   private static final String DEFAULT_REGISTRY_URL = "https://che-plugin-registry.openshift.io/v2";
   private static final String DOWNLOAD_ERROR = "Error downloading";
   private static final URI PLUGIN_URL =
-      UriBuilder.fromUri(DEFAULT_REGISTRY_URL + "/plugins/" + EDITOR_REF + "/").build();
+      UriBuilder.fromUri(DEFAULT_REGISTRY_URL + "/plugins/" + EDITOR_REF + "/meta.yaml").build();
   private static final ExtendedPluginFQN PLUGIN_FQN =
       new ExtendedPluginFQN(null, EDITOR_REF, "publisher", "name", "version");
 

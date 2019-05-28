@@ -81,6 +81,7 @@ public class CdnSupportService extends Service {
   private static final String CHE_PLUGIN_TGZ_FILE_NAME = "che-plugin.tar.gz";
   private static final String TEMP_DIR_PREFIX = "che-plugin-archive-dir";
   private static final String LABEL_NAME = "che-plugin.cdn.artifacts";
+  private static final String META_YAML = "meta.yaml";
 
   private static final String REGISTRY_URL_FORMAT = "%s/%s/meta.yaml";
 
@@ -265,8 +266,7 @@ public class CdnSupportService extends Service {
         pluginFQN.getRegistry() == null
             ? pluginRegistry.clone()
             : UriBuilder.fromUri(pluginFQN.getRegistry());
-    // slash after 'id' is required to avoid '301 permanently moved' http error
-    URI editorURI = uriBuilder.path(pluginFQN.getId() + "/").build();
+    URI editorURI = uriBuilder.path(pluginFQN.getId()).path(META_YAML).build();
     try {
       return yamlDownloader.getYamlResponseAndParse(editorURI);
     } catch (IOException e) {
