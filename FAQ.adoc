@@ -31,3 +31,16 @@ Once user login to the underlying cluster he will get the `view` access in the `
 There is a dedicated status page - https://che.statuspage.io/
 
 == Troubleshooting
+
+===  Can not login to che.openshift.io - `Authorization token is missed`
+
+To authenticate in https://che.openshift.io, you need to allow cookies from
+`static.developers.redhat.com`.
+
+In case these cookies are blocked (by a browser extension like Privacy Badger),
+authentication fails with following error:
+
+----
+Authorization token is missed
+Click here to reload page.
+----
