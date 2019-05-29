@@ -13,20 +13,24 @@ package com.redhat.che.cdn;
 
 import static org.testng.Assert.assertEquals;
 
+import com.redhat.che.cdn.plugin.model.Container;
+import com.redhat.che.cdn.plugin.model.PluginMeta;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.eclipse.che.api.workspace.server.wsplugins.model.PluginMeta;
+import java.util.List;
 import org.testng.annotations.Test;
 
 public class HttpYamlDownloaderTest {
   private final String EDITOR_PLUGIN_URL_ON_PROD =
-      "https://che-plugin-registry.openshift.io/v2/plugins/eclipse/che-theia/next/meta.yaml";
+      "https://che-plugin-registry.openshift.io/v3/plugins/eclipse/che-theia/next/meta.yaml";
   private final String EDITOR_PLUGIN_URL_ON_PROD_PREVIEW =
-      "https://che-plugin-registry.prod-preview.openshift.io/v2/plugins/eclipse/che-theia/next/meta.yaml";
+      "https://che-plugin-registry.prod-preview.openshift.io/v3/plugins/eclipse/che-theia/next/meta.yaml";
   private final String EDITOR_PLUGIN_VERSION = "next";
-  private final String EDITOR_PLUGIN_REPOSITORY = "https://github.com/eclipse/che-theia";
-  private final String EDITOR_PLUGIN_CATEGORY = "Editor";
+  private final String EDITOR_PLUGIN_PUBLISHER = "eclipse";
+  private final String EDITOR_PLUGIN_TYPE = "Che Editor";
+  private final String EDITOR_CONTAINER_NAME = "theia-ide";
+  private final String EDITOR_CONTAINER_IMAGE = "eclipse/che-theia:next";
 
   @Test
   public void getYamlResponseAndParseOnProd() throws URISyntaxException, IOException {
@@ -42,9 +46,18 @@ public class HttpYamlDownloaderTest {
       throws URISyntaxException, IOException {
     HttpYamlDownloader httpYamlDownloader = new HttpYamlDownloader();
     PluginMeta pluginMeta = httpYamlDownloader.getYamlResponseAndParse(new URI(editorPluginUrl));
-    assertEquals(pluginMeta.getCategory(), EDITOR_PLUGIN_CATEGORY, "Plugin category is incorrect");
+
     assertEquals(pluginMeta.getVersion(), EDITOR_PLUGIN_VERSION, "Plugin version is incorrect");
     assertEquals(
-        pluginMeta.getRepository(), EDITOR_PLUGIN_REPOSITORY, "Plugin repository is incorrect");
+        pluginMeta.getPublisher(), EDITOR_PLUGIN_PUBLISHER, "Plugin publisher is incorrect");
+    assertEquals(pluginMeta.getType(), EDITOR_PLUGIN_TYPE, "Plugin type is incorrect");
+
+    List<Container> containers = pluginMeta.getSpec().getContainers();
+    assertEquals(containers.size(), 1, "There should be 1 'theia-ide' container");
+
+    Container container = containers.get(0);
+    assertEquals(container.getName(), EDITOR_CONTAINER_NAME, "Editor container name is incorrect");
+    assertEquals(
+        container.getImage(), EDITOR_CONTAINER_IMAGE, "Editor container image is incorrect");
   }
 }

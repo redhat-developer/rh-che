@@ -12,30 +12,28 @@
 package com.redhat.che.cdn;
 
 import static java.lang.String.format;
-import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
-import static java.util.stream.StreamSupport.stream;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.redhat.che.cdn.plugin.model.Container;
+import com.redhat.che.cdn.plugin.model.PluginMeta;
+import com.redhat.che.cdn.plugin.model.Spec;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +45,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.UriBuilder;
-import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.rest.Service;
@@ -57,7 +54,6 @@ import org.eclipse.che.api.core.util.ProcessUtil;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.api.workspace.server.wsplugins.PluginFQNParser;
 import org.eclipse.che.api.workspace.server.wsplugins.model.PluginFQN;
-import org.eclipse.che.api.workspace.server.wsplugins.model.PluginMeta;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +62,6 @@ import org.slf4j.LoggerFactory;
 @Path("cdn-support")
 public class CdnSupportService extends Service {
   private static final Logger LOG = LoggerFactory.getLogger(CdnSupportService.class);
-  private static final ObjectMapper YAML_PARSER = new ObjectMapper(new YAMLFactory());
   private static final ObjectMapper JSON_PARSER = new ObjectMapper(new JsonFactory());
   private static final String SKOPEO_BINARY = "skopeo";
   private static final String[] SKOPEO_HELP_ARGS = new String[] {"--help"};
@@ -74,16 +69,8 @@ public class CdnSupportService extends Service {
   private static final String SKOPEO_INSPECT_ARG = "inspect";
   private static final String SKOPEO_IMAGE_PREFIX = "docker://";
   private static final long SKOPEO_INSPECT_TIMEOUT_SECONDS = 10;
-  private static final String TAR_BINARY = "tar";
-  private static final String TAR_ARG = "-xvf";
-  private static final long TAR_TIMEOUT_SECONDS = 5;
-  private static final String CHE_PLUGIN_YAML_FILE_NAME = "che-plugin.yaml";
-  private static final String CHE_PLUGIN_TGZ_FILE_NAME = "che-plugin.tar.gz";
-  private static final String TEMP_DIR_PREFIX = "che-plugin-archive-dir";
   private static final String LABEL_NAME = "che-plugin.cdn.artifacts";
   private static final String META_YAML = "meta.yaml";
-
-  private static final String REGISTRY_URL_FORMAT = "%s/%s/meta.yaml";
 
   private static final CompletableFuture<?>[] FUTURE_ARRAY = new CompletableFuture<?>[0];
   private static final CommandRunner RUNNER = new CommandRunner();
@@ -93,7 +80,6 @@ public class CdnSupportService extends Service {
   private final CommandRunner commandRunner;
   private final PluginFQNParser pluginFQNParser;
   private final HttpYamlDownloader yamlDownloader;
-  @VisibleForTesting String editorDefinitionUrl = null;
   @VisibleForTesting String dockerImage = null;
 
   @Inject
@@ -146,27 +132,40 @@ public class CdnSupportService extends Service {
       throw new NotFoundException("No editor is configured for CDN resource pre-fetching");
     }
 
-    String url = retrieveEditorPluginUrl();
-    if (!url.equals(editorDefinitionUrl)) {
-      editorDefinitionUrl = url;
-      dockerImage = null;
-    } else {
-      LOG.debug("Editor full definition didn't change");
-    }
-
-    if (dockerImage == null) {
-      dockerImage = readDockerImageName(editorDefinitionUrl);
-    }
-
-    if (dockerImage == null) {
-      throw new ServerException(
-          format(
-              "Plugin container image not found in the plugin descriptor of '%s'",
-              editorToPrefetch));
-    }
+    PluginMeta editorMeta = getEditorMeta();
+    dockerImage = getDockerImage(editorMeta);
 
     JsonNode json = inspectDockerImage();
     return json.path("Labels").path(LABEL_NAME).asText("[]");
+  }
+
+  private String getDockerImage(final PluginMeta editorMeta) throws ServerException {
+    if (editorMeta == null) {
+      throw new ServerException(format("Plugin meta not found for '%s'", editorToPrefetch));
+    }
+
+    Spec spec = editorMeta.getSpec();
+    if (spec == null) {
+      throw new ServerException(format("Plugin spec not found for '%s'", editorToPrefetch));
+    }
+
+    List<Container> containers = spec.getContainers();
+    if (containers == null || containers.isEmpty()) {
+      throw new ServerException(
+          format("No containers found in the plugin spec for '%s'", editorToPrefetch));
+    }
+
+    if (containers.size() != 1) {
+      throw new ServerException(
+          format("More than one container found in the plugin spec for '%s'", editorToPrefetch));
+    }
+
+    String image = containers.get(0).getImage();
+    if (image == null || image.isEmpty()) {
+      throw new ServerException(
+          format("Image is not defined in the container spec for '%s'", editorToPrefetch));
+    }
+    return image;
   }
 
   private JsonNode inspectDockerImage()
@@ -197,67 +196,6 @@ public class CdnSupportService extends Service {
 
     JsonNode json = JSON_PARSER.readTree(skopeoOutput);
     return json;
-  }
-
-  private String retrieveEditorPluginUrl() throws InfrastructureException, ServerException {
-    LOG.debug("Searching the editor plugin entry in the plugin registry");
-
-    PluginMeta editor = getEditorMeta();
-
-    LOG.debug("Retrieving editor URL");
-
-    String url = editor.getUrl();
-    if (url == null) {
-      throw new ServerException(format("URL of editor '%s' is null", editorToPrefetch));
-    }
-    return url;
-  }
-
-  private String readDockerImageName(String editorDefinitionUrl)
-      throws JsonProcessingException, IOException, TimeoutException, InterruptedException,
-          ExecutionException, ApiException {
-    LOG.debug("Creating temp folder");
-    java.nio.file.Path archiveDir =
-        Files.createTempDirectory(FileSystems.getDefault().getPath("/tmp"), TEMP_DIR_PREFIX);
-    java.nio.file.Path archive = archiveDir.resolve(CHE_PLUGIN_TGZ_FILE_NAME);
-
-    LOG.debug("Downloading Editor definition at URL {} into {}", editorDefinitionUrl, archive);
-    try (InputStream in = URI.create(editorDefinitionUrl).toURL().openStream()) {
-      Files.copy(in, archive);
-    } catch (IOException e) {
-      LOG.warn("Exception while downloading", e);
-      throw e;
-    }
-
-    LOG.debug("Unzipping archive");
-    final ListLineConsumer err = commandRunner.newErrorConsumer();
-    Process tar =
-        commandRunner.runCommand(
-            TAR_BINARY,
-            new String[] {TAR_ARG, archive.toRealPath().toString()},
-            archiveDir.toRealPath().toFile(),
-            TAR_TIMEOUT_SECONDS,
-            TimeUnit.SECONDS,
-            null,
-            err);
-    if (tar.exitValue() != 0) {
-      String message =
-          format(
-              "Tar command failed with error status: %d and error log: %s",
-              tar.exitValue(), err.getText());
-      LOG.warn(message);
-      throw new ServerException(message);
-    }
-    java.nio.file.Path pluginYaml = archiveDir.resolve(CHE_PLUGIN_YAML_FILE_NAME);
-
-    LOG.debug("Parse Plugin YAML file: {}", pluginYaml.toAbsolutePath().toString());
-    JsonNode json = YAML_PARSER.readTree(pluginYaml.toFile());
-
-    LOG.debug("Plugin YAML file content: {}", json.toString());
-    return stream(spliteratorUnknownSize(json.path("containers").elements(), 0), false)
-        .findFirst()
-        .map(node -> node.path("image").asText())
-        .orElse(null);
   }
 
   private PluginMeta getEditorMeta() throws InfrastructureException {

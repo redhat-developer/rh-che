@@ -14,12 +14,12 @@ package com.redhat.che.cdn;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.io.CharStreams;
+import com.redhat.che.cdn.plugin.model.PluginMeta;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import org.eclipse.che.api.workspace.server.wsplugins.model.PluginMeta;
 
 public class HttpYamlDownloader {
   private static final ObjectMapper YAML_PARSER = new ObjectMapper(new YAMLFactory());
