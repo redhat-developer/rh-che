@@ -204,25 +204,25 @@ echo ---------- Remove route ----------------------
 echo "oc delete -f $FILE"
 oc delete -f $FILE
 
-
 if $hard_failed; then
 	echo
 	echo "---------------- HARD FAIL ---------------------"
 	echo "Route was not available. Waiting for $hard_timeout seconds."
-fi
-if $soft_failed; then
-	echo
-	echo "------------------- SOFT FAIL ---------------------"
-	echo "It took more than $soft_timeout seconds for the route to start."
-	echo "Route was available after $exposure_time seconds."
-fi
-if $flapping_found; then
-	echo
-	echo "------------------- FLAPPING FAIL ---------------------------"
-	echo "The route flapping was present after the route was available."
-	echo "For more information see section \"Test route flapping\" above."
+else
+    if $soft_failed; then
+        echo
+        echo "------------------- SOFT FAIL ---------------------"
+        echo "It took more than $soft_timeout seconds for the route to start."
+        echo "Route was available after $exposure_time seconds."
+    fi
+    if $flapping_found; then
+        echo
+        echo "------------------- FLAPPING FAIL ---------------------------"
+        echo "The route flapping was present after the route was available."
+        echo "For more information see section \"Test route flapping\" above."
+    fi
 fi
 
 if $hard_failed || $soft_failed || $flapping_found; then
-	exit 1
+    exit 1
 fi
