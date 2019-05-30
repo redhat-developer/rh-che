@@ -37,7 +37,6 @@ import org.eclipse.che.api.workspace.server.wsplugins.model.ExtendedPluginFQN;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -100,12 +99,6 @@ public class CdnSupportServiceTest {
         });
   }
 
-  @BeforeMethod
-  public void setUp() throws Exception {
-    service = null;
-    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
-  }
-
   @Test(
       expectedExceptions = {RuntimeException.class},
       expectedExceptionsMessageRegExp =
@@ -131,6 +124,7 @@ public class CdnSupportServiceTest {
       expectedExceptions = {InfrastructureException.class},
       expectedExceptionsMessageRegExp = DOWNLOAD_EXCEPTION_MESSAGE)
   public void throwWhenEditorNotFound() throws Exception {
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doThrow(new IOException(DOWNLOAD_ERROR)).when(yamlDownloader).getYamlResponseAndParse(any());
     service =
         new CdnSupportService(
@@ -142,6 +136,7 @@ public class CdnSupportServiceTest {
       expectedExceptions = {ServerException.class},
       expectedExceptionsMessageRegExp = SERVER_EXCEPTION_MESSAGE_WHEN_SPEC_IS_NULL)
   public void throwWhenEditorSpecIsNull() throws Exception {
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
     doReturn(null).when(pluginMeta).getSpec();
     service =
@@ -155,7 +150,7 @@ public class CdnSupportServiceTest {
       expectedExceptions = {ServerException.class},
       expectedExceptionsMessageRegExp = SERVER_EXCEPTION_MESSAGE_WHEN_NO_CONTAINERS_IN_SPEC)
   public void throwWhenEditorContainersIsNull() throws Exception {
-
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
     doReturn(pluginSpec).when(pluginMeta).getSpec();
     doReturn(null).when(pluginSpec).getContainers();
@@ -170,6 +165,7 @@ public class CdnSupportServiceTest {
       expectedExceptions = {ServerException.class},
       expectedExceptionsMessageRegExp = SERVER_EXCEPTION_MESSAGE_WHEN_NO_CONTAINERS_IN_SPEC)
   public void throwWhenEditorContainersIsEmpty() throws Exception {
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
     doReturn(pluginSpec).when(pluginMeta).getSpec();
     doReturn(Collections.EMPTY_LIST).when(pluginSpec).getContainers();
@@ -184,6 +180,7 @@ public class CdnSupportServiceTest {
       expectedExceptions = {ServerException.class},
       expectedExceptionsMessageRegExp = SERVER_EXCEPTION_MESSAGE_WHEN_MULTIPLE_CONTAINERS_IN_SPEC)
   public void throwWhenMultipleEditorContainers() throws Exception {
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
     doReturn(pluginSpec).when(pluginMeta).getSpec();
     doReturn(containers).when(pluginSpec).getContainers();
@@ -199,6 +196,7 @@ public class CdnSupportServiceTest {
       expectedExceptions = {ServerException.class},
       expectedExceptionsMessageRegExp = SERVER_EXCEPTION_MESSAGE_WHEN_CONTAINER_IMAGE_IS_NULL)
   public void throwWhenContainerImageIsNull() throws Exception {
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
     doReturn(pluginSpec).when(pluginMeta).getSpec();
     doReturn(containers).when(pluginSpec).getContainers();
@@ -244,14 +242,6 @@ public class CdnSupportServiceTest {
 
   @Test
   public void reuseExistingImageRefAndReturnLabelWhenSkopeoSucceeds() throws Exception {
-    doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
-    doReturn(pluginSpec).when(pluginMeta).getSpec();
-    doReturn(containers).when(pluginSpec).getContainers();
-    doReturn(false).when(containers).isEmpty();
-    doReturn(1).when(containers).size();
-    doReturn(container).when(containers).get(0);
-    doReturn(IMAGE_REF).when(container).getImage();
-
     lenient()
         .when(commandRunner.runCommand(eq("skopeo"), any(), any(), anyLong(), any(), any(), any()))
         .thenReturn(skopeoHelpProcess, skopeoInspectProcess);
@@ -268,11 +258,12 @@ public class CdnSupportServiceTest {
 
     assertEquals(service.getPaths(), "cdnJsonContent");
 
-    verify(yamlDownloader, times(1)).getYamlResponseAndParse(PLUGIN_URL);
+    verify(yamlDownloader, times(0)).getYamlResponseAndParse(PLUGIN_URL);
   }
 
   @Test
   public void searchForImageRefAndReturnLabelWhenSkopeoSucceeds() throws Exception {
+    when(pluginFQNParser.parsePluginFQN(any())).thenReturn(PLUGIN_FQN);
     doReturn(pluginMeta).when(yamlDownloader).getYamlResponseAndParse(any());
     doReturn(pluginSpec).when(pluginMeta).getSpec();
     doReturn(containers).when(pluginSpec).getContainers();

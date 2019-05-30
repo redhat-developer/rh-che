@@ -132,8 +132,10 @@ public class CdnSupportService extends Service {
       throw new NotFoundException("No editor is configured for CDN resource pre-fetching");
     }
 
-    PluginMeta editorMeta = getEditorMeta();
-    dockerImage = getDockerImage(editorMeta);
+    if (dockerImage == null) {
+      PluginMeta editorMeta = getEditorMeta();
+      dockerImage = getDockerImage(editorMeta);
+    }
 
     JsonNode json = inspectDockerImage();
     return json.path("Labels").path(LABEL_NAME).asText("[]");
