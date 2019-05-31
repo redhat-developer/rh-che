@@ -58,6 +58,7 @@ data:
   CHE_LOGS_APPENDERS_IMPL: "json"
   CHE_MULTIUSER: "true"
   CHE_WORKSPACE_PLUGIN__REGISTRY__URL: 'https://che-plugin-registry.prod-preview.openshift.io/v3'
+  CHE_WORKSPACE_DEVFILE__REGISTRY__URL: 'https://che-devfile-registry.prod-preview.openshift.io/'
   CHE_PORT: "8080"
   CHE_DEBUG_SERVER: "false"
   SENTRY_ENVIRONMENT: 'dev'
