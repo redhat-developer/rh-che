@@ -119,7 +119,6 @@ function initAnalytics(writeKey){
 };
 
 (function( window, undefined ) {
-    var osioApiURL;
     var osioAuthURL;
 
     function createPromise() {
@@ -263,7 +262,7 @@ function initAnalytics(writeKey){
     }
     
     function performAccounkLinking(keycloak) {
-        return get(osioApiURL + "/users?filter%5Busername%5D=" + encodeURIComponent(keycloak.tokenParsed.preferred_username), keycloak.token)
+        return get(osioAuthURL + "/users?filter%5Busername%5D=" + encodeURIComponent(keycloak.tokenParsed.preferred_username), keycloak.token)
         .then((request) => {
                 var json = parseJson(request.responseText);
                 if (json && json.data && json.data[0] && json.data[0].attributes && json.data[0].attributes.cluster) {
@@ -325,12 +324,12 @@ function initAnalytics(writeKey){
     }
 
     function setUpNamespaces(keycloak) {
-        return get(osioApiURL + "/user/services", keycloak.token)
+        return get(osioAuthURL + "/user/services", keycloak.token)
         .catch((request) => {
             sessionStorage.removeItem('osio-provisioning-notification-message');
             track(telemetry_event_setup_namespaces);
             setStatusMessage(osio_msg_setting_up_namespaces);
-            return get(osioApiURL + "/user", keycloak.token)
+            return get(osioAuthURL + "/user", keycloak.token)
             .then((request) => checkNamespacesCreated(keycloak, new Date().getTime() + 30000),
             (request) => {
                 var message = "Error while triggering the namespace setup";
@@ -342,7 +341,7 @@ function initAnalytics(writeKey){
 
     function checkNamespacesCreated(keycloak, timeLimit) {
         setStatusMessage(osio_msg_setting_up_namespaces);
-        return get(osioApiURL + "/user/services", keycloak.token)
+        return get(osioAuthURL + "/user/services", keycloak.token)
         .catch((request) => {
             if (new Date().getTime() < timeLimit) {
                 return new Promise((resolve, reject) => {
@@ -360,7 +359,7 @@ function initAnalytics(writeKey){
 
     function identifyUser(keycloak) {
         if (window.analytics) {
-            return get(osioApiURL + "/user", keycloak.token)
+            return get(osioAuthURL + "/user", keycloak.token)
             .then((request) => {
                 try {
                     var json = JSON.parse(request.response);
@@ -487,10 +486,8 @@ function initAnalytics(writeKey){
         osioAuthURL = config.oidcProvider;
         
         if (osioAuthURL.includes('.prod-preview.')) {
-            osioApiURL = 'https://api.prod-preview.openshift.io/api';
             osioProvisioningURL = "https://manage.openshift.com/openshiftio?cluster=starter-us-east-2a";
         } else {
-            osioApiURL = 'https://api.openshift.io/api';
             osioProvisioningURL = "https://manage.openshift.com/register/openshiftio_create";
         }
 
