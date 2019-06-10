@@ -19,7 +19,6 @@ data:
   CHE_FABRIC8_AUTH_ENDPOINT: "https://auth.prod-preview.openshift.io"
   CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL: "https://osoproxy.prod-preview.openshift.io"
   CHE_FABRIC8_MULTITENANT: "true"
-  CHE_FABRIC8_USER__SERVICE_ENDPOINT: "https://auth.prod-preview.openshift.io/api/user/services"
   CHE_HOST: "che.prod-preview.openshift.io"
   CHE_KEYCLOAK_AUTH__SERVER__URL: "NULL"
   CHE_KEYCLOAK_CLIENT__ID: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"

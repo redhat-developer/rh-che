@@ -33,15 +33,15 @@ import org.eclipse.che.api.core.rest.HttpJsonResponse;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 
 class TenantDataCacheLoader extends CacheLoader<TenantDataCacheKey, UserCheTenantData> {
-
+  private static final String API_USER_SERVICES_PATH = "/api/user/services";
   private final HttpJsonRequestFactory httpJsonRequestFactory;
   private final String fabric8UserServiceEndpoint;
 
   @Inject
   TenantDataCacheLoader(
       HttpJsonRequestFactory httpJsonRequestFactory,
-      @Named("che.fabric8.user_service.endpoint") String fabric8UserServiceEndpoint) {
-    this.fabric8UserServiceEndpoint = fabric8UserServiceEndpoint;
+      @Named("che.fabric8.auth.endpoint") String fabric8AuthEndpoint) {
+    this.fabric8UserServiceEndpoint = fabric8AuthEndpoint + API_USER_SERVICES_PATH;
     this.httpJsonRequestFactory = httpJsonRequestFactory;
   }
 
