@@ -1,0 +1,4 @@
+--timeout 240000
+--reporter 'node_modules/e2e/dist/driver/CheReporter.js'
+-u tdd
+--spec ./dist/tests/HappyPath.spec.js
