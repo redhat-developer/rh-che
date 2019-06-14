@@ -121,15 +121,9 @@ public class Che7DialogAbout {
     workspaces.clickOnAddWorkspaceBtn();
     newWorkspace.waitToolbar();
     LOG.info("Selecting stack...");
-    newWorkspace.clickOnAllStacksTab();
     selectStack();
     LOG.info("Setting workspace name...");
     newWorkspace.typeWorkspaceName(workspaceName);
-
-    if (machineRam != null) {
-      LOG.info("Setting RAM...");
-      newWorkspace.setMachineRAM("dev-machine", machineRam);
-    }
   }
 
   private void selectStack() {
