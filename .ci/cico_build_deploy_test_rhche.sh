@@ -37,7 +37,13 @@ else
 fi
 
 # Build and push image to docker registry
+
+start=$(date +%s)
 BuildTagAndPushDocker
+stop=$(date +%s)
+build_tag_push_duration=$(echo "$stop - $start" | bc)
+echo "Build, tag and push lasted $build_tag_push_duration seconds."
+
 
 # Deploy rh-che image
 echo "Deploying image with tag ${DOCKER_IMAGE_TAG} from ${DOCKER_IMAGE_URL}"
@@ -52,6 +58,7 @@ else
 fi
 oc policy add-role-to-user edit Katka92 ScrewTSW rhopp garagatyi ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT_NAMESPACE
 
+start=$(date +%s)
 if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" \
                                          -r "${DOCKER_IMAGE_URL}" \
                                          -t $DOCKER_IMAGE_TAG \
@@ -68,6 +75,11 @@ else
 fi
 set -x
 
+stop=$(date +%s)
+deploy_duration=$(echo "$stop - $start" | bc)
+echo "Deploy on devcluster lasted $deploy_duration seconds."
+
+start=$(date +%s)
 echo "Custom che deployment successful, running Rh-che tests against ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL}"
 if ./functional-tests/devscripts/run_tests.sh
 then
@@ -76,6 +88,9 @@ else
   echo "Che functional tests failed. Error code:$?"
   exit 4
 fi
+stop=$(date +%s)
+test_duration=$(echo "$stop - $start" | bc)
+echo "Test execution lasted $test_duration seconds."
 
 unset RH_CHE_AUTOMATION_BUILD_TAG;
 unset CHE_DOCKER_BASE_IMAGE;

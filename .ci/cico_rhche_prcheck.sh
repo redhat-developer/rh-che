@@ -5,6 +5,8 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+echo "****** Starting RH-Che PR check $(date) ******"
+total_start_time=$(date +%s)
 export PR_CHECK_BUILD="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
@@ -23,11 +25,20 @@ source .ci/functional_tests_utils.sh
 
 echo "Checking credentials:"
 checkAllCreds
+
 echo "Installing dependencies:"
+start=$(date +%s)
 installDependencies
+stop=$(date +%s)
+instal_dep_duration=$(echo "$stop - $start" | bc)
+echo "Installing all dependencies lasted $instal_dep_duration seconds."
 
 export PROJECT_NAMESPACE=prcheck-${RH_PULL_REQUEST_ID}
 export DOCKER_IMAGE_TAG="${RH_TAG_DIST_SUFFIX}"-"${RH_PULL_REQUEST_ID}"
 
 echo "Running ${JOB_NAME} PR: #${RH_PULL_REQUEST_ID}, build number #${BUILD_NUMBER}"
 .ci/cico_build_deploy_test_rhche.sh
+
+end_time=$(date +%s)
+whole_check_duration=$(echo "$end_time - $total_start_time" | bc)
+echo "****** PR check ended at $(date) and whole run took $whole_check_duration seconds. ******"

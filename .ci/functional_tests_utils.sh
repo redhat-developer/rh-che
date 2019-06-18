@@ -40,12 +40,17 @@ function installNodejs() {
 	yum install --assumeyes rh-nodejs8
 }
 
+function installBC(){
+	yum install --assumeyes bc
+}
+
 function installDependencies() {
 	installEpelRelease
 	installYQ
 	installStartDocker
 	installJQ
 	installOC
+	installBC
 	
 	# Getting dependencies ready
 	yum install --assumeyes \

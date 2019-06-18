@@ -66,7 +66,9 @@ MVN_COMMAND="mvn clean --projects functional-tests -Pfunctional-tests -B \
   -Dche.osio.auth.endpoint=${CHE_OSIO_AUTH_ENDPOINT} \
   -DexcludedGroups=${RHCHE_EXCLUDED_GROUPS} \
   -Dtests.screenshots_dir=${RHCHE_SCREENSHOTS_DIR} \
-  -Dtest.suite=${TEST_SUITE}"
+  -Dtest.suite=${TEST_SUITE} \
+  -Dorg.slf4j.simpleLogger.showDateTime=true \
+  -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss"
 
 if [[ -n $RHCHE_HOST_PROTOCOL ]]; then
 	MVN_COMMAND="${MVN_COMMAND} -Dche.protocol=${RHCHE_HOST_PROTOCOL}"

@@ -13,7 +13,6 @@ package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
 import java.util.concurrent.ExecutionException;
-import org.eclipse.che.selenium.core.SeleniumWebDriver;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
 import org.eclipse.che.selenium.pageobject.Ide;
@@ -31,7 +30,6 @@ public abstract class RhCheAbstractTestClass {
   @Inject private NotificationsPopupPanel notificationsPopupPanel;
   @Inject private ProjectExplorer projectExplorer;
   @Inject private CodenvyEditor editor;
-  @Inject private SeleniumWebDriver seleniumWebDriver;
 
   public void checkWorkspace(TestWorkspace workspace) throws Exception {
     try {
