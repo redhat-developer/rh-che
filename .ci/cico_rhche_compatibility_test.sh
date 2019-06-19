@@ -5,15 +5,56 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
-set -e
+set -e -m
 
+function checkPullRequest() {
+  che_version=$1
+  job_name=$2
+  branch=$3
+
+  RELATED_PR_TITLE="Update to $(echo $che_version | cut -d'-' -f 1)"
+  PULL_REQUESTS=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[].title')
+  PR_EXISTS="false"
+  while read -r pr_title
+  do
+    if [[ "$pr_title" == "\"$RELATED_PR_TITLE\"" ]]; then
+      PR_EXISTS="true"
+      break
+    fi
+  done <<< "$PULL_REQUESTS"
+
+  if [[ "$PR_EXISTS" == "false" ]]; then
+    echo "false"
+  else
+    echo "true"
+  fi
+}
+
+function createPullRequest() {
+  PR_BODY="Tracking changes for fixing compatibility with upstream $CHE_VERSION. This PR was created automatically by Jenkins from job $JOB_NAME"
+  PR_HEAD="$BRANCH"
+  PR_BASE="master"
+  RELATED_PR_TITLE="Update to $(echo $CHE_VERSION | cut -d'-' -f 1)"
+  echo "Pull request for tracking changes of version $CHE_VERSION was not found - creating new one."
+  git push origin "$BRANCH" -f
+  curl -X POST -s -L -H "Content-Type: application/json" \
+       -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" \
+       --data "{\"title\":\"$RELATED_PR_TITLE\", \"head\":\"$PR_HEAD\", \"base\":\"$PR_BASE\", \"body\":\"$PR_BODY\"}" \
+       https://api.github.com/repos/redhat-developer/rh-che/pulls
+  if [[ "$?" != "0" ]]; then
+    echo $? > compatibility_test
+  fi
+}
+
+function runCompatibilityTest() {
 export USE_CHE_LATEST_SNAPSHOT="true"
 export BASEDIR=$(pwd)
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}')
 if [[ -z $CHE_VERSION ]]; then
-	echo "FAILED to get che version. Finishing script."
-	exit 1
+  echo "FAILED to get che version. Finishing script."
+  echo "1" > compatibility_test
+  exit 1
 fi
 
 echo "********** Prepare environment for running compatibility test with upstream version of che: $CHE_VERSION **********"
@@ -27,7 +68,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^ghprbPullId$ \
         ^RH_CHE \
         ^FABRIC8_HUB_TOKEN)"
-        
+
 source ./config
 source ./.ci/functional_tests_utils.sh
 
@@ -40,19 +81,41 @@ installDependencies
 BRANCH="upstream-check-$CHE_VERSION"
 echo "Checking if branch $BRANCH exists."
 set +e
-git checkout "$BRANCH"
+git checkout "$BRANCH" 2>&1 >/dev/null
 return_code=$?
 set -e
-if [ $return_code -eq 0 ]; then 
-  echo "Branch $BRANCH found - rebasing."
-  git rebase origin/master "$BRANCH"
-else 
+if [ $return_code -eq 0 ]; then
+  #If branch exists
+  if [[ "$(checkPullRequest $CHE_VERSION $JOB_NAME $BRANCH)" == "false" ]]; then
+    #If PR doesn't exist
+    createPullRequest
+  fi
+else
   echo "Branch $BRANCH not found - creating new one."
+  git checkout master
   git checkout -b "$BRANCH"
-	
-  #change version of used che
+  git config -l
+  echo "Setting new branch origin"
+  git push -v --set-upstream origin $BRANCH
   echo ">>> change upstream version to: $CHE_VERSION"
   scl enable rh-maven33 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
+fi
+
+git rebase origin/master "$BRANCH"
+if [[ "$?" != "0" ]]; then
+    echo $? > compatibility_test
+fi
+
+if ( git diff --exit-code ); then
+  echo "Nothing to commit, continue."
+else
+  echo "Changes found. Commit and push them before creating PR."
+  git add -u
+  git commit -m "Changing version of parent che to $CHE_VERSION" || echo "No changes found to commit."
+  git push origin "$BRANCH" -f
+  if [[ "$?" != "0" ]]; then
+    echo $? > compatibility_test
+  fi
 fi
 
 echo "Setting image tags for pushing to quay."
@@ -69,47 +132,6 @@ shortHashDownstream=${longHashDownstream:0:7}
 export DOCKER_IMAGE_TAG="upstream-check-latest"	
 export DOCKER_IMAGE_TAG_WITH_SHORTHASHES="upstream-check-$shortHashUpstream-$shortHashDownstream"
 export PROJECT_NAMESPACE=compatibility-check
-
-#set values needed for checking/creating PR
-RELATED_PR_TITLE="Update to $(echo $CHE_VERSION | cut -d'-' -f 1)"
-PR_BODY="Tracking changes for fixing compatibility with upstream $CHE_VERSION. This PR was created automatically by Jenkins from job $JOB_NAME"
-PR_HEAD="$BRANCH"
-PR_BASE="master"
-
-PULL_REQUESTS=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq '.[].title')
-
-echo "Checking if PR exists."
-PR_EXISTS=1
-while read -r pr_title
-do
-  if [[ "$pr_title" == "\"$RELATED_PR_TITLE\"" ]]; then
-    echo "Pull request for tracking changes of version $CHE_VERSION has been already created."
-    PR_EXISTS=0
-    break
-  fi
-done <<< "$PULL_REQUESTS"
-
-#if PR does not exist, create it
-if [[ $PR_EXISTS -eq 1 ]]; then
-  echo "Pull request for tracking changes of version $CHE_VERSION was not found - creating new one."
-	
-  #add changes (if there are some) and push branch
-  if ( git diff --exit-code ); then
-    echo "Nothing to commit, continue."
-  else
-    echo "Changes found. Commit and push them before creating PR."
-    git add -u
-    git commit -m"Changing version of parent che to $CHE_VERSION" || echo "No changes found to commit."
-  fi
-  #push everytime - with commited changes or with rebased branch
-  git remote set-url --push origin "https://$(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)@github.com/redhat-developer/rh-che.git"
-  #force push because of possible rebase
-  git push origin "$BRANCH" -f 
-
-  curl -X POST -s -L -H "Content-Type: application/json" -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" --data "{\"title\":\"$RELATED_PR_TITLE\", \"head\":\"$PR_HEAD\", \"base\":\"$PR_BASE\", \"body\":\"$PR_BODY\"}" https://api.github.com/repos/redhat-developer/rh-che/pulls
-else
-  echo "Pull request for tracking changes of version $CHE_VERSION was found."
-fi
 
 echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
 set +e
@@ -130,4 +152,31 @@ if [ $RETURN_CODE != 0 ]; then
   curl -X POST -s -L -H "Authorization: token $(echo ${FABRIC8_HUB_TOKEN}|base64 --decode)" $url -d "{\"body\": \"$message\"}"
 fi
 
-exit $RETURN_CODE
+echo $RETURN_CODE > compatibility_status
+}
+
+run_tests_timeout_seconds=${RUN_TEST_TIMEOUT:-300}
+SECONDS=0
+touch compatibility_status
+echo "Starting compatibility test"
+runCompatibilityTest &
+COMPATIBILITY_PID=$!
+COMPATIBILITY_STATUS=$(cat compatibility_status)
+echo "Compatibility test running in background thread $COMPATIBILITY_PID $COMPATIBILITY_STATUS"
+while true; do
+  COMPATIBILITY_STATUS=$(cat compatibility_status)
+  echo "Tick Tock $SECONDS status:$COMPATIBILITY_STATUS"
+  if [[ "$COMPATIBILITY_STATUS" != "" ]]; then
+    echo "Compatibility test finished"
+    kill $COMPATIBILITY_PID 2>&1 >/dev/null
+    rm compatibility_status
+    exit $COMPATIBILITY_STATUS
+  fi
+  if [ $SECONDS -gt $run_tests_timeout_seconds ]; then
+    echo "Compatibility test timed out"
+    kill $COMPATIBILITY_PID 2>&1 >/dev/null
+    rm compatibility_status
+    exit 1
+  fi
+  sleep 1
+done

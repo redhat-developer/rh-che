@@ -7,6 +7,9 @@
 
 set -e
 
+./.ci/cico_rhche_compatibility_test.sh
+exit 1
+
 echo "****** Starting RH-Che PR check $(date) ******"
 total_start_time=$(date +%s)
 export PR_CHECK_BUILD="true"
