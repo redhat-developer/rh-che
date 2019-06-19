@@ -43,9 +43,7 @@ function checkPrereq {
 		fi
 		installOC
 	fi
-	
-	yum install -y bc
-	
+		
 	if $SEND_TO_ZABBIX; then
 		rpm -ivh https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/zabbix-release-3.0-1.el7.noarch.rpm
 		yum install -y zabbix-sender
@@ -142,7 +140,7 @@ ZABBIX_TIMESTAMP=$(date +%s) # time when test starts
 start_time=$(date +%s.%N)
 wait_for_route
 end_time=$(date +%s.%N)
-exposure_time=$(echo "$end_time - $start_time" | bc)
+exposure_time=$(($end_time - $start_time))
 
 if ! $hard_failed; then
 	printf "Time taken for route to be available: %.3f seconds. \n" $exposure_time

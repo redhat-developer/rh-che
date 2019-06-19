@@ -41,7 +41,7 @@ fi
 start=$(date +%s)
 BuildTagAndPushDocker
 stop=$(date +%s)
-build_tag_push_duration=$(echo "$stop - $start" | bc)
+build_tag_push_duration=$(($stop - $start))
 echo "Build, tag and push lasted $build_tag_push_duration seconds."
 
 
@@ -76,7 +76,7 @@ fi
 set -x
 
 stop=$(date +%s)
-deploy_duration=$(echo "$stop - $start" | bc)
+deploy_duration=$(($stop - $start))
 echo "Deploy on devcluster lasted $deploy_duration seconds."
 
 start=$(date +%s)
@@ -89,7 +89,7 @@ else
   exit 4
 fi
 stop=$(date +%s)
-test_duration=$(echo "$stop - $start" | bc)
+test_duration=$(($stop - $start))
 echo "Test execution lasted $test_duration seconds."
 
 unset RH_CHE_AUTOMATION_BUILD_TAG;

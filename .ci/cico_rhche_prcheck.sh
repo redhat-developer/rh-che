@@ -30,7 +30,7 @@ echo "Installing dependencies:"
 start=$(date +%s)
 installDependencies
 stop=$(date +%s)
-instal_dep_duration=$(echo "$stop - $start" | bc)
+instal_dep_duration=$(($stop - $start))
 echo "Installing all dependencies lasted $instal_dep_duration seconds."
 
 export PROJECT_NAMESPACE=prcheck-${RH_PULL_REQUEST_ID}
@@ -40,5 +40,5 @@ echo "Running ${JOB_NAME} PR: #${RH_PULL_REQUEST_ID}, build number #${BUILD_NUMB
 .ci/cico_build_deploy_test_rhche.sh
 
 end_time=$(date +%s)
-whole_check_duration=$(echo "$end_time - $total_start_time" | bc)
+whole_check_duration=$(($end_time - $total_start_time))
 echo "****** PR check ended at $(date) and whole run took $whole_check_duration seconds. ******"

@@ -4,7 +4,11 @@
 #   checkAllCreds
 #   installDependencies
 #   archiveArtifacts
+
 source .ci/functional_tests_utils.sh
+
+echo "****** Starting functional tests $(date) ******"
+start=$(date +%s)
 
 function printHelp {
 	YELLOW="\\033[93;1m"
@@ -154,7 +158,15 @@ else
 	fi
 fi
 
+end=$(date +%s)
+test_duration=$(($end - $start))
+echo "Running tests lasted $test_duration seconds."
+
+start=$(date +%s)
 archiveArtifacts
+end=$(date +%s)
+archive_duration=$(($end - $start))
+echo "Archiving artifacts lasted $archive_duration seconds."
 
 if [[ $RESULT == 0 ]]; then
 	echo "Tests result: SUCCESS"
