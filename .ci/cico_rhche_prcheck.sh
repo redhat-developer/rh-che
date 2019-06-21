@@ -5,6 +5,8 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+set -e
+
 echo "****** Starting RH-Che PR check $(date) ******"
 total_start_time=$(date +%s)
 export PR_CHECK_BUILD="true"
