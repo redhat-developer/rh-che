@@ -137,9 +137,9 @@ function wait_for_route {
 }
 
 ZABBIX_TIMESTAMP=$(date +%s) # time when test starts
-start_time=$(date +%s.%N)
+start_time=$(date +%s)
 wait_for_route
-end_time=$(date +%s.%N)
+end_time=$(date +%s)
 exposure_time=$(($end_time - $start_time))
 
 if ! $hard_failed; then
