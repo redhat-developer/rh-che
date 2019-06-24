@@ -36,6 +36,7 @@ public class Che7DialogAbout {
 
   private static final Logger LOG = LoggerFactory.getLogger(Che7DialogAbout.class);
 
+  private static final String JAVA_MAVEN_DEVFILE_ID = "Java Maven";
   private static final String WORKSPACE_NAME = NameGenerator.generate("wksp-", 5);
 
   @Inject private Dashboard dashboard;
@@ -82,13 +83,14 @@ public class Che7DialogAbout {
       cli.execute(switchProject);
       try {
         // the command "get all" fails, but all info we need is in its message
-        // so the hack here is to get the result of "get all" and not throw this exception
+        // so the hack here is to get the result of "get all" and not throw this
+        // exception
         LOG.info(cli.execute("get all"));
       } catch (Exception ex) {
         String[] log = ex.getCause().getMessage().split("(Output: |;)");
         LOG.info("\n" + log[1]);
       }
-      //    throw the exception from the test
+      // throw the exception from the test
       throw e;
     }
   }
@@ -108,25 +110,25 @@ public class Che7DialogAbout {
   }
 
   private TestWorkspace createChe7Workspace() {
-    prepareWorkspace("che7", WORKSPACE_NAME, null);
+    prepareWorkspace(JAVA_MAVEN_DEVFILE_ID, WORKSPACE_NAME, null);
     projectSourcePage.clickOnAddOrImportProjectButton();
     newWorkspace.clickOnCreateButtonAndOpenInIDE();
     return testWorkspaceProvider.getWorkspace(WORKSPACE_NAME, defaultTestUser);
   }
 
-  private void prepareWorkspace(String stack, String workspaceName, Double machineRam) {
+  private void prepareWorkspace(String devfileID, String workspaceName, Double machineRam) {
     dashboard.waitDashboardToolbarTitle();
     LOG.info("Opening Workspaces from left menu...");
     dashboard.selectWorkspacesItemOnDashboard();
     workspaces.clickOnAddWorkspaceBtn();
     newWorkspace.waitToolbar();
     LOG.info("Selecting stack...");
-    selectStack();
+    selectDevfile(devfileID);
     LOG.info("Setting workspace name...");
     newWorkspace.typeWorkspaceName(workspaceName);
   }
 
-  private void selectStack() {
-    seleniumWebDriverHelper.waitAndClick(By.xpath("//div[@data-stack-id='che7']"));
+  private void selectDevfile(String devfileID) {
+    seleniumWebDriverHelper.waitAndClick(By.xpath("//div[@data-devfile-id='" + devfileID + "']"));
   }
 }
