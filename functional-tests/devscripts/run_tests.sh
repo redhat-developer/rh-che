@@ -67,12 +67,20 @@ else
   API_SERVER_URL="https://api.openshift.io"
 fi
 
+events_file="events_report.txt"
+touch $events_file
+
 if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME" | jq '.data[0].attributes.cluster')
+  OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
+  oc login -u $RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME -p $RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD $OC_CLUSTER_URL
+  oc get events -n ${RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME}-che -w -o json > $events_file &
 else
   OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$USERNAME" | jq '.data[0].attributes.cluster')
+  OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
+  oc login -u $USERNAME -p $PASSWORD $OC_CLUSTER_URL
+  oc get events -n ${USERNAME}-che -w -o json > $events_file &
 fi
-OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
 
 echo "API_SERVER_URL=$API_SERVER_URL"
 echo "OPENSHIFT_URL=$OC_CLUSTER_URL"
