@@ -8,6 +8,7 @@ echo "Installing dependencies..."
 source .ci/functional_tests_utils.sh
 installJQ
 installStartDocker
+installOC
 
 docker pull quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep | cat # Suppress multiple-line output for docker pull
 
