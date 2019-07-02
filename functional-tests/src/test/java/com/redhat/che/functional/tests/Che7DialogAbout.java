@@ -12,6 +12,7 @@
 package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import java.io.IOException;
 import org.eclipse.che.commons.lang.NameGenerator;
 import org.eclipse.che.selenium.core.client.TestWorkspaceServiceClient;
@@ -37,7 +38,9 @@ public class Che7DialogAbout {
   private static final Logger LOG = LoggerFactory.getLogger(Che7DialogAbout.class);
 
   private static final String JAVA_MAVEN_DEVFILE_ID = "Java Maven";
+  private static final String LEGACY_SELENIUM_STACK_NAME = "che7";
   private static final String WORKSPACE_NAME = NameGenerator.generate("wksp-", 5);
+  public static final String CHE_PROD_URL = "che.openshift.io";
 
   @Inject private Dashboard dashboard;
   @Inject private TheiaIde theiaIde;
@@ -50,6 +53,10 @@ public class Che7DialogAbout {
   @Inject private ProjectSourcePage projectSourcePage;
   @Inject private TestWorkspaceProvider testWorkspaceProvider;
   @Inject private OpenShiftCliCommandExecutor cli;
+
+  @Inject
+  @Named("che.host")
+  String cheHost;
 
   @AfterClass
   public void tearDown() throws Exception {
@@ -129,6 +136,15 @@ public class Che7DialogAbout {
   }
 
   private void selectDevfile(String devfileID) {
-    seleniumWebDriverHelper.waitAndClick(By.xpath("//div[@data-devfile-id='" + devfileID + "']"));
+    if (isProd()) {
+      seleniumWebDriverHelper.waitAndClick(
+          By.xpath("//div[@data-stack-id='" + LEGACY_SELENIUM_STACK_NAME + "']"));
+    } else {
+      seleniumWebDriverHelper.waitAndClick(By.xpath("//div[@data-devfile-id='" + devfileID + "']"));
+    }
+  }
+
+  private boolean isProd() {
+    return CHE_PROD_URL.equals(cheHost);
   }
 }

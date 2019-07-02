@@ -46,7 +46,7 @@ public class BayesianPomXml extends BayesianAbstractTestClass {
     // Bayesian is not working on prod-preview environment. Remove that SkipException once this
     // issues is fixed.
     // Issue: https://github.com/redhat-developer/rh-che/issues/524
-    if (cheHost.equals(CHE_PROD_PREVIEW_URL)) {
+    if (isPreview()) {
       throw new SkipException("Skipping bayesian test on prod-preview.");
     }
     setPathToFile(PATH_TO_FILE);

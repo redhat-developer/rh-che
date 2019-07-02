@@ -12,7 +12,6 @@
 package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.eclipse.che.selenium.core.provider.TestApiEndpointUrlProvider;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
@@ -34,10 +33,6 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   @Inject private ProjectExplorer projectExplorer;
   @Inject private TestApiEndpointUrlProvider testApiEndpointUrlProvider;
 
-  @Inject
-  @Named("che.host")
-  String cheHost;
-
   private Integer EXPECTED_ERROR_LINE;
   private Integer INJECTION_ENTRY_POINT;
   private String EXPECTED_ERROR_TEXT;
@@ -45,8 +40,6 @@ public abstract class BayesianAbstractTestClass extends RhCheAbstractTestClass {
   private String PATH_TO_FILE;
   private String PROJECT_DEPENDENCY;
   private String ERROR_MESSAGE;
-  public static final String CHE_PROD_PREVIEW_URL = "che.prod-preview.openshift.io";
-  public static final String CHE_PROD_URL = "che.openshift.io";
 
   public void setExpectedErrorLine(Integer expectedErrorLine) {
     EXPECTED_ERROR_LINE = expectedErrorLine;

@@ -12,6 +12,7 @@
 package com.redhat.che.functional.tests;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.che.selenium.core.workspace.TestWorkspace;
 import org.eclipse.che.selenium.pageobject.CodenvyEditor;
@@ -26,10 +27,17 @@ public abstract class RhCheAbstractTestClass {
 
   private static final Logger LOG = LoggerFactory.getLogger(RhCheAbstractTestClass.class);
 
+  public static final String CHE_PROD_PREVIEW_URL = "che.prod-preview.openshift.io";
+  public static final String CHE_PROD_URL = "che.openshift.io";
+
   @Inject private Ide ide;
   @Inject private NotificationsPopupPanel notificationsPopupPanel;
   @Inject private ProjectExplorer projectExplorer;
   @Inject private CodenvyEditor editor;
+
+  @Inject
+  @Named("che.host")
+  String cheHost;
 
   public void checkWorkspace(TestWorkspace workspace) throws Exception {
     try {
@@ -73,5 +81,13 @@ public abstract class RhCheAbstractTestClass {
 
   public void closeBrowser() {
     ide.close();
+  }
+
+  public boolean isProd() {
+    return CHE_PROD_URL.equals(cheHost);
+  }
+
+  public boolean isPreview() {
+    return CHE_PROD_PREVIEW_URL.equals(cheHost);
   }
 }
