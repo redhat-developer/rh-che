@@ -145,7 +145,6 @@
                 </executions>
                 <configuration>
                     <scanWarDependencies>true</scanWarDependencies>
-                    <skipResources>.*justify-.*jar,.*json-api.*jar</skipResources>
                 </configuration>
             </plugin>
             <plugin>
