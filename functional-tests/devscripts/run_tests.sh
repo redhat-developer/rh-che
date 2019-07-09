@@ -165,10 +165,28 @@ else
 	    RESULT=$?
 	fi
 fi
-
 end=$(date +%s)
 test_duration=$(($end - $start))
-echo "Running tests lasted $test_duration seconds."
+echo "Running functional tests lasted $test_duration seconds."
+
+if [[ "$TEST_SUITE" = "flaky.xml" ]]; then
+	mkdir screens
+	
+	docker run 	\
+	   -v $pwd/screens:/root/rh-che/e2e-saas/report:Z \
+	   -e USERNAME=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME \
+	   -e PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD \
+	   -e URL=https://che.openshift.io \
+	   --shm-size=256m \
+	quay.io/openshiftio/rhchestage-rh-che-e2e-tests           
+		
+	mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
+	cp ./screens/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
+	
+	end=$(date +%s)
+	test_duration=$(($end - $start))
+	echo "Running e2e tests lasted $test_duration seconds."
+fi
 
 start=$(date +%s)
 archiveArtifacts

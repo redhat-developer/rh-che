@@ -8,22 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, WorkspaceDetailsPlugins, ProjectTree } from 'e2e';
+import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree } from 'e2e';
 import { rhCheContainer,  } from '../inversify.config';
 
 const workspaceName: string = NameGenerator.generate('wksp-test-', 5);
 const namespace: string = TestConstants.TS_SELENIUM_USERNAME;
 const sampleName: string = 'console-java-simple';
-const pluginId: string = 'redhat/java/0.45.0';
-const pluginVersion: string = '0.45.0';
-const javaPluginName: string = 'Language Support for Java(TM)';
 const fileFolderPath: string = `${sampleName}/src/main/java/org/eclipse/che/examples`;
 const tabTitle: string = 'HelloWorld.java';
 
 const loginPage: ILoginPage = rhCheContainer.get<ILoginPage>(TYPES.LoginPage);
 const dashboard: Dashboard = rhCheContainer.get(CLASSES.Dashboard);
 const newWorkspace: NewWorkspace = rhCheContainer.get(CLASSES.NewWorkspace);
-const workspaceDetailsPlugins: WorkspaceDetailsPlugins = rhCheContainer.get(CLASSES.WorkspaceDetailsPlugins);
 const ide: Ide = rhCheContainer.get(CLASSES.Ide);
 const projectTree: ProjectTree = rhCheContainer.get(CLASSES.ProjectTree);
 const editor: Editor = rhCheContainer.get(CLASSES.Editor);
@@ -41,12 +37,9 @@ suite('RhChe E2E', async () => {
             await newWorkspace.openPageByUI();
         });
 
-        test(`Create a '${workspaceName}' workspace and proceed editing`, async () => {
-            await newWorkspace.createWorkspaceAndProceedEditing(workspaceName, 'che7', sampleName);
-        });
-
-        test(`Add 'Java Language Support' plugin to workspace`, async () => {
-            await workspaceDetailsPlugins.addPluginAndOpenWorkspace(namespace, workspaceName, javaPluginName, pluginId, pluginVersion);
+        test(`Create and start '${workspaceName}' `, async () => {
+            var namespace = TestConstants.TS_SELENIUM_USERNAME;
+            await newWorkspace.createAndRunWorkspace(namespace, workspaceName, 'Java Maven', sampleName);
         });
 
     });
