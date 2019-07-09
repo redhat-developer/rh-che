@@ -5,14 +5,29 @@ Tests are based on upstream Che 7 Theia tests, which can be found [here](https:/
 
 ## Running the tests
 There are two ways how to run them - using docker file with pre-installed dependencies or using a script. 
-*... in progress ...*
+
+### Running tests via Docker
+Docker image is pushed here: quay.io/openshiftio/rhchestage-rh-che-e2e-tests. To run this image, you need to add some parameters:
+```
+docker run 
+-e USERNAME=<username>
+-e PASSWORD=<password>
+-e URL=<url of running RH-Che>
+quay.io/openshiftio/rhchestage-rh-che-e2e-tests
+```
+
+If you would like to run tests with your source code, you can mount a volume to ` /root/rh-che/local_tests `.
+```
+-v /local/full/path/to/your/source/code/:/root/rh-che/local_tests
+```
+
+If you would like to save screenshots and reports, you can mount a volume to ` /root/rh-che/e2e-saas/report/ `. When you run your local test, you should replace `e2e-saas` by `local_tests`.
 
 ## Test flow
 The tests are end-to-end tests that should represent Happy path through a product. Current flow is following:
 
 - Login
-- Create Che 7 workspace based on Che 7 stack with console-java-simple project
-- Add Java Language Support plugin
+- Create Che 7 workspace based on Java Maven devfile with console-java-simple project
 - Start and open workspace
 - Open file in editor
 - Stop workspace
