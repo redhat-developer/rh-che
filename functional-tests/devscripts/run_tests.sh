@@ -139,6 +139,7 @@ else
 		           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
 		           -e "OPENSHIFT_USERNAME=$USERNAME"  \
 		           -e "OPENSHIFT_PASSWORD=$PASSWORD" \
+		           --shm-size=256m \
 	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
     	RESULT=$?
     
@@ -157,10 +158,11 @@ else
 		           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
 		           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
 		           -e "RHCHE_HOST_URL=$HOST_URL" \
-		           -e "TEST_SUITE=$TEST_SUITE" \
+		           -e "TEST_SUITE=prodPreviewSuite.xml" \
 		           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
 		           -e "OPENSHIFT_USERNAME=$USERNAME"  \
 		           -e "OPENSHIFT_PASSWORD=$PASSWORD" \
+		           --shm-size=256m \
 	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
 	    RESULT=$?
 	fi
