@@ -129,10 +129,9 @@ echo "You can wath localy using VNC with IP: ${hostname}:0"
 if mount | grep 'local_tests'; then
 	echo "The local scripts are mounted. Executing local scripts."
 	cd local_tests
-	pwd
-	echo "ls:"
-	ls
 	rm -rf node_modules dist
+	#When mounting local code, there can be local dependency to e2e set - this would cause script to fail.
+	sed -i '/e2e/d' package.json 
 	npm --silent i
 	echo "Local scripts successfully built."
 	ls
@@ -141,7 +140,7 @@ else
 fi
 
 echo "Installing upstream dependency."
-npm i ../../e2e/
+npm --silent i ../../e2e/
 
 echo "Running tests."
 npm run test
