@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 Red Hat, Inc.
+ * Copyright (c) 2015-2018 Red Hat, Inc.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -16,7 +16,6 @@ import {EnvironmentManager} from '../../../components/api/environment/environmen
 import {IEnvironmentManagerMachine} from '../../../components/api/environment/environment-manager-machine';
 import {CreateWorkspaceSvc} from './create-workspace.service';
 import {NamespaceSelectorSvc} from './namespace-selector/namespace-selector.service';
-import {StackSelectorSvc} from './stack-selector/stack-selector.service';
 import {RandomSvc} from '../../../components/utils/random.service';
 import {CheNotification} from '../../../components/notification/che-notification.factory';
 import {
@@ -104,12 +103,12 @@ export class CreateWorkspaceController {
    */
   private hideLoader: boolean;
 
-  /** Begin rhche specific changes */
+  /** Begin rhche-specific changes */
   /**
    * Downstream property for ephemeral mode toggle
    */
   private isEphemeralMode: boolean;
-  /** End rhche specific changes */
+  /** End rhche-specific changes */
 
   /**
    * Default constructor that is using resource injection
@@ -147,13 +146,13 @@ export class CreateWorkspaceController {
     // and default stack is selected
     this.hideLoader = false;
 
-    /** Begin rh-che specific changes */
+    /** Begin rhche-specific changes */
     if (!this.selectedDevfile || !this.selectedDevfile.attributes || !this.selectedDevfile.attributes.persistVolumes) {
       this.isEphemeralMode = false;
     } else {
       this.isEphemeralMode = JSON.parse(this.selectedDevfile.attributes.persistVolumes);
     }
-    /** End rh-che specific changes */
+    /** End rhche-specific changes */
 
     // header toolbar
     // dropdown button config
@@ -180,7 +179,7 @@ export class CreateWorkspaceController {
     };
   }
 
-  /** Begin rhche specific changes */
+  /** Begin rhche-specific changes */
   /**
    * Track the changes in ephemeral mode input.
    */
@@ -192,7 +191,7 @@ export class CreateWorkspaceController {
       delete this.selectedDevfile.attributes.persistVolumes;
     }
   }
-  /** End rhche specific changes */
+  /** End rhche-specific changes */
 
   /**
    * Callback which is called when stack is selected.
@@ -204,13 +203,13 @@ export class CreateWorkspaceController {
     this.$timeout(() => {
       this.hideLoader = true;
     }, 10);
-    this.selectedDevfile = devfile
+    this.selectedDevfile = devfile;
 
-    /** Begin rhche specific changes */
+    /** Begin rhche-specific changes */
     // set persistVolumes: false (ephemeral mode)
     this.isEphemeralMode = true;
     this.onEphemeralModeChange();
-    /** End rhche specific changes */
+    /** End rhche-specific changes */
   }
 
   /**
@@ -334,8 +333,9 @@ export class CreateWorkspaceController {
    */
   createWorkspace(): ng.IPromise<che.IWorkspace> {
     // update workspace name
-    this.selectedDevfile.metadata.name = this.workspaceName;
-    return this.createWorkspaceSvc.createWorkspaceFromDevfile(this.selectedDevfile, null);
+    let devfileSource = angular.copy(this.selectedDevfile);
+    devfileSource.metadata.name = this.workspaceName;
+    return this.createWorkspaceSvc.createWorkspaceFromDevfile(devfileSource, null);
   }
 
   /**

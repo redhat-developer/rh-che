@@ -1,16 +1,3 @@
-<!--
-
-    Copyright (c) 2016-2018 Red Hat, Inc.
-    This program and the accompanying materials are made
-    available under the terms of the Eclipse Public License 2.0
-    which is available at https://www.eclipse.org/legal/epl-2.0/
-
-    SPDX-License-Identifier: EPL-2.0
-
-    Contributors:
-      Red Hat, Inc. - initial API and implementation
-
--->
 <che-toolbar che-title="New Workspace"
              class="create-workspace-toolbar">
   <che-button-dropdown button-style="che-button-save-flat"
@@ -64,13 +51,7 @@
         on-namespace-change="createWorkspaceController.onNamespaceChanged(namespaceId)"></namespace-selector>
     </che-label-container>
 
-    <che-label-container che-label-name="Select Stack"
-                         che-label-description="Choose your workspace runtime environment used to build and run your projects.">
-      <devfile-selector on-devfile-select="createWorkspaceController.onDevfileSelected(devfile)">
-      </devfile-selector>
-    </che-label-container>
-
-    <!-- Ephemeral mode - rh-che specific -->
+    <!-- Ephemeral mode - rhche-specific -->
     <che-label-container che-label-name="Ephemeral mode" che-label-description="In ephemeral mode workspace has no PVC attached.">
       <md-switch class="ephemeral-mode-toggle"
         ng-model="createWorkspaceController.isEphemeralMode"
@@ -78,13 +59,17 @@
         aria-label="ephemeral-mode">
       </md-switch>
     </che-label-container>
-    <!-- Ephemeral mode - rh-che specific -->
+    <!-- Ephemeral mode - rhche-specific -->
 
+    <che-label-container che-label-name="Select Stack"
+                         che-label-description="Choose your workspace runtime environment used to build and run your projects.">
+      <devfile-selector on-devfile-select="createWorkspaceController.onDevfileSelected(devfile)">
+      </devfile-selector>
+    </che-label-container>
     <!-- Project source selector -->
     <che-label-container che-label-name="Projects">
-      <project-source-selector></project-source-selector>
+      <project-source-selector devfile="createWorkspaceController.selectedDevfile"></project-source-selector>
     </che-label-container>
-
     <che-label-container>
       <che-button-save-flat class="create-workspace-footer-button"
                             name="saveButton"
