@@ -10,6 +10,9 @@
 import 'reflect-metadata';
 import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree } from 'e2e';
 import { rhCheContainer,  } from '../inversify.config';
+import { error } from 'selenium-webdriver';
+import * as restClient from 'typed-rest-client/RestClient';
+import { RhCheTestConstants } from '../RhCheTestConstants';
 
 const workspaceName: string = NameGenerator.generate('wksp-test-', 5);
 const namespace: string = TestConstants.TS_SELENIUM_USERNAME;
@@ -54,7 +57,19 @@ suite('RhChe E2E', async () => {
         });
 
         test('Wait project imported', async () => {
-            await projectTree.waitProjectImported(sampleName, 'src');
+            try {
+                await projectTree.waitProjectImported(sampleName, 'src');
+            } catch (err) {
+                if (!(err instanceof error.TimeoutError)) {
+                    throw err;
+                }
+                var rest: restClient.RestClient = new restClient.RestClient('user-agent');
+                const workspaceStatusApiUrl: string = `${TestConstants.TS_SELENIUM_BASE_URL}/api/workspace/${namespace}:${workspaceName}`;
+
+                const response: restClient.IRestResponse<any> = await rest.get(workspaceStatusApiUrl, {additionalHeaders: {'Authorization' : 'Bearer ' + RhCheTestConstants.E2E_SAAS_TESTS_USER_TOKEN } });
+                console.log('WORKSPACE DEFINITION: ' + JSON.stringify(response.result));
+                throw err;
+            }
         });
 
         test('Expand project and open file in editor', async () => {
