@@ -16,6 +16,7 @@ import java.util.Map;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.eclipse.che.api.factory.shared.dto.FactoryDto;
+import org.eclipse.che.api.workspace.shared.dto.WorkspaceConfigDto;
 
 /**
  * This interceptor must be bound for the method {@link
@@ -32,11 +33,14 @@ public class FactoryUrlSetterInterceptor implements MethodInterceptor {
     @SuppressWarnings("unchecked")
     final Map<String, String> parameters = (Map<String, String>) args[0];
     FactoryDto factory = (FactoryDto) invocation.proceed();
-    Map<String, String> attributes = factory.getWorkspace().getAttributes();
-    parameters.forEach(
-        (k, v) -> {
-          attributes.put("factory.parameter." + k, v);
-        });
+    WorkspaceConfigDto workspace = factory.getWorkspace();
+    if (workspace != null) {
+      Map<String, String> attributes = workspace.getAttributes();
+      parameters.forEach(
+          (k, v) -> {
+            attributes.put("factory.parameter." + k, v);
+          });
+    }
     return factory;
   }
 }
