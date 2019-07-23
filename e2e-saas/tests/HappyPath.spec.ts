@@ -34,8 +34,8 @@ suite('RhChe E2E', async () => {
             await dashboard.waitPage(30000);
         });
     });
-
-    suite('Create workspace and add plugin', async () => {
+    
+    suite('Create and run workspace', async () => {
         test(`Open 'New Workspace' page`, async () => {
             await newWorkspace.openPageByUI();
         });
@@ -76,18 +76,21 @@ suite('RhChe E2E', async () => {
             await projectTree.expandPathAndOpenFile(fileFolderPath, tabTitle);
         });
 
-        // unskip after resolving issue https://github.com/eclipse/che/issues/12904
-        test.skip(`Check 'Java Language Server' initialization by statusbar`, async () => {
+        test.skip('Check "Java Language Server" initialization by statusbar', async () => {
             await ide.waitStatusBarContains('Starting Java Language Server');
             await ide.waitStatusBarContains('100% Starting Java Language Server');
             await ide.waitStatusBarTextAbcence('Starting Java Language Server');
         });
 
-        // unskip after resolving issue https://github.com/eclipse/che/issues/12904
-        test.skip(`Check 'Java Language Server' initialization by suggestion invoking`, async () => {
+        test('Check "Java Language Server" initialization by suggestion invoking', async () => {
+            await ide.closeAllNotifications();
             await editor.waitEditorAvailable(tabTitle);
             await editor.clickOnTab(tabTitle);
             await editor.waitEditorAvailable(tabTitle);
+            await editor.waitTabFocused(tabTitle);
+            await editor.moveCursorToLineAndChar(tabTitle, 6, 20);
+            await editor.pressControlSpaceCombination(tabTitle);
+            await editor.waitSuggestion(tabTitle, 'append(CharSequence csq, int start, int end) : PrintStream');
         });
 
     });
