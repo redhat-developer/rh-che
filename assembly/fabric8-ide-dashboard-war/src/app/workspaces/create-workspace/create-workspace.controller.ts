@@ -186,6 +186,7 @@ export class CreateWorkspaceController {
    */
   onEphemeralModeChange(): void {
     if (this.isEphemeralMode) {
+      this.selectedDevfile.attributes = this.selectedDevfile.attributes || {};
       this.selectedDevfile.attributes.persistVolumes = 'false';
     } else {
       delete this.selectedDevfile.attributes.persistVolumes;
