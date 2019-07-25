@@ -106,35 +106,11 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
 	   -e URL=http://$HOST_URL \
 	   --shm-size=256m \
 	quay.io/openshiftio/rhchestage-rh-che-e2e-tests
-	E2E_RESULT=$?
+	RESULT=$?
 	
 	mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
 	cp -r ./report ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
-	
-	docker run --name functional-tests-dep --privileged \
-	           -v /var/run/docker.sock:/var/run/docker.sock \
-	           -v /root/payload/logs:/root/logs \
-	           -v $path:/root/che/ \
-	           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
-	           -e "RHCHE_ACC_USERNAME=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME" \
-	           -e "RHCHE_ACC_PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD" \
-	           -e "RHCHE_ACC_EMAIL=$RH_CHE_AUTOMATION_CHE_PREVIEW_EMAIL" \
-	           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
-	           -e "RHCHE_HOST_URL=$HOST_URL" \
-	           -e "RHCHE_HOST_PROTOCOL=http" \
-	           -e "RHCHE_PORT=80" \
-	           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
-	           -e "TEST_SUITE=prcheck.xml" \
-	           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
-	           -e "OPENSHIFT_USERNAME=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME"  \
-	           -e "OPENSHIFT_PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD" \
-	       quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
-	RESULT=$?	
-	
-	if [[ $E2E_RESULT -ne 0 ]]; then
-	    RESULT=1
-	fi
-	
+
 else
 	if [[ -z $USERNAME || -z $PASSWORD || -z $EMAIL || -z $HOST_URL ]]; then
 	    echo "Please check if all credentials for user are set."
@@ -178,32 +154,11 @@ else
 			-e URL=https://$HOST_URL \
 			--shm-size=256m \
 		quay.io/openshiftio/rhchestage-rh-che-e2e-tests
-		E2E_RESULT=$?
+		RESULT=$?
 	    
 		mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
 		cp -r ./report/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
-	    
-		docker run --name functional-tests-dep --privileged \
-		           -v /var/run/docker.sock:/var/run/docker.sock \
-		           -v /root/payload/logs:/root/logs \
-		           -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
-		           -e "RHCHE_ACC_USERNAME=$USERNAME" \
-		           -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
-		           -e "RHCHE_ACC_EMAIL=$EMAIL" \
-		           -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
-		           -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
-		           -e "RHCHE_HOST_URL=$HOST_URL" \
-		           -e "TEST_SUITE=prodPreviewSuite.xml" \
-		           -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
-		           -e "OPENSHIFT_USERNAME=$USERNAME"  \
-		           -e "OPENSHIFT_PASSWORD=$PASSWORD" \
-		           --shm-size=256m \
-	           quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
-	    RESULT=$?
 	
-		if [[ $E2E_RESULT -ne 0 ]]; then
-			RESULT=1
-		fi
 	fi
 fi
 end=$(date +%s)
