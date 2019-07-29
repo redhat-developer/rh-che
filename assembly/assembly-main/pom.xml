@@ -26,11 +26,6 @@
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
-            <type>tar.gz</type>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
             <type>war</type>
         </dependency>
@@ -140,11 +135,6 @@
             <dependencies>
                 <dependency>
                     <groupId>com.redhat.che</groupId>
-                    <artifactId>fabric8-ide-assembly-ide-war</artifactId>
-                    <type>war</type>
-                </dependency>
-                <dependency>
-                    <groupId>com.redhat.che</groupId>
                     <artifactId>fabric8-ide-dashboard-war</artifactId>
                     <type>war</type>
                 </dependency>
@@ -172,14 +162,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>com.redhat.che</groupId>
-                    <artifactId>fabric8-ide-assembly-ide-war</artifactId>
-                    <type>war</type>
-                    <classifier>without-dashboard</classifier>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 </project>
