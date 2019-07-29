@@ -57,18 +57,20 @@ date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 DOCKERFILE="e2e-saas/"
 DOCKER_IMAGE="rh-che-e2e-tests"
+TAG=$(getVersionFromPom)
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
 echo "Building docker image for functional tests (used e.g. in periodic tests)."
-docker build -t ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_PATH}${DOCKERFILE}
+docker build -t ${DOCKER_IMAGE_URL}:${TAG} --build-arg TAG=$TAG ${DOCKER_PATH}${DOCKERFILE}
 if [ $? -ne 0 ]; then
   echo 'Docker Build Failed'
   exit 2
 fi
 
-echo "Build was successful, pushing image ${DOCKER_IMAGE_URL}:${SHORT_HASH}"
+echo "Build was successful, pushing image ${DOCKER_IMAGE_URL} with tags ${TAG}, ${SHORT_HAS} and latest"
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 docker tag ${DOCKER_IMAGE_URL}:${TAG} ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 docker push ${DOCKER_IMAGE_URL}:${TAG}
+docker push ${DOCKER_IMAGE_URL}:latest
 docker push ${DOCKER_IMAGE_URL}:${SHORT_HASH}
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'

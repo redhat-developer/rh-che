@@ -36,25 +36,20 @@ length=${#USERNAME}
 echo "Trying to find token for $(echo $USERNAME | cut -c1-3) $(echo $USERNAME | cut -c4-$length)"  
     
 #verify environment - if production or prod-preview
-#variable preview is used differ between prod and prod-preview urls
+#variable preview is used to differ between prod and prod-preview urls
+rm -rf cookie-file loginfile.html
 if [[ "$USERNAME" == *"preview"* ]]; then
-	response=$(curl -s -g -X GET --header 'Accept: application/json' "https://api.prod-preview.openshift.io/api/users?filter[username]=$USERNAME")
-	echo $response
-	data=$(echo "$response" | jq .data)
-	if [ "$data" == "[]" ]; then
-		echo -e "${RED}User $USERNAME is not provisoned on prod-preview cluster. Please check settings. ${NC}"
-	    exit 1
-    fi        
-    preview="prod-preview."
+  preview="prod-preview."
 else
-	response=$(curl -s -g --header 'Accept: application/json' -X GET "https://api.openshift.io/api/users?filter[username]=$USERNAME")
-	data=$(echo "$response" | jq .data)
-	if [ "$data" == "[]" ]; then
-		echo -e "${RED}User $USERNAME is not provisioned on production cluster. Please check settings. ${NC}" 
-        exit 1
-    fi        
-	preview=""
+  preview=""
 fi
+
+response=$(curl -s -g -X GET --header 'Accept: application/json' "https://api.${preview}openshift.io/api/users?filter[username]=$USERNAME")
+data=$(echo "$response" | jq .data)
+if [ "$data" == "[]" ]; then
+  echo -e "${RED}Can not find active token for user $USERNAME. Please check settings. ${NC}"
+  exit 1
+fi 
 		
 #get html of developers login page
 curl -sX GET -L -c cookie-file -b cookie-file "https://auth.${preview}openshift.io/api/login?redirect=https://che.openshift.io" > loginfile.html
@@ -84,7 +79,7 @@ do
 done
 set -e
 
-#substract active token
+#extract active token
 token=$(echo "$url" | grep -o "ey.[^%]*" | head -1)
 if [[ ${#token} -gt 0 ]]; then
     #save each token into file tokens.txt in format: token;username;["","prod-preview"]

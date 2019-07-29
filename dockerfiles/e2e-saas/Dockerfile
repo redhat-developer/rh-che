@@ -4,7 +4,8 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
-FROM docker.io/eclipse/che-e2e:7.0.0-rc-3.0
+ARG TAG=latest
+FROM docker.io/eclipse/che-e2e:$TAG
 
 ENV LANG=en_US.utf8 \
     DISPLAY=:99 \
