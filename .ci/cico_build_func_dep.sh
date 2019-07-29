@@ -55,12 +55,14 @@ date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 # Build and push e2e-tests base image
 
+source .ci/functional_tests_utils.sh
+
 DOCKERFILE="e2e-saas/"
 DOCKER_IMAGE="rh-che-e2e-tests"
 TAG=$(getVersionFromPom)
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
-echo "Building docker image for functional tests (used e.g. in periodic tests)."
+echo "Building docker image for e2e tests (used e.g. in periodic tests)."
 docker build -t ${DOCKER_IMAGE_URL}:${TAG} --build-arg TAG=$TAG ${DOCKER_PATH}${DOCKERFILE}
 if [ $? -ne 0 ]; then
   echo 'Docker Build Failed'
