@@ -24,11 +24,7 @@
     <packaging>pom</packaging>
     <name>Fabric8 IDE :: Plugins</name>
     <modules>
-        <module>ls-bayesian-agent</module>
-        <module>che-plugin-bayesian-lang-server</module>
-        <module>plugin-product-info</module>
         <module>fabric8-multi-tenant-manager</module>
-        <module>che-plugin-analytics</module>
         <module>fabric8-end2end-flow</module>
         <module>fabric8-cdn-support</module>
     </modules>

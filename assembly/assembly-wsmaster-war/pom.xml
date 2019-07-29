@@ -42,19 +42,11 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>che-plugin-analytics-wsmaster</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-cdn-support</artifactId>
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-end2end-flow</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-stacks</artifactId>
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
@@ -131,21 +123,6 @@
                         <phase>process-sources</phase>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.che.core</groupId>
-                <artifactId>che-core-dynamodule-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate</id>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <scanWarDependencies>true</scanWarDependencies>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
