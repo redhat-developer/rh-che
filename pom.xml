@@ -55,12 +55,6 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>che-plugin-bayesian-lang-server</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-cdn-support</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
@@ -76,31 +70,6 @@
                 <artifactId>fabric8-ide-assembly-ide-war</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-assembly-ide-war</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>war</type>
-                <classifier>without-dashboard</classifier>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-assembly-wsagent-server</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>tar.gz</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-assembly-wsagent-war</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-assembly-wsagent-war</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
@@ -122,18 +91,6 @@
             </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-gwt-app</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>fabric8-ide-stacks</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-multi-tenant-manager</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
@@ -143,12 +100,6 @@
                 <artifactId>fabric8-plugin-product-info</artifactId>
                 <version>${redhat.che.version}</version>
                 <type>gwt-lib</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
-                <artifactId>ls-bayesian-agent</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>com.segment.analytics.java</groupId>
@@ -180,12 +131,6 @@
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-servlet-api</artifactId>
                 <version>${org.apache.tomcat.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.che</groupId>
-                <artifactId>fabric8-ide-gwt-app</artifactId>
-                <version>${rh.che.plugins.version}</version>
-                <type>gwt-app</type>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che.multiuser</groupId>

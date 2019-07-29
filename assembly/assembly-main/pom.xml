@@ -26,7 +26,17 @@
     <dependencies>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-assembly-ide-war</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-ide-assembly-wsmaster-war</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>fabric8-ide-dashboard-war</artifactId>
             <type>war</type>
         </dependency>
         <dependency>
@@ -123,45 +133,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>withDashboard</id>
-            <activation>
-                <property>
-                    <name>withoutDashboard</name>
-                    <value>!true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.redhat.che</groupId>
-                    <artifactId>fabric8-ide-dashboard-war</artifactId>
-                    <type>war</type>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>withoutDashboard</id>
-            <activation>
-                <property>
-                    <name>withoutDashboard</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <appendAssemblyId>true</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>${project.basedir}/src/assembly/assembly-wo-dashboard.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

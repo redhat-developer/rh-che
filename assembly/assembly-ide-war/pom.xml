@@ -24,16 +24,9 @@
     <packaging>war</packaging>
     <name>Fabric8 IDE :: Assemblies :: IDE</name>
     <properties>
-        <generated.sources.directory>${project.build.directory}/generated-sources/gen</generated.sources.directory>
-        <gwt.log.enable>true</gwt.log.enable>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>fabric8-ide-gwt-app</artifactId>
-            <type>war</type>
-        </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
@@ -48,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.che</groupId>
-            <artifactId>assembly-ide-war</artifactId>
+            <artifactId>assembly-root-war</artifactId>
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
@@ -80,7 +73,7 @@
                     <overlays>
                         <overlay>
                             <groupId>org.eclipse.che</groupId>
-                            <artifactId>assembly-ide-war</artifactId>
+                            <artifactId>assembly-root-war</artifactId>
                             <type>war</type>
                             <includes>
                                 <include>_app/IDE.html</include>
@@ -104,72 +97,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>withDashboard</id>
-            <activation>
-                <property>
-                    <name>withoutDashboard</name>
-                    <value>!true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.eclipse.che.core</groupId>
-                        <artifactId>che-core-dynamodule-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>generate</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <scanWarDependencies>true</scanWarDependencies>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>withoutDashboard</id>
-            <activation>
-                <property>
-                    <name>withoutDashboard</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- add classifier without-dashboard -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <configuration>
-                            <classifier>without-dashboard</classifier>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.che</groupId>
-                    <artifactId>assembly-ide-war</artifactId>
-                    <classifier>classes</classifier>
-                    <exclusions>
-                        <exclusion>
-                            <artifactId>che-plugin-ext-dashboard-client</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>che-plugin-product-info</artifactId>
-                            <groupId>org.eclipse.che.plugin</groupId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>
