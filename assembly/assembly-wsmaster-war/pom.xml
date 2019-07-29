@@ -53,10 +53,6 @@
             <artifactId>fabric8-multi-tenant-manager</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.redhat.che</groupId>
-            <artifactId>ls-bayesian-agent</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
         </dependency>
