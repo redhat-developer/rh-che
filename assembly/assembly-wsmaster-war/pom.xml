@@ -42,6 +42,14 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
+            <artifactId>che-plugin-analytics-wsmaster</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
+            <artifactId>che-plugin-analytics-wsmaster</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-cdn-support</artifactId>
         </dependency>
         <dependency>
@@ -145,6 +153,7 @@
                             <ignoredUnusedDeclaredDependencies>
                                 <dep>io.sentry:sentry</dep>
                                 <dep>io.sentry:sentry-logback</dep>
+                                <dep>com.redhat.che:che-plugin-analytics-wsmaster</dep>
                                 <dep>com.redhat.che:fabric8-cdn-support</dep>
                                 <dep>com.redhat.che:fabric8-end2end-flow</dep>
                                 <dep>com.redhat.che:fabric8-ide-stacks</dep>

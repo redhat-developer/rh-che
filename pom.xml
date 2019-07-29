@@ -43,16 +43,10 @@
         <dependencies>
             <dependency>
                 <groupId>com.redhat.che</groupId>
-                <artifactId>che-plugin-analytics-wsagent</artifactId>
-                <version>${redhat.che.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.redhat.che</groupId>
                 <artifactId>che-plugin-analytics-wsmaster</artifactId>
-                <version>${redhat.che.version}</version>
+                <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
-            </dependency>
+            </dependency>                        
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-cdn-support</artifactId>
