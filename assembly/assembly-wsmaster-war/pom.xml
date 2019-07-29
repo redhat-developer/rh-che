@@ -145,8 +145,11 @@
                             <ignoredUnusedDeclaredDependencies>
                                 <dep>io.sentry:sentry</dep>
                                 <dep>io.sentry:sentry-logback</dep>
+                                <dep>com.redhat.che:fabric8-cdn-support</dep>
+                                <dep>com.redhat.che:fabric8-end2end-flow</dep>
                                 <dep>com.redhat.che:fabric8-ide-stacks</dep>
                                 <dep>org.eclipse.che.multiuser:che-multiuser-keycloak-server</dep>
+                                <dep>org.eclipse.che.multiuser:che-multiuser-personal-account</dep>
                             </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
