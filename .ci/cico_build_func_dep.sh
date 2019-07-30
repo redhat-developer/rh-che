@@ -20,10 +20,13 @@ cat jenkins-env \
 source /tmp/export-env
 
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
+
+source .ci/functional_tests_utils.sh
 yum update --assumeyes
-yum install --assumeyes docker git
+installMvn
+installStartDocker
+installGit
 SHORT_HASH=$(git rev-parse --short HEAD)
-systemctl start docker
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then

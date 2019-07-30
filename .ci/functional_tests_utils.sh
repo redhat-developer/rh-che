@@ -36,11 +36,16 @@ function installStartDocker() {
 }
 
 function installMvn() {
+  yum install --assumeyes centos-release-scl
   yum install --assumeyes rh-maven33
 }
 
 function installNodejs() {
   yum install --assumeyes rh-nodejs8
+}
+
+function installGit(){
+  yum install --assumeyes git
 }
 
 function installDependencies() {
@@ -49,20 +54,18 @@ function installDependencies() {
   installStartDocker
   installJQ
   installOC
-  
+  installGit  
   # Getting dependencies ready
   yum install --assumeyes \
-              git \
               patch \
               pcp \
               bzip2 \
               golang \
               make \
               java-1.8.0-openjdk \
-              java-1.8.0-openjdk-devel \
-              centos-release-scl
-  installNodejs
+              java-1.8.0-openjdk-devel 
   installMvn
+  installNodejs
 }
 
 function checkAllCreds() {
