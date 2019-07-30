@@ -42,7 +42,7 @@ suite('RhChe E2E', async () => {
 
         test(`Create and start '${workspaceName}' `, async () => {
             var namespace = TestConstants.TS_SELENIUM_USERNAME;
-            await newWorkspace.createAndRunWorkspace(namespace, workspaceName, 'Java Maven', sampleName);
+            await newWorkspace.createAndRunWorkspace(namespace, workspaceName, 'Java Maven');
         });
 
     });
@@ -79,7 +79,7 @@ suite('RhChe E2E', async () => {
         test.skip('Check "Java Language Server" initialization by statusbar', async () => {
             await ide.waitStatusBarContains('Starting Java Language Server');
             await ide.waitStatusBarContains('100% Starting Java Language Server');
-            await ide.waitStatusBarTextAbcence('Starting Java Language Server');
+            await ide.waitStatusBarTextAbsence('Starting Java Language Server');
         });
 
         test('Check "Java Language Server" initialization by suggestion invoking', async () => {
