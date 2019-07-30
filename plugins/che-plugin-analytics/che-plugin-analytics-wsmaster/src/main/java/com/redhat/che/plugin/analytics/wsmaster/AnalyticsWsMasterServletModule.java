@@ -24,6 +24,7 @@ public class AnalyticsWsMasterServletModule extends ServletModule {
 
   @Override
   protected void configureServlets() {
-    filter("/activity/*").through(ForwardActivityFilter.class);
+    // Disabling filter as part of the https://github.com/redhat-developer/rh-che/issues/1493
+    // filter("/activity/*").through(ForwardActivityFilter.class);
   }
 }
