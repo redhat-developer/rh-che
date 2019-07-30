@@ -54,14 +54,12 @@ done
 
 if [[ "$JOB_NAME" == *"flaky"* ]]; then
   TEST_SUITE="flaky.xml"
-elif [[ "$JOB_NAME" == *"saas"* ]]; then
-  TEST_SUITE="saasPrCheck.xml"
 else
   TEST_SUITE="simpleTestSuite.xml"
 fi
 
 #Get cluster to be able to get logs. Related to issue: https://github.com/redhat-developer/che-functional-tests/issues/476
-if [[ "$USERNAME" == *"preview"* ]] || [[ "$PR_CHECK_BUILD" == "true" ]]; then
+if [[ "$USERNAME" == *"preview"* ]] || [[ "$PR_CHECK_BUILD" == "true" ]] || [[ "$JOB_NAME" == *"saas"* ]]; then
   API_SERVER_URL="https://api.prod-preview.openshift.io"
 else
   API_SERVER_URL="https://api.openshift.io"
@@ -170,14 +168,12 @@ else
     
   #PROD-PREVIEW
   else
-    echo "Running test with user $USERNAME against prod-preview environment."
-    CHE_OSIO_AUTH_ENDPOINT="https://auth.prod-preview.openshift.io"
+    TAG=$(getVersionFromProdPreview)
+    echo "Running test with user $USERNAME against prod-preview environment with version $TAG."
   
     path="$(pwd)"
     mkdir report
     
-    TAG=$(getVersionFromProdPreview)
-
     docker run \
       -v $path/report:/root/rh-che/e2e-saas/report:Z \
       -e USERNAME=$USERNAME \
