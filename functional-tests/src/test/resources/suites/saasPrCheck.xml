@@ -19,7 +19,6 @@
 
     <test name="all">
         <classes>
-            <class name="com.redhat.che.functional.tests.BuildAndRunProjectTest"/>
             <class name="com.redhat.che.functional.tests.Che7DialogAbout"/>
         </classes>
     </test>
