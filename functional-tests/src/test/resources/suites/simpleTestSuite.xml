@@ -19,7 +19,6 @@
 
     <test name="all">
         <classes>
-            <class name="org.eclipse.che.selenium.miscellaneous.DialogAboutTest"/>
             <class name="com.redhat.che.functional.tests.Che7DialogAbout"/>
         </classes>
     </test>
