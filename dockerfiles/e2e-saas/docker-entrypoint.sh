@@ -38,7 +38,7 @@ echo "Trying to find token for $(echo $USERNAME | cut -c1-3) $(echo $USERNAME | 
 #verify environment - if production or prod-preview
 #variable preview is used to differ between prod and prod-preview urls
 rm -rf cookie-file loginfile.html
-if [[ "$USERNAME" == *"preview"* ]]; then
+if [[ "$USERNAME" == *"preview"* ]] || [[ "$USERNAME" == *"saas"* ]]; then
   preview="prod-preview."
 else
   preview=""
