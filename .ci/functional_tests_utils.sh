@@ -116,7 +116,7 @@ function getVersionFromPom() {
 
 function getActiveToken() {
   rm -rf cookie-file loginfile.html
-  if [[ "$USERNAME" == *"preview"* ]]; then
+  if [[ "$USERNAME" == *"preview"* ]] || [[ "$USERNAME" == *"saas"* ]]; then
     preview="prod-preview."
   else
     preview=""
