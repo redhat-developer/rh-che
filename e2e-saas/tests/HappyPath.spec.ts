@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree } from 'e2e';
+import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer } from 'e2e';
 import { rhCheContainer,  } from '../inversify.config';
 import { error } from 'selenium-webdriver';
 import * as restClient from 'typed-rest-client/RestClient';
@@ -26,6 +26,8 @@ const newWorkspace: NewWorkspace = rhCheContainer.get(CLASSES.NewWorkspace);
 const ide: Ide = rhCheContainer.get(CLASSES.Ide);
 const projectTree: ProjectTree = rhCheContainer.get(CLASSES.ProjectTree);
 const editor: Editor = rhCheContainer.get(CLASSES.Editor);
+const topMenu: TopMenu = rhCheContainer.get(CLASSES.TopMenu);
+const quickOpenContainer: QuickOpenContainer = rhCheContainer.get(CLASSES.QuickOpenContainer);
 
 suite('RhChe E2E', async () => {
     suite('Login and wait dashboard', async () => {
@@ -34,15 +36,14 @@ suite('RhChe E2E', async () => {
             await dashboard.waitPage(30000);
         });
     });
-    
+
     suite('Create and run workspace', async () => {
         test(`Open 'New Workspace' page`, async () => {
             await newWorkspace.openPageByUI();
         });
 
-        test(`Create and start '${workspaceName}' `, async () => {
-            var namespace = TestConstants.TS_SELENIUM_USERNAME;
-            await newWorkspace.createAndRunWorkspace(namespace, workspaceName, 'Java Maven');
+        test('Create and open workspace', async () => {
+            await newWorkspace.createAndOpenWorkspace(workspaceName, 'Java Maven');
         });
 
     });
@@ -76,12 +77,6 @@ suite('RhChe E2E', async () => {
             await projectTree.expandPathAndOpenFile(fileFolderPath, tabTitle);
         });
 
-        test.skip('Check "Java Language Server" initialization by statusbar', async () => {
-            await ide.waitStatusBarContains('Starting Java Language Server');
-            await ide.waitStatusBarContains('100% Starting Java Language Server');
-            await ide.waitStatusBarTextAbsence('Starting Java Language Server');
-        });
-
         test('Check "Java Language Server" initialization by suggestion invoking', async () => {
             await ide.closeAllNotifications();
             await editor.waitEditorAvailable(tabTitle);
@@ -91,6 +86,21 @@ suite('RhChe E2E', async () => {
             await editor.moveCursorToLineAndChar(tabTitle, 6, 20);
             await editor.pressControlSpaceCombination(tabTitle);
             await editor.waitSuggestion(tabTitle, 'append(CharSequence csq, int start, int end) : PrintStream');
+        });
+
+    });
+
+    suite('Validation of workspace build and run', async () => {
+        test('Build application', async () => {
+            await runTask('che: maven build');
+            await ide.waitNotification('Task 0 has exited with code 0.', 30000);
+            await ide.waitNotificationDisappearance('Task 0 has exited with code 0.', 5, 5000);
+        });
+
+        test('Run application', async () => {
+            await runTask('che: maven build and run');
+            await ide.waitNotification('Task 1 has exited with code 0.', 30000);
+            await ide.waitNotificationDisappearance('Task 1 has exited with code 0.', 5, 5000);
         });
 
     });
@@ -106,4 +116,19 @@ suite('RhChe E2E', async () => {
 
     });
 
+    async function runTask(task: string) {
+        await topMenu.selectOption('Terminal', 'Run Task...');
+        try {
+            await quickOpenContainer.waitContainer();
+        } catch (err) {
+            if (err instanceof error.TimeoutError) {
+                console.warn(`After clicking to the "Terminal" -> "Run Task ..." the "Quick Open Container" has not been displayed, one more try`);
+
+                await topMenu.selectOption('Terminal', 'Run Task...');
+                await quickOpenContainer.waitContainer();
+            }
+        }
+
+        await quickOpenContainer.clickOnContainerItem(task);
+    }
 });
