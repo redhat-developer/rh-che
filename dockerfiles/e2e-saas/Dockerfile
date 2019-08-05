@@ -10,8 +10,11 @@ FROM docker.io/eclipse/che-e2e:$TAG
 ENV LANG=en_US.utf8 \
     DISPLAY=:99 \
     FABRIC8_USER_NAME=fabric8
-    
-RUN cd e2e && \
+
+COPY index.ts /root/
+
+RUN cat /root/index.ts > e2e/index.ts && \
+    cd e2e && \
     npm run tsc && \
     #Download rh-che
     cd ../ && \
