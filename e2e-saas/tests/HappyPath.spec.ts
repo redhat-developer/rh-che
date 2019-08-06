@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer } from 'e2e';
+import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer, Terminal } from 'e2e';
 import { rhCheContainer,  } from '../inversify.config';
-import { error } from 'selenium-webdriver';
+import { error, Key } from 'selenium-webdriver';
 import * as restClient from 'typed-rest-client/RestClient';
 import { RhCheTestConstants } from '../RhCheTestConstants';
 
@@ -19,6 +19,7 @@ const namespace: string = TestConstants.TS_SELENIUM_USERNAME;
 const sampleName: string = 'console-java-simple';
 const fileFolderPath: string = `${sampleName}/src/main/java/org/eclipse/che/examples`;
 const tabTitle: string = 'HelloWorld.java';
+const codeNavigationClassName: string = 'String.class';
 
 const loginPage: ILoginPage = rhCheContainer.get<ILoginPage>(TYPES.LoginPage);
 const dashboard: Dashboard = rhCheContainer.get(CLASSES.Dashboard);
@@ -28,6 +29,7 @@ const projectTree: ProjectTree = rhCheContainer.get(CLASSES.ProjectTree);
 const editor: Editor = rhCheContainer.get(CLASSES.Editor);
 const topMenu: TopMenu = rhCheContainer.get(CLASSES.TopMenu);
 const quickOpenContainer: QuickOpenContainer = rhCheContainer.get(CLASSES.QuickOpenContainer);
+const terminal: Terminal = rhCheContainer.get(CLASSES.Terminal);
 
 suite('RhChe E2E', async () => {
     suite('Login and wait dashboard', async () => {
@@ -76,7 +78,31 @@ suite('RhChe E2E', async () => {
         test('Expand project and open file in editor', async () => {
             await projectTree.expandPathAndOpenFile(fileFolderPath, tabTitle);
         });
+    });
 
+    suite('Validation of workspace build and run', async () => {
+        test('Build application', async () => {
+            await runTask('che: maven build');
+            await ide.waitNotification('Task 0 has exited with code 0.', 30000);
+            await ide.waitNotificationDisappearance('Task 0 has exited with code 0.', 5, 5000);
+        });
+
+        test('Close the terminal tasks', async () => {
+            await terminal.closeTerminalTab('maven build');
+        });
+
+        test('Run application', async () => {
+            await runTask('che: maven build and run');
+            await ide.waitNotification('Task 1 has exited with code 0.', 30000);
+            await ide.waitNotificationDisappearance('Task 1 has exited with code 0.', 5, 5000);
+        });
+
+        test('Close the terminal tasks', async () => {
+            await terminal.closeTerminalTab('maven build and run');
+        });
+    });
+
+    suite('Language server validation', async () => {
         test('Check "Java Language Server" initialization by suggestion invoking', async () => {
             await ide.closeAllNotifications();
             await editor.waitEditorAvailable(tabTitle);
@@ -88,19 +114,24 @@ suite('RhChe E2E', async () => {
             await editor.waitSuggestion(tabTitle, 'append(CharSequence csq, int start, int end) : PrintStream');
         });
 
-    });
-
-    suite('Validation of workspace build and run', async () => {
-        test('Build application', async () => {
-            await runTask('che: maven build');
-            await ide.waitNotification('Task 0 has exited with code 0.', 30000);
-            await ide.waitNotificationDisappearance('Task 0 has exited with code 0.', 5, 5000);
+        test('Error highlighting', async () => {
+            await editor.type(tabTitle, 'error', 7);
+            await editor.waitErrorInLine(7);
+            await editor.performKeyCombination(tabTitle, Key.chord(Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE));
+            await editor.waitErrorInLineDisappearance(7);
         });
 
-        test('Run application', async () => {
-            await runTask('che: maven build and run');
-            await ide.waitNotification('Task 1 has exited with code 0.', 30000);
-            await ide.waitNotificationDisappearance('Task 1 has exited with code 0.', 5, 5000);
+        test('Autocomplete', async () => {
+            await editor.moveCursorToLineAndChar(tabTitle, 6, 11);
+            await editor.pressControlSpaceCombination(tabTitle);
+            await editor.waitSuggestionContainer();
+            await editor.waitSuggestion(tabTitle, 'System - java.lang');
+        });
+
+        test('Codenavigation', async () => {
+            await editor.moveCursorToLineAndChar(tabTitle, 5, 10);
+            await editor.performKeyCombination(tabTitle, Key.chord(Key.CONTROL, Key.F12));
+            await editor.waitEditorAvailable(codeNavigationClassName);
         });
 
     });
