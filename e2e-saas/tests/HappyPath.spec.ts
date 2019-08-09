@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { TYPES, CLASSES, TestConstants, ILoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer, Terminal } from 'e2e';
+import { TYPES, CLASSES, TestConstants, ICheLoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer, Terminal } from 'e2e';
 import { rhCheContainer,  } from '../inversify.config';
 import { error, Key } from 'selenium-webdriver';
 import * as restClient from 'typed-rest-client/RestClient';
@@ -21,7 +21,7 @@ const fileFolderPath: string = `${sampleName}/src/main/java/org/eclipse/che/exam
 const tabTitle: string = 'HelloWorld.java';
 const codeNavigationClassName: string = 'String.class';
 
-const loginPage: ILoginPage = rhCheContainer.get<ILoginPage>(TYPES.LoginPage);
+const loginPage: ICheLoginPage = rhCheContainer.get<ICheLoginPage>(TYPES.CheLogin);
 const dashboard: Dashboard = rhCheContainer.get(CLASSES.Dashboard);
 const newWorkspace: NewWorkspace = rhCheContainer.get(CLASSES.NewWorkspace);
 const ide: Ide = rhCheContainer.get(CLASSES.Ide);

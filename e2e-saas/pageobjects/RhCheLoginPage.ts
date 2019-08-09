@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { ILoginPage, TYPES, CLASSES, IDriver, TestConstants, DriverHelper } from 'e2e';
+import { ICheLoginPage, TYPES, CLASSES, IDriver, TestConstants, DriverHelper } from 'e2e';
 import { injectable, inject } from 'inversify';
 import { ThenableWebDriver } from 'selenium-webdriver';
 import { By } from 'selenium-webdriver';
@@ -19,7 +19,7 @@ const NEXT_BUTTON_ID : string = 'login-show-step2';
 const LOGIN_BUTTON_ID : string = 'kc-login';
 
 @injectable()
-export class RhCheLoginPage implements ILoginPage {
+export class RhCheLoginPage implements ICheLoginPage {
     constructor(
         @inject(CLASSES.DriverHelper) private readonly driverHelper: DriverHelper,
         @inject(TYPES.Driver) private readonly driver: IDriver) { }

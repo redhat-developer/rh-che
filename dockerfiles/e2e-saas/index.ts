@@ -17,7 +17,7 @@ export * from './pageobjects/dashboard/workspace-details/WorkspaceDetails'
 export * from './pageobjects/dashboard/workspace-details/WorkspaceDetailsPlugins'
 
 //pageobjects - login
-export * from './pageobjects/login/ILoginPage'
+export * from './pageobjects/login/ICheLoginPage'
 export * from './pageobjects/login/SingleUserLoginPage'
 
 //pageobjects - ide  
