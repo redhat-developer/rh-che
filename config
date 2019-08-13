@@ -41,5 +41,3 @@ if [ "$PR_CHECK_BUILD" == "true" ] || [ "$USE_CHE_LATEST_SNAPSHOT" == "true" ]; 
 else
   export RH_TAG_DIST_SUFFIX=fabric8
 fi
-
-export RH_NO_DASHBOARD_SUFFIX=without-dashboard

@@ -22,9 +22,6 @@
         <format>zip</format>
         <format>tar.gz</format>
     </formats>
-    <componentDescriptors>
-        <componentDescriptor>src/assembly/base-component.xml</componentDescriptor>
-    </componentDescriptors>
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
@@ -44,5 +41,45 @@
                 <include>com.redhat.che:fabric8-ide-dashboard-war</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <outputDirectory>tomcat/webapps</outputDirectory>
+            <outputFileNameMapping>api.war</outputFileNameMapping>
+            <includes>
+                <include>com.redhat.che:fabric8-ide-assembly-wsmaster-war</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <outputDirectory>tomcat/webapps</outputDirectory>
+            <outputFileNameMapping>docs.war</outputFileNameMapping>
+            <includes>
+                <include>com.redhat.che:fabric8-ide-docs</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/dependency/eclipse-che-${che.version}</directory>
+            <outputDirectory />
+            <excludes>
+                <exclude>**/tomcat/webapps/ROOT.war</exclude>
+                <exclude>**/tomcat/webapps/api.war</exclude>
+                <exclude>**/lib/ws-agent.tar.gz</exclude>
+                <exclude>**/tomcat/webapps/dashboard.war</exclude>
+                <exclude>**/tomcat/webapps/swagger.war</exclude>
+                <exclude>**/tomcat/webapps/docs.war</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/stacks/</directory>
+            <outputDirectory>stacks/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/assembly/conf</directory>
+            <outputDirectory>tomcat/conf/</outputDirectory>
+        </fileSet>
+    </fileSets>
 </assembly>

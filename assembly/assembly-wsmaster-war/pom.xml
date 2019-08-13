@@ -46,10 +46,6 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.che</groupId>
-            <artifactId>che-plugin-analytics-wsmaster</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.redhat.che</groupId>
             <artifactId>fabric8-cdn-support</artifactId>
         </dependency>
         <dependency>

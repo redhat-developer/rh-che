@@ -37,7 +37,6 @@
         <segment.analytics.client.java.version>2.1.1</segment.analytics.client.java.version>
         <sentry.version>1.7.2</sentry.version>
         <unleash.client.java.version>3.0.0</unleash.client.java.version>
-        <withoutDashboard>false</withoutDashboard>
     </properties>
     <dependencyManagement>
         <dependencies>

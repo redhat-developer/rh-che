@@ -26,6 +26,10 @@ config/
 *.iws
 .idea/
 
+# VSCode #
+##################
+.vscode
+
 # Compiled source #
 ###################
 !*.com/
