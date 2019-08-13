@@ -23,26 +23,15 @@ cd ${DIR}
 
 distPath='assembly/assembly-main/target/eclipse-che-*/eclipse-che-*'
 for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
-  case "$distribution" in
-    ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}-*${RH_NO_DASHBOARD_SUFFIX}*)
-      TAG=${UPSTREAM_TAG}-${RH_TAG_DIST_SUFFIX}-no-dashboard-${RH_CHE_TAG}
-      NIGHTLY=nightly-${RH_TAG_DIST_SUFFIX}-no-dashboard
-      if [ "$PR_CHECK_BUILD" == "true" ]; then
-        TAG=${RH_TAG_DIST_SUFFIX}-no-dashhoard-${RH_PULL_REQUEST_ID}
-      fi
-      ;;
-    ${ABSOLUTE_PATH}/../assembly/assembly-main/target/eclipse-che-${RH_DIST_SUFFIX}*)
-      TAG=${UPSTREAM_TAG}-${RH_TAG_DIST_SUFFIX}-${RH_CHE_TAG}
-      NIGHTLY=nightly-${RH_TAG_DIST_SUFFIX}
-      if [ "$PR_CHECK_BUILD" == "true" ]; then
-        TAG=${RH_TAG_DIST_SUFFIX}-${RH_PULL_REQUEST_ID}
-      fi
-      # File che_image_tag.env will be used by the verification script to
-      # retrieve the image tag to promote to production. That's the only
-      # mechanism we have found to share the tag amongs the two scripts
-      echo 'export CHE_SERVER_DOCKER_IMAGE_TAG='${TAG} >> ~/che_image_tag.env
-      ;;
-  esac
+  TAG=${UPSTREAM_TAG}-${RH_TAG_DIST_SUFFIX}-${RH_CHE_TAG}
+  NIGHTLY=nightly-${RH_TAG_DIST_SUFFIX}
+  if [ "$PR_CHECK_BUILD" == "true" ]; then
+    TAG=${RH_TAG_DIST_SUFFIX}-${RH_PULL_REQUEST_ID}
+  fi
+  # File che_image_tag.env will be used by the verification script to
+  # retrieve the image tag to promote to production. That's the only
+  # mechanism we have found to share the tag amongs the two scripts
+  echo 'export CHE_SERVER_DOCKER_IMAGE_TAG='${TAG} >> ~/che_image_tag.env
 
   # Use of folder
   LOCAL_ASSEMBLY_DIR="${DIR}"/eclipse-che

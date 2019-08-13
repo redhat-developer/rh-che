@@ -33,17 +33,6 @@ cd ${scriptDir}/../
 mkdir $NPM_CONFIG_PREFIX 2>/dev/null
 mvnche -B $* clean install
 if [ $? -ne 0 ]; then
-  echo "Error building che/rh-che with dashboard"
+  echo "Error building che/rh-che"
   exit 1;
 fi
-
-# Che 6: Error building che/rh-che without dashboard - https://github.com/redhat-developer/rh-che/issues/563
-# if [ "$DeveloperBuild" != "true" ]
-#   then
-#     mvnche -B -DwithoutDashboard -pl=:fabric8-ide-assembly-ide-war clean
-#     mvnche -B -DwithoutDashboard -pl=:fabric8-ide-assembly-ide-war,:fabric8-ide-assembly-main $* install
-#     if [ $? -ne 0 ]; then
-#       echo "Error building che/rh-che without dashboard"
-#       exit 1;
-#     fi
-# fi
