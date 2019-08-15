@@ -17,8 +17,15 @@ function installJQ() {
 }
 
 function installEpelRelease() {
-  yum install epel-release --assumeyes
-  yum update --assumeyes
+  if yum repolist | grep epel; then
+    echo "Epel already installed, skipping instalation."
+  else
+    #excluding mirror.ci.centos.org because of bug https://bugs.centos.org/view.php?id=16337
+    echo "exclude=mirror.ci.centos.org" >> /etc/yum/pluginconf.d/fastestmirror.conf
+    echo "Installing epel..."
+    yum install epel-release --assumeyes
+    yum update --assumeyes
+  fi
 }
 
 function installYQ() {
