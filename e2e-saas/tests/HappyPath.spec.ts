@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { TYPES, CLASSES, TestConstants, ICheLoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer, Terminal } from 'e2e';
-import { rhCheContainer,  } from '../inversify.config';
+import { TYPES, CLASSES, TestConstants, ICheLoginPage, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer, Terminal, inversifyConfig } from 'e2e';
 import { error, Key } from 'selenium-webdriver';
 import * as restClient from 'typed-rest-client/RestClient';
 import { RhCheTestConstants } from '../RhCheTestConstants';
+import { Container } from 'inversify';
 
 const workspaceName: string = NameGenerator.generate('wksp-test-', 5);
 const namespace: string = TestConstants.TS_SELENIUM_USERNAME;
@@ -21,15 +21,16 @@ const fileFolderPath: string = `${sampleName}/src/main/java/org/eclipse/che/exam
 const tabTitle: string = 'HelloWorld.java';
 const codeNavigationClassName: string = 'String.class';
 
-const loginPage: ICheLoginPage = rhCheContainer.get<ICheLoginPage>(TYPES.CheLogin);
-const dashboard: Dashboard = rhCheContainer.get(CLASSES.Dashboard);
-const newWorkspace: NewWorkspace = rhCheContainer.get(CLASSES.NewWorkspace);
-const ide: Ide = rhCheContainer.get(CLASSES.Ide);
-const projectTree: ProjectTree = rhCheContainer.get(CLASSES.ProjectTree);
-const editor: Editor = rhCheContainer.get(CLASSES.Editor);
-const topMenu: TopMenu = rhCheContainer.get(CLASSES.TopMenu);
-const quickOpenContainer: QuickOpenContainer = rhCheContainer.get(CLASSES.QuickOpenContainer);
-const terminal: Terminal = rhCheContainer.get(CLASSES.Terminal);
+const e2eContainer: Container = inversifyConfig.e2eContainer;
+const loginPage: ICheLoginPage = e2eContainer.get<ICheLoginPage>(TYPES.CheLogin);
+const dashboard: Dashboard = e2eContainer.get(CLASSES.Dashboard);
+const newWorkspace: NewWorkspace = e2eContainer.get(CLASSES.NewWorkspace);
+const ide: Ide = e2eContainer.get(CLASSES.Ide);
+const projectTree: ProjectTree = e2eContainer.get(CLASSES.ProjectTree);
+const editor: Editor = e2eContainer.get(CLASSES.Editor);
+const topMenu: TopMenu = e2eContainer.get(CLASSES.TopMenu);
+const quickOpenContainer: QuickOpenContainer = e2eContainer.get(CLASSES.QuickOpenContainer);
+const terminal: Terminal = e2eContainer.get(CLASSES.Terminal);
 
 suite('RhChe E2E', async () => {
     suite('Login and wait dashboard', async () => {

@@ -12,6 +12,6 @@ export const RhCheTestConstants = {
     /**
      * User active token to proceed API calls
      */
-    E2E_SAAS_TESTS_USER_TOKEN: process.env.E2E_SAAS_TESTS_USER_TOKEN,
+    E2E_SAAS_TESTS_USER_TOKEN: process.env.E2E_SAAS_TESTS_USER_TOKEN
 
 };
