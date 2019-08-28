@@ -1,0 +1,104 @@
+{
+    "projects": [
+      {
+        "mixins": [],
+        "problems": [],
+        "source": {
+          "location": "https://github.com/openshiftio-vertx-boosters/vertx-http-booster",
+          "type": "git",
+          "parameters": {}
+        },
+        "description": "HTTP Vert.x Booster",
+        "name": "vertx-http-booster",
+        "type": "maven",
+        "path": "/vertx-http-booster",
+        "attributes": {
+          "language": [
+            "java"
+          ]
+        }
+      }
+    ],
+    "commands": [
+      {
+        "commandLine": "scl enable rh-maven33 'mvn compile vertx:debug -f ${current.project.path} -Dvertx.disableDnsResolver=true'",
+        "name": "debug",
+        "type": "custom",
+        "attributes": {
+          "goal": "Debug",
+          "previewUrl": "${server.8080/tcp}"
+        }
+      },
+      {
+        "commandLine": "scl enable rh-maven33 'mvn compile vertx:run -f ${current.project.path} -Dvertx.disableDnsResolver=true'",
+        "name": "run",
+        "type": "custom",
+        "attributes": {
+          "goal": "Run",
+          "previewUrl": "${server.8080/tcp}"
+        }
+      },
+      {
+        "commandLine": "scl enable rh-maven33 'mvn clean install -f ${current.project.path}'",
+        "name": "build",
+        "type": "mvn",
+        "attributes": {
+          "goal": "Build",
+          "previewUrl": ""
+        }
+      },
+      {
+        "commandLine": "mvn -Duser.home=${HOME} -f ${CHE_PROJECTS_ROOT}/vertx-http-booster clean package",
+        "name": "vertx-http-booster:build",
+        "type": "mvn",
+        "attributes": {
+          "goal": "Build",
+          "previewUrl": ""
+        }
+      },
+      {
+        "commandLine": "mvn -Duser.home=${HOME} -f ${CHE_PROJECTS_ROOT}/vertx-http-booster vertx:run",
+        "name": "vertx-http-booster:run",
+        "type": "mvn",
+        "attributes": {
+          "goal": "Run",
+          "previewUrl": "${server.8080/tcp}"
+        }
+      }
+    ],
+    "defaultEnv": "default",
+    "environments": {
+      "default": {
+        "recipe": {
+          "type": "dockerimage",
+          "content": "quay.io/openshiftio/che-vertx"
+        },
+        "machines": {
+          "dev-machine": {
+            "servers": {
+              "8080/tcp": {
+                "protocol": "http",
+                "port": "8080",
+                "attributes": {}
+              }
+            },
+            "volumes": {},
+            "installers": [
+              "com.redhat.oc-login",
+              "com.redhat.bayesian.lsp",
+              "org.eclipse.che.ls.java",
+              "org.eclipse.che.ws-agent",
+              "org.eclipse.che.exec",
+              "org.eclipse.che.terminal"
+            ],
+            "env": {},
+            "attributes": {
+              "memoryLimitBytes": "2147483648"
+            }
+          }
+        }
+      }
+    },
+    "name": "WORKSPACE_NAME",
+    "attributes": {}
+  }

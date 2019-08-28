@@ -1,0 +1,10 @@
+{
+  "jsonrpc": "2.0",
+  "method": "user.login",
+  "params": {
+    "user": "",
+    "password": ""
+  },
+  "id": 0,
+  "auth": null
+}

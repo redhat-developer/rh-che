@@ -1,0 +1,70 @@
+{
+  "projects": [
+    {
+      "mixins": [],
+      "problems": [],
+      "description": "Simple NodeJS Project.",
+      "source": {
+        "location": "https://github.com/che-samples/web-nodejs-sample.git",
+        "type": "git",
+        "parameters": {}
+      },
+      "name": "nodejs-hello-world",
+      "type": "node-js",
+      "path": "/nodejs-hello-world",
+      "attributes": {
+        "language": [
+          "javascript"
+        ]
+      }
+    }
+  ],
+  "commands": [
+    {
+      "commandLine": "echo ${CHE_OSO_CLUSTER//api/console}",
+      "name": "Get OpenShift Console URL",
+      "type": "custom",
+      "attributes": {}
+    },
+    {
+      "commandLine": "cd ${current.project.path} \n node .",
+      "name": "nodejs-hello-world:run",
+      "type": "custom",
+      "attributes": {
+        "goal": "Run",
+        "previewUrl": "${server.3000/tcp}"
+      }
+    }
+  ],
+  "defaultEnv": "default",
+  "environments": {
+    "default": {
+      "recipe": {
+        "contentType": "application/x-yaml",
+        "type": "openshift",
+        "content": "kind: List\nitems:\n - \n  apiVersion: v1\n  kind: Pod\n  metadata:\n   name: ws\n  spec:\n   containers:\n    - \n     image: 'eclipse/che-dev:nightly'\n     name: dev\n     resources:\n      limits:\n       memory: 512Mi\n"
+      },
+      "machines": {
+        "ws/dev": {
+          "servers": {},
+          "volumes": {
+            "projects": {
+              "path": "/projects"
+            }
+          },
+          "installers": [],
+          "env": {},
+          "attributes": {
+            "memoryLimitBytes": "536870912"
+          }
+        }
+      }
+    }
+  },
+  "name": "WORKSPACE_NAME",
+  "attributes": {
+    "plugins": "eclipse/che-machine-exec-plugin/0.0.1",
+    "persistVolumes": "false",
+    "editor": "eclipse/che-theia/next"
+  }
+}
