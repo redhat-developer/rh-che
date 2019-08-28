@@ -1,5 +1,5 @@
 def ACTIVE_USER_TOKENS_RAW
-def RELATIVE_PATH = "che-start-workspace"
+def RELATIVE_PATH = ".ci/workspace-startup"
 def PROPERTIES_FILE = "users.properties"
 def EXPORT_FILE = "exports"
 def TOKENS_FILE = "tokens.txt"

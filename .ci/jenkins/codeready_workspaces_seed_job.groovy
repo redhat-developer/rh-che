@@ -10,9 +10,9 @@ worksapceStartupNames.each { workspaceStartupJobName ->
       cpsScm {
         scm {
           git {
-            remote { url('https://www.github.com/ScrewTSW/che-functional-tests.git') }
-            branches('*/feature-migrate-jobs-to-crew-jenkins')
-            scriptPath('che-start-workspace/' + "${workspaceStartupJobName}" + '.groovy')
+            remote { url('https://www.github.com/ScrewTSW/rh-che.git') }
+            branches('*/548-feature-use-jenkins-job-dsl-for-osioperf-jobs')
+            scriptPath('.ci/workspace-startup/' + "${workspaceStartupJobName}" + '.groovy')
             extensions { }
           }
         }
@@ -64,9 +64,9 @@ pipelineJob("${workspaceStartupReporterJobName}") {
     cpsScm {
       scm {
         git {
-          remote { url('https://www.github.com/ScrewTSW/che-functional-tests.git') }
-          branches('*/518-feature-implement-slack-reporter-for-zabbix-startup-data')
-          scriptPath('che-start-workspace/' + "${workspaceStartupReporterJobName}" + '.groovy')
+            remote { url('https://www.github.com/ScrewTSW/rh-che.git') }
+            branches('*/548-feature-use-jenkins-job-dsl-for-osioperf-jobs')
+          scriptPath('.ci/workspace-startup/' + "${workspaceStartupReporterJobName}" + '.groovy')
           extensions { }
         }
       }
@@ -119,7 +119,7 @@ mountVolumeNames.each { mountVolumeJobName ->
           git {
             remote { url('https://www.github.com/ScrewTSW/rh-che.git') }
             branches('*/548-feature-use-jenkins-job-dsl-for-osioperf-jobs')
-            scriptPath("${mountVolumeJobName}" + '.groovy')
+            scriptPath('.ci/mount-volume/mount_volume_job.groovy')
             extensions { }
           }
         }

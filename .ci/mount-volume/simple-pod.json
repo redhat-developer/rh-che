@@ -1,0 +1,50 @@
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "simple-pod",
+    "creationTimestamp": null,
+    "labels": {
+      "name": "simple-pod"
+    }
+  },
+  "spec": {
+    "containers": [
+      {
+        "name": "simple-pod",
+        "image": "registry.devshift.net/che/centos_jdk8",
+        "ports": [
+          {
+            "containerPort": 8080,
+            "protocol": "TCP"
+          }
+        ],
+        "resources": {},
+        "volumeMounts": [
+          {
+            "name":"che-pvc",
+            "mountPath":"/data"
+          }
+        ],
+        "terminationMessagePath": "/dev/termination-log",
+        "imagePullPolicy": "IfNotPresent",
+        "capabilities": {},
+        "securityContext": {
+          "capabilities": {},
+          "privileged": false
+        }
+      }
+    ],
+    "volumes": [
+      {
+        "name":"che-pvc",
+        "persistentVolumeClaim": {
+        }
+      }
+    ],
+    "restartPolicy": "Always",
+    "dnsPolicy": "ClusterFirst",
+    "serviceAccount": ""
+  },
+  "status": {}
+}

@@ -21,14 +21,14 @@ pipeline {
         }
         stage ("Build zabbix reporter java application") {
             steps {
-                dir ("che-start-workspace/start-workspace-reporter") {
+                dir (".ci/workspace-startup/start-workspace-reporter") {
                     sh "mvn clean install package"
                 }
             }
         }
         stage ("Run zabbix reporter") {
             steps {
-                dir ("che-start-workspace/start-workspace-reporter/target") {
+                dir (".ci/workspace-startup/start-workspace-reporter/target") {
                     sh '#!/bin/sh -e\n' + "ZABBIX_USERNAME=${ZABBIX_REPORTER_USER} ZABBIX_PASSWORD=${ZABBIX_REPORTER_PASSWORD} ZABBIX_URL=${ZABBIX_URL} SLACK_URL=${SLACK_URL} SLACK_CHANNEL=${SLACK_CHANNEL} java -jar start-workspace-reporter-1.0-SNAPSHOT-jar-with-dependencies.jar"
                 }
             }
