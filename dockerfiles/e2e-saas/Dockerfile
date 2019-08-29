@@ -11,18 +11,16 @@ ENV LANG=en_US.utf8 \
     DISPLAY=:99 \
     FABRIC8_USER_NAME=fabric8
 
-COPY index.ts /root/
-
-RUN cat /root/index.ts > e2e/index.ts && \
-    cd e2e && \
-    npm run tsc && \
+# currently in tmp/e2e
+RUN npm run tsc && \
+    apt-get install -y git && \
     #Download rh-che
     cd ../ && \
     git clone https://github.com/redhat-developer/rh-che.git && \
     cd rh-che/e2e-saas && \
     npm --silent i
     
-WORKDIR /root/
-COPY docker-entrypoint.sh /root/
+WORKDIR /tmp/
+COPY docker-entrypoint.sh /tmp/
 
-ENTRYPOINT ["/root/docker-entrypoint.sh"]
+ENTRYPOINT ["/tmp/docker-entrypoint.sh"]

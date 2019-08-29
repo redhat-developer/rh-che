@@ -115,7 +115,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
     curl --silent -f -lSL https://index.docker.io/v1/repositories/eclipse/che-e2e/tags/${version} > /dev/null
     RESULT=$?
     if [[ $RESULT != 0 ]]; then
-      echo "Could not found Che test image with tag ${versin}. Building own RH-Che image based on Che image with nightly tag."
+      echo "Could not found Che test image with tag ${version}. Building own RH-Che image based on Che image with nightly tag."
       docker build --build-arg TAG=nightly -t e2e_tests dockerfiles/e2e-saas
       rhche_image=e2e_tests
     else
