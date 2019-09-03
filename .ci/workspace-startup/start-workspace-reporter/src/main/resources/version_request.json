@@ -1,7 +1,0 @@
-{
-  "jsonrpc":"2.0",
-  "method":"apiinfo.version",
-  "id":0,
-  "auth":null,
-  "params":{}
-}

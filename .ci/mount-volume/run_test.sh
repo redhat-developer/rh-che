@@ -34,11 +34,8 @@ while getopts "hu:p:r:v:z:t:i:f" opt; do
 done
 checkParams
 
-chmod +x simple-pod.sh
-
 #login and choose right project
-chrlen=$((${#USERNAME}-3))
-echo "running tests with user: ${USERNAME:0:3} ${USERNAME:3:$chrlen}"
+echo "running tests with user: ${USERNAME}"
 
 if ! (oc login $URL -u $USERNAME -p $PASSWORD) ; then 
   echo "Can not login - please check credentials."

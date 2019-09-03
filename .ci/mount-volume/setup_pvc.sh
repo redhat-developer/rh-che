@@ -33,7 +33,7 @@ else
   echo "Waiting for max $ATTEMPT_TIMEOUT seconds for pod to start."
   waitForPod "Start" "$POD_NAME"
 
-  echo "Clonning project from https://github.com/angular/quickstart.git."
+  echo "Cloning project from https://github.com/angular/quickstart.git."
   oc exec $POD_NAME -- git clone https://github.com/angular/quickstart.git /data/quickstart
   if [[ $? != 0 ]]; then 
     echo "Project could not be cloned. Cleaning environment and finishing tests."

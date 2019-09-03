@@ -1,21 +1,22 @@
 String seedJobName = 'osio_ci_seed_job'
-String[] worksapceStartupNames = ['workspace-startup-test-ephemeral', 'workspace-startup-test']
+String[] workspaceStartupNames = ['workspace-startup-test-ephemeral', 'workspace-startup-test']
 String workspaceStartupReporterJobName = 'workspace-startup-reporter'
 String[] mountVolumeNames = ['mount-volume-preview-2a', 'mount-volume-preview-2a-large', 'mount-volume-production-2']
 
-worksapceStartupNames.each { workspaceStartupJobName ->
+workspaceStartupNames.each { workspaceStartupJobName ->
   pipelineJob("${workspaceStartupJobName}") {
     concurrentBuild(false)
     definition {
       cpsScm {
         scm {
           git {
-            remote { url('https://www.github.com/ScrewTSW/rh-che.git') }
-            branches('*/548-feature-use-jenkins-job-dsl-for-osioperf-jobs')
+            remote { url('https://www.github.com/redhat-developer/rh-che.git') }
+            branches('*/master')
             scriptPath('.ci/workspace-startup/' + "${workspaceStartupJobName}" + '.groovy')
             extensions { }
           }
         }
+        lightweight(true)
       }
     }
     parameters {
@@ -23,10 +24,10 @@ worksapceStartupNames.each { workspaceStartupJobName ->
       stringParam('ZABBIX_PORT', '10051', 'A port of Zabbix server used by zabbix_sender utility')
       stringParam('CYCLES_COUNT', '1', 'Number of runs per user')
       stringParam('PIPELINE_TIMEOUT', '13', 'Job timeout in minutes')
-      stringParam('START_SOFT_FAILURE_TIMEOUT', '60', 'Time in seconds after which the workspace startup is considered failed (didn\'t meet requirements)')
-      stringParam('START_HARD_FAILURE_TIMEOUT', '300', 'Hard timeout for workspace startup (workspace failed to start)')
-      stringParam('STOP_SOFT_FAILURE_TIMEOUT', '5', 'Time in seconds after which the workspace stop is considered failed (didn\'t meet requirements)')
-      stringParam('STOP_HARD_FAILURE_TIMEOUT', '120', 'Hard timeout for workspace stop (workspace failed to stop)')
+      stringParam('START_SOFT_FAILURE_TIMEOUT', '60', 'Time in seconds at which workspace should start')
+      stringParam('START_HARD_FAILURE_TIMEOUT', '300', 'Hard timeout in seconds for workspace startup (workspace failed to start)')
+      stringParam('STOP_SOFT_FAILURE_TIMEOUT', '5', 'Time in seconds at which workspace should be stopped')
+      stringParam('STOP_HARD_FAILURE_TIMEOUT', '120', 'Hard timeout in seconds for workspace stop (workspace failed to stop)')
       credentialsParam('USERS_PROPERTIES_FILE_ID'){
         type('org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl')
         required()
@@ -38,7 +39,7 @@ worksapceStartupNames.each { workspaceStartupJobName ->
       buildDiscarder {
         strategy {
           logRotator {
-            daysToKeepStr('3')
+            daysToKeepStr('7')
             numToKeepStr('')
             artifactDaysToKeepStr('')
             artifactNumToKeepStr('')
@@ -60,12 +61,13 @@ worksapceStartupNames.each { workspaceStartupJobName ->
 }
 
 pipelineJob("${workspaceStartupReporterJobName}") {
+  concurrentBuild(false)
   definition {
     cpsScm {
       scm {
         git {
-            remote { url('https://www.github.com/ScrewTSW/rh-che.git') }
-            branches('*/548-feature-use-jenkins-job-dsl-for-osioperf-jobs')
+            remote { url('https://www.github.com/redhat-developer/rh-che.git') }
+            branches('*/master')
           scriptPath('.ci/workspace-startup/' + "${workspaceStartupReporterJobName}" + '.groovy')
           extensions { }
         }
@@ -117,12 +119,13 @@ mountVolumeNames.each { mountVolumeJobName ->
       cpsScm {
         scm {
           git {
-            remote { url('https://www.github.com/ScrewTSW/rh-che.git') }
-            branches('*/548-feature-use-jenkins-job-dsl-for-osioperf-jobs')
+            remote { url('https://www.github.com/redhat-developer/rh-che.git') }
+            branches('*/master')
             scriptPath('.ci/mount-volume/mount_volume_job.groovy')
             extensions { }
           }
         }
+        lightweight(true)
       }
     }
     parameters {
@@ -158,11 +161,11 @@ mountVolumeNames.each { mountVolumeJobName ->
 }
 
 listView('OSIO_CI') {
-  description('Test view for learning DSL')
+  description('Rh-Che tests that can\'t be running on ci.centos.org because they are using JobDSL.')
   filterBuildQueue()
   filterExecutors()
   jobs {
-    for (jobName in worksapceStartupNames
+    for (jobName in workspaceStartupNames
     .plus(seedJobName)
     .plus(workspaceStartupReporterJobName)
     .plus(mountVolumeNames)) {

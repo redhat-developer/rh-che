@@ -5,7 +5,7 @@ pipeline {
         PASSWORD = ""
     }
     stages {
-        stage ("Prepairing environment") {
+        stage ("Preparing environment") {
             steps {
                 withCredentials([usernameColonPassword(credentialsId: '${MOUNT_VOLUME_ACCOUNT_CREDENTIALS_ID}', variable: 'USERPASS')]) {
                     script {
@@ -28,5 +28,4 @@ pipeline {
             }
         }
     }
-    
 }
