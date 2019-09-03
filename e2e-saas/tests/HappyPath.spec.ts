@@ -40,7 +40,7 @@ suite('RhChe E2E', async () => {
         });
     });
 
-    suite('Create and run workspace', async () => {
+    suite('Create and run workspace ' + workspaceName, async () => {
         test(`Open 'New Workspace' page`, async () => {
             await newWorkspace.openPageByUI();
         });
@@ -76,34 +76,14 @@ suite('RhChe E2E', async () => {
             }
         });
 
+    });
+
+    suite.skip('Language server validation', async () => {
         test('Expand project and open file in editor', async () => {
+            console.log('fileFolderPath ' + fileFolderPath);
             await projectTree.expandPathAndOpenFile(fileFolderPath, tabTitle);
         });
-    });
 
-    suite('Validation of workspace build and run', async () => {
-        test('Build application', async () => {
-            await runTask('che: maven build');
-            await ide.waitNotification('Task 0 has exited with code 0.', 30000);
-            await ide.waitNotificationDisappearance('Task 0 has exited with code 0.', 5, 5000);
-        });
-
-        test('Close the terminal tasks', async () => {
-            await terminal.closeTerminalTab('maven build');
-        });
-
-        test('Run application', async () => {
-            await runTask('che: maven build and run');
-            await ide.waitNotification('Task 1 has exited with code 0.', 30000);
-            await ide.waitNotificationDisappearance('Task 1 has exited with code 0.', 5, 5000);
-        });
-
-        test('Close the terminal tasks', async () => {
-            await terminal.closeTerminalTab('maven build and run');
-        });
-    });
-
-    suite('Language server validation', async () => {
         test('Check "Java Language Server" initialization by suggestion invoking', async () => {
             await ide.closeAllNotifications();
             await editor.waitEditorAvailable(tabTitle);
@@ -112,7 +92,7 @@ suite('RhChe E2E', async () => {
             await editor.waitTabFocused(tabTitle);
             await editor.moveCursorToLineAndChar(tabTitle, 6, 20);
             await editor.pressControlSpaceCombination(tabTitle);
-            await editor.waitSuggestion(tabTitle, 'append(CharSequence csq, int start, int end) : PrintStream');
+            await editor.waitSuggestion(tabTitle, 'append(char c) : PrintStream');
         });
 
         test('Error highlighting', async () => {
@@ -135,6 +115,28 @@ suite('RhChe E2E', async () => {
             await editor.waitEditorAvailable(codeNavigationClassName);
         });
 
+    });
+
+    suite('Validation of workspace build and run', async () => {
+        test('Build application', async () => {
+            let taskName: string = 'che: maven build';
+            await runTask(taskName);
+            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 30000);
+        });
+
+        test('Close the terminal tasks', async () => {
+            await terminal.closeTerminalTab('maven build');
+        });
+
+        test('Run application', async () => {
+            let taskName: string = 'che: maven build and run';
+            await runTask(taskName);
+            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 30000);
+        });
+
+        test('Close the terminal tasks', async () => {
+            await terminal.closeTerminalTab('maven build and run');
+        });
     });
 
     suite('Stop and remove workspace', async () => {

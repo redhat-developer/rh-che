@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import { Container } from 'inversify';
-import { TYPES, ICheLoginPage, ITestWorkspaceUtil } from 'e2e';
+import { TYPES, ICheLoginPage, ITestWorkspaceUtil, CLASSES } from 'e2e';
 import { RhCheLoginPage } from '../pageobjects/RhCheLoginPage';
+import { RhCheProjectTree } from '../pageobjects/RhCheProjectTree';
 import { RhCheTestWorkspaceUtils } from '../utils/RhCheTestWorkspaceUtils';
 import * as path from 'path';
 
@@ -23,6 +24,9 @@ export function getContainer(): Container {
 
     e2eContainer.unbind(TYPES.WorkspaceUtil);
     e2eContainer.bind<ITestWorkspaceUtil>(TYPES.WorkspaceUtil).to(RhCheTestWorkspaceUtils).inSingletonScope();
+
+    e2eContainer.unbind(CLASSES.ProjectTree);
+    e2eContainer.bind(CLASSES.ProjectTree).to(RhCheProjectTree).inSingletonScope();
 
     return e2eContainer;
 }

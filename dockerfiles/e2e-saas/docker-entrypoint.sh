@@ -98,8 +98,30 @@ export TS_SELENIUM_USERNAME=$USERNAME
 export TS_SELENIUM_PASSWORD=$PASSWORD
 export TS_SELENIUM_BASE_URL=$URL
 
-echo "Starting chromedriver"
-chromedriver &
+# Launch selenium server
+/usr/bin/supervisord --configuration /etc/supervisord.conf & \
+export TS_SELENIUM_REMOTE_DRIVER_URL=http://localhost:4444/wd/hub
+
+# Check selenium server launching
+expectedStatus=200
+currentTry=1
+maximumAttempts=5
+
+while [ $(curl -s -o /dev/null -w "%{http_code}" --fail http://localhost:4444/wd/hub/status) != $expectedStatus ];
+do
+  if (( currentTry > maximumAttempts ));
+  then
+    status=$(curl -s -o /dev/null -w "%{http_code}" --fail http://localhost:4444/wd/hub/status)
+    echo "Exceeded the maximum number of checking attempts,"
+    echo "selenium server status is '$status' and it is different from '$expectedStatus'";
+    exit 1;
+  fi;
+
+  echo "Wait selenium server availability ..."
+
+  curentTry=$((curentTry + 1))
+  sleep 1
+done
 
 echo "Running Xvfb"
 /usr/bin/Xvfb :1 -screen 0 1920x1080x24 +extension RANDR > /dev/null 2>&1 &
@@ -107,9 +129,8 @@ echo "Running Xvfb"
 x11vnc -display :1.0 > /dev/null 2>&1 &
 export DISPLAY=:1.0
 
-
 # ------------------------------------------------------------------------------------------
-#-------------- -------------------- RUN TESTS ---------------------------------------------
+#----------------------------------- RUN TESTS ---------------------------------------------
 # ------------------------------------------------------------------------------------------
 
 echo
@@ -119,7 +140,7 @@ echo "**************************************************************"
 echo
 
 hostname=$(hostname -I)
-echo "You can wath localy using VNC with IP: ${hostname}:0"
+echo "You can watch localy using VNC with IP: ${hostname}:0"
 
 if mount | grep 'local_tests'; then
 	echo "The local scripts are mounted. Executing local scripts."
@@ -129,7 +150,6 @@ if mount | grep 'local_tests'; then
 	sed -i '/e2e/d' package.json 
 	npm --silent i
 	echo "Local scripts successfully built."
-	ls
 else
 	cd e2e-saas
 fi
