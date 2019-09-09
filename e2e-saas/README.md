@@ -28,7 +28,16 @@ The tests are end-to-end tests that should represent Happy path through a produc
 
 - Login
 - Create Che 7 workspace based on Java Maven devfile with console-java-simple project
-- Start and open workspace
+- Create and open workspace
 - Open file in editor
+- Build application
+- Close the terminal task
+- Run application
+- Close the terminal tesk
+- Check Java Language Server
+  - Check suggestion invoking
+  - Error highlighting
+  - Autocomplete
+  - Codenavigation
 - Stop workspace
 - Delete workspace
