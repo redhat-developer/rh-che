@@ -78,13 +78,19 @@ suite('RhChe E2E', async () => {
 
     });
 
-    suite.skip('Language server validation', async () => {
+    suite('Language server validation', async () => {
         test('Expand project and open file in editor', async () => {
-            console.log('fileFolderPath ' + fileFolderPath);
-            await projectTree.expandPathAndOpenFile(fileFolderPath, tabTitle);
+            await projectTree.expandPathAndOpenFileInAssociatedWorkspace(fileFolderPath, tabTitle);
+            await editor.selectTab(tabTitle);
         });
 
-        test('Check "Java Language Server" initialization by suggestion invoking', async () => {
+        test('Java LS initialization', async () => {
+            await ide.checkLsInitializationStart('Starting Java Language Server');
+            await ide.waitStatusBarTextAbsence('Starting Java Language Server', 1800000);
+            await ide.waitStatusBarTextAbsence('Building workspace', 360000);
+        });
+
+        test('Suggestion invoking', async () => {
             await ide.closeAllNotifications();
             await editor.waitEditorAvailable(tabTitle);
             await editor.clickOnTab(tabTitle);
