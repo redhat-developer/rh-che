@@ -30,21 +30,19 @@ public class HttpYamlDownloaderTest {
   private final String EDITOR_PLUGIN_PUBLISHER = "eclipse";
   private final String EDITOR_PLUGIN_TYPE = "Che Editor";
   private final String EDITOR_CONTAINER_NAME = "theia-ide";
-  private final String PROD_EDITOR_CONTAINER_IMAGE = "eclipse/che-theia:next";
-  private final String PREVIEW_EDITOR_CONTAINER_IMAGE = "docker.io/eclipse/che-theia:next";
+  private final String EDITOR_CONTAINER_IMAGE = "docker.io/eclipse/che-theia:next";
 
   @Test
   public void getYamlResponseAndParseOnProd() throws URISyntaxException, IOException {
-    getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD, PROD_EDITOR_CONTAINER_IMAGE);
+    getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD);
   }
 
   @Test
   public void getYamlResponseAndParseOnProdPreview() throws URISyntaxException, IOException {
-    getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD_PREVIEW, PREVIEW_EDITOR_CONTAINER_IMAGE);
+    getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD_PREVIEW);
   }
 
-  private void getYamlResponseAndParse(
-      final String editorPluginUrl, final String editorContainerImage)
+  private void getYamlResponseAndParse(final String editorPluginUrl)
       throws URISyntaxException, IOException {
     HttpYamlDownloader httpYamlDownloader = new HttpYamlDownloader();
     PluginMeta pluginMeta = httpYamlDownloader.getYamlResponseAndParse(new URI(editorPluginUrl));
@@ -59,6 +57,7 @@ public class HttpYamlDownloaderTest {
 
     Container container = containers.get(0);
     assertEquals(container.getName(), EDITOR_CONTAINER_NAME, "Editor container name is incorrect");
-    assertEquals(container.getImage(), editorContainerImage, "Editor container image is incorrect");
+    assertEquals(
+        container.getImage(), EDITOR_CONTAINER_IMAGE, "Editor container image is incorrect");
   }
 }
