@@ -146,25 +146,23 @@ else
   
   #PRODUCTION
   if [[ "$HOST_URL" == "che.openshift.io" ]]; then
-    echo "Running test with user $USERNAME against production environment."
-    CHE_OSIO_AUTH_ENDPOINT="https://auth.openshift.io"
-
-    docker run --name functional-tests-dep --privileged \
-               -v /var/run/docker.sock:/var/run/docker.sock \
-               -v /root/payload/logs:/root/logs \
-               -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
-               -e "RHCHE_ACC_USERNAME=$USERNAME" \
-               -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
-               -e "RHCHE_ACC_EMAIL=$EMAIL" \
-               -e "CHE_OSIO_AUTH_ENDPOINT=$CHE_OSIO_AUTH_ENDPOINT" \
-               -e "RHCHE_HOST_URL=$HOST_URL" \
-               -e "TEST_SUITE=$TEST_SUITE" \
-               -e "OPENSHIFT_URL=$OC_CLUSTER_URL" \
-               -e "OPENSHIFT_USERNAME=$USERNAME"  \
-               -e "OPENSHIFT_PASSWORD=$PASSWORD" \
-               --shm-size=256m \
-             quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
-      RESULT=$?
+    TAG=$(getVersionFromProd)
+    echo "Running test with user $USERNAME against prod environment with version $TAG."
+  
+    path="$(pwd)"
+    mkdir report
+    
+    docker run \
+      -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
+      -e USERNAME=$USERNAME \
+      -e PASSWORD=$PASSWORD \
+      -e URL=https://$HOST_URL \
+      --shm-size=256m \
+    quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
+    RESULT=$?
+      
+    mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
+    cp -r ./report/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
     
   #PROD-PREVIEW
   else

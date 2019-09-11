@@ -23,6 +23,7 @@ export class RhCheProjectTree extends ProjectTree {
     }
     /* tslint:enable */
 
+    /* This is workaround for issue: https://github.com/redhat-developer/rh-che/issues/1598 it is fixed in upstream from 7.2.0 */
     async expandPathAndOpenFile(pathToItem: string, fileName: string, timeout: number = TestConstants.TS_SELENIUM_DEFAULT_TIMEOUT) {
 
         console.log('In Rh-CHe Project tree method expandPathAndOpenFile');
