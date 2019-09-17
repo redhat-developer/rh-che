@@ -5,6 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "test-java-maven": "npm run lint && npm run tsc && mocha --opts mocha-java-maven.opts",
+    "test-java-vertx": "npm run lint && npm run tsc && mocha --opts mocha-java-vertx.opts",
+    "test-all": "npm run lint && npm run tsc && mocha --opts mocha-all.opts",
     "tsc": "rm -rf dist && tsc -p .",
     "lint": "tslint --fix -p .",
     "test_without_lint": "npm run tsc && mocha --opts mocha.opts"

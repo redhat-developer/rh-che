@@ -2,4 +2,4 @@
 --reporter 'node_modules/e2e/dist/driver/CheReporter.js'
 -u tdd
 --spec ./dist/tests/login/Login.spec.js
---spec ./dist/tests/JavaMaven.spec.js
+--spec ./dist/tests/JavaVertx.spec.js

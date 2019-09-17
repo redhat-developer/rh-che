@@ -7,21 +7,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
+import { NameGenerator, TestConstants, CLASSES, inversifyConfig, Dashboard, NewWorkspace, Ide, ProjectTree, Editor, TopMenu, QuickOpenContainer, Terminal } from 'e2e';
 import 'reflect-metadata';
-import { CLASSES, TestConstants, Dashboard, Editor, Ide, NameGenerator , NewWorkspace, ProjectTree, TopMenu, QuickOpenContainer, Terminal, inversifyConfig } from 'e2e';
 import { error, Key } from 'selenium-webdriver';
 import * as restClient from 'typed-rest-client/RestClient';
 import { RhCheTestConstants } from '../RhCheTestConstants';
-import { Container } from 'inversify';
 
 const workspaceName: string = NameGenerator.generate('wksp-test-', 5);
 const namespace: string = TestConstants.TS_SELENIUM_USERNAME;
-const sampleName: string = 'console-java-simple';
-const fileFolderPath: string = `${sampleName}/src/main/java/org/eclipse/che/examples`;
-const tabTitle: string = 'HelloWorld.java';
-const codeNavigationClassName: string = 'String.class';
+const sampleName: string = 'java-web-vertx';
+const fileFolderPath: string = `${sampleName}/src/main/java/io/vertx/examples/spring`;
+const tabTitle: string = 'SpringExampleRunner.java';
+const codeNavigationClassName: string = 'ApplicationContext.class';
 
-const e2eContainer: Container = inversifyConfig.e2eContainer;
+const e2eContainer = inversifyConfig.e2eContainer;
 const dashboard: Dashboard = e2eContainer.get(CLASSES.Dashboard);
 const newWorkspace: NewWorkspace = e2eContainer.get(CLASSES.NewWorkspace);
 const ide: Ide = e2eContainer.get(CLASSES.Ide);
@@ -31,16 +30,15 @@ const topMenu: TopMenu = e2eContainer.get(CLASSES.TopMenu);
 const quickOpenContainer: QuickOpenContainer = e2eContainer.get(CLASSES.QuickOpenContainer);
 const terminal: Terminal = e2eContainer.get(CLASSES.Terminal);
 
-suite('RhChe E2E Java Maven test', async () => {
-    suite('Create and run workspace ' + workspaceName, async () => {
-        test(`Open 'New Workspace' page`, async () => {
+suite('RhChe E2E Java Vert.x test', async () => {
+    suite('Create Java Vert.x workspace ' + workspaceName, async () => {
+        test('Open \'New Workspace\' page', async () => {
             await newWorkspace.openPageByUI();
         });
 
         test('Create and open workspace', async () => {
-            await newWorkspace.createAndOpenWorkspace(workspaceName, 'Java Maven');
+            await newWorkspace.createAndOpenWorkspace(workspaceName, 'Java Vert.x');
         });
-
     });
 
     suite('Work with IDE', async () => {
@@ -88,52 +86,44 @@ suite('RhChe E2E Java Maven test', async () => {
             await editor.clickOnTab(tabTitle);
             await editor.waitEditorAvailable(tabTitle);
             await editor.waitTabFocused(tabTitle);
-            await editor.moveCursorToLineAndChar(tabTitle, 6, 20);
+            await editor.moveCursorToLineAndChar(tabTitle, 19, 11);
             await editor.pressControlSpaceCombination(tabTitle);
-            await editor.waitSuggestion(tabTitle, 'append(char c) : PrintStream');
+            await editor.waitSuggestion(tabTitle, 'cancelTimer(long arg0) : boolean');
         });
 
         test('Error highlighting', async () => {
-            await editor.type(tabTitle, 'error', 7);
-            await editor.waitErrorInLine(7);
+            await editor.type(tabTitle, 'error', 21);
+            await editor.waitErrorInLine(21);
             await editor.performKeyCombination(tabTitle, Key.chord(Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE));
-            await editor.waitErrorInLineDisappearance(7);
+            await editor.waitErrorInLineDisappearance(21);
         });
 
         test('Autocomplete', async () => {
-            await editor.moveCursorToLineAndChar(tabTitle, 6, 11);
+            await editor.moveCursorToLineAndChar(tabTitle, 18, 15);
             await editor.pressControlSpaceCombination(tabTitle);
             await editor.waitSuggestionContainer();
-            await editor.waitSuggestion(tabTitle, 'System - java.lang');
+            await editor.waitSuggestion(tabTitle, 'Vertx - io.vertx.core');
         });
 
         test('Codenavigation', async () => {
-            await editor.moveCursorToLineAndChar(tabTitle, 5, 10);
+            await editor.moveCursorToLineAndChar(tabTitle, 17, 15);
             await editor.performKeyCombination(tabTitle, Key.chord(Key.CONTROL, Key.F12));
             await editor.waitEditorAvailable(codeNavigationClassName);
         });
 
     });
 
-    suite('Validation of workspace build and run', async () => {
+    suite('Validation of project build', async () => {
         test('Build application', async () => {
             let taskName: string = 'che: maven build';
             await runTask(taskName);
-            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 30000);
+            // uncomment in version higner then 7.1.0 or try to use upstream test, both should be same
+            // await quickOpenContainer.clickOnContainerItem('Continue without scanning the task output');
+            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 60000);
         });
 
         test('Close the terminal tasks', async () => {
             await terminal.closeTerminalTab('maven build');
-        });
-
-        test('Run application', async () => {
-            let taskName: string = 'che: maven build and run';
-            await runTask(taskName);
-            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 30000);
-        });
-
-        test('Close the terminal tasks', async () => {
-            await terminal.closeTerminalTab('maven build and run');
         });
     });
 
@@ -163,4 +153,5 @@ suite('RhChe E2E Java Maven test', async () => {
 
         await quickOpenContainer.clickOnContainerItem(task);
     }
+
 });

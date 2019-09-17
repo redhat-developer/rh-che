@@ -52,12 +52,6 @@ while getopts "hu:p:m:o:r:" opt; do
   esac
 done
 
-if [[ "$JOB_NAME" == *"flaky"* ]]; then
-  TEST_SUITE="flaky.xml"
-else
-  TEST_SUITE="simpleTestSuite.xml"
-fi
-
 #Get cluster to be able to get logs. Related to issue: https://github.com/redhat-developer/che-functional-tests/issues/476
 if [[ "$USERNAME" == *"preview"* ]] || [[ "$PR_CHECK_BUILD" == "true" ]] || [[ "$JOB_NAME" == *"saas"* ]]; then
   API_SERVER_URL="https://api.prod-preview.openshift.io"
@@ -131,6 +125,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
      -e USERNAME=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME \
      -e PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD \
      -e URL=http://$HOST_URL \
+     -e TEST_SUITE=test-all \
      --shm-size=256m \
   $rhche_image
   RESULT=$?
@@ -148,19 +143,31 @@ else
   if [[ "$HOST_URL" == "che.openshift.io" ]]; then
     TAG=$(getVersionFromProd)
     echo "Running test with user $USERNAME against prod environment with version $TAG."
-  
+
     path="$(pwd)"
     mkdir report
     
-    docker run \
-      -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
-      -e USERNAME=$USERNAME \
-      -e PASSWORD=$PASSWORD \
-      -e URL=https://$HOST_URL \
-      --shm-size=256m \
-    quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
-    RESULT=$?
-      
+    if [[ "$JOB_NAME" == *"flaky"* ]]; then
+      docker run \
+        -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
+        -e USERNAME=$USERNAME \
+        -e PASSWORD=$PASSWORD \
+        -e URL=https://$HOST_URL \
+        -e TEST_SUITE=test-all \
+        --shm-size=256m \
+      quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
+      RESULT=$?
+    else
+      docker run \
+        -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
+        -e USERNAME=$USERNAME \
+        -e PASSWORD=$PASSWORD \
+        -e URL=https://$HOST_URL \
+        --shm-size=256m \
+      quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
+      RESULT=$?
+    fi
+    
     mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
     cp -r ./report/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
     
@@ -177,6 +184,7 @@ else
       -e USERNAME=$USERNAME \
       -e PASSWORD=$PASSWORD \
       -e URL=https://$HOST_URL \
+      -e TEST_SUITE=test-all \
       --shm-size=256m \
     quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
     RESULT=$?
