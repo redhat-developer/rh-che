@@ -6,25 +6,29 @@ set -e
 # ------------------------------- VALIDATE ALL REQUIRED PARAMETERS -------------------------
 # ------------------------------------------------------------------------------------------
 
-    all_set=true;
-    if [ -z $USERNAME ]; then
-    	all_set=false;
-    	echo "USERNAME is not set";
-    fi
-    if [ -z $PASSWORD ]; then
-        all_set=false;
-        echo "PASSWORD is not set";
-    fi
-    if [ -z $URL ]; then
-        all_set=false;
-        echo "URL is not set";
-    fi
+all_set=true;
+if [ -z $USERNAME ]; then
+  all_set=false;
+  echo "USERNAME is not set";
+fi
+if [ -z $PASSWORD ]; then
+  all_set=false;
+  echo "PASSWORD is not set";
+fi
+if [ -z $URL ]; then
+  all_set=false;
+  echo "URL is not set";
+fi
 
-    if ! $all_set; then
-        exit 1
-    else
-        echo "All mandatory parameters were set. Running Che 7 Theia E2E tests against $URL with user $USERNAME."
-    fi
+if ! $all_set; then
+  exit 1
+else
+  echo "All mandatory parameters were set. Running Che 7 Theia E2E tests against $URL with user $USERNAME."
+fi
+
+if [ -z $TEST_SUITE ]; then
+  TEST_SUITE="test-java-maven"
+fi
 
 cd rh-che
 length=${#USERNAME}
@@ -157,5 +161,5 @@ fi
 echo "Installing upstream dependency."
 npm --silent i ../../e2e/
 
-echo "Running tests."
-npm run test
+echo "Running test suite: $TEST_SUITE" 
+npm run $TEST_SUITE

@@ -13,15 +13,18 @@ docker run
 -e USERNAME=<username>
 -e PASSWORD=<password>
 -e URL=<url of running RH-Che>
-quay.io/openshiftio/rhchestage-rh-che-e2e-tests
+--shm-size=256m
+quay.io/openshiftio/rhchestage-rh-che-e2e-tests:<version>
 ```
 
-If you would like to run tests with your source code, you can mount a volume to ` /root/rh-che/local_tests `.
+If you would like to run tests with your source code, you can mount a volume to ` /tmp/rh-che/local_tests `.
 ```
--v /local/full/path/to/your/source/code/:/root/rh-che/local_tests
+-v /local/full/path/to/your/source/code/:/tmp/rh-che/local_tests
 ```
 
 If you would like to save screenshots and reports, you can mount a volume to ` /root/rh-che/e2e-saas/report/ `. When you run your local test, you should replace `e2e-saas` by `local_tests`.
+
+Default testsuite is `test-java-maven` suite. It can be changed by setting parametr `TEST_SUITE` in docker run command.
 
 ## Test flow
 The tests are end-to-end tests that should represent Happy path through a product. Current flow is following:

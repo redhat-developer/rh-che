@@ -12,10 +12,14 @@ ENV LANG=en_US.utf8 \
     FABRIC8_USER_NAME=fabric8
 
 # currently in tmp/e2e
-RUN npm run tsc && \
-    apt-get install -y git && \
-    #Download rh-che
-    cd ../ && \
+RUN npm run tsc
+    
+# install git
+RUN apt-get update &&\
+    apt-get install -y git
+ 
+# Download rh-che
+RUN cd ../ && \
     git clone https://github.com/redhat-developer/rh-che.git && \
     cd rh-che/e2e-saas && \
     npm --silent i
