@@ -1,0 +1,7 @@
+{
+  "jsonrpc": "2.0",
+  "method": "history.get",
+  "params": {},
+  "auth": "",
+  "id": 0
+}
