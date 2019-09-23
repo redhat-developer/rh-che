@@ -163,6 +163,7 @@ else
         -e USERNAME=$USERNAME \
         -e PASSWORD=$PASSWORD \
         -e URL=https://$HOST_URL \
+        -e TEST_SUITE=test-all \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
       RESULT=$?
