@@ -1,27 +1,28 @@
 package com.redhat.che.start_workspace_reporter;
 
-import static com.redhat.che.start_workspace_reporter.util.Constants.TIMESTAMP_LAST_SEVEN_DAYS;
-import static com.redhat.che.start_workspace_reporter.util.Constants.TIMESTAMP_NOW;
-import static com.redhat.che.start_workspace_reporter.util.Constants.TIMESTAMP_YESTERDAY;
-import static com.redhat.che.start_workspace_reporter.util.Constants.ZABBIX_HISTORY_GET_ALL_ENTRIES;
+import static com.redhat.che.start_workspace_reporter.util.Constants.*;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceActions.START;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceActions.STOP;
-import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceClusterNames;
-import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceItemIDs;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceModes.EPH;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceModes.PVC;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-import com.redhat.che.start_workspace_reporter.model.*;
+import com.redhat.che.start_workspace_reporter.model.HttpRequestWrapperResponse;
+import com.redhat.che.start_workspace_reporter.model.JSONRPCRequest;
+import com.redhat.che.start_workspace_reporter.model.SlackPost;
+import com.redhat.che.start_workspace_reporter.model.SlackPostAttachment;
+import com.redhat.che.start_workspace_reporter.model.SlackPostAttachmentField;
+import com.redhat.che.start_workspace_reporter.model.ZabbixHistoryMetricsEntry;
+import com.redhat.che.start_workspace_reporter.model.ZabbixHistoryParams;
+import com.redhat.che.start_workspace_reporter.model.ZabbixLoginParams;
 import com.redhat.che.start_workspace_reporter.util.Constants;
 import com.redhat.che.start_workspace_reporter.util.HttpRequestWrapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
@@ -32,8 +33,6 @@ public class ReporterMain {
   private static final Logger LOG = Logger.getLogger(ReporterMain.class.getName());
   private static final Gson gson = new Gson();
   private static final JsonParser parser = new JsonParser();
-  private static final AtomicInteger pvc_cycles_count = new AtomicInteger(0);
-  private static final AtomicInteger eph_cycles_count = new AtomicInteger(0);
 
   private static final String SLACK_SUCCESS_COLOR = "#2EB886";
   private static final String SLACK_UNSTABLE_COLOR = "#FFAA00";
@@ -42,24 +41,17 @@ public class ReporterMain {
   private static final float SLACK_UNSTABLE_PERCENTAGE = 1f; // above value
   private static final String SUFFIX_AVG = "_AVG";
   private static final String SUFFIX_MAX = "_MAX";
-  private static final String SUFFIX_PREVIOUS = "_PREVIOUS";
 
-  private static final HttpRequestWrapper zabbixWrapper =
+  private static final HttpRequestWrapper zabbixRequestWrapper =
       new HttpRequestWrapper(System.getenv("ZABBIX_URL"));
-  private static final HttpRequestWrapper slackWrapper =
+  private static final HttpRequestWrapper slackRequestWrapper =
       new HttpRequestWrapper(System.getenv("SLACK_URL"));
-  private static String zabbixAuthToken = null;
 
   public static void main(String[] args) {
     InputStream getHistoryRequestIS =
         ReporterMain.class.getClassLoader().getResourceAsStream("get_history_request.json");
-    InputStream slackPostIS =
-        ReporterMain.class.getClassLoader().getResourceAsStream("slack_post_template.json");
     assert getHistoryRequestIS != null;
     InputStreamReader getHistoryRequestISReader = new InputStreamReader(getHistoryRequestIS);
-    assert slackPostIS != null;
-    InputStreamReader slackPostISReader = new InputStreamReader(slackPostIS);
-    SlackPost slackPost = gson.fromJson(slackPostISReader, SlackPost.class);
 
     /* =================== *
      *  Contacting zabbix  *
@@ -73,60 +65,35 @@ public class ReporterMain {
     }
 
     // Log in to zabbix and get auth token
-    InputStream loginRequestIS =
-        ReporterMain.class.getClassLoader().getResourceAsStream("login_request.json");
-    assert loginRequestIS != null;
-    InputStreamReader loginRequestISReader = new InputStreamReader(loginRequestIS);
-    JSONRPCRequest loginRequest = gson.fromJson(loginRequestISReader, JSONRPCRequest.class);
-    ZabbixLoginParams loginParams =
-        new ZabbixLoginParams(System.getenv("ZABBIX_USERNAME"), System.getenv("ZABBIX_PASSWORD"));
-    loginRequest.setParams(parser.parse(gson.toJson(loginParams)));
-    try {
-      HttpResponse tmp =
-          zabbixWrapper.post(
-              "/api_jsonrpc.php", ContentType.APPLICATION_JSON.toString(), loginRequest.toString());
-      response = new HttpRequestWrapperResponse(tmp);
-    } catch (IOException e) {
-      LOG.log(Level.SEVERE, "Failed to contact zabbix on devshift.net:" + e.getLocalizedMessage());
-    } catch (IllegalArgumentException e) {
-      LOG.log(Level.SEVERE, "Wrapper failed to parse HtppResponse:" + e.getLocalizedMessage());
-    }
-    if (response != null) {
-      if (responseSuccess(response)) {
-        LOG.log(Level.INFO, "Zabbix login successful.");
-        try {
-          zabbixAuthToken = response.asJSONRPCResponse().getResult().getAsString();
-        } catch (IOException e) {
-          LOG.log(
-              Level.SEVERE, "Failed to get login response auth token:" + e.getLocalizedMessage());
-          return;
-        }
-      } else {
-        return;
-      }
-    }
+    response = logInToZabbix();
+    String zabbixAuthToken = extractZabbixToken(response);
+    response = null;
 
-    JSONRPCRequest getHistoryRequest =
-        gson.fromJson(getHistoryRequestISReader, JSONRPCRequest.class);
-    getHistoryRequest.setAuth(zabbixAuthToken);
-    ZabbixHistoryParams historyParams = new ZabbixHistoryParams();
-
-    historyParams.setItemids(ZabbixWorkspaceItemIDs.getItemIDs());
-    historyParams.setLimit(ZABBIX_HISTORY_GET_ALL_ENTRIES);
-    historyParams.setOutput((Set<String>) null);
-    historyParams.setSortfield(ZabbixHistoryParams.SortField.CLOCK.toString());
-    historyParams.setSortorder(ZabbixHistoryParams.SortOrder.ASC.toString());
+    /* ======================== *
+     *  Getting and processing  *
+     *     data from Zabbix     *
+     * ======================== */
 
     List<ZabbixHistoryMetricsEntry> zabbixHistoryResults = new ArrayList<>();
     Map<String, Float> zabbixMaxAvgValuesHistory = new HashMap<>();
     Map<String, Float> zabbixMaxAvgValues = new HashMap<>();
 
+    JSONRPCRequest getHistoryRequest =
+        gson.fromJson(getHistoryRequestISReader, JSONRPCRequest.class);
+
+    ZabbixHistoryParams historyParams = new ZabbixHistoryParams();
+    historyParams.setItemids(ZabbixWorkspaceItemIDs.getItemIDs());
+    historyParams.setLimit(ZABBIX_HISTORY_GET_ALL_ENTRIES);
+    historyParams.setOutput((Set<String>) null);
+    historyParams.setSortfield(ZabbixHistoryParams.SortField.CLOCK.toString());
+    historyParams.setSortorder(ZabbixHistoryParams.SortOrder.ASC.toString());
     historyParams.setTime_from(TIMESTAMP_LAST_SEVEN_DAYS);
     historyParams.setTime_till(TIMESTAMP_YESTERDAY);
-    getHistoryRequest.setParams(parser.parse(gson.toJson(historyParams)));
 
-    if (!grabHistoryDataFromZabbix(
-        zabbixWrapper, response, getHistoryRequest, zabbixHistoryResults)) return;
+    getHistoryRequest.setParams(parser.parse(gson.toJson(historyParams)));
+    getHistoryRequest.setAuth(zabbixAuthToken);
+
+    if (grabHistoryDataFromZabbix(getHistoryRequest, zabbixHistoryResults)) return;
 
     calculateZabbixResults(zabbixHistoryResults, zabbixMaxAvgValuesHistory);
 
@@ -135,56 +102,50 @@ public class ReporterMain {
     historyParams.setTime_till(TIMESTAMP_NOW);
     getHistoryRequest.setParams(parser.parse(gson.toJson(historyParams)));
 
-    if (!grabHistoryDataFromZabbix(
-        zabbixWrapper, response, getHistoryRequest, zabbixHistoryResults)) return;
+    if (grabHistoryDataFromZabbix(getHistoryRequest, zabbixHistoryResults)) return;
 
     calculateZabbixResults(zabbixHistoryResults, zabbixMaxAvgValues);
 
+    SlackPost slackPost = prepareSlackPost(zabbixMaxAvgValuesHistory, zabbixMaxAvgValues);
+
+    sendSlackMessage(slackPost);
+  }
+
+  private static SlackPost prepareSlackPost(
+      Map<String, Float> zabbixMaxAvgValuesHistory, Map<String, Float> zabbixMaxAvgValues) {
+    InputStream slackPostIS =
+        ReporterMain.class.getClassLoader().getResourceAsStream("slack_post_template.json");
+    assert slackPostIS != null;
+    InputStreamReader slackPostISReader = new InputStreamReader(slackPostIS);
+    SlackPost slackPost = gson.fromJson(slackPostISReader, SlackPost.class);
     List<SlackPostAttachment> attachments = slackPost.getAttachments();
     List<SlackPostAttachment> newAttachments = new ArrayList<>();
     for (SlackPostAttachment a : attachments) {
       String attachmentColor = a.getColor();
       // If it's a field that needs to have it's values set
       if (attachmentColor != null) {
+        ZabbixWorkspaceClusterNames clusterName;
         switch (attachmentColor) {
           case "STARTER_US_EAST_1A_COLOR":
-            prepareSlackAttachment(
-                zabbixMaxAvgValuesHistory,
-                zabbixMaxAvgValues,
-                a,
-                ZabbixWorkspaceClusterNames.PROD_1A);
+            clusterName = ZabbixWorkspaceClusterNames.PROD_1A;
             break;
           case "STARTER_US_EAST_1B_COLOR":
-            prepareSlackAttachment(
-                zabbixMaxAvgValuesHistory,
-                zabbixMaxAvgValues,
-                a,
-                ZabbixWorkspaceClusterNames.PROD_1B);
+            clusterName = ZabbixWorkspaceClusterNames.PROD_1B;
             break;
           case "STARTER_US_EAST_2_COLOR":
-            prepareSlackAttachment(
-                zabbixMaxAvgValuesHistory,
-                zabbixMaxAvgValues,
-                a,
-                ZabbixWorkspaceClusterNames.PROD_2);
+            clusterName = ZabbixWorkspaceClusterNames.PROD_2;
             break;
           case "STARTER_US_EAST_2A_COLOR":
-            prepareSlackAttachment(
-                zabbixMaxAvgValuesHistory,
-                zabbixMaxAvgValues,
-                a,
-                ZabbixWorkspaceClusterNames.PROD_2A);
+            clusterName = ZabbixWorkspaceClusterNames.PROD_2A;
             break;
           case "STARTER_US_EAST_2A_PREVIEW_COLOR":
-            prepareSlackAttachment(
-                zabbixMaxAvgValuesHistory,
-                zabbixMaxAvgValues,
-                a,
-                ZabbixWorkspaceClusterNames.PREVIEW_2A);
+            clusterName = ZabbixWorkspaceClusterNames.PREVIEW_2A;
             break;
           default:
+            clusterName = null;
             break;
         }
+        prepareSlackAttachment(zabbixMaxAvgValuesHistory, zabbixMaxAvgValues, a, clusterName);
       }
       newAttachments.add(a);
     }
@@ -192,10 +153,15 @@ public class ReporterMain {
     String channel = System.getenv("SLACK_CHANNEL");
     slackPost.setChannel(channel != null ? channel : "#devtools-che");
     LOG.info(gson.toJson(slackPost));
+    return slackPost;
+  }
 
+  private static void sendSlackMessage(SlackPost slackPost) {
+    HttpRequestWrapperResponse response = null;
     try {
       HttpResponse tmp =
-          slackWrapper.post("", ContentType.APPLICATION_JSON.toString(), gson.toJson(slackPost));
+          slackRequestWrapper.post(
+              "", ContentType.APPLICATION_JSON.toString(), gson.toJson(slackPost));
       response = new HttpRequestWrapperResponse(tmp);
     } catch (IOException e) {
       LOG.log(Level.SEVERE, "Failed to contact slack bot:" + e.getLocalizedMessage());
@@ -223,18 +189,6 @@ public class ReporterMain {
     Map<String, Float> clusterChangesMap =
         calculateChangeAndSetColor(clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a);
     createAndSetFields(clusterName, zabbixMaxAvgValues, a, clusterChangesMap);
-  }
-
-  private static void storeAverageHistory(
-      Map<String, Float> zabbixMaxAvgValuesHistory, Map<String, Float> zabbixMaxAvgValues) {
-    zabbixMaxAvgValuesHistory
-        .entrySet()
-        .parallelStream()
-        .forEach(
-            entry -> {
-              if (entry.getKey().contains(SUFFIX_AVG))
-                zabbixMaxAvgValues.put(entry.getKey(), entry.getValue());
-            });
   }
 
   private static void createAndSetFields(
@@ -368,7 +322,7 @@ public class ReporterMain {
     JSONRPCRequest versionRequest = gson.fromJson(versionRequestISReader, JSONRPCRequest.class);
     try {
       HttpResponse tmp =
-          zabbixWrapper.post(
+          zabbixRequestWrapper.post(
               "/api_jsonrpc.php",
               ContentType.APPLICATION_JSON.toString(),
               versionRequest.toString());
@@ -388,14 +342,53 @@ public class ReporterMain {
     return response;
   }
 
-  private static boolean grabHistoryDataFromZabbix(
-      HttpRequestWrapper wrapper,
-      HttpRequestWrapperResponse response,
-      JSONRPCRequest getHistoryRequest,
-      List<ZabbixHistoryMetricsEntry> zabbixHistoryResults) {
+  private static HttpRequestWrapperResponse logInToZabbix() {
+    HttpRequestWrapperResponse response = null;
+    InputStream loginRequestIS =
+        ReporterMain.class.getClassLoader().getResourceAsStream("login_request.json");
+    assert loginRequestIS != null;
+    InputStreamReader loginRequestISReader = new InputStreamReader(loginRequestIS);
+    JSONRPCRequest loginRequest = gson.fromJson(loginRequestISReader, JSONRPCRequest.class);
+    ZabbixLoginParams loginParams =
+        new ZabbixLoginParams(System.getenv("ZABBIX_USERNAME"), System.getenv("ZABBIX_PASSWORD"));
+    loginRequest.setParams(parser.parse(gson.toJson(loginParams)));
     try {
       HttpResponse tmp =
-          wrapper.post(
+          zabbixRequestWrapper.post(
+              "/api_jsonrpc.php", ContentType.APPLICATION_JSON.toString(), loginRequest.toString());
+      response = new HttpRequestWrapperResponse(tmp);
+    } catch (IOException e) {
+      LOG.log(Level.SEVERE, "Failed to contact zabbix on devshift.net:" + e.getLocalizedMessage());
+    } catch (IllegalArgumentException e) {
+      LOG.log(Level.SEVERE, "Wrapper failed to parse HtppResponse:" + e.getLocalizedMessage());
+    }
+    return response;
+  }
+
+  private static String extractZabbixToken(HttpRequestWrapperResponse response) {
+    if (response != null) {
+      if (responseSuccess(response)) {
+        LOG.log(Level.INFO, "Zabbix login successful.");
+        try {
+          return response.asJSONRPCResponse().getResult().getAsString();
+        } catch (IOException e) {
+          LOG.log(
+              Level.SEVERE, "Failed to get login response auth token:" + e.getLocalizedMessage());
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private static boolean grabHistoryDataFromZabbix(
+      JSONRPCRequest getHistoryRequest, List<ZabbixHistoryMetricsEntry> zabbixHistoryResults) {
+    HttpRequestWrapperResponse response = null;
+    try {
+      HttpResponse tmp =
+          ReporterMain.zabbixRequestWrapper.post(
               "/api_jsonrpc.php",
               ContentType.APPLICATION_JSON.toString(),
               getHistoryRequest.toString());
@@ -415,14 +408,14 @@ public class ReporterMain {
         } catch (IOException e) {
           LOG.log(
               Level.SEVERE, "Failed to parse response into value list:" + e.getLocalizedMessage());
-          return false;
+          return true;
         }
       } else {
         LOG.log(Level.SEVERE, "Zabbix getHistory request failed.");
-        return false;
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   private static void calculateZabbixResults(
