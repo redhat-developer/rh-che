@@ -14,6 +14,7 @@ import com.redhat.che.start_workspace_reporter.model.ZabbixLoginParams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,27 +62,26 @@ public class ZabbixHelper {
 
   public static void calculateZabbixResults(
       List<ZabbixHistoryMetricsEntry> zabbixHistoryResults, Map<String, Float> zabbixMaxAvgValues) {
-    zabbixHistoryResults
-        .parallelStream()
-        .forEach(
-            result -> {
-              String itemName = Constants.ZabbixWorkspaceItemIDs.getNameForItem(result.getItemid());
-              Float itemCurrentValue = Float.valueOf(result.getValue());
-              Float itemMaxValue = zabbixMaxAvgValues.get(itemName.concat(SUFFIX_MAX));
-              Float itemAvgValue = zabbixMaxAvgValues.get(itemName.concat(SUFFIX_AVG));
-              if (itemMaxValue != null) {
-                itemMaxValue = itemMaxValue < itemCurrentValue ? itemCurrentValue : itemMaxValue;
-              } else {
-                itemMaxValue = itemCurrentValue;
-              }
-              if (itemAvgValue != null) {
-                itemAvgValue = (itemAvgValue + itemCurrentValue) / 2f;
-              } else {
-                itemAvgValue = itemCurrentValue;
-              }
-              zabbixMaxAvgValues.put(itemName.concat(SUFFIX_MAX), itemMaxValue);
-              zabbixMaxAvgValues.put(itemName.concat(SUFFIX_AVG), itemAvgValue);
-            });
+    Collections.sort(zabbixHistoryResults);
+    zabbixHistoryResults.forEach(
+        result -> {
+          String itemName = Constants.ZabbixWorkspaceItemIDs.getNameForItem(result.getItemid());
+          Float itemCurrentValue = Float.valueOf(result.getValue());
+          Float itemMaxValue = zabbixMaxAvgValues.get(itemName.concat(SUFFIX_MAX));
+          Float itemAvgValue = zabbixMaxAvgValues.get(itemName.concat(SUFFIX_AVG));
+          if (itemMaxValue != null) {
+            itemMaxValue = itemMaxValue < itemCurrentValue ? itemCurrentValue : itemMaxValue;
+          } else {
+            itemMaxValue = itemCurrentValue;
+          }
+          if (itemAvgValue != null) {
+            itemAvgValue = (itemAvgValue + itemCurrentValue) / 2f;
+          } else {
+            itemAvgValue = itemCurrentValue;
+          }
+          zabbixMaxAvgValues.put(itemName.concat(SUFFIX_MAX), itemMaxValue);
+          zabbixMaxAvgValues.put(itemName.concat(SUFFIX_AVG), itemAvgValue);
+        });
   }
 
   public static HttpRequestWrapperResponse logInToZabbix() {

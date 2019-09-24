@@ -64,7 +64,7 @@ public class SlackHelper {
             clusterName = null;
             break;
         }
-        prepareSlackAttachment(zabbixMaxAvgValuesHistory, zabbixMaxAvgValues, a, clusterName);
+        prepareSlackAttachment(zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a, clusterName);
       }
       newAttachments.add(a);
     }
@@ -101,18 +101,20 @@ public class SlackHelper {
   }
 
   private static void prepareSlackAttachment(
-      Map<String, Float> zabbixMaxAvgValuesHistory,
       Map<String, Float> zabbixMaxAvgValues,
+      Map<String, Float> zabbixMaxAvgValuesHistory,
       SlackPostAttachment a,
       Constants.ZabbixWorkspaceClusterNames clusterName) {
     Map<String, Float> clusterChangesMap =
         calculateChangeAndSetColor(clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a);
-    createAndSetFields(clusterName, zabbixMaxAvgValues, a, clusterChangesMap);
+    createAndSetFields(
+        clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a, clusterChangesMap);
   }
 
   private static void createAndSetFields(
       Constants.ZabbixWorkspaceClusterNames clusterName,
       Map<String, Float> zabbixMaxAvgValues,
+      Map<String, Float> zabbixMaxAvgValuesHistory,
       SlackPostAttachment a,
       Map<String, Float> cluster_changes) {
     List<SlackPostAttachmentField> cluster_fields = new ArrayList<>();
@@ -123,6 +125,7 @@ public class SlackHelper {
     String startTimesString =
         generateAttachmentString(
             zabbixMaxAvgValues,
+            zabbixMaxAvgValuesHistory,
             cluster_changes,
             startAvgKey,
             startMaxKey,
@@ -134,6 +137,7 @@ public class SlackHelper {
     String stopTimesString =
         generateAttachmentString(
             zabbixMaxAvgValues,
+            zabbixMaxAvgValuesHistory,
             cluster_changes,
             stopAvgKey,
             stopMaxKey,
@@ -149,24 +153,31 @@ public class SlackHelper {
 
   private static String generateAttachmentString(
       Map<String, Float> zabbixMaxAvgValues,
+      Map<String, Float> zabbixMaxAvgValuesHistory,
       Map<String, Float> cluster_changes,
       String actionAvgKey,
       String actionMaxKey,
       String pvcActionAvgChangeKey,
       String ephActionAvgChangeKey) {
-    return String.format(
-            "*PVC* avg: %.1fs", zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000)
+    Float pvcAvgSeconds = zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000;
+    Float pvcMaxSeconds = zabbixMaxAvgValues.get(PVC.get().concat(actionMaxKey)) / 1000;
+    Float pvcAvgDiffPercentage = cluster_changes.get(pvcActionAvgChangeKey);
+    Float pvcAvgDiffSeconds =
+        zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000
+            - zabbixMaxAvgValuesHistory.get(PVC.get().concat(actionAvgKey)) / 1000;
+    Float ephAvgSeconds = zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000;
+    Float ephMaxSeconds = zabbixMaxAvgValues.get(EPH.get().concat(actionMaxKey)) / 1000;
+    Float ephAvgDiffPercentage = cluster_changes.get(ephActionAvgChangeKey);
+    Float ephAvgDiffSeconds =
+        zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000
+            - zabbixMaxAvgValuesHistory.get(EPH.get().concat(actionAvgKey)) / 1000;
+    return String.format("*PVC* avg: %.1fs", pvcAvgSeconds)
+        .concat(String.format(", max: %.1fs\n", pvcMaxSeconds))
         .concat(
-            String.format(
-                ", max: %.1fs\n", zabbixMaxAvgValues.get(PVC.get().concat(actionMaxKey)) / 1000))
-        .concat(String.format("avg-diff: %.2f%%\n", cluster_changes.get(pvcActionAvgChangeKey)))
-        .concat(
-            String.format(
-                "*EPH* avg: %.1fs", zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000))
-        .concat(
-            String.format(
-                ", max: %.1fs\n", zabbixMaxAvgValues.get(EPH.get().concat(actionMaxKey)) / 1000))
-        .concat(String.format("avg-diff: %.2f%%", cluster_changes.get(ephActionAvgChangeKey)));
+            String.format("avg-diff: %.2f%% {%.2fs}\n", pvcAvgDiffPercentage, pvcAvgDiffSeconds))
+        .concat(String.format("*EPH* avg: %.1fs", ephAvgSeconds))
+        .concat(String.format(", max: %.1fs\n", ephMaxSeconds))
+        .concat(String.format("avg-diff: %.2f%% {%.2fs}", ephAvgDiffPercentage, ephAvgDiffSeconds));
   }
 
   private static Map<String, Float> calculateChangeAndSetColor(

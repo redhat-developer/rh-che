@@ -65,7 +65,6 @@ public class ReporterMain {
     getHistoryRequest.setAuth(zabbixAuthToken);
 
     if (ZabbixHelper.grabHistoryDataFromZabbix(getHistoryRequest, zabbixHistoryResults)) return;
-
     ZabbixHelper.calculateZabbixResults(zabbixHistoryResults, zabbixMaxAvgValuesHistory);
 
     // Get today's data
@@ -75,7 +74,6 @@ public class ReporterMain {
     getHistoryRequest.setParams(parser.parse(gson.toJson(historyParams)));
 
     if (ZabbixHelper.grabHistoryDataFromZabbix(getHistoryRequest, zabbixHistoryResults)) return;
-
     ZabbixHelper.calculateZabbixResults(zabbixHistoryResults, zabbixMaxAvgValues);
 
     SlackPost slackPost =

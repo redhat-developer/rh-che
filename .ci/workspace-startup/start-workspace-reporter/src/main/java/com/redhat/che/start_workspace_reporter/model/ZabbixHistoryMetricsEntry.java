@@ -1,6 +1,7 @@
 package com.redhat.che.start_workspace_reporter.model;
 
-public class ZabbixHistoryMetricsEntry {
+@SuppressWarnings("WeakerAccess")
+public class ZabbixHistoryMetricsEntry implements Comparable<ZabbixHistoryMetricsEntry> {
 
   private String itemid;
   private String clock;
@@ -44,5 +45,14 @@ public class ZabbixHistoryMetricsEntry {
 
   public void setNs(String ns) {
     this.ns = ns;
+  }
+
+  @Override
+  public int compareTo(ZabbixHistoryMetricsEntry o) {
+    if (Integer.valueOf(o.getClock()) > Integer.valueOf(this.getClock())) return -1;
+    if (Integer.valueOf(o.getClock()) < Integer.valueOf(this.getClock())) return 1;
+    if (Integer.valueOf(o.getNs()) > Integer.valueOf(this.getNs())) return -1;
+    if (Integer.valueOf(o.getNs()) < Integer.valueOf(this.getNs())) return 1;
+    return 0;
   }
 }
