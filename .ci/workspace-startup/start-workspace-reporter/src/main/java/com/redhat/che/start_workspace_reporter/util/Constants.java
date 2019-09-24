@@ -15,6 +15,14 @@ public class Constants {
 
   public static final int ZABBIX_HISTORY_GET_ALL_ENTRIES = 0;
 
+  public static final String SLACK_SUCCESS_COLOR = "#2EB886";
+  public static final String SLACK_UNSTABLE_COLOR = "#FFAA00";
+  public static final String SLACK_BROKEN_COLOR = "#FF0000";
+  public static final float SLACK_BROKEN_PERCENTAGE = 5f; // above value
+  public static final float SLACK_UNSTABLE_PERCENTAGE = 1f; // above value
+  public static final String SUFFIX_AVG = "_AVG";
+  public static final String SUFFIX_MAX = "_MAX";
+
   public enum ZabbixWorkspaceModes {
     PVC("PVC"),
     EPH("EPHEMERAL");
