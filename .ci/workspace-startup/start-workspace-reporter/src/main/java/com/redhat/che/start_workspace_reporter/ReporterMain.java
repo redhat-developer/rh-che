@@ -8,22 +8,19 @@ import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorks
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceActions.STOP;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceClusterNames;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceItemIDs;
-import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceModes.EPHEMERAL;
+import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceModes.EPH;
 import static com.redhat.che.start_workspace_reporter.util.Constants.ZabbixWorkspaceModes.PVC;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.redhat.che.start_workspace_reporter.model.*;
+import com.redhat.che.start_workspace_reporter.util.Constants;
 import com.redhat.che.start_workspace_reporter.util.HttpRequestWrapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,53 +44,42 @@ public class ReporterMain {
   private static final String SUFFIX_MAX = "_MAX";
   private static final String SUFFIX_PREVIOUS = "_PREVIOUS";
 
+  private static final HttpRequestWrapper zabbixWrapper =
+      new HttpRequestWrapper(System.getenv("ZABBIX_URL"));
+  private static final HttpRequestWrapper slackWrapper =
+      new HttpRequestWrapper(System.getenv("SLACK_URL"));
+  private static String zabbixAuthToken = null;
+
   public static void main(String[] args) {
-    HttpRequestWrapper zabbixWrapper = new HttpRequestWrapper(System.getenv("ZABBIX_URL"));
-    HttpRequestWrapper slackWrapper = new HttpRequestWrapper(System.getenv("SLACK_URL"));
-    HttpRequestWrapperResponse response = null;
-    InputStream versionRequestIS =
-        ReporterMain.class.getClassLoader().getResourceAsStream("version_request.json");
-    InputStream loginRequestIS =
-        ReporterMain.class.getClassLoader().getResourceAsStream("login_request.json");
     InputStream getHistoryRequestIS =
         ReporterMain.class.getClassLoader().getResourceAsStream("get_history_request.json");
     InputStream slackPostIS =
         ReporterMain.class.getClassLoader().getResourceAsStream("slack_post_template.json");
-    assert versionRequestIS != null;
-    InputStreamReader versionRequestISReader = new InputStreamReader(versionRequestIS);
-    assert loginRequestIS != null;
-    InputStreamReader loginRequestISReader = new InputStreamReader(loginRequestIS);
     assert getHistoryRequestIS != null;
     InputStreamReader getHistoryRequestISReader = new InputStreamReader(getHistoryRequestIS);
     assert slackPostIS != null;
     InputStreamReader slackPostISReader = new InputStreamReader(slackPostIS);
-    ZabbixLoginParams loginParams =
-        new ZabbixLoginParams(System.getenv("ZABBIX_USERNAME"), System.getenv("ZABBIX_PASSWORD"));
-    JSONRPCRequest versionRequest = gson.fromJson(versionRequestISReader, JSONRPCRequest.class);
-    JSONRPCRequest loginRequest = gson.fromJson(loginRequestISReader, JSONRPCRequest.class);
     SlackPost slackPost = gson.fromJson(slackPostISReader, SlackPost.class);
 
-    try {
-      HttpResponse tmp =
-          zabbixWrapper.post(
-              "/api_jsonrpc.php",
-              ContentType.APPLICATION_JSON.toString(),
-              versionRequest.toString());
-      response = new HttpRequestWrapperResponse(tmp);
-    } catch (IOException e) {
-      LOG.log(Level.SEVERE, "Failed to contact zabbix on devshift.net:" + e.getLocalizedMessage());
-    } catch (IllegalArgumentException e) {
-      LOG.log(Level.SEVERE, "Wrapper failed to parse HtppResponse:" + e.getLocalizedMessage());
-    }
-    if (response != null) {
-      if (responseSuccess(response)) {
-        LOG.log(Level.INFO, "Zabbix heartbeat successful.");
-      } else {
-        return;
-      }
+    /* =================== *
+     *  Contacting zabbix  *
+     * =================== */
+    HttpRequestWrapperResponse response;
+
+    // Get zabbix heartbeat
+    response = getZabbixHeartbeat();
+    if (response == null) {
+      throw new RuntimeException("Zabbix heartbeat has failed, response is null.");
     }
 
-    String zabbixAuthToken = null;
+    // Log in to zabbix and get auth token
+    InputStream loginRequestIS =
+        ReporterMain.class.getClassLoader().getResourceAsStream("login_request.json");
+    assert loginRequestIS != null;
+    InputStreamReader loginRequestISReader = new InputStreamReader(loginRequestIS);
+    JSONRPCRequest loginRequest = gson.fromJson(loginRequestISReader, JSONRPCRequest.class);
+    ZabbixLoginParams loginParams =
+        new ZabbixLoginParams(System.getenv("ZABBIX_USERNAME"), System.getenv("ZABBIX_PASSWORD"));
     loginRequest.setParams(parser.parse(gson.toJson(loginParams)));
     try {
       HttpResponse tmp =
@@ -135,8 +121,6 @@ public class ReporterMain {
     Map<String, Float> zabbixMaxAvgValuesHistory = new HashMap<>();
     Map<String, Float> zabbixMaxAvgValues = new HashMap<>();
 
-    pvc_cycles_count.set(0);
-    eph_cycles_count.set(0);
     historyParams.setTime_from(TIMESTAMP_LAST_SEVEN_DAYS);
     historyParams.setTime_till(TIMESTAMP_YESTERDAY);
     getHistoryRequest.setParams(parser.parse(gson.toJson(historyParams)));
@@ -147,8 +131,6 @@ public class ReporterMain {
     calculateZabbixResults(zabbixHistoryResults, zabbixMaxAvgValuesHistory);
 
     zabbixHistoryResults = new ArrayList<>();
-    pvc_cycles_count.set(0);
-    eph_cycles_count.set(0);
     historyParams.setTime_from(TIMESTAMP_YESTERDAY);
     historyParams.setTime_till(TIMESTAMP_NOW);
     getHistoryRequest.setParams(parser.parse(gson.toJson(historyParams)));
@@ -166,57 +148,39 @@ public class ReporterMain {
       if (attachmentColor != null) {
         switch (attachmentColor) {
           case "STARTER_US_EAST_1A_COLOR":
-            Map<String, Float> starter_1a_changes =
-                calculateChangeAndSetColor(
-                    ZabbixWorkspaceClusterNames.PROD_1A,
-                    zabbixMaxAvgValues,
-                    zabbixMaxAvgValuesHistory,
-                    a);
-            createAndSetFields(
-                ZabbixWorkspaceClusterNames.PROD_1A, zabbixMaxAvgValues, a, starter_1a_changes);
-            break;
-          case "STARTER_US_EAST_1B_COLOR":
-            Map<String, Float> starter_1b_changes =
-                calculateChangeAndSetColor(
-                    ZabbixWorkspaceClusterNames.PROD_1B,
-                    zabbixMaxAvgValues,
-                    zabbixMaxAvgValuesHistory,
-                    a);
-            createAndSetFields(
-                ZabbixWorkspaceClusterNames.PROD_1B, zabbixMaxAvgValues, a, starter_1b_changes);
-            break;
-          case "STARTER_US_EAST_2_COLOR":
-            Map<String, Float> starter_2_changes =
-                calculateChangeAndSetColor(
-                    ZabbixWorkspaceClusterNames.PROD_2,
-                    zabbixMaxAvgValues,
-                    zabbixMaxAvgValuesHistory,
-                    a);
-            createAndSetFields(
-                ZabbixWorkspaceClusterNames.PROD_2, zabbixMaxAvgValues, a, starter_2_changes);
-            break;
-          case "STARTER_US_EAST_2A_COLOR":
-            Map<String, Float> starter_2a_changes =
-                calculateChangeAndSetColor(
-                    ZabbixWorkspaceClusterNames.PROD_2A,
-                    zabbixMaxAvgValues,
-                    zabbixMaxAvgValuesHistory,
-                    a);
-            createAndSetFields(
-                ZabbixWorkspaceClusterNames.PROD_2A, zabbixMaxAvgValues, a, starter_2a_changes);
-            break;
-          case "STARTER_US_EAST_2A_PREVIEW_COLOR":
-            Map<String, Float> starter_2a_preview_changes =
-                calculateChangeAndSetColor(
-                    ZabbixWorkspaceClusterNames.PREVIEW_2A,
-                    zabbixMaxAvgValues,
-                    zabbixMaxAvgValuesHistory,
-                    a);
-            createAndSetFields(
-                ZabbixWorkspaceClusterNames.PREVIEW_2A,
+            prepareSlackAttachment(
+                zabbixMaxAvgValuesHistory,
                 zabbixMaxAvgValues,
                 a,
-                starter_2a_preview_changes);
+                ZabbixWorkspaceClusterNames.PROD_1A);
+            break;
+          case "STARTER_US_EAST_1B_COLOR":
+            prepareSlackAttachment(
+                zabbixMaxAvgValuesHistory,
+                zabbixMaxAvgValues,
+                a,
+                ZabbixWorkspaceClusterNames.PROD_1B);
+            break;
+          case "STARTER_US_EAST_2_COLOR":
+            prepareSlackAttachment(
+                zabbixMaxAvgValuesHistory,
+                zabbixMaxAvgValues,
+                a,
+                ZabbixWorkspaceClusterNames.PROD_2);
+            break;
+          case "STARTER_US_EAST_2A_COLOR":
+            prepareSlackAttachment(
+                zabbixMaxAvgValuesHistory,
+                zabbixMaxAvgValues,
+                a,
+                ZabbixWorkspaceClusterNames.PROD_2A);
+            break;
+          case "STARTER_US_EAST_2A_PREVIEW_COLOR":
+            prepareSlackAttachment(
+                zabbixMaxAvgValuesHistory,
+                zabbixMaxAvgValues,
+                a,
+                ZabbixWorkspaceClusterNames.PREVIEW_2A);
             break;
           default:
             break;
@@ -251,6 +215,28 @@ public class ReporterMain {
     }
   }
 
+  private static void prepareSlackAttachment(
+      Map<String, Float> zabbixMaxAvgValuesHistory,
+      Map<String, Float> zabbixMaxAvgValues,
+      SlackPostAttachment a,
+      ZabbixWorkspaceClusterNames clusterName) {
+    Map<String, Float> clusterChangesMap =
+        calculateChangeAndSetColor(clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a);
+    createAndSetFields(clusterName, zabbixMaxAvgValues, a, clusterChangesMap);
+  }
+
+  private static void storeAverageHistory(
+      Map<String, Float> zabbixMaxAvgValuesHistory, Map<String, Float> zabbixMaxAvgValues) {
+    zabbixMaxAvgValuesHistory
+        .entrySet()
+        .parallelStream()
+        .forEach(
+            entry -> {
+              if (entry.getKey().contains(SUFFIX_AVG))
+                zabbixMaxAvgValues.put(entry.getKey(), entry.getValue());
+            });
+  }
+
   private static void createAndSetFields(
       ZabbixWorkspaceClusterNames clusterName,
       Map<String, Float> zabbixMaxAvgValues,
@@ -262,46 +248,52 @@ public class ReporterMain {
     String stopMaxKey = "_" + clusterName.get() + "_" + STOP.get() + SUFFIX_MAX;
     String stopAvgKey = "_" + clusterName.get() + "_" + STOP.get() + SUFFIX_AVG;
     String startTimesString =
-        String.format(
-                "*PVC* avg: %.1fs", zabbixMaxAvgValues.get(PVC.get().concat(startAvgKey)) / 1000)
-            .concat(
-                String.format(
-                    ", max: %.1fs\n", zabbixMaxAvgValues.get(PVC.get().concat(startMaxKey)) / 1000))
-            .concat(String.format("avg-diff: %.2f%%\n", cluster_changes.get("pvc_start_avg")))
-            .concat(
-                String.format(
-                    "*EPH* avg: %.1fs",
-                    zabbixMaxAvgValues.get(EPHEMERAL.get().concat(startAvgKey)) / 1000))
-            .concat(
-                String.format(
-                    ", max: %.1fs\n",
-                    zabbixMaxAvgValues.get(EPHEMERAL.get().concat(startMaxKey)) / 1000))
-            .concat(String.format("avg-diff: %.2f%%", cluster_changes.get("eph_start_avg")));
+        generateAttachmentString(
+            zabbixMaxAvgValues,
+            cluster_changes,
+            startAvgKey,
+            startMaxKey,
+            "pvc_start_avg",
+            "eph_start_avg");
     SlackPostAttachmentField cluster_start_times =
         new SlackPostAttachmentField(
             "Cluster  " + clusterName.get() + " start", startTimesString, true);
     String stopTimesString =
-        String.format(
-                "*PVC* avg: %.1fs", zabbixMaxAvgValues.get(PVC.get().concat(stopAvgKey)) / 1000)
-            .concat(
-                String.format(
-                    ", max: %.1fs\n", zabbixMaxAvgValues.get(PVC.get().concat(stopMaxKey)) / 1000))
-            .concat(String.format("avg-diff: %.2f%%\n", cluster_changes.get("pvc_stop_avg")))
-            .concat(
-                String.format(
-                    "*EPH* avg: %.1fs",
-                    zabbixMaxAvgValues.get(EPHEMERAL.get().concat(startAvgKey)) / 1000))
-            .concat(
-                String.format(
-                    ", max: %.1fs\n",
-                    zabbixMaxAvgValues.get(EPHEMERAL.get().concat(startMaxKey)) / 1000))
-            .concat(String.format("avg-diff: %.2f%%", cluster_changes.get("eph_stop_avg")));
+        generateAttachmentString(
+            zabbixMaxAvgValues,
+            cluster_changes,
+            stopAvgKey,
+            stopMaxKey,
+            "pvc_stop_avg",
+            "eph_stop_avg");
     SlackPostAttachmentField cluster_stop_times =
         new SlackPostAttachmentField(
             "Cluster  " + clusterName.get() + " stop", stopTimesString, true);
     cluster_fields.add(cluster_start_times);
     cluster_fields.add(cluster_stop_times);
     a.setFields(cluster_fields);
+  }
+
+  private static String generateAttachmentString(
+      Map<String, Float> zabbixMaxAvgValues,
+      Map<String, Float> cluster_changes,
+      String actionAvgKey,
+      String actionMaxKey,
+      String pvcActionAvgChangeKey,
+      String ephActionAvgChangeKey) {
+    return String.format(
+            "*PVC* avg: %.1fs", zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000)
+        .concat(
+            String.format(
+                ", max: %.1fs\n", zabbixMaxAvgValues.get(PVC.get().concat(actionMaxKey)) / 1000))
+        .concat(String.format("avg-diff: %.2f%%\n", cluster_changes.get(pvcActionAvgChangeKey)))
+        .concat(
+            String.format(
+                "*EPH* avg: %.1fs", zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000))
+        .concat(
+            String.format(
+                ", max: %.1fs\n", zabbixMaxAvgValues.get(EPH.get().concat(actionMaxKey)) / 1000))
+        .concat(String.format("avg-diff: %.2f%%", cluster_changes.get(ephActionAvgChangeKey)));
   }
 
   private static Map<String, Float> calculateChangeAndSetColor(
@@ -328,11 +320,7 @@ public class ReporterMain {
   }
 
   private static float getMaxChange(Map<String, Float> changes) {
-    return Math.max(
-        changes.get("pvc_start_avg"),
-        Math.max(
-            changes.get("eph_start_avg"),
-            Math.max(changes.get("pvc_stop_avg"), changes.get("eph_stop_avg"))));
+    return Collections.max(changes.values());
   }
 
   private static Map<String, Float> getChangesMap(
@@ -340,57 +328,64 @@ public class ReporterMain {
       Map<String, Float> zabbixMaxAvgValues,
       Map<String, Float> zabbixMaxAvgValuesHistory) {
     Map<String, Float> changes = new HashMap<>();
-    String startMaxKey = "_" + clusterName.get() + "_" + START.get() + SUFFIX_MAX;
     String startAvgKey = "_" + clusterName.get() + "_" + START.get() + SUFFIX_AVG;
-    String stopMaxKey = "_" + clusterName.get() + "_" + STOP.get() + SUFFIX_MAX;
     String stopAvgKey = "_" + clusterName.get() + "_" + STOP.get() + SUFFIX_AVG;
-    changes.put(
-        "pvc_start_avg",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(PVC.get() + startAvgKey),
-            zabbixMaxAvgValues.get(PVC.get() + startAvgKey)));
-    changes.put(
-        "pvc_start_max",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(PVC.get() + startMaxKey),
-            zabbixMaxAvgValues.get(PVC.get() + startMaxKey)));
-    changes.put(
-        "eph_start_avg",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(EPHEMERAL.get() + startAvgKey),
-            zabbixMaxAvgValues.get(EPHEMERAL.get() + startAvgKey)));
-    changes.put(
-        "eph_start_max",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(EPHEMERAL.get() + startMaxKey),
-            zabbixMaxAvgValues.get(EPHEMERAL.get() + startMaxKey)));
-    changes.put(
-        "pvc_stop_avg",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(PVC.get() + stopAvgKey),
-            zabbixMaxAvgValues.get(PVC.get() + stopAvgKey)));
-    changes.put(
-        "pvc_stop_max",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(PVC.get() + stopMaxKey),
-            zabbixMaxAvgValues.get(PVC.get() + stopMaxKey)));
-    changes.put(
-        "eph_stop_avg",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(EPHEMERAL.get() + stopAvgKey),
-            zabbixMaxAvgValues.get(EPHEMERAL.get() + stopAvgKey)));
-    changes.put(
-        "eph_stop_max",
-        getPercentageDifference(
-            zabbixMaxAvgValuesHistory.get(EPHEMERAL.get() + stopMaxKey),
-            zabbixMaxAvgValues.get(EPHEMERAL.get() + stopMaxKey)));
+    getChangesMapPercentage(
+        zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, changes, startAvgKey, "pvc_start_avg", PVC);
+    getChangesMapPercentage(
+        zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, changes, startAvgKey, "eph_start_avg", EPH);
+    getChangesMapPercentage(
+        zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, changes, stopAvgKey, "pvc_stop_avg", PVC);
+    getChangesMapPercentage(
+        zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, changes, stopAvgKey, "eph_stop_avg", EPH);
     return changes;
+  }
+
+  private static void getChangesMapPercentage(
+      Map<String, Float> zabbixMaxAvgValues,
+      Map<String, Float> zabbixMaxAvgValuesHistory,
+      Map<String, Float> changes,
+      String actionValueKey,
+      String changesMapKey,
+      Constants.ZabbixWorkspaceModes workspaceMode) {
+    Float historyAverageTime = zabbixMaxAvgValuesHistory.get(workspaceMode.get() + actionValueKey);
+    Float currentAverageTime = zabbixMaxAvgValues.get(workspaceMode.get() + actionValueKey);
+    changes.put(changesMapKey, getPercentageDifference(historyAverageTime, currentAverageTime));
   }
 
   private static float getPercentageDifference(Float oldValue, Float newValue) {
     return newValue == null || oldValue == null
         ? Float.MAX_VALUE
         : (newValue - oldValue) / oldValue * 100;
+  }
+
+  private static HttpRequestWrapperResponse getZabbixHeartbeat() {
+    HttpRequestWrapperResponse response = null;
+    InputStream versionRequestIS =
+        ReporterMain.class.getClassLoader().getResourceAsStream("version_request.json");
+    assert versionRequestIS != null;
+    InputStreamReader versionRequestISReader = new InputStreamReader(versionRequestIS);
+    JSONRPCRequest versionRequest = gson.fromJson(versionRequestISReader, JSONRPCRequest.class);
+    try {
+      HttpResponse tmp =
+          zabbixWrapper.post(
+              "/api_jsonrpc.php",
+              ContentType.APPLICATION_JSON.toString(),
+              versionRequest.toString());
+      response = new HttpRequestWrapperResponse(tmp);
+    } catch (IOException e) {
+      LOG.log(Level.SEVERE, "Failed to contact zabbix on devshift.net:" + e.getLocalizedMessage());
+    } catch (IllegalArgumentException e) {
+      LOG.log(Level.SEVERE, "Wrapper failed to parse HtppResponse:" + e.getLocalizedMessage());
+    }
+    if (response != null) {
+      if (responseSuccess(response)) {
+        LOG.log(Level.INFO, "Zabbix heartbeat successful.");
+      } else {
+        return null;
+      }
+    }
+    return response;
   }
 
   private static boolean grabHistoryDataFromZabbix(

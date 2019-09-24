@@ -14,11 +14,10 @@ public class Constants {
       (System.currentTimeMillis() - ONE_DAY_MILLIS - SEVEN_DAYS_LILLIS) / 1000;
 
   public static final int ZABBIX_HISTORY_GET_ALL_ENTRIES = 0;
-  public static final float MINMAX_INIT_VALUE = -1f;
 
   public enum ZabbixWorkspaceModes {
     PVC("PVC"),
-    EPHEMERAL("EPHEMERAL");
+    EPH("EPHEMERAL");
 
     private String mode;
 
