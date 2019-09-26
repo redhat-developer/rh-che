@@ -43,8 +43,8 @@ import org.eclipse.che.commons.subject.SubjectImpl;
 import org.eclipse.che.workspace.infrastructure.kubernetes.environment.KubernetesEnvironment.PodData;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GitUserProfileProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerServersPortProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
@@ -79,13 +79,13 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private RestartPolicyRewriter restartPolicyRewriter;
   @Mock private WorkspaceVolumesStrategy volumesStrategy;
   @Mock private RamLimitRequestProvisioner ramLimitProvisioner;
-  @Mock private InstallerServersPortProvisioner installerServersPortProvisioner;
   @Mock private LogsVolumeMachineProvisioner logsVolumeMachineProvisioner;
   @Mock private PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner;
   @Mock private ImagePullSecretProvisioner imagePullSecretProvisioner;
   @Mock private ProxySettingsProvisioner proxySettingsProvisioner;
   @Mock private CertificateProvisioner certificateProvisioner;
   @Mock private VcsSshKeysProvisioner vcsSshKeysProvisioner;
+  @Mock private GitUserProfileProvisioner gitUserProfileProvisioner;
 
   @Mock private OpenshiftUserTokenProvider openshiftUserTokenProvider;
   @Mock private TenantDataProvider tenantDataProvider;
@@ -116,7 +116,6 @@ public class RhCheInfraEnvironmentProvisionerTest {
             restartPolicyRewriter,
             volumesStrategy,
             ramLimitProvisioner,
-            installerServersPortProvisioner,
             logsVolumeMachineProvisioner,
             openshiftUserTokenProvider,
             tenantDataProvider,
@@ -126,6 +125,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             serviceAccountProvisioner,
             certificateProvisioner,
             vcsSshKeysProvisioner,
+            gitUserProfileProvisioner,
             false,
             WSAGENT_ROUTER_TIMEOUT);
 
