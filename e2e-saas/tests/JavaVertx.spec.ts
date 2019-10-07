@@ -30,6 +30,29 @@ const topMenu: TopMenu = e2eContainer.get(CLASSES.TopMenu);
 const quickOpenContainer: QuickOpenContainer = e2eContainer.get(CLASSES.QuickOpenContainer);
 const terminal: Terminal = e2eContainer.get(CLASSES.Terminal);
 
+const vertxTasks: string = '{ \
+    "tasks": [ \n \
+        { \n \
+            "type": "che", \n \
+            "label": "run app", \n \
+            "command": "JDBC_URL=jdbc:h2:/tmp/db \\\njava -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 \\\n./target/*fat.jar\n", \n \
+            "target": { \n \
+                "workingDir": "${CHE_PROJECTS_ROOT}/java-web-vertx", \n \
+                "containerName": "maven" \n \
+            } \n \
+        }, \n \
+        { \n \
+            "type": "che", \n \
+            "label": "maven build", \n \
+            "command": "mvn -Duser.home=${HOME} clean install  > ${CHE_PROJECTS_ROOT}/java-web-vertx/output.txt ", \n \
+            "target": { \n \
+                "workingDir": "${CHE_PROJECTS_ROOT}/java-web-vertx", \n \
+                "containerName": "maven" \n \
+            } \n \
+        } \n \
+    ] \n \
+}';
+
 suite('RhChe E2E Java Vert.x test', async () => {
     suite('Create Java Vert.x workspace ' + workspaceName, async () => {
         test('Open \'New Workspace\' page', async () => {
@@ -68,6 +91,38 @@ suite('RhChe E2E Java Vert.x test', async () => {
 
     });
 
+    suite('Validation of project build', async () => {
+        // workaround for pop-up not shown  https://github.com/eclipse/che/issues/14724 remove all tests once it is fixed
+        test('Workaround for pop-up not shown', async () => {
+            let taskName: string = 'che: maven build';
+            let tasksFile: string = 'tasks.json';
+            await topMenu.selectOption('Terminal', 'Configure Tasks...');
+            await quickOpenContainer.clickOnContainerItem(taskName);
+            await editor.waitEditorOpened(tasksFile);
+            await editor.performKeyCombination(tasksFile, Key.chord(Key.CONTROL, 'a'));
+            await editor.performKeyCombination(tasksFile, Key.DELETE);
+            await editor.performKeyCombination(tasksFile, vertxTasks);
+
+            await editor.performKeyCombination(tasksFile, Key.chord(Key.CONTROL, 's'));
+            await editor.waitTabWithSavedStatus(tasksFile);
+        });
+
+        test('Build application', async () => {
+            let taskName: string = 'che: maven build';
+            await runTask(taskName);
+            await quickOpenContainer.clickOnContainerItem('Continue without scanning the task output');
+
+            // replace next two lines by commented line when pop-up issue is fixed
+            // await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 60000);
+            await projectTree.expandPathAndOpenFileInAssociatedWorkspace(sampleName, 'output.txt');
+            await editor.followAndWaitForText('output.txt', '[INFO] BUILD SUCCESS', 220000, 5000);
+        });
+
+        test('Close the terminal tasks', async () => {
+            await terminal.closeTerminalTab('maven build');
+        });
+    });
+
     suite('Language server validation', async () => {
         test('Expand project and open file in editor', async () => {
             await projectTree.expandPathAndOpenFileInAssociatedWorkspace(fileFolderPath, tabTitle);
@@ -75,7 +130,8 @@ suite('RhChe E2E Java Vert.x test', async () => {
         });
 
         test('Java LS initialization', async () => {
-            await ide.checkLsInitializationStart('Starting Java Language Server');
+            // await ide.checkLsInitializationStart('Starting Java Language Server');
+            await ide.waitStatusBarContains('Starting Java Language Server', 20000);
             await ide.waitStatusBarTextAbsence('Starting Java Language Server', 1800000);
             await ide.waitStatusBarTextAbsence('Building workspace', 360000);
         });
@@ -111,20 +167,6 @@ suite('RhChe E2E Java Vert.x test', async () => {
             await editor.waitEditorAvailable(codeNavigationClassName);
         });
 
-    });
-
-    suite('Validation of project build', async () => {
-        test('Build application', async () => {
-            let taskName: string = 'che: maven build';
-            await runTask(taskName);
-            // uncomment in version higner then 7.1.0 or try to use upstream test, both should be same
-            // await quickOpenContainer.clickOnContainerItem('Continue without scanning the task output');
-            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 60000);
-        });
-
-        test('Close the terminal tasks', async () => {
-            await terminal.closeTerminalTab('maven build');
-        });
     });
 
     suite('Stop and remove workspace', async () => {
