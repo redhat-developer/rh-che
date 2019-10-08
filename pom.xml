@@ -45,7 +45,7 @@
                 <artifactId>che-plugin-analytics-wsmaster</artifactId>
                 <version>${rh.che.plugins.version}</version>
                 <type>jar</type>
-            </dependency>                        
+            </dependency>
             <dependency>
                 <groupId>com.redhat.che</groupId>
                 <artifactId>fabric8-cdn-support</artifactId>

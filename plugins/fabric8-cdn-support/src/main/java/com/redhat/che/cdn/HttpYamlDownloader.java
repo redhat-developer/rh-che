@@ -11,6 +11,8 @@
  */
 package com.redhat.che.cdn;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.io.CharStreams;
@@ -44,13 +46,13 @@ public class HttpYamlDownloader {
   }
 
   private String getError(HttpURLConnection httpURLConnection) throws IOException {
-    try (InputStreamReader isr = new InputStreamReader(httpURLConnection.getInputStream())) {
+    try (InputStreamReader isr = new InputStreamReader(httpURLConnection.getInputStream(), UTF_8)) {
       return CharStreams.toString(isr);
     }
   }
 
   protected PluginMeta parseYamlResponseStreamAndClose(InputStream inputStream) throws IOException {
-    try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+    try (InputStreamReader reader = new InputStreamReader(inputStream, UTF_8)) {
       return YAML_PARSER.readValue(reader, PluginMeta.class);
     } catch (IOException e) {
       throw new IOException(

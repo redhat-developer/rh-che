@@ -11,6 +11,8 @@
  */
 package com.redhat.che.multitenant;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.common.io.CharStreams;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -32,11 +34,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import org.eclipse.che.api.core.BadRequestException;
-import org.eclipse.che.api.core.ForbiddenException;
-import org.eclipse.che.api.core.NotFoundException;
-import org.eclipse.che.api.core.ServerException;
-import org.eclipse.che.api.core.UnauthorizedException;
+import org.eclipse.che.api.core.*;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.lang.Pair;
 import org.eclipse.che.dto.server.DtoFactory;
@@ -139,7 +137,7 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
           in = conn.getInputStream();
         }
         final String str;
-        try (Reader reader = new InputStreamReader(in)) {
+        try (Reader reader = new InputStreamReader(in, UTF_8)) {
           str = CharStreams.toString(reader);
         }
         final String contentType = conn.getContentType();
@@ -167,7 +165,7 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
                 "Failed access: %s, method: %s, response code: %d, message: %s",
                 UriBuilder.fromUri(url).replaceQuery("token").build(), method, responseCode, str));
       }
-      try (Reader reader = new InputStreamReader(conn.getInputStream())) {
+      try (Reader reader = new InputStreamReader(conn.getInputStream(), UTF_8)) {
         return CharStreams.toString(reader);
       }
     } finally {
@@ -176,6 +174,7 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
   }
 
   /** Class to allow parsing json response from auth server for github token */
+  @SuppressWarnings("ClassCanBeStatic")
   class GithubToken {
     private String accessToken;
     private String providerApiUrl;
