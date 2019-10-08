@@ -12,6 +12,7 @@
 package com.redhat.che.cdn;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
@@ -27,11 +28,7 @@ import com.google.common.collect.Lists;
 import com.redhat.che.cdn.plugin.model.Container;
 import com.redhat.che.cdn.plugin.model.PluginMeta;
 import com.redhat.che.cdn.plugin.model.Spec;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -253,7 +250,7 @@ public class CdnSupportService extends Service {
                                         : process.getErrorStream();
                                 // consume logs until process ends
                                 try (BufferedReader inputReader =
-                                    new BufferedReader(new InputStreamReader(is))) {
+                                    new BufferedReader(new InputStreamReader(is, UTF_8))) {
                                   String line;
                                   while ((line = inputReader.readLine()) != null) {
                                     consumer.writeLine(line);

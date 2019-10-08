@@ -11,6 +11,7 @@
  */
 package com.redhat.che.end2end;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -241,8 +242,8 @@ public class End2EndFlowService extends Service {
               try {
                 conn = resource.openConnection();
                 try (BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(conn.getInputStream())); ) {
-                  Writer writer = new BufferedWriter(new OutputStreamWriter(os));
+                    new BufferedReader(new InputStreamReader(conn.getInputStream(), UTF_8))) {
+                  Writer writer = new BufferedWriter(new OutputStreamWriter(os, UTF_8));
 
                   Stream<String> lines = reader.lines();
                   if (staticFilesFilters.containsKey(path)) {

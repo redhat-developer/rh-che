@@ -31,14 +31,7 @@ import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
 import org.eclipse.che.workspace.infrastructure.kubernetes.environment.KubernetesEnvironment.PodData;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.InstallerServersPortProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSshKeysProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.*;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.RamLimitRequestProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
@@ -81,7 +74,6 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       RestartPolicyRewriter restartPolicyRewriter,
       WorkspaceVolumesStrategy volumesStrategy,
       RamLimitRequestProvisioner ramLimitProvisioner,
-      InstallerServersPortProvisioner installerServersPortProvisioner,
       LogsVolumeMachineProvisioner logsVolumeMachineProvisioner,
       OpenshiftUserTokenProvider openshiftUserTokenProvider,
       TenantDataProvider tenantDataProvider,
@@ -91,6 +83,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       ServiceAccountProvisioner serviceAccountProvisioner,
       CertificateProvisioner certificateProvisioner,
       VcsSshKeysProvisioner vcsSshKeysProvisioner,
+      GitUserProfileProvisioner gitUserProfileProvisioner,
       @Named("che.infra.kubernetes.trust_certs") boolean trustCerts,
       @Named("che.fabric8.wsagent_routing_timeout") String wsAgentRoutingTimeout) {
     super(
@@ -102,14 +95,14 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         restartPolicyRewriter,
         volumesStrategy,
         ramLimitProvisioner,
-        installerServersPortProvisioner,
         logsVolumeMachineProvisioner,
         podTerminationGracePeriodProvisioner,
         imagePullSecretProvisioner,
         proxySettingsProvisioner,
         serviceAccountProvisioner,
         certificateProvisioner,
-        vcsSshKeysProvisioner);
+        vcsSshKeysProvisioner,
+        gitUserProfileProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;
