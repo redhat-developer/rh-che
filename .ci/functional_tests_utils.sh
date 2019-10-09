@@ -13,7 +13,7 @@ function installOC() {
 
 function installJQ() {
   installEpelRelease
-  yum install --assumeyes -q jq
+  yum install --assumeyes -d1 jq
 }
 
 function installEpelRelease() {
@@ -23,36 +23,36 @@ function installEpelRelease() {
     #excluding mirror.ci.centos.org because of bug https://bugs.centos.org/view.php?id=16337
     echo "exclude=mirror.ci.centos.org" >> /etc/yum/pluginconf.d/fastestmirror.conf
     echo "Installing epel..."
-    yum install epel-release --assumeyes
-    yum update --assumeyes
+    yum install --assumeyes -d1 epel-release
+    yum update --assumeyes -d1
   fi
 }
 
 function installYQ() {
   installEpelRelease
-  yum install python-pip --assumeyes
+  yum install --assumeyes -d1 python-pip
   pip install yq
 }
 
 function installStartDocker() {
-  yum install -y yum-utils device-mapper-persistent-data lvm2
+  yum install --assumeyes -d1 yum-utils device-mapper-persistent-data lvm2
   yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  yum install -y docker-ce
+  yum install --assumeyes -d1 docker-ce
   systemctl start docker
   docker version
 }
 
 function installMvn() {
-  yum install --assumeyes centos-release-scl
-  yum install --assumeyes rh-maven33
+  yum install --assumeyes -d1 centos-release-scl
+  yum install --assumeyes -d1 rh-maven33
 }
 
 function installNodejs() {
-  yum install --assumeyes rh-nodejs8
+  yum install --assumeyes -d1 rh-nodejs8
 }
 
 function installGit(){
-  yum install --assumeyes git
+  yum install --assumeyes -d1 git
 }
 
 function installDependencies() {
@@ -63,7 +63,7 @@ function installDependencies() {
   installOC
   installGit  
   # Getting dependencies ready
-  yum install --assumeyes \
+  yum install --assumeyes -d1 \
               patch \
               pcp \
               bzip2 \
@@ -117,7 +117,7 @@ function archiveArtifacts() {
 }
 
 function getVersionFromPom() {
-  version=$(scl enable rh-maven33 "mvn org.apache.maven.plugins:maven-help-plugin:evaluate -q -Dexpression=project.parent.version -DforceStdout")
+  version=$(scl enable rh-maven33 "mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn org.apache.maven.plugins:maven-help-plugin:evaluate -q -Dexpression=project.parent.version -DforceStdout")
   echo $version
 }
 

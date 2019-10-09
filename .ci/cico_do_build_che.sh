@@ -20,12 +20,12 @@ mvnche() {
     then
       # gulp-cli is needed to build the dashboard
       scl enable rh-nodejs8 "npm install --global gulp-cli"
-      scl enable rh-maven33 rh-nodejs8 "mvn $*"
+      scl enable rh-maven33 rh-nodejs8 "mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn $*"
     else
-      mvn $*
+      mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn $*
     fi
   else
-    mvn $*
+    mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn $*
   fi
 }
 
