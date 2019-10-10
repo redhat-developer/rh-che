@@ -88,27 +88,27 @@ suite('RhChe E2E Java Maven test', async () => {
             await editor.clickOnTab(tabTitle);
             await editor.waitEditorAvailable(tabTitle);
             await editor.waitTabFocused(tabTitle);
-            await editor.moveCursorToLineAndChar(tabTitle, 6, 20);
+            await editor.moveCursorToLineAndChar(tabTitle, 10, 20);
             await editor.pressControlSpaceCombination(tabTitle);
             await editor.waitSuggestion(tabTitle, 'append(char c) : PrintStream');
         });
 
         test('Error highlighting', async () => {
-            await editor.type(tabTitle, 'error', 7);
-            await editor.waitErrorInLine(7);
+            await editor.type(tabTitle, 'error', 11);
+            await editor.waitErrorInLine(11);
             await editor.performKeyCombination(tabTitle, Key.chord(Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE));
             await editor.waitErrorInLineDisappearance(7);
         });
 
         test('Autocomplete', async () => {
-            await editor.moveCursorToLineAndChar(tabTitle, 6, 11);
+            await editor.moveCursorToLineAndChar(tabTitle, 10, 11);
             await editor.pressControlSpaceCombination(tabTitle);
             await editor.waitSuggestionContainer();
             await editor.waitSuggestion(tabTitle, 'System - java.lang');
         });
 
         test('Codenavigation', async () => {
-            await editor.moveCursorToLineAndChar(tabTitle, 5, 10);
+            await editor.moveCursorToLineAndChar(tabTitle, 9, 10);
             await editor.performKeyCombination(tabTitle, Key.chord(Key.CONTROL, Key.F12));
             await editor.waitEditorAvailable(codeNavigationClassName);
         });
