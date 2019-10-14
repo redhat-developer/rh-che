@@ -12,7 +12,7 @@
 # 4 - OpenShift login failed
 # 5 - command execution failed
 
-usage="\\033[93;1m$(basename "$0") \\033[0;1m[-u <username>] [-p <passwd>] [-o <token>] \\033[90m{-t <tag>} {-r <registry>} {-e <namespace>} {-b <rh-che branch>} {-n} {-s} {-h} \\033[0m-- Login to dev cluster and deploy che with specific build tag
+usage="\\033[93;1m$(basename "$0") \\033[0;1m[-u <username>] [-p <passwd>] [-o <token>] \\033[90m{-t <tag>} {-r <registry>} {-e <namespace>} {-b <rh-che branch>} {-n} {-s} {-R} {-V <che-version>} {-h} \\033[0m-- Login to dev cluster and deploy che with specific build tag
 
 \\033[32;1mwhere:\\033[0m
     \\033[1m-u\\033[0m  \\033[93musername for openshift account\\033[0m
@@ -28,6 +28,8 @@ usage="\\033[93;1m$(basename "$0") \\033[0;1m[-u <username>] [-p <passwd>] [-o <
     \\033[1m-r\\033[0m  docker image registry from where to pull
     \\033[1m-z\\033[0m  run this script as a standalone self-contained application
     \\033[1m-U\\033[0m  use unsecure route (do not annotate route)
+    \\033[1m-R\\033[0m  Deply curstom registries (flag)
+    \\033[1m-V\\033[0m  Version of upstream Che the rh-che is based on (used for custom registries)
 
 \\033[32;1mrequirements\\033[0m:
     \\033[1moc\\033[0m  openshift origin CLI admin (dnf install origin-clients)
@@ -74,11 +76,15 @@ function unsetVars() {
   unset RH_CHE_USE_TLS;
   unset RH_CHE_APPLY_SECRET;
   unset RH_CHE_OC_SECRET;
+  unset RH_CHE_USE_CUSTOM_REPOSITORIES;
+  unset RH_CHE_CUSTOM_REPOSITORIES_VERSION;
 }
 
 function clearEnv() {
   rm rh-che.app.yaml > /dev/null 2>&1
   rm rh-che.config.yaml > /dev/null 2>&1
+  rm che-plugin-registry.yaml > /dev/null 2>&1
+  rm che-devfile-registry.yaml > /dev/null 2>&1
   rm -rf postgres > /dev/null 2>&1
 }
 
@@ -139,7 +145,7 @@ function deployPostgres() {
 }
 
 # Parse commandline flags
-while getopts ':hnu:szUS:b:e:r:t:o:p:' option; do
+while getopts ':hnu:szUS:b:e:r:t:o:p:RV:' option; do
   case "$option" in
     h) echo -e "$usage"
        exit 0
@@ -169,6 +175,10 @@ while getopts ':hnu:szUS:b:e:r:t:o:p:' option; do
        ;;
     S) export RH_CHE_APPLY_SECRET="true"
        export RH_CHE_OC_SECRET=$OPTARG
+       ;;
+    R) export RH_CHE_USE_CUSTOM_REPOSITORIES="true"
+       ;;
+    V) export RH_CHE_CUSTOM_REPOSITORIES_VERSION=$OPTARG
        ;;
     :) echo -e "\\033[91;1mMissing argument for -$OPTARG\\033[0m" >&2
        echo -e "$usage" >&2
@@ -255,7 +265,7 @@ fi
 # https://gitlab.cee.redhat.com/dtsd/housekeeping/issues/2570
 if [ "$RH_CHE_OPENSHIFT_URL" == "https://devtools-dev.ext.devshift.net:8443" ]; then
   cp postgres-template.yaml postgres-template_tmp.yaml
-  yq -y 'del(.objects[0].spec.template.spec.volumes[0].persistentVolumeClaim) | .objects[0].spec.template.spec.volumes[0] += {"emptyDir":{}}' postgres-template_tmp.yaml > postgres-template.yaml
+  yq --yaml-output 'del(.objects[0].spec.template.spec.volumes[0].persistentVolumeClaim) | .objects[0].spec.template.spec.volumes[0] += {"emptyDir":{}}' postgres-template_tmp.yaml > postgres-template.yaml
 fi
 
 cd ../ || exit 1
@@ -279,6 +289,38 @@ else
 fi
 
 echo -e "\\033[92;1mGetting deployment scripts done.\\033[0m"
+
+# DEPLOY CUSTOM REPOSITORIES
+if [ "$RH_CHE_USE_CUSTOM_REPOSITORIES" == "true" ]; then
+  echo "Downloading che plugin registry yaml"
+  if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-plugin-registry/master/deploy/openshift/che-plugin-registry.yml -o che-plugin-registry.yaml > /dev/null 2>&1); then
+    echo -e "\\033[91;1mCould not download che-plugin-registry yaml!\\033[0m"
+    exit 2
+  fi
+  echo "Downloading che devfile registry yaml"
+  if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-devfile-registry/master/deploy/openshift/che-devfile-registry.yaml -o che-devfile-registry.yaml > /dev/null 2>&1); then
+    echo -e "\\033[91;1mCould not download che-devfile-registry yaml!\\033[0m"
+    exit 2
+  fi
+  if [ ! -z "$RH_CHE_CUSTOM_REPOSITORIES_VERSION" ]; then
+    echo "Processing che plugin registry yaml"
+    yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REPOSITORIES_VERSION}\"))" che-plugin-registry.yaml > che-plugin-registry-tmp.yaml
+    mv che-plugin-registry-tmp.yaml che-plugin-registry.yaml
+    echo "Processing che devfile registry yaml"
+    yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REPOSITORIES_VERSION}\"))" che-devfile-registry.yaml > che-devfile-registry-tmp.yaml
+    mv che-devfile-registry-tmp.yaml che-devfile-registry.yaml
+  fi
+  echo "Deploy plugin registry"
+  if ! (oc process -f che-plugin-registry.yaml | oc apply -f - > /dev/null 2>&1); then
+    echo -e "\\033[0;91;1mFailed to deploy Che plugin registry\\033[0m"
+    exit 5
+  fi
+  echo "Deploy devfile registry"
+  if ! (oc process -f che-devfile-registry.yaml | oc apply -f - > /dev/null 2>&1); then
+    echo -e "\\033[0;91;1mFailed to deploy Che devfile registry\\033[0m"
+    exit 5
+  fi  
+fi
 
 # DEPLOY POSTGRES
 if [ "$RH_CHE_WIPE_SQL" == "true" ]; then
@@ -325,6 +367,12 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                       .\"data\".\"CHE_WEBSOCKET_ENDPOINT__MINOR\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket-minor\" |
                       .\"metadata\".\"name\" = \"rhche\" |
                       .\"data\".\"CHE_INFRA_OPENSHIFT_TLS__ENABLED\" = \"$RH_CHE_USE_TLS\" ")
+
+if [ "$RH_CHE_USE_CUSTOM_REPOSITORIES" == "true" ]; then
+  CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
+                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http://che-plugin-registry:8080/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http://che-devfile-registry:8080/\" ")
+fi
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
   echo -e "\\033[91;1mFailed to apply configmap [$?].\\033[0m"
