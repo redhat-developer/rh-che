@@ -144,6 +144,14 @@ function deployPostgres() {
   echo -e "\\033[0;92;1mPostreSQL database successfully deployed\\033[0m"
 }
 
+function getVersionBasedOnChe() {
+  che_version=$1
+  if [[ $che_version =~ "SNAPSHOT" ]]; then
+    return "nightly"
+  fi
+  return $che_version
+}
+
 # Parse commandline flags
 while getopts ':hnu:szUS:b:e:r:t:o:p:RV:' option; do
   case "$option" in
@@ -178,7 +186,7 @@ while getopts ':hnu:szUS:b:e:r:t:o:p:RV:' option; do
        ;;
     R) export RH_CHE_USE_CUSTOM_REPOSITORIES="true"
        ;;
-    V) export RH_CHE_CUSTOM_REPOSITORIES_VERSION=$OPTARG
+    V) export RH_CHE_CUSTOM_REPOSITORIES_VERSION=$(getVersionBasedOnChe "${OPTARG}")
        ;;
     :) echo -e "\\033[91;1mMissing argument for -$OPTARG\\033[0m" >&2
        echo -e "$usage" >&2

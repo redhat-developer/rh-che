@@ -61,9 +61,11 @@ oc policy add-role-to-user edit Katka92 ScrewTSW rhopp garagatyi ibuziuk amisevs
 start=$(date +%s)
 if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" \
                                          -r "${DOCKER_IMAGE_URL}" \
-                                         -t $DOCKER_IMAGE_TAG \
-                                         -e $PROJECT_NAMESPACE \
-                                         -S "$QUAY_SECRET_JSON" \
+                                         -t "${DOCKER_IMAGE_TAG}" \
+                                         -e "${PROJECT_NAMESPACE}" \
+                                         -S "${QUAY_SECRET_JSON}" \
+                                         -V "${CHE_VERSION}" \
+                                         -R \
                                          -s \
                                          -U;
 then

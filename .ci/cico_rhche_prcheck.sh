@@ -37,6 +37,8 @@ echo "Installing all dependencies lasted $instal_dep_duration seconds."
 
 export PROJECT_NAMESPACE=prcheck-${RH_PULL_REQUEST_ID}
 export DOCKER_IMAGE_TAG="${RH_TAG_DIST_SUFFIX}"-"${RH_PULL_REQUEST_ID}"
+CHE_VERSION=$(curl -s https://raw.githubusercontent.com/redhat-developer/rh-che/master/pom.xml | xq -r '.project.parent.version')
+export CHE_VERSION
 
 echo "Running ${JOB_NAME} PR: #${RH_PULL_REQUEST_ID}, build number #${BUILD_NUMBER}"
 .ci/cico_build_deploy_test_rhche.sh
