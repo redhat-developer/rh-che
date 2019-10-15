@@ -17,6 +17,7 @@ import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientConfigFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProject;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProjectFactory;
@@ -30,9 +31,17 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
   @Inject
   public Fabric8OpenShiftProjectFactory(
       @Nullable @Named("che.infra.openshift.project") String projectName,
+      @Nullable @Named("che.infra.kubernetes.namespace.default") String defaultNamespaceName,
       OpenShiftClientFactory clientFactory,
       Fabric8WorkspaceEnvironmentProvider envProvider) {
-    super(projectName, null, null, clientFactory);
+    super(
+        projectName,
+        null,
+        null,
+        defaultNamespaceName,
+        false,
+        clientFactory,
+        new OpenShiftClientConfigFactory());
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
