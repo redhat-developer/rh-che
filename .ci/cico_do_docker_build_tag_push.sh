@@ -52,7 +52,7 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
     fi
   fi
 
-  docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f $DIR/${DOCKERFILE} .
+  docker build -t ${DOCKER_IMAGE_URL}:${TAG} -f $DIR/${DOCKERFILE} . | cat
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
     exit 2
@@ -69,17 +69,17 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
   fi
   
   if [ "${USE_CHE_LATEST_SNAPSHOT}" == "true" ]; then
-    docker push ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG_WITH_SHORTHASHES}
-    docker push ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG}
+    docker push ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG_WITH_SHORTHASHES} | cat
+    docker push ${DOCKER_IMAGE_URL}:${DOCKER_IMAGE_TAG} | cat
   else
     if [ "$DeveloperBuild" != "true" ]; then
-      docker push ${DOCKER_IMAGE_URL}:${NIGHTLY}
-      docker push ${DOCKER_IMAGE_URL}:${TAG}
+      docker push ${DOCKER_IMAGE_URL}:${NIGHTLY} | cat
+      docker push ${DOCKER_IMAGE_URL}:${TAG} | cat
     fi
   fi
 
   if [ "${NIGHTLY}" != "*-no-dashboard" ] && [ "$PR_CHECK_BUILD" != "true" ]; then
-      docker build -t ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator
+      docker build -t ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG} $ADDONS/rhche-prerequisites/keycloak-configurator | cat
 
       if [ $? -ne 0 ]; then
         echo 'Docker Build Failed'
@@ -92,8 +92,8 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
       dockerTags="${dockerTags} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${NIGHTLY} ${REGISTRY}/${NAMESPACE}/${KEYCLOAK_STANDALONE_CONFIGURATOR_IMAGE}:${TAG}"
 
       if [ "$DeveloperBuild" != "true" ]; then
-          docker push ${KEYCLOAK_DOCKER_IMAGE_URL}:${NIGHTLY}
-          docker push ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG}
+          docker push ${KEYCLOAK_DOCKER_IMAGE_URL}:${NIGHTLY} | cat
+          docker push ${KEYCLOAK_DOCKER_IMAGE_URL}:${TAG} | cat
       fi
   fi
 done
@@ -107,7 +107,7 @@ fi
 echo "!"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "!"
-echo "! Created / tagged the following eclipse Che images:"
+echo "! Created / tagged the following Eclipse Che images:"
 echo "!     ${dockerTags}"
 echo "! in the ${dockerEnv}"
 echo "!"
