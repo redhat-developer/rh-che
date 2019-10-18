@@ -110,6 +110,8 @@ export class CreateWorkspaceController {
   private isEphemeralMode: boolean;
   /** End rhche-specific changes */
 
+  private stackName: string;
+
   /**
    * Default constructor that is using resource injection
    */
@@ -215,6 +217,7 @@ export class CreateWorkspaceController {
     this.isEphemeralMode = true;
     this.onEphemeralModeChange();
     /** End rhche-specific changes */
+
   }
 
   /**
@@ -340,7 +343,7 @@ export class CreateWorkspaceController {
     // update workspace name
     let devfileSource = angular.copy(this.selectedDevfile);
     devfileSource.metadata.name = this.workspaceName;
-    return this.createWorkspaceSvc.createWorkspaceFromDevfile(devfileSource, null);
+    return this.createWorkspaceSvc.createWorkspaceFromDevfile(devfileSource, {stackName: this.stackName});
   }
 
   /**
