@@ -102,7 +102,12 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   rhche_image="quay.io/openshiftio/rhchestage-rh-che-e2e-tests:${version}"
 
   #reuse image if exists or build new image for test
-  if docker pull $rhche_image | cat; then
+  set +e
+  docker pull $rhche_image > /dev/null 2>&1
+  docker_pull_exit_code=$?
+  set -e
+
+  if [[ $docker_pull_exit_code == 0 ]]; then
     echo "RH-Che test image with tag ${version} found on docker. Reusing image."
 	else
     echo "Could not found RH-Che tests image with tag ${version}."
