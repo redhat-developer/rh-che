@@ -84,6 +84,7 @@ if [ -z "$USERNAME" ]; then
 fi
 echo "User name printed in format: 3 first letters, space, the rest of letters.    $USERNAME_TO_PRINT"
 
+set +e
 #PR CHECK
 if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   HOST_URL=$(echo ${RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL} | cut -d"/" -f 3)
@@ -102,10 +103,8 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   rhche_image="quay.io/openshiftio/rhchestage-rh-che-e2e-tests:${version}"
 
   #reuse image if exists or build new image for test
-  set +e
   docker pull $rhche_image > /dev/null 2>&1
   docker_pull_exit_code=$?
-  set -e
 
   if [[ $docker_pull_exit_code == 0 ]]; then
     echo "RH-Che test image with tag ${version} found on docker. Reusing image."
@@ -200,6 +199,8 @@ else
   
   fi
 fi
+set -e
+
 end=$(date +%s)
 test_duration=$(($end - $start))
 echo "Running functional tests lasted $test_duration seconds."
