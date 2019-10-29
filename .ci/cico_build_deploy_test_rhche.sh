@@ -59,6 +59,7 @@ fi
 oc policy add-role-to-user edit Katka92 ScrewTSW rhopp garagatyi ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT_NAMESPACE
 
 start=$(date +%s)
+echo "Running deploy script for che version:${CHE_VERSION}"
 if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" \
                                          -r "${DOCKER_IMAGE_URL}" \
                                          -t "${DOCKER_IMAGE_TAG}" \

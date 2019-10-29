@@ -41,6 +41,8 @@ export RH_CHE_WIPE_SQL="false";
 export RH_CHE_IS_V_FIVE="false";
 export RH_CHE_OPENSHIFT_USE_TOKEN="false";
 export RH_CHE_OPENSHIFT_URL=https://devtools-dev.ext.devshift.net:8443;
+export RH_CHE_OPENSHIFT_URL_PROTOCOL="$(echo ${RH_CHE_OPENSHIFT_URL} | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+export RH_CHE_OPENSHIFT_URL_HOSTNAME="$(echo ${RH_CHE_OPENSHIFT_URL/$RH_CHE_OPENSHIFT_URL_PROTOCOL/} | sed 's,:.*,,g')"
 export RH_CHE_JDBC_USERNAME=pgche;
 export RH_CHE_JDBC_PASSWORD=pgchepassword;
 export RH_CHE_JDBC_URL=jdbc:postgresql://postgres:5432/dbche;
@@ -58,6 +60,8 @@ function unsetVars() {
   unset RH_CHE_OPENSHIFT_TOKEN;
   unset RH_CHE_DOCKER_IMAGE_TAG;
   unset RH_CHE_OPENSHIFT_URL;
+  unset RH_CHE_OPENSHIFT_URL_HOSTNAME;
+  unset RH_CHE_OPENSHIFT_URL_PROTOCOL;
   unset RH_CHE_DOCKER_IMAGE_NAME;
   unset RH_CHE_DEPLOY_SCRIPT_CLEANUP;
   unset RH_CHE_WIPE_SQL;
@@ -76,8 +80,9 @@ function unsetVars() {
   unset RH_CHE_USE_TLS;
   unset RH_CHE_APPLY_SECRET;
   unset RH_CHE_OC_SECRET;
-  unset RH_CHE_USE_CUSTOM_REPOSITORIES;
-  unset RH_CHE_CUSTOM_REPOSITORIES_VERSION;
+  unset RH_CHE_USE_CUSTOM_REGISTRIES;
+  unset RH_CHE_VERSION;
+  unset RH_CHE_CUSTOM_REGISTRIES_VERSION;
 }
 
 function clearEnv() {
@@ -101,9 +106,9 @@ function checkCheStatus() {
 }
 
 function waitForPostgresToBeDeleted() {
+  printf "Waiting for postgres deployment to be deleted"
   oc delete all -l app=postgres > /dev/null 2>&1
   oc delete pvc/postgres-data > /dev/null 2>&1
-  printf "Waiting for postgres deployment to be deleted"
   while (oc get all -l app=postgres 2>&1 | [ "$(wc -l)" -ge 2 ] > /dev/null 2>&1); do
     printf "."
     sleep 1
@@ -147,9 +152,9 @@ function deployPostgres() {
 function getVersionBasedOnChe() {
   che_version=$1
   if [[ $che_version =~ "SNAPSHOT" ]]; then
-    return "nightly"
+    echo "nightly"
   fi
-  return $che_version
+  echo $che_version
 }
 
 # Parse commandline flags
@@ -184,9 +189,10 @@ while getopts ':hnu:szUS:b:e:r:t:o:p:RV:' option; do
     S) export RH_CHE_APPLY_SECRET="true"
        export RH_CHE_OC_SECRET=$OPTARG
        ;;
-    R) export RH_CHE_USE_CUSTOM_REPOSITORIES="true"
+    R) export RH_CHE_USE_CUSTOM_REGISTRIES="true"
        ;;
-    V) export RH_CHE_CUSTOM_REPOSITORIES_VERSION=$(getVersionBasedOnChe "${OPTARG}")
+    V) export RH_CHE_VERSION=$OPTARG
+       export RH_CHE_CUSTOM_REGISTRIES_VERSION=$(getVersionBasedOnChe "${RH_CHE_VERSION}")
        ;;
     :) echo -e "\\033[91;1mMissing argument for -$OPTARG\\033[0m" >&2
        echo -e "$usage" >&2
@@ -298,8 +304,20 @@ fi
 
 echo -e "\\033[92;1mGetting deployment scripts done.\\033[0m"
 
-# DEPLOY CUSTOM REPOSITORIES
-if [ "$RH_CHE_USE_CUSTOM_REPOSITORIES" == "true" ]; then
+# DEPLOY CUSTOM REGISTRIES
+if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
+  echo "Deploying che registries for che version ${RH_CHE_VERSION}"
+  echo "Removing previous deployment if exists"
+  if (oc get dc che-devfile-registry > /dev/null 2>&1); then
+    echo "Deleting devfile registry"
+    oc delete dc che-devfile-registry --force=true --grace-period=0 > /dev/null 2>&1
+    oc delete configmap che-devfile-registry > /dev/null 2>&1
+  fi
+  if (oc get dc che-plugin-registry > /dev/null 2>&1); then
+    echo "Deleting plugin registry"
+    oc delete dc che-plugin-registry --force=true --grace-period=0 > /dev/null 2>&1
+    oc delete configmap che-plugin-registry > /dev/null 2>&1
+  fi
   echo "Downloading che plugin registry yaml"
   if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-plugin-registry/master/deploy/openshift/che-plugin-registry.yml -o che-plugin-registry.yaml > /dev/null 2>&1); then
     echo -e "\\033[91;1mCould not download che-plugin-registry yaml!\\033[0m"
@@ -310,24 +328,26 @@ if [ "$RH_CHE_USE_CUSTOM_REPOSITORIES" == "true" ]; then
     echo -e "\\033[91;1mCould not download che-devfile-registry yaml!\\033[0m"
     exit 2
   fi
-  if [ ! -z "$RH_CHE_CUSTOM_REPOSITORIES_VERSION" ]; then
+  if [ -n "$RH_CHE_CUSTOM_REGISTRIES_VERSION" ]; then
+    echo "Deploying registries with custom image tag ${RH_CHE_CUSTOM_REGISTRIES_VERSION}"
     echo "Processing che plugin registry yaml"
-    yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REPOSITORIES_VERSION}\"))" che-plugin-registry.yaml > che-plugin-registry-tmp.yaml
-    mv che-plugin-registry-tmp.yaml che-plugin-registry.yaml
+    yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REGISTRIES_VERSION}\"))" che-plugin-registry.yaml > che-plugin-registry-tmp.yaml
+    mv che-plugin-registry-tmp.yaml che-plugin-registry.yaml -f
     echo "Processing che devfile registry yaml"
-    yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REPOSITORIES_VERSION}\"))" che-devfile-registry.yaml > che-devfile-registry-tmp.yaml
-    mv che-devfile-registry-tmp.yaml che-devfile-registry.yaml
+    yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REGISTRIES_VERSION}\"))" che-devfile-registry.yaml > che-devfile-registry-tmp.yaml
+    mv che-devfile-registry-tmp.yaml che-devfile-registry.yaml -f
   fi
-  echo "Deploy plugin registry"
+  echo "Deploying plugin registry"
   if ! (oc process -f che-plugin-registry.yaml | oc apply -f - > /dev/null 2>&1); then
     echo -e "\\033[0;91;1mFailed to deploy Che plugin registry\\033[0m"
     exit 5
   fi
-  echo "Deploy devfile registry"
+  echo "Deploying devfile registry"
   if ! (oc process -f che-devfile-registry.yaml | oc apply -f - > /dev/null 2>&1); then
     echo -e "\\033[0;91;1mFailed to deploy Che devfile registry\\033[0m"
     exit 5
-  fi  
+  fi
+  echo "Done deploying registries."
 fi
 
 # DEPLOY POSTGRES
@@ -376,10 +396,10 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                       .\"metadata\".\"name\" = \"rhche\" |
                       .\"data\".\"CHE_INFRA_OPENSHIFT_TLS__ENABLED\" = \"$RH_CHE_USE_TLS\" ")
 
-if [ "$RH_CHE_USE_CUSTOM_REPOSITORIES" == "true" ]; then
+if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http://che-plugin-registry:8080/v3\" |
-                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http://che-devfile-registry:8080/\" ")
+                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/\" ")
 fi
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
