@@ -27,17 +27,36 @@ If you would like to save screenshots and reports, you can mount a volume to ` /
 Default testsuite is `test-java-maven` suite. It can be changed by setting parametr `TEST_SUITE` in docker run command.
 
 ## Test flow
-The tests are end-to-end tests that should represent Happy path through a product. Current flow is following:
+The tests are end-to-end tests that should represent Happy path through a product. Current tests are testing Java Maven stack and Java Vert.x stack. 
 
+Pre-test:
 - Login
+
+Java Maven flow:
+
 - Create Che 7 workspace based on Java Maven devfile with console-java-simple project
 - Create and open workspace
-- Open file in editor
 - Build application
 - Close the terminal task
 - Run application
 - Close the terminal tesk
 - Check Java Language Server
+  - Open file in editor
+  - Check suggestion invoking
+  - Error highlighting
+  - Autocomplete
+  - Codenavigation
+- Stop workspace
+- Delete workspace
+
+Java Vert.x test flow is following:
+
+- Create Che 7 workspace based on Java Vert.x devfile with default project
+- Create and open workspace
+- Build application
+- Close the terminal task
+- Check Java Language Server
+  - Open file in editor
   - Check suggestion invoking
   - Error highlighting
   - Autocomplete
