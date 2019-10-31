@@ -122,15 +122,15 @@ class TokenBehavior(TaskSet):
     self.log("Creating workspace")
     now_time_ms = "%.f" % (time.time() * 1000)
     json = _stackDefinitionFileRaw.replace("WORKSPACE_NAME", now_time_ms)
-    response = self.client.post("/api/workspace", headers={
+    response = self.client.post("/api/workspace/devfile", headers={
       "Authorization": "Bearer " + self.locust.taskUserToken,
-      "Content-Type": "application/json"}, 
+      "Content-Type": "text/yaml"}, 
      name="createWorkspace_"+self.clusterName, data=json, catch_response=True)
     self.log("Create workspace server api response:" + str(response.ok))
     try:
       if not response.ok:
-        self.log("Can not create workspace: [" + response.content + "]")
-        response.failure("Can not create workspace: [" + response.content + "]")
+        self.log("Can not create workspace: [" + str(response.content) + "]")
+        response.failure("Can not create workspace: [" + str(response.content) + "]")
       else:
         resp_json = response.json()
         self.log("Workspace with id " 
@@ -150,7 +150,7 @@ class TokenBehavior(TaskSet):
     try:
       content = response.content
       if not response.ok:
-        response.failure("Got wrong response: [" + content + "]")
+        response.failure("Got wrong response: [" + str(content) + "]")
       else:
         response.success()
     except ValueError:
@@ -257,7 +257,7 @@ class TokenBehavior(TaskSet):
     try:
       content = response.content
       if not response.ok:
-        response.failure("Got wrong response: [" + content + "]")
+        response.failure("Got wrong response: [" + str(content) + "]")
       else:
         response.success()
     except ValueError:
@@ -274,7 +274,7 @@ class TokenBehavior(TaskSet):
     try:
       content = response.content
       if not response.ok:
-        response.failure("Got wrong response: [" + content + "]")
+        response.failure("Got wrong response: [" + str(content) + "]")
       else:
         response.success()
     except ValueError:
@@ -321,7 +321,7 @@ class TokenBehavior(TaskSet):
       resp_json = response.json()
       content = response.content
       if not response.ok:
-        response.failure("Got wrong response: [" + content + "]")
+        response.failure("Got wrong response: [" + str(content) + "]")
       else:
         response.success()
         return resp_json["status"]
@@ -345,7 +345,7 @@ class TokenBehavior(TaskSet):
       resp_json = response.json()
       content = response.content
       if not response.ok:
-        response.failure("Got wrong response: [" + content + "]")
+        response.failure("Got wrong response: [" + str(content) + "]")
       else:
         response.success()
         self.log("Removing " + str(len(resp_json)) + " existing workspaces.")

@@ -40,9 +40,10 @@ pipeline {
                 }
                 dir ("${LOG_DIR}") {
                     silent_sh """
+                    wget https://che-devfile-registry.prod-preview.openshift.io/devfiles/nodejs/devfile.yaml -O ../${RELATIVE_PATH}/nodejs_eph.yaml
                     export USER_TOKENS="$USER_TOKENS"
                     export CYCLES_COUNT="$CYCLES_COUNT"
-                    export CHE_STACK_FILE="../${RELATIVE_PATH}/che7_ephemeral.json"
+                    export CHE_STACK_FILE="../${RELATIVE_PATH}/nodejs_eph.yaml"
                     export ZABBIX_SERVER="${ZABBIX_SERVER}"
                     export ZABBIX_PORT="${ZABBIX_PORT}"
                     export ZABBIX_EPHEMERAL="true"
