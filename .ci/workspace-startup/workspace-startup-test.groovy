@@ -40,11 +40,14 @@ pipeline {
                 }
                 dir ("${LOG_DIR}") {
                     silent_sh """
-                    wget -q https://che-devfile-registry.prod-preview.openshift.io/devfiles/nodejs/devfile.yaml -O ../${RELATIVE_PATH}/nodejs_pvc.yaml
-                    sed -i.bak 's/persistVolumes: \'false\'/persistVolumes: \'true\'/g' ../${RELATIVE_PATH}/nodejs_pvc.yaml
+                    curl -Lso ../${RELATIVE_PATH}/nodejs_pvc_preview.yaml https://che-devfile-registry.prod-preview.openshift.io/devfiles/nodejs/devfile.yaml
+                    curl -Lso ../${RELATIVE_PATH}/nodejs_pvc_prod.yaml https://che-devfile-registry.openshift.io/devfiles/nodejs/devfile.yaml
+                    sed -i.bak 's/persistVolumes: \'false\'/persistVolumes: \'true\'/g' ../${RELATIVE_PATH}/nodejs_pvc_preview.yaml
+                    sed -i.bak 's/persistVolumes: \'false\'/persistVolumes: \'true\'/g' ../${RELATIVE_PATH}/nodejs_pvc_prod.yaml
                     export USER_TOKENS="$USER_TOKENS"
                     export CYCLES_COUNT="$CYCLES_COUNT"
-                    export CHE_STACK_FILE="../${RELATIVE_PATH}/nodejs_pvc.yaml"
+                    export IS_EPHEMERAL="false"
+                    export CHE_STACK_FILES_PATH="../${RELATIVE_PATH}/"
                     export ZABBIX_SERVER="${ZABBIX_SERVER}"
                     export ZABBIX_PORT="${ZABBIX_PORT}"
                     export START_SOFT_FAILURE_TIMEOUT="${START_SOFT_FAILURE_TIMEOUT}"

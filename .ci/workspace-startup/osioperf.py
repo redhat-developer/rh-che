@@ -11,13 +11,24 @@ _userEnvironment = []
 _userNames = []
 _currentUser = 0
 _userLock = threading.RLock()
-_stackDefinitionFilePath = os.getenv("CHE_STACK_FILE")
-if (not os.path.isfile(_stackDefinitionFilePath)):
-  raise IOError("Stack input file does not exist: " + _stackDefinitionFilePath)
-if (not os.access(_stackDefinitionFilePath, os.R_OK)):
-  raise IOError("Cannot read from the stack file: " + _stackDefinitionFilePath)
-_stackDefinitionFile = open(_stackDefinitionFilePath, "r")
-_stackDefinitionFileRaw = _stackDefinitionFile.read()
+_stackDefinitionFilesPath = os.getenv("CHE_STACK_FILES_PATH")
+_devfileProdPath = ""
+_devfilePreviewPath = ""
+_isEphemeral = os.getenv("IS_EPHEMERAL")
+if (_isEphemeral == "true"):
+  _devfileProdPath = _stackDefinitionFilesPath+"nodejs_eph_prod.yaml"
+  _devfilePreviewPath = _stackDefinitionFilesPath+"nodejs_eph_preview.yaml"
+else:
+  _devfileProdPath = _stackDefinitionFilesPath+"nodejs_pvc_prod.yaml"
+  _devfilePreviewPath = _stackDefinitionFilesPath+"nodejs_pvc_preview.yaml"
+if (not os.path.isfile(_devfilePreviewPath)):
+  raise IOError("ProdPreview devfile does not exist: " + _devfilePreviewPath)
+if (not os.path.isfile(_devfileProdPath)):
+  raise IOError("Production devfile does not exist:" + _devfileProdPath)
+if (not os.access(_devfileProdPath, os.R_OK)):
+  raise IOError("Cannot read Production devfile: " + _devfileProdPath)
+if (not os.access(_devfilePreviewPath, os.R_OK)):
+  raise IOError("Cannot read ProdPreview devfile:" + _devfilePreviewPath)
 _zabbixServer = os.getenv("ZABBIX_SERVER")
 _zabbixPort = os.getenv("ZABBIX_PORT")
 _zabbixEphemeral = False if os.getenv("ZABBIX_EPHEMERAL") == None else True
@@ -33,8 +44,16 @@ class TokenBehavior(TaskSet):
   hard_stop_failure_cmd = ""
   cycles = 0
   cyclesMax = 1
+  devfileFile = None
+  devfileFileRaw = ""
 
   def on_start(self):
+    if (self.locust.taskUserEnvironment == "prod-preview"):
+      devfileFile = open(_devfilePreviewPath, "r")
+      self.devfileFileRaw = devfileFile.read()
+    else:
+      devfileFile = open(_devfileProdPath, "r")
+      self.devfileFileRaw = devfileFile.read()
     self.log("Username:" + self.locust.taskUserName
             #  + " Token:" + self.taskUserToken
              + " Environment:" + self.locust.taskUserEnvironment)
@@ -121,7 +140,7 @@ class TokenBehavior(TaskSet):
   def createWorkspace(self):
     self.log("Creating workspace")
     now_time_ms = "%.f" % (time.time() * 1000)
-    json = _stackDefinitionFileRaw.replace("WORKSPACE_NAME", now_time_ms)
+    json = self.devfileFileRaw.replace("WORKSPACE_NAME", now_time_ms)
     response = self.client.post("/api/workspace/devfile", headers={
       "Authorization": "Bearer " + self.locust.taskUserToken,
       "Content-Type": "text/yaml"}, 
