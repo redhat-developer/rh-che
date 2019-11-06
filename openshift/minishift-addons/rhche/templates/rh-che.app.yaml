@@ -87,8 +87,6 @@ objects:
             value: ${CHE_FABRIC8_USER__SERVICE_ENDPOINT}
           - name: CHE_HOST
             value: "rhche-${NAMESPACE}.${ROUTING_SUFFIX}"
-          - name: CHE_INFRA_KUBERNETES_BOOTSTRAPPER_BINARY__URL
-            value: "${PROTOCOL}://rhche-${NAMESPACE}.${ROUTING_SUFFIX}/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
           - name: CHE_INFRA_OPENSHIFT_PROJECT
             valueFrom:
               fieldRef:
