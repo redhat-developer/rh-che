@@ -20,10 +20,10 @@ function installEpelRelease() {
   if yum repolist | grep epel; then
     echo "Epel already installed, skipping instalation."
   else
-    #excluding mirror.ci.centos.org because of bug https://bugs.centos.org/view.php?id=16337
-    echo "exclude=mirror.ci.centos.org" >> /etc/yum/pluginconf.d/fastestmirror.conf
+    #excluding mirror1.ci.centos.org 
+    echo "exclude=mirror1.ci.centos.org" >> /etc/yum/pluginconf.d/fastestmirror.conf
     echo "Installing epel..."
-    yum install --assumeyes -d1 epel-release
+    yum install -d1 --assumeyes epel-release
     yum update --assumeyes -d1
   fi
 }
