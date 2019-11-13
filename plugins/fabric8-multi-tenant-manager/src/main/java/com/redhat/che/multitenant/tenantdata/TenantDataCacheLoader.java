@@ -21,6 +21,7 @@ import com.google.inject.name.Named;
 import com.redhat.che.multitenant.tenantdata.UserServicesJsonResponse.Namespace;
 import java.io.IOException;
 import java.util.List;
+import org.eclipse.che.api.core.ApiException;
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.ConflictException;
 import org.eclipse.che.api.core.ForbiddenException;
@@ -31,8 +32,11 @@ import org.eclipse.che.api.core.ValidationException;
 import org.eclipse.che.api.core.rest.HttpJsonRequestFactory;
 import org.eclipse.che.api.core.rest.HttpJsonResponse;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class TenantDataCacheLoader extends CacheLoader<TenantDataCacheKey, UserCheTenantData> {
+  private static final Logger LOG = LoggerFactory.getLogger(TenantDataCacheLoader.class);
   private static final String API_USER_SERVICES_PATH = "/api/user/services";
   private final HttpJsonRequestFactory httpJsonRequestFactory;
   private final String fabric8UserServiceEndpoint;
@@ -50,7 +54,8 @@ class TenantDataCacheLoader extends CacheLoader<TenantDataCacheKey, UserCheTenan
     String responseBody;
     try {
       responseBody = getResponseBody(fabric8UserServiceEndpoint, cacheKey.getKeycloakToken());
-    } catch (Exception e) {
+    } catch (ApiException | IOException e) {
+      LOG.error(e.getMessage(), e);
       throw new InfrastructureException("Exception during the user tenant data retrieval", e);
     }
     try {
