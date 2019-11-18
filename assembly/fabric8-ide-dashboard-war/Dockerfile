@@ -22,13 +22,12 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 RUN yarn global upgrade yarn@1.13.0
 # Copy only necessary files and run yarn with them to allow caching in case dependencies hasn't changed
-COPY ["${SOURCES_DIR}/package.json", "${SOURCES_DIR}/typings.json", "/dashboard/"]
+COPY ["${SOURCES_DIR}/package.json", "${SOURCES_DIR}/yarn.lock", "/dashboard/"]
 WORKDIR /dashboard
 RUN yarn install --ignore-optional
 # Copy all the files (including previously copied) for simplicity of the Dockerfile
 COPY ${SOURCES_DIR} /dashboard/
-#RUN yarn build && yarn test
-RUN yarn build
+RUN yarn build && yarn test
 RUN cd /dashboard/target/ && tar zcf /tmp/dashboard.tar.gz dist/
 
 CMD zcat /tmp/dashboard.tar.gz
