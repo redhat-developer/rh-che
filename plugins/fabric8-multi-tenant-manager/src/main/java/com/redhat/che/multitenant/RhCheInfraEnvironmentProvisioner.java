@@ -47,6 +47,7 @@ import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftEnvironmentPr
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
+import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
 import org.slf4j.Logger;
 
 /**
@@ -91,6 +92,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       CertificateProvisioner certificateProvisioner,
       VcsSshKeysProvisioner vcsSshKeysProvisioner,
       GitUserProfileProvisioner gitUserProfileProvisioner,
+      OpenShiftPreviewUrlExposer previewUrlEndpointsProvisioner,
       @Named("che.infra.kubernetes.trust_certs") boolean trustCerts,
       @Named("che.fabric8.wsagent_routing_timeout") String wsAgentRoutingTimeout) {
     super(
@@ -109,7 +111,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         serviceAccountProvisioner,
         certificateProvisioner,
         vcsSshKeysProvisioner,
-        gitUserProfileProvisioner);
+        gitUserProfileProvisioner,
+        previewUrlEndpointsProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;

@@ -13,6 +13,7 @@ package com.redhat.che.multitenant;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.eclipse.che.api.workspace.server.WorkspaceManager;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
@@ -33,7 +34,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       @Nullable @Named("che.infra.openshift.project") String projectName,
       @Nullable @Named("che.infra.kubernetes.namespace.default") String defaultNamespaceName,
       OpenShiftClientFactory clientFactory,
-      Fabric8WorkspaceEnvironmentProvider envProvider) {
+      Fabric8WorkspaceEnvironmentProvider envProvider,
+      WorkspaceManager workspaceManager) {
     super(
         projectName,
         null,
@@ -41,7 +43,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         defaultNamespaceName,
         false,
         clientFactory,
-        new OpenShiftClientConfigFactory());
+        new OpenShiftClientConfigFactory(),
+        workspaceManager);
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
