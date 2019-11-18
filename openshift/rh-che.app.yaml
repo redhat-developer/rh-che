@@ -119,7 +119,7 @@ objects:
           - name: CHE_INFRASTRUCTURE_ACTIVE
             value: "openshift"
           - name: SENTRY_RELEASE
-            value: ${IMAGE_TAG}
+            value: "${IMAGE_TAG}"
           envFrom:
           - configMapRef:
               name: rhche
