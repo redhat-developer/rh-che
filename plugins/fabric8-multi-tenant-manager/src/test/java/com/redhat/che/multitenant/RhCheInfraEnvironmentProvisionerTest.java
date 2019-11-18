@@ -57,6 +57,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.Serv
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
+import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeMethod;
@@ -86,6 +87,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private CertificateProvisioner certificateProvisioner;
   @Mock private VcsSshKeysProvisioner vcsSshKeysProvisioner;
   @Mock private GitUserProfileProvisioner gitUserProfileProvisioner;
+  @Mock private OpenShiftPreviewUrlExposer openshiftPreviewUrlExposer;
 
   @Mock private OpenshiftUserTokenProvider openshiftUserTokenProvider;
   @Mock private TenantDataProvider tenantDataProvider;
@@ -126,6 +128,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             certificateProvisioner,
             vcsSshKeysProvisioner,
             gitUserProfileProvisioner,
+            openshiftPreviewUrlExposer,
             false,
             WSAGENT_ROUTER_TIMEOUT);
 
