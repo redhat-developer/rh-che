@@ -62,7 +62,7 @@ is dependent on building che credentials master too and is executed right after 
 
 Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A Che server is running on OpenShift Dedicated, and the user base is spread across multiple OpenShift Online clusters where workspaces are created. The detailed information about the Hosted Che can be found in the official [documentation](https://www.eclipse.org/che/docs/che-7/hosted-che/#about-hosted-che_hosted-che).
 
-## How to build it
+## Developer Guide
 
 *See*: [the Dev guide](./dev-guide.adoc)
 
