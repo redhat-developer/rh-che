@@ -58,19 +58,9 @@ is dependent on building che credentials master too and is executed right after 
 
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)](https://ci.centos.org/job/devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)
 
+## Red Hat Che distribution (Hosted Che)
 
-
-## What is the Red Hat Che distribution
-
-The Red Hat distribution of Eclipse Che is a Red Hat specific packaging of Che assemblies
-that adds some Red Hat specific plugins / behaviors up to the standard upstream Che
-distribution. The Red Hat distribution powers [openshift.io](https://openshift.io) developers workspaces.
-
-Red Hat modifications against the upstream Che include:
-
-* [fabric8-analytics Language Server](https://github.com/fabric8-analytics/fabric8-analytics-lsp-server)
-* a different set of Che stacks than upstream. They can contain specific Red Hat configurations such as providing 'oc' on command-line
-* telemetry to follow usage of different parts
+Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A Che server is running on OpenShift Dedicated, and the user base is spread across multiple OpenShift Online clusters where workspaces are created. The detailed information about the Hosted Che can be found in the official [documentation](https://www.eclipse.org/che/docs/che-7/hosted-che/#about-hosted-che_hosted-che).
 
 ## How to build it
 
