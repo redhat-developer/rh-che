@@ -12,14 +12,10 @@
 package com.redhat.che.wsmaster.deploy;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.matcher.AbstractMatcher;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
 import com.redhat.che.multitenant.Fabric8AuthServiceClient;
 import com.redhat.che.multitenant.Fabric8OAuthAPIProvider;
-import java.lang.reflect.Method;
 import org.eclipse.che.inject.DynaModule;
-import org.eclipse.che.multiuser.keycloak.server.AbstractKeycloakFilter;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakServiceClient;
 import org.eclipse.che.multiuser.keycloak.server.deploy.OAuthAPIProvider;
 import org.eclipse.che.multiuser.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
@@ -36,18 +32,6 @@ public class Fabric8WsMasterModule extends AbstractModule {
         .asEagerSingleton();
     bind(OAuthAPIProvider.class).to(Fabric8OAuthAPIProvider.class);
     bind(KeycloakServiceClient.class).to(Fabric8AuthServiceClient.class).asEagerSingleton();
-    final DisableAuthenticationInterceptor disableAuthenticationInterceptor =
-        new DisableAuthenticationInterceptor();
-    requestInjection(disableAuthenticationInterceptor);
-    bindInterceptor(
-        Matchers.subclassesOf(AbstractKeycloakFilter.class),
-        new AbstractMatcher<Method>() {
-          @Override
-          public boolean matches(Method m) {
-            return "doFilter".equals(m.getName());
-          }
-        },
-        disableAuthenticationInterceptor);
 
     final Multibinder<MachineAuthenticatedResource> machineAuthenticatedResources =
         Multibinder.newSetBinder(binder(), MachineAuthenticatedResource.class);
