@@ -16,7 +16,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.name.Named;
-import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.JwtParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -64,8 +64,10 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
 
   @Inject
   public Fabric8AuthServiceClient(
-      @Named("che.fabric8.auth.endpoint") String baseAuthUrl, KeycloakSettings keycloakSettings) {
-    super(keycloakSettings);
+      @Named("che.fabric8.auth.endpoint") String baseAuthUrl,
+      KeycloakSettings keycloakSettings,
+      JwtParser jwtParser) {
+    super(keycloakSettings, jwtParser);
     this.githubTokenEndpoint = baseAuthUrl + GITHUB_TOKEN_API_PATH;
     this.githubLinkEndpoint = baseAuthUrl + GITHUB_LINK_API_PATH;
   }
@@ -78,7 +80,7 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
    */
   @Override
   public String getAccountLinkingURL(
-      @SuppressWarnings("rawtypes") Jwt token, String oauthProvider, String redirectAfterLogin) {
+      String token, String oauthProvider, String redirectAfterLogin) {
     String linkingEndpoint =
         UriBuilder.fromUri(githubLinkEndpoint)
             .queryParam("redirect", redirectAfterLogin)

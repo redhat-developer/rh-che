@@ -24,6 +24,7 @@ import com.google.inject.Provider;
 import com.redhat.che.multitenant.toggle.CheServiceAccountTokenToggle;
 import io.fabric8.kubernetes.client.Config;
 import java.util.Optional;
+import okhttp3.EventListener;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
@@ -56,6 +57,7 @@ public class Fabric8OpenShiftClientFactoryTest {
   @Mock private KubernetesRuntimeStateCache runtimeStateCache;
   @Mock private CheServiceAccountTokenToggle cheServiceAccountTokenToggle;
   @Mock private KubernetesRuntimeState runtimeState;
+  @Mock private EventListener eventListener;
   @Mock private Subject currentSubject;
   @Mock private Subject ownerSubject;
 
@@ -94,7 +96,8 @@ public class Fabric8OpenShiftClientFactoryTest {
             1,
             1,
             1,
-            1);
+            1,
+            eventListener);
 
     EnvironmentContext.getCurrent().setSubject(currentSubject);
   }

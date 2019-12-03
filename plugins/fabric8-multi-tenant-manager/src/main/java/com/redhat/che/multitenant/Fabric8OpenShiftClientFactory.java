@@ -18,6 +18,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import okhttp3.EventListener;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes;
@@ -57,7 +58,8 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
           int maxConcurrentRequestsPerHost,
       @Named("che.infra.kubernetes.client.http.connection_pool.max_idle") int maxIdleConnections,
       @Named("che.infra.kubernetes.client.http.connection_pool.keep_alive_min")
-          int connectionPoolKeepAlive) {
+          int connectionPoolKeepAlive,
+      EventListener eventListener) {
     super(
         null,
         null,
@@ -65,7 +67,8 @@ public class Fabric8OpenShiftClientFactory extends OpenShiftClientFactory {
         maxConcurrentRequests,
         maxConcurrentRequestsPerHost,
         maxIdleConnections,
-        connectionPoolKeepAlive);
+        connectionPoolKeepAlive,
+        eventListener);
     this.envProvider = envProvider;
     this.workspaceRuntimeProvider = workspaceRuntimeProvider;
     this.subjectsRegistry = subjectsRegistry;
