@@ -87,6 +87,7 @@
                                 <copy overwrite="true" todir="${basedir}/target/sources/" verbose="true">
                                     <fileset dir="${basedir}">
                                         <include name="src/**" />
+                                        <include name="index.d.ts" />
                                     </fileset>
                                 </copy>
                             </target>
