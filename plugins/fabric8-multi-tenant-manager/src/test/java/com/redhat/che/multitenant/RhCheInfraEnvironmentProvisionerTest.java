@@ -43,13 +43,14 @@ import org.eclipse.che.commons.subject.SubjectImpl;
 import org.eclipse.che.workspace.infrastructure.kubernetes.environment.KubernetesEnvironment.PodData;
 import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.WorkspaceVolumesStrategy;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GitUserProfileProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GitConfigProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSshKeysProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.RamLimitRequestProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
@@ -86,7 +87,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private ProxySettingsProvisioner proxySettingsProvisioner;
   @Mock private CertificateProvisioner certificateProvisioner;
   @Mock private VcsSshKeysProvisioner vcsSshKeysProvisioner;
-  @Mock private GitUserProfileProvisioner gitUserProfileProvisioner;
+  @Mock private GitConfigProvisioner gitConfigProvisioner;
   @Mock private OpenShiftPreviewUrlExposer openshiftPreviewUrlExposer;
 
   @Mock private OpenshiftUserTokenProvider openshiftUserTokenProvider;
@@ -94,6 +95,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private RuntimeIdentity runtimeIdentity;
   @Mock private OpenShiftEnvironment openShiftEnvironment;
   @Mock private ServiceAccountProvisioner serviceAccountProvisioner;
+  @Mock private VcsSslCertificateProvisioner vcsSslCertificateProvisioner;
 
   private List<EnvVar> con1EnvVars;
   private List<EnvVar> con2EnvVars;
@@ -127,8 +129,9 @@ public class RhCheInfraEnvironmentProvisionerTest {
             serviceAccountProvisioner,
             certificateProvisioner,
             vcsSshKeysProvisioner,
-            gitUserProfileProvisioner,
+            gitConfigProvisioner,
             openshiftPreviewUrlExposer,
+            vcsSslCertificateProvisioner,
             false,
             WSAGENT_ROUTER_TIMEOUT);
 
