@@ -13,7 +13,8 @@ package com.redhat.che.multitenant;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.che.api.workspace.server.WorkspaceManager;
+import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
+import org.eclipse.che.api.user.server.UserManager;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
@@ -35,7 +36,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       @Nullable @Named("che.infra.kubernetes.namespace.default") String defaultNamespaceName,
       OpenShiftClientFactory clientFactory,
       Fabric8WorkspaceEnvironmentProvider envProvider,
-      WorkspaceManager workspaceManager) {
+      UserManager userManager) {
     super(
         projectName,
         null,
@@ -44,17 +45,17 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         false,
         clientFactory,
         new OpenShiftClientConfigFactory(),
-        workspaceManager);
+        userManager);
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
 
   @Override
-  public OpenShiftProject create(String workspaceId) throws InfrastructureException {
+  public OpenShiftProject getOrCreate(RuntimeIdentity identity) throws InfrastructureException {
     Subject currentSubject = EnvironmentContext.getCurrent().getSubject();
 
     String workspacesNamespace = envProvider.getWorkspacesOpenshiftNamespace(currentSubject);
 
-    return new OpenShiftProject(clientFactory, workspacesNamespace, workspaceId);
+    return new OpenShiftProject(clientFactory, workspacesNamespace, identity.getWorkspaceId());
   }
 }
