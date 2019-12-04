@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This interceptor must be bound for the {@code doFilter} method of the {@link
- * KeycloakEnvironmentInitalizationFilter} and {@link KeycloakAuthenticationFilter} classes.
+ * MultiUserEnvironmentInitializationFilter} and {@link KeycloakEnvironmentInitializationFilter}
+ * classes.
  *
  * @author David Festal
  */

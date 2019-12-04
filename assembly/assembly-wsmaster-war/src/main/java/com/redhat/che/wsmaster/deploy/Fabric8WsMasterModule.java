@@ -19,7 +19,7 @@ import com.redhat.che.multitenant.Fabric8AuthServiceClient;
 import com.redhat.che.multitenant.Fabric8OAuthAPIProvider;
 import java.lang.reflect.Method;
 import org.eclipse.che.inject.DynaModule;
-import org.eclipse.che.multiuser.keycloak.server.AbstractKeycloakFilter;
+import org.eclipse.che.multiuser.api.authentication.commons.filter.MultiUserEnvironmentInitializationFilter;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakServiceClient;
 import org.eclipse.che.multiuser.keycloak.server.deploy.OAuthAPIProvider;
 import org.eclipse.che.multiuser.keycloak.token.provider.oauth.OpenShiftGitHubOAuthAuthenticator;
@@ -40,7 +40,7 @@ public class Fabric8WsMasterModule extends AbstractModule {
         new DisableAuthenticationInterceptor();
     requestInjection(disableAuthenticationInterceptor);
     bindInterceptor(
-        Matchers.subclassesOf(AbstractKeycloakFilter.class),
+        Matchers.subclassesOf(MultiUserEnvironmentInitializationFilter.class),
         new AbstractMatcher<Method>() {
           @Override
           public boolean matches(Method m) {
