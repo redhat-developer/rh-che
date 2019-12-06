@@ -12,7 +12,7 @@ Docker image is pushed here: quay.io/openshiftio/rhchestage-rh-che-e2e-tests. To
 docker run 
 -e USERNAME=<username>
 -e PASSWORD=<password>
--e URL=<url of running RH-Che>
+-e URL=<url of running Hosted Che>
 --shm-size=256m
 quay.io/openshiftio/rhchestage-rh-che-e2e-tests:<version>
 ```
@@ -63,3 +63,5 @@ Java Vert.x test flow is following:
   - Codenavigation
 - Stop workspace
 - Delete workspace
+
+Java Vert.x tests is saved in upstream and is only reused on Hosted Che side. Test for Java Maven should be moved to upstream too. 
