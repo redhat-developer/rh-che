@@ -50,8 +50,9 @@ class TenantDataCacheLoader extends CacheLoader<TenantDataCacheKey, UserCheTenan
   }
 
   @Override
-  public UserCheTenantData load(TenantDataCacheKey cacheKey) throws InfrastructureException {
-    String responseBody;
+  public UserCheTenantData load(final TenantDataCacheKey cacheKey) throws InfrastructureException {
+    final String namespace = cacheKey.getNamespaceType();
+    final String responseBody;
     try {
       responseBody = getResponseBody(fabric8UserServiceEndpoint, cacheKey.getKeycloakToken());
     } catch (ApiException | IOException e) {
@@ -64,7 +65,7 @@ class TenantDataCacheLoader extends CacheLoader<TenantDataCacheKey, UserCheTenan
           gson.fromJson(responseBody, UserServicesJsonResponse.class);
       List<Namespace> namespaces = userServicesData.getNamespaces();
       for (Namespace ns : namespaces) {
-        if (cacheKey.getNamespaceType().equals(ns.getType())) {
+        if (namespace.equals(ns.getType())) {
           UserCheTenantData cheTenantData =
               new UserCheTenantData(
                   ns.getName(),
@@ -78,6 +79,13 @@ class TenantDataCacheLoader extends CacheLoader<TenantDataCacheKey, UserCheTenan
     } catch (ValidationException | JsonSyntaxException | NullPointerException e) {
       throw new InfrastructureException(
           "Invalid response from Fabric8 user services:" + responseBody, e);
+    }
+    if ("user".equals(namespace)) {
+      // This happens only if there is a bug on the '/api/user/services' or init tenant side
+      // Let's log the error and return blank data instead of throwing an exception and failing the
+      // workspace startup
+      LOG.error("No namespace with type 'user' was found in the user tenant: {}", responseBody);
+      return new UserCheTenantData("", "", "", false);
     }
     throw new InfrastructureException(
         format(

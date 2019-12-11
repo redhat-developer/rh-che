@@ -39,7 +39,8 @@ public class TenantDataCacheLoaderTest {
   private static final String ENDPOINT = "test-endpoint";
   private static final String CLUSTER_URL = "test-url";
   private static final String ROUTE_PREFIX = "test-route-prefix";
-  private static final String NAMESPACE_TYPE = "che";
+  private static final String NAMESPACE_TYPE_CHE = "che";
+  private static final String NAMESPACE_TYPE_USER = "user";
   private static final String BAD_NAMESPACE_TYPE = "not-che";
 
   @Mock private HttpJsonRequestFactory httpJsonRequestFactory;
@@ -62,7 +63,7 @@ public class TenantDataCacheLoaderTest {
   public void shouldParseJsonAndReturnTenantData() throws Exception {
     // Given
     String jsonResponse =
-        generateResponse(ROUTE_PREFIX, CLUSTER_URL, NAMESPACE, NAMESPACE_TYPE, false);
+        generateResponse(ROUTE_PREFIX, CLUSTER_URL, NAMESPACE, NAMESPACE_TYPE_CHE, false);
     when(httpJsonResponse.asString()).thenReturn(jsonResponse);
     TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", "che");
 
@@ -96,7 +97,7 @@ public class TenantDataCacheLoaderTest {
     String jsonResponse =
         generateResponse(ROUTE_PREFIX, CLUSTER_URL, NAMESPACE, BAD_NAMESPACE_TYPE, false);
     when(httpJsonResponse.asString()).thenReturn(jsonResponse);
-    TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", NAMESPACE_TYPE);
+    TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", NAMESPACE_TYPE_CHE);
 
     // When
     cacheLoader.load(cacheKey);
@@ -107,7 +108,7 @@ public class TenantDataCacheLoaderTest {
       expectedExceptionsMessageRegExp = "Invalid response.*")
   public void shouldThrowInfrastructureExceptionWhenResponseFailsToValidate() throws Exception {
     // Given
-    String jsonResponse = generateBadResponse(ROUTE_PREFIX, NAMESPACE, NAMESPACE_TYPE, false);
+    String jsonResponse = generateBadResponse(ROUTE_PREFIX, NAMESPACE, NAMESPACE_TYPE_CHE, false);
     when(httpJsonResponse.asString()).thenReturn(jsonResponse);
     TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", "che");
 
@@ -122,6 +123,56 @@ public class TenantDataCacheLoaderTest {
     // Given
     when(httpJsonResponse.asString()).thenReturn("{}"); // Should parse to null
     TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", "che");
+
+    // When
+    cacheLoader.load(cacheKey);
+  }
+
+  @Test
+  public void shouldReturnValidTenantDataIfUserNamespaceExists() throws Exception {
+    // Given
+    String jsonResponse =
+        generateResponse(ROUTE_PREFIX, CLUSTER_URL, NAMESPACE, NAMESPACE_TYPE_USER, false);
+    when(httpJsonResponse.asString()).thenReturn(jsonResponse);
+    TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", "user");
+
+    // When
+    UserCheTenantData data = cacheLoader.load(cacheKey);
+
+    // Then
+    assertEquals(data.getRouteBaseSuffix(), ROUTE_PREFIX);
+    assertEquals(data.getClusterUrl(), CLUSTER_URL);
+    assertEquals(data.getNamespace(), NAMESPACE);
+    assertEquals(data.isClusterCapacityExhausted(), false);
+  }
+
+  @Test
+  public void shouldNotThrowExceptionWhenUserNamespaceIsMissing() throws InfrastructureException {
+    // Given
+    String jsonResponse =
+        generateResponse(ROUTE_PREFIX, CLUSTER_URL, NAMESPACE, NAMESPACE_TYPE_CHE, false);
+    when(httpJsonResponse.asString()).thenReturn(jsonResponse);
+    TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", "user");
+
+    // When
+    UserCheTenantData data = cacheLoader.load(cacheKey);
+
+    // Then expect blank data
+    assertEquals(data.getRouteBaseSuffix(), "");
+    assertEquals(data.getClusterUrl(), "");
+    assertEquals(data.getNamespace(), "");
+    assertEquals(data.isClusterCapacityExhausted(), false);
+  }
+
+  @Test(
+      expectedExceptions = InfrastructureException.class,
+      expectedExceptionsMessageRegExp = "No namespace with type '" + BAD_NAMESPACE_TYPE + "'.*")
+  public void shouldThrowInfrastructureExceptionWhenNamespaceDoesNotExist() throws Exception {
+    // Given
+    String jsonResponse =
+        generateResponse(ROUTE_PREFIX, CLUSTER_URL, NAMESPACE, NAMESPACE_TYPE_CHE, false);
+    when(httpJsonResponse.asString()).thenReturn(jsonResponse);
+    TenantDataCacheKey cacheKey = new TenantDataCacheKey("token", BAD_NAMESPACE_TYPE);
 
     // When
     cacheLoader.load(cacheKey);
