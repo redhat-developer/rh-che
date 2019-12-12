@@ -56,7 +56,7 @@ else
   echo "Switching to project failed, probably not exists [$?]. Creating..."
   oc new-project "${PROJECT_NAMESPACE}" --display-name="PR ${RH_PULL_REQUEST_ID} - Automated Deployment" > /dev/null 2>&1
 fi
-oc policy add-role-to-user edit Katka92 ScrewTSW rhopp garagatyi ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT_NAMESPACE
+oc policy add-role-to-user edit Katka92 ScrewTSW rhopp tomgeorge ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT_NAMESPACE
 
 start=$(date +%s)
 echo "Running deploy script for che version:${CHE_VERSION}"
