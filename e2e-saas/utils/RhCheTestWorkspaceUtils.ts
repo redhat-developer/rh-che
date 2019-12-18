@@ -22,6 +22,20 @@ export class RhCheTestWorkspaceUtils implements ITestWorkspaceUtil {
             rest = new rm.RestClient('rest-samples');
          }
 
+    public async cleanUpAllWorkspaces() {
+        let id : string = await this.getIdOfRunningWorkspace();
+        await this.stopWorkspaceById(id);
+        await this.removeWorkspaceById(id);
+
+    }
+
+    public async getIdOfRunningWorkspaces(): Promise<string[]> {
+        // using the same method as upstream has would be possible with having getCheBearerToken() in ITestWorkspaceUtil
+        // then we can call upstream getIdOfRunningWorkspaces and override the getCheBearerToken 
+        // that will also result in simplifying other methods
+        return [ await this.getIdOfRunningWorkspace()];
+    }
+
     public async waitWorkspaceStatus(namespace: string, workspaceName: string, expectedWorkspaceStatus: WorkspaceStatus) {
         const workspaceStatusApiUrl: string = `${TestConstants.TS_SELENIUM_BASE_URL}/api/workspace/${namespace}:${workspaceName}`;
         const attempts: number = TestConstants.TS_SELENIUM_WORKSPACE_STATUS_ATTEMPTS;
