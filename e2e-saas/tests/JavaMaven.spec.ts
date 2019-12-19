@@ -82,7 +82,7 @@ suite('RhChe E2E Java Maven test', async () => {
             await runTask(taskName);
             await quickOpenContainer.clickOnContainerItem('Continue without scanning the task output');
 
-            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 30000);
+            await ide.waitNotification('has exited with code 0.', 30000);
        });
 
         test('Close the terminal tasks', async () => {
@@ -94,7 +94,7 @@ suite('RhChe E2E Java Maven test', async () => {
             await runTask(taskName);
             await quickOpenContainer.clickOnContainerItem('Continue without scanning the task output');
 
-            await ide.waitNotification('Task ' + taskName + ' has exited with code 0.', 30000);
+            await ide.waitNotification('has exited with code 0.', 30000);
         });
 
         test('Close the terminal tasks', async () => {
