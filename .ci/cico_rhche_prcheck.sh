@@ -37,6 +37,7 @@ echo "Installing all dependencies lasted $instal_dep_duration seconds."
 
 export PROJECT_NAMESPACE=prcheck-${RH_PULL_REQUEST_ID}
 export DOCKER_IMAGE_TAG="${RH_TAG_DIST_SUFFIX}"-"${RH_PULL_REQUEST_ID}"
+getMavenVersion # Checking the maven version for debugging https://github.com/redhat-developer/rh-che/issues/1716
 CHE_VERSION=$(getVersionFromPom)
 export CHE_VERSION
 

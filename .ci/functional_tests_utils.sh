@@ -119,7 +119,6 @@ function archiveArtifacts() {
 }
 
 function getVersionFromPom() {
-  getMavenVersion # Checking the maven version for debugging https://github.com/redhat-developer/rh-che/issues/1716
   version=$(scl enable rh-maven33 "mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn org.apache.maven.plugins:maven-help-plugin:evaluate -q -Dexpression=project.parent.version -DforceStdout")
   echo $version
 }
