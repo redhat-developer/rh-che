@@ -95,6 +95,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   mkdir report
 
   #check version in rh-che pom.xml to use correct version of tests.
+  getMavenVersion # Checking the maven version for debugging https://github.com/redhat-developer/rh-che/issues/1716
   version=$(getVersionFromPom)
   if [[ -z "${version}" ]]; then
     echo "[ERROR]: Could not find version in pom.xml."
