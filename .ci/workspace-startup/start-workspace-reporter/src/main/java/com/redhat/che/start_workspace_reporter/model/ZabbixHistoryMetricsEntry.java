@@ -60,10 +60,10 @@ public class ZabbixHistoryMetricsEntry implements Comparable<ZabbixHistoryMetric
 
   @Override
   public int compareTo(ZabbixHistoryMetricsEntry o) {
-    if (Integer.valueOf(o.getClock()) > Integer.valueOf(this.getClock())) return -1;
-    if (Integer.valueOf(o.getClock()) < Integer.valueOf(this.getClock())) return 1;
-    if (Integer.valueOf(o.getNs()) > Integer.valueOf(this.getNs())) return -1;
-    if (Integer.valueOf(o.getNs()) < Integer.valueOf(this.getNs())) return 1;
+    if (Integer.parseInt(o.getClock()) > Integer.parseInt(this.getClock())) return -1;
+    if (Integer.parseInt(o.getClock()) < Integer.parseInt(this.getClock())) return 1;
+    if (Integer.parseInt(o.getNs()) > Integer.parseInt(this.getNs())) return -1;
+    if (Integer.parseInt(o.getNs()) < Integer.parseInt(this.getNs())) return 1;
     return 0;
   }
 }

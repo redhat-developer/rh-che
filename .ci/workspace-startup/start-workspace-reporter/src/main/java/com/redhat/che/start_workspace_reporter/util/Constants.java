@@ -29,6 +29,7 @@ public class Constants {
   public static final String SLACK_SUCCESS_COLOR = "#2EB886";
   public static final String SLACK_UNSTABLE_COLOR = "#FFAA00";
   public static final String SLACK_BROKEN_COLOR = "#FF0000";
+  public static final String SLACK_NO_DATA_COLOR = "#333333";
   public static final float SLACK_BROKEN_PERCENTAGE = 5f; // above value
   public static final float SLACK_UNSTABLE_PERCENTAGE = 1f; // above value
   public static final String SUFFIX_AVG = "_AVG";

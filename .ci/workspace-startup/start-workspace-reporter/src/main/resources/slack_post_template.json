@@ -6,7 +6,7 @@
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "STARTER_US_EAST_1A_COLOR",
-      "mrkdwn_in": ["fields"],
+      "mrkdwn_in": ["fields", "text"],
       "fields": [
         {
           "title": "Cluster 1a start",
@@ -23,7 +23,7 @@
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "STARTER_US_EAST_1B_COLOR",
-      "mrkdwn_in": ["fields"],
+      "mrkdwn_in": ["fields", "text"],
       "fields": [
         {
           "title": "Cluster 1b start",
@@ -40,7 +40,7 @@
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "STARTER_US_EAST_2_COLOR",
-      "mrkdwn_in": ["fields"],
+      "mrkdwn_in": ["fields", "text"],
       "fields": [
         {
           "title": "Cluster 2 start",
@@ -57,7 +57,7 @@
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "STARTER_US_EAST_2A_COLOR",
-      "mrkdwn_in": ["fields"],
+      "mrkdwn_in": ["fields", "text"],
       "fields": [
         {
           "title": "Cluster 2a start",
@@ -74,7 +74,7 @@
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "STARTER_US_EAST_2A_PREVIEW_COLOR",
-      "mrkdwn_in": ["fields"],
+      "mrkdwn_in": ["fields", "text"],
       "fields": [
         {
           "title": "Cluster 2a preview start",

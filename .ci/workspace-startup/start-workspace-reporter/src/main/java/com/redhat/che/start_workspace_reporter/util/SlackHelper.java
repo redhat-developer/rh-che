@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
@@ -37,6 +38,11 @@ public class SlackHelper {
 
   private static final Logger LOG = Logger.getLogger(SlackHelper.class.getName());
   private static final Gson gson = new Gson();
+
+  private static final Float DEFAULT_WORKSPACE_STARTUP_WARNING_THRESHOLD = 35f;
+  private static final Float DEFAULT_WORKSPACE_STARTUP_FAILURE_THRESHOLD = 60f;
+  private static final Float DEFAULT_WORKSPACE_STOP_WARNING_THRESHOLD = 5f;
+  private static final Float DEFAULT_WORKSPACE_STOP_FAILURE_THRESHOLD = 10f;
 
   private static final HttpRequestWrapper slackRequestWrapper =
       new HttpRequestWrapper(System.getenv("SLACK_URL"));
@@ -50,6 +56,12 @@ public class SlackHelper {
     SlackPost slackPost = gson.fromJson(slackPostISReader, SlackPost.class);
     List<SlackPostAttachment> attachments = slackPost.getAttachments();
     List<SlackPostAttachment> newAttachments = new ArrayList<>();
+    AtomicReference<Float> startWarningThreshold = new AtomicReference<>();
+    AtomicReference<Float> startFailureThreshold = new AtomicReference<>();
+    AtomicReference<Float> stopWarningThreshold = new AtomicReference<>();
+    AtomicReference<Float> stopFailureThreshold = new AtomicReference<>();
+    setFailureThresholdValues(
+        startWarningThreshold, startFailureThreshold, stopWarningThreshold, stopFailureThreshold);
     for (SlackPostAttachment a : attachments) {
       String attachmentColor = a.getColor();
       // If it's a field that needs to have it's values set
@@ -75,14 +87,21 @@ public class SlackHelper {
             clusterName = null;
             break;
         }
-        prepareSlackAttachment(zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a, clusterName);
+        prepareSlackAttachment(
+            zabbixMaxAvgValues,
+            zabbixMaxAvgValuesHistory,
+            a,
+            clusterName,
+            startWarningThreshold.get(),
+            startFailureThreshold.get(),
+            stopWarningThreshold.get(),
+            stopFailureThreshold.get());
       }
       newAttachments.add(a);
     }
     slackPost.setAttachments(newAttachments);
     String channel = System.getenv("SLACK_CHANNEL");
     slackPost.setChannel(channel != null ? channel : "#devtools-che");
-    LOG.info(gson.toJson(slackPost));
     return slackPost;
   }
 
@@ -115,9 +134,21 @@ public class SlackHelper {
       Map<String, Float> zabbixMaxAvgValues,
       Map<String, Float> zabbixMaxAvgValuesHistory,
       SlackPostAttachment a,
-      Constants.ZabbixWorkspaceClusterNames clusterName) {
+      Constants.ZabbixWorkspaceClusterNames clusterName,
+      Float startWarningThreshold,
+      Float startFailureThreshold,
+      Float stopWarningThreshold,
+      Float stopFailureThreshold) {
     Map<String, Float> clusterChangesMap =
-        calculateChangeAndSetColor(clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a);
+        calculateChangeAndSetColor(
+            clusterName,
+            zabbixMaxAvgValues,
+            zabbixMaxAvgValuesHistory,
+            a,
+            startWarningThreshold,
+            startFailureThreshold,
+            stopWarningThreshold,
+            stopFailureThreshold);
     createAndSetFields(
         clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory, a, clusterChangesMap);
   }
@@ -170,52 +201,133 @@ public class SlackHelper {
       String actionMaxKey,
       String pvcActionAvgChangeKey,
       String ephActionAvgChangeKey) {
-    Float pvcAvgSeconds = zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000;
-    Float pvcMaxSeconds = zabbixMaxAvgValues.get(PVC.get().concat(actionMaxKey)) / 1000;
-    Float pvcAvgDiffPercentage = cluster_changes.get(pvcActionAvgChangeKey);
-    Float pvcAvgDiffSeconds =
-        zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000
-            - zabbixMaxAvgValuesHistory.get(PVC.get().concat(actionAvgKey)) / 1000;
-    Float ephAvgSeconds = zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000;
-    Float ephMaxSeconds = zabbixMaxAvgValues.get(EPH.get().concat(actionMaxKey)) / 1000;
-    Float ephAvgDiffPercentage = cluster_changes.get(ephActionAvgChangeKey);
-    Float ephAvgDiffSeconds =
-        zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000
-            - zabbixMaxAvgValuesHistory.get(EPH.get().concat(actionAvgKey)) / 1000;
-    return String.format("*PVC* avg: %.1fs", pvcAvgSeconds)
-        .concat(String.format(", max: %.1fs\n", pvcMaxSeconds))
-        .concat(
-            String.format("avg-diff: %.2f%% {%.2fs}\n", pvcAvgDiffPercentage, pvcAvgDiffSeconds))
-        .concat(String.format("*EPH* avg: %.1fs", ephAvgSeconds))
-        .concat(String.format(", max: %.1fs\n", ephMaxSeconds))
-        .concat(String.format("avg-diff: %.2f%% {%.2fs}", ephAvgDiffPercentage, ephAvgDiffSeconds));
+    // Create strings for PVC part of the attachment
+    String pvcAvgString = "*PVC* avg: NO_DATA";
+    if (zabbixMaxAvgValues.containsKey(PVC.get().concat(actionAvgKey)))
+      pvcAvgString =
+          String.format(
+              "*PVC* avg: %.1fs", zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000);
+    String pvcMaxString = ", max: NO_DATA\n";
+    if (zabbixMaxAvgValues.containsKey(PVC.get().concat(actionMaxKey)))
+      pvcMaxString =
+          String.format(
+              ", max: %.1fs\n", zabbixMaxAvgValues.get(PVC.get().concat(actionMaxKey)) / 1000);
+    String pvcAvgDiff = "NO_DATA ";
+    String pvcAvgDiffSeconds = "{NO_HISTORY}\n";
+    if (cluster_changes.containsKey(pvcActionAvgChangeKey))
+      pvcAvgDiff = String.format("%.2f%% ", cluster_changes.get(pvcActionAvgChangeKey));
+    if (zabbixMaxAvgValuesHistory.containsKey(PVC.get().concat(actionAvgKey))) {
+      pvcAvgDiffSeconds = "{CANNOT_CALCULATE}\n";
+      if (zabbixMaxAvgValues.containsKey(PVC.get().concat(actionAvgKey)))
+        pvcAvgDiffSeconds =
+            String.format(
+                "{%.2fs}\n",
+                zabbixMaxAvgValues.get(PVC.get().concat(actionAvgKey)) / 1000
+                    - zabbixMaxAvgValuesHistory.get(PVC.get().concat(actionAvgKey)) / 1000);
+    }
+    String pvcAvgDiffString = "avg-diff: ".concat(pvcAvgDiff).concat(pvcAvgDiffSeconds);
+
+    // Create strings for EPH part of the attachments
+    String ephAvgString = "*EPH* avg: NO_DATA";
+    if (zabbixMaxAvgValues.containsKey(EPH.get().concat(actionAvgKey)))
+      ephAvgString =
+          String.format(
+              "*EPH* avg: %.1fs", zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000);
+    String ephMaxString = ", max: NO_DATA\n";
+    if (zabbixMaxAvgValues.containsKey(EPH.get().concat(actionMaxKey)))
+      ephMaxString =
+          String.format(
+              ", max: %.1fs\n", zabbixMaxAvgValues.get(EPH.get().concat(actionMaxKey)) / 1000);
+    String ephAvgDiff = "NO_DATA ";
+    String ephAvgDiffSeconds = "{NO_HISTORY}\n";
+    if (cluster_changes.containsKey(ephActionAvgChangeKey))
+      ephAvgDiff = String.format("%.2f%% ", cluster_changes.get(ephActionAvgChangeKey));
+    if (zabbixMaxAvgValuesHistory.containsKey(EPH.get().concat(actionAvgKey))) {
+      ephAvgDiffSeconds = "{CANNOT_CALCULATE}";
+      if (zabbixMaxAvgValues.containsKey(EPH.get().concat(actionAvgKey)))
+        ephAvgDiffSeconds =
+            String.format(
+                "{%.2fs}",
+                zabbixMaxAvgValues.get(EPH.get().concat(actionAvgKey)) / 1000
+                    - zabbixMaxAvgValuesHistory.get(EPH.get().concat(actionAvgKey)) / 1000);
+    }
+    String ephAvgDiffString = "avg-diff: ".concat(ephAvgDiff).concat(ephAvgDiffSeconds);
+
+    return pvcAvgString
+        .concat(pvcMaxString)
+        .concat(pvcAvgDiffString)
+        .concat(ephAvgString)
+        .concat(ephMaxString)
+        .concat(ephAvgDiffString);
   }
 
   private static Map<String, Float> calculateChangeAndSetColor(
       Constants.ZabbixWorkspaceClusterNames clusterName,
       Map<String, Float> zabbixMaxAvgValues,
       Map<String, Float> zabbixMaxAvgValuesHistory,
-      SlackPostAttachment a) {
+      SlackPostAttachment a,
+      Float startWarningThreshold,
+      Float startFailureThreshold,
+      Float stopWarningThreshold,
+      Float stopFailureThreshold) {
     Map<String, Float> changes =
         getChangesMap(clusterName, zabbixMaxAvgValues, zabbixMaxAvgValuesHistory);
-    float percentageChange = getMaxChange(changes);
-    LOG.info(
-        "Average diff percentage:"
-            + percentageChange
-            + " color:"
-            + getColorBasedOnPercentage(percentageChange));
-    a.setColor(getColorBasedOnPercentage(percentageChange));
+    if (zabbixMaxAvgValues.containsKey(
+            PVC.get() + "_" + clusterName + "_" + START.get() + SUFFIX_AVG)
+        && zabbixMaxAvgValues.containsKey(
+            EPH.get() + "_" + clusterName + "_" + START.get() + SUFFIX_AVG)
+        && zabbixMaxAvgValues.containsKey(
+            PVC.get() + "_" + clusterName + "_" + STOP.get() + SUFFIX_AVG)
+        && zabbixMaxAvgValues.containsKey(
+            EPH.get() + "_" + clusterName + "_" + STOP.get() + SUFFIX_AVG)) {
+      String attachmentColor =
+          setAttachmentColorBasedOnThresholds(
+              zabbixMaxAvgValues,
+              clusterName.get(),
+              startWarningThreshold,
+              startFailureThreshold,
+              stopWarningThreshold,
+              stopFailureThreshold);
+      a.setColor(attachmentColor);
+    } else {
+      LOG.info("No data available - color set to SLACK_NO_DATA_COLOR.");
+      a.setColor(SLACK_NO_DATA_COLOR);
+    }
     return changes;
   }
 
-  private static String getColorBasedOnPercentage(float percentage) {
-    if (percentage > SLACK_BROKEN_PERCENTAGE) return SLACK_BROKEN_COLOR;
-    if (percentage > SLACK_UNSTABLE_PERCENTAGE) return SLACK_UNSTABLE_COLOR;
-    return SLACK_SUCCESS_COLOR;
-  }
-
-  private static float getMaxChange(Map<String, Float> changes) {
-    return Collections.max(changes.values());
+  private static String setAttachmentColorBasedOnThresholds(
+      Map<String, Float> zabbixMaxAvgValues,
+      String clusterName,
+      Float startWarningThreshold,
+      Float startFailureThreshold,
+      Float stopWarningThreshold,
+      Float stopFailureThreshold) {
+    float pvcStartAvg;
+    float ephStartAvg;
+    float pvcStopAvg;
+    float ephStopAvg;
+    pvcStartAvg =
+        zabbixMaxAvgValues.get(PVC.get() + "_" + clusterName + "_" + START.get() + SUFFIX_AVG)
+            / 1000f;
+    ephStartAvg =
+        zabbixMaxAvgValues.get(EPH.get() + "_" + clusterName + "_" + START.get() + SUFFIX_AVG)
+            / 1000f;
+    pvcStopAvg =
+        zabbixMaxAvgValues.get(PVC.get() + "_" + clusterName + "_" + STOP.get() + SUFFIX_AVG)
+            / 1000f;
+    ephStopAvg =
+        zabbixMaxAvgValues.get(EPH.get() + "_" + clusterName + "_" + STOP.get() + SUFFIX_AVG)
+            / 1000f;
+    if (pvcStartAvg < startWarningThreshold
+        && ephStartAvg < startWarningThreshold
+        && pvcStopAvg < stopWarningThreshold
+        && ephStopAvg < stopWarningThreshold) return SLACK_SUCCESS_COLOR;
+    if (pvcStartAvg < startFailureThreshold
+        && ephStartAvg < startFailureThreshold
+        && pvcStopAvg < stopFailureThreshold
+        && ephStopAvg < stopFailureThreshold) return SLACK_UNSTABLE_COLOR;
+    return SLACK_BROKEN_COLOR;
   }
 
   private static Map<String, Float> getChangesMap(
@@ -243,9 +355,13 @@ public class SlackHelper {
       String actionValueKey,
       String changesMapKey,
       Constants.ZabbixWorkspaceModes workspaceMode) {
-    Float historyAverageTime = zabbixMaxAvgValuesHistory.get(workspaceMode.get() + actionValueKey);
-    Float currentAverageTime = zabbixMaxAvgValues.get(workspaceMode.get() + actionValueKey);
-    changes.put(changesMapKey, getPercentageDifference(historyAverageTime, currentAverageTime));
+    if (zabbixMaxAvgValues.containsKey(workspaceMode.get() + actionValueKey)
+        && zabbixMaxAvgValuesHistory.containsKey(workspaceMode.get() + actionValueKey)) {
+      Float historyAverageTime =
+          zabbixMaxAvgValuesHistory.get(workspaceMode.get() + actionValueKey);
+      Float currentAverageTime = zabbixMaxAvgValues.get(workspaceMode.get() + actionValueKey);
+      changes.put(changesMapKey, getPercentageDifference(historyAverageTime, currentAverageTime));
+    }
   }
 
   private static float getPercentageDifference(Float oldValue, Float newValue) {
@@ -257,5 +373,38 @@ public class SlackHelper {
   private static boolean responseSuccess(HttpRequestWrapperResponse response) {
     int responseStatusCode = response.getStatusCode();
     return responseStatusCode == 200;
+  }
+
+  private static void setFailureThresholdValues(
+      AtomicReference<Float> startWarningThreshold,
+      AtomicReference<Float> startFailureThreshold,
+      AtomicReference<Float> stopWarningThreshold,
+      AtomicReference<Float> stopFailureThreshold) {
+    startWarningThreshold.set(DEFAULT_WORKSPACE_STARTUP_WARNING_THRESHOLD);
+    try {
+      startWarningThreshold.set(
+          Float.parseFloat(System.getenv("WORKSPACE_STARTUP_WARNING_THRESHOLD")));
+    } catch (Exception e) {
+      LOG.warning("Could not parse workspace startup warning threshold, using default value");
+    }
+    startFailureThreshold.set(DEFAULT_WORKSPACE_STARTUP_FAILURE_THRESHOLD);
+    try {
+      startFailureThreshold.set(
+          Float.parseFloat(System.getenv("WORKSPACE_STARTUP_FAILURE_THRESHOLD")));
+    } catch (Exception e) {
+      LOG.warning("Could not parse workspace startup failure threshold, using default value");
+    }
+    stopWarningThreshold.set(DEFAULT_WORKSPACE_STOP_WARNING_THRESHOLD);
+    try {
+      stopWarningThreshold.set(Float.parseFloat(System.getenv("WORKSPACE_STOP_WARNING_THRESHOLD")));
+    } catch (Exception e) {
+      LOG.warning("Could not parse workspace stop warning threshold, using default value");
+    }
+    stopFailureThreshold.set(DEFAULT_WORKSPACE_STOP_FAILURE_THRESHOLD);
+    try {
+      stopFailureThreshold.set(Float.parseFloat(System.getenv("WORKSPACE_STOP_FAILURE_THRESHOLD")));
+    } catch (Exception e) {
+      LOG.warning("Could not parse workspace stop failure threshold, using default value");
+    }
   }
 }
