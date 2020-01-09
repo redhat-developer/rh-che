@@ -146,6 +146,7 @@ else
   
   #PRODUCTION
   if [[ "$HOST_URL" == "che.openshift.io" ]]; then
+    getMavenVersion
     TAG=$(getVersionFromProd)
     echo "Running test with user $USERNAME against prod environment with version $TAG."
 
@@ -179,6 +180,7 @@ else
     
   #PROD-PREVIEW
   else
+    getMavenVersion
     TAG=$(getVersionFromProdPreview)
     echo "Running test with user $USERNAME against prod-preview environment with version $TAG."
   

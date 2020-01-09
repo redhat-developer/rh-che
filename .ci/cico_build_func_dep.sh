@@ -62,6 +62,7 @@ source .ci/functional_tests_utils.sh
 
 DOCKERFILE="e2e-saas/"
 DOCKER_IMAGE="rh-che-e2e-tests"
+getMavenVersion
 TAG=$(getVersionFromPom)
 DOCKER_IMAGE_URL="${REGISTRY}/openshiftio/${NAMESPACE}-${DOCKER_IMAGE}"
 
