@@ -31,7 +31,7 @@ export class RhCheTestWorkspaceUtils implements ITestWorkspaceUtil {
 
     public async getIdOfRunningWorkspaces(): Promise<string[]> {
         // using the same method as upstream has would be possible with having getCheBearerToken() in ITestWorkspaceUtil
-        // then we can call upstream getIdOfRunningWorkspaces and override the getCheBearerToken 
+        // then we can call upstream getIdOfRunningWorkspaces and override the getCheBearerToken
         // that will also result in simplifying other methods
         return [ await this.getIdOfRunningWorkspace()];
     }
