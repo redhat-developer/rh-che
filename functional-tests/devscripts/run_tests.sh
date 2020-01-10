@@ -124,6 +124,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
     fi
   fi
   
+  #increase timeout for load page to workaround https://github.com/redhat-developer/rh-che/issues/1604
   docker run \
      -v $path/report:/tmp/rh-che/local_tests/report:Z \
      -v $path/e2e-saas/:/tmp/rh-che/local_tests:Z \
@@ -131,6 +132,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
      -e PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD \
      -e URL=http://$HOST_URL \
      -e TEST_SUITE=test-all \
+     -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
      --shm-size=256m \
   $rhche_image
   RESULT=$?
@@ -153,6 +155,7 @@ else
     path="$(pwd)"
     mkdir report
     
+    #increase timeout for load page to workaround https://github.com/redhat-developer/rh-che/issues/1604
     if [[ "$JOB_NAME" == *"flaky"* ]]; then
       docker run \
         -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
@@ -160,6 +163,7 @@ else
         -e PASSWORD=$PASSWORD \
         -e URL=https://$HOST_URL \
         -e TEST_SUITE=test-all \
+        -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
       RESULT=$?
@@ -170,6 +174,7 @@ else
         -e PASSWORD=$PASSWORD \
         -e URL=https://$HOST_URL \
         -e TEST_SUITE=test-all \
+        -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
       RESULT=$?
@@ -187,12 +192,14 @@ else
     path="$(pwd)"
     mkdir report
     
+    #increase timeout for load page to workaround https://github.com/redhat-developer/rh-che/issues/1604
     docker run \
       -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
       -e USERNAME=$USERNAME \
       -e PASSWORD=$PASSWORD \
       -e URL=https://$HOST_URL \
       -e TEST_SUITE=test-all \
+      -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
       --shm-size=256m \
     quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
     RESULT=$?
