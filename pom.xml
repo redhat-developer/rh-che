@@ -17,7 +17,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>7.7.0-SNAPSHOT</version>
+        <version>7.7.0</version>
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>fabric8-ide-parent</artifactId>
@@ -31,6 +31,7 @@
         <module>functional-tests</module>
     </modules>
     <properties>
+        <che.version>7.7.0</che.version>
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
@@ -141,11 +142,6 @@
         </dependencies>
     </dependencyManagement>
     <repositories>
-        <repository>
-            <id>codenvy-public-repo</id>
-            <name>codenvy public</name>
-            <url>https://maven.codenvycorp.com/content/groups/public/</url>
-        </repository>
         <repository>
             <id>ossrh</id>
             <name>central public snapshots</name>
