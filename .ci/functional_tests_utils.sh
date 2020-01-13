@@ -30,8 +30,9 @@ function installEpelRelease() {
 
 function installYQ() {
   installEpelRelease
-  yum install --assumeyes -d1 python-pip
-  pip install yq
+  yum install --assumeyes -d1 python3-pip
+  pip3 install --upgrade setuptools
+  pip3 install yq
 }
 
 function installStartDocker() {
