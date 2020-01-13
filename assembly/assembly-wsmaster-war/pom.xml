@@ -24,7 +24,6 @@
     <packaging>war</packaging>
     <name>Fabric8 IDE :: Assemblies :: Workspace Master</name>
     <properties>
-        <org.jgroups.version>4.1.8.Final</org.jgroups.version>
         <original-project-basedir>assembly/${original-project-name}</original-project-basedir>
         <original-project-name>assembly-wsmaster-war</original-project-name>
     </properties>
@@ -109,11 +108,6 @@
             <artifactId>che-multiuser-personal-account</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
-            <version>${org.jgroups.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -146,7 +140,7 @@
                         </overlay>
                     </overlays>
                     <packagingExcludes>WEB-INF/lib/che-core-ide-stacks-${che.version}.jar,
-                        WEB-INF/classes/che-in-che.json,WEB-INF/lib/jgroups-4.1.0.Final.jar</packagingExcludes>
+                        WEB-INF/classes/che-in-che.json</packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -165,7 +159,6 @@
                                 <dep>com.redhat.che:fabric8-ide-stacks</dep>
                                 <dep>org.eclipse.che.multiuser:che-multiuser-keycloak-server</dep>
                                 <dep>org.eclipse.che.multiuser:che-multiuser-personal-account</dep>
-                                <dep>org.jgroups:jgroups</dep>
                             </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
