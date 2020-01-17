@@ -31,9 +31,47 @@ function createPullRequest() {
        https://api.github.com/repos/redhat-developer/rh-che/pulls
   return_code=$?
   if [ ! $return_code -eq 0 ]; then
-    echo $return_code > compatibility_test
+    commentToPR "Can not create PR."
+    setRedStatus
+    echo $return_code > compatibility_status
     exit $return_code
   fi
+}
+
+function commentToPR() {
+  message=$1
+  url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"${RELATED_PR_TITLE}\") | .url" | sed 's/pulls/issues/g')
+  url=$(echo "${url}" | cut -d"\"" -f 2)
+  url="${url}/comments"
+  job_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/${BUILD_NUMBER}/console"
+  message="${message} See more details here: ${job_url}"
+  curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
+}
+
+function setRedStatus() {
+  setStatus "failure" 
+}
+
+function setGreenStatus() {
+  setStatus "success"
+}
+
+function setStatus() {
+  state=$1
+  target_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/${BUILD_NUMBER}/console"
+  description="Compatibility check"
+  context="compatibility"
+
+  JSON_STRING=$(jq -n \
+    --arg state "$state" \
+    --arg url "$target_url" \
+    --arg desc "$description" \
+    --arg cont "$context" \
+    '{state: $state, target_url: $url, description: $desc, context: $cont}')
+    
+  url="https://api.github.com/repos/redhat-developer/rh-che/statuses/${GIT_COMMIT}"
+  curl -v -X POST -H "Content-Type: application/json" -H "Authorization: token ${GITHUB_PUSH_TOKEN}" --data "$JSON_STRING" $url
+  
 }
 
 function runCompatibilityTest() {
@@ -48,7 +86,7 @@ function runCompatibilityTest() {
   export CHE_VERSION
   if [[ -z $CHE_VERSION ]]; then
     echo "FAILED to get che version. Finishing script."
-    echo "1" > compatibility_test
+    echo "1" > compatibility_status
     exit 1
   fi
   export RELATED_PR_TITLE="Update to ${CHE_VERSION%-SNAPSHOT}"
@@ -101,21 +139,34 @@ function runCompatibilityTest() {
     git push origin "${BRANCH}" -f
     return_code=$?
     if [ ! $return_code -eq 0 ]; then
-      echo $return_code > compatibility_test
+      echo $return_code > compatibility_status
       exit $return_code
     fi
   fi
 
   git rebase origin/master "${BRANCH}"
-  return_code=$?
-  if [ ! $return_code -eq 0 ]; then
-    echo $return_code > compatibility_test
-    exit $return_code
-  else
-    if ! checkPullRequest; then
+  rebase_return_code=$?
+  if [ ! $rebase_return_code -eq 0 ]; then
+    echo "Rebase failed with code: $rebase_return_code"
+    echo "Aborting rebase..."
+    rebase --abort
+  fi
+
+  if ! checkPullRequest; then
       #If PR doesn't exist
+      echo "PR does not exists. Creating PR."
       createPullRequest
-    fi
+  fi
+
+  #if rebase was not successful, send message to the PR and quit
+  if [ ! $rebase_return_code -eq 0 ]; then
+    echo "There banch ${BRANCH} can't be rebased. Please solve conflicts and rebase a branch. Sending comment to related PR."
+    message="Periodic compatibility check failed to rebase a branch ${BRANCH}. Please, resolve conflicts and rebase the branch."
+    commentToPR $message
+    setRedStatus
+    
+    echo $rebase_return_code > compatibility_status
+    exit $rebase_return_code
   fi
 
   echo "Setting image tags for pushing to quay."
@@ -144,18 +195,19 @@ function runCompatibilityTest() {
   #if test fails, send comment to PR
   if [ $return_code != 0 ]; then
     echo "There were some problems and compatibility check failed. Sending comment to related PR."
-    url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"${RELATED_PR_TITLE}\") | .url" | sed 's/pulls/issues/g')
-    url=$(echo "${url}" | cut -d"\"" -f 2)
-    url="${url}/comments"
-    job_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/${BUILD_NUMBER}/console"
-    message="Periodic compatibility check failed. See more details here: ${job_url}"
-    curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
+    message="Tests in compatibility check failed."
+    commentToPR $message
+    setRedStatus
+
+    echo $return_code > compatibility_status
+    exit $return_code
   fi
 
+  setGreenStatus
   echo $return_code > compatibility_status
 }
 
-run_tests_timeout_seconds=${RUN_TEST_TIMEOUT:-1200}
+run_tests_timeout_seconds=${RUN_TEST_TIMEOUT:-2400}
 # SECONDS is an internal bash variable that is increased by one every second that a shell is executing a command/script
 # It is being reset here to zero to be used as a counter for our timeout
 SECONDS=0
@@ -176,6 +228,7 @@ while true; do
   fi
   if [ "$SECONDS" -gt "$run_tests_timeout_seconds" ]; then
     echo "Compatibility test timed out"
+    setRedStatus
     kill "$COMPATIBILITY_PID" > /dev/null 2>&1
     rm compatibility_status
     exit 1

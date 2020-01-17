@@ -20,8 +20,9 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^BUILD_NUMBER$ \
         ^JOB_NAME$ \
         ^ghprb \
-        ^RH_CHE)"
-
+        ^RH_CHE \
+        ^GIT_COMMIT)"
+        
 source ./config
 source .ci/functional_tests_utils.sh
 
