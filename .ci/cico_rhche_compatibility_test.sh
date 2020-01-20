@@ -39,12 +39,12 @@ function createPullRequest() {
 }
 
 function commentToPR() {
-  message=$1
+  job_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/${BUILD_NUMBER}/console"
+  message="$1 See more details here: ${job_url}"
   url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"${RELATED_PR_TITLE}\") | .url" | sed 's/pulls/issues/g')
   url=$(echo "${url}" | cut -d"\"" -f 2)
   url="${url}/comments"
-  job_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/${BUILD_NUMBER}/console"
-  message="${message} See more details here: ${job_url}"
+  
   curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
 }
 
@@ -68,10 +68,9 @@ function setStatus() {
     --arg desc "$description" \
     --arg cont "$context" \
     '{state: $state, target_url: $url, description: $desc, context: $cont}')
-    
-  url="https://api.github.com/repos/redhat-developer/rh-che/statuses/${GIT_COMMIT}"
+  git_commit=$(curl -X GET https://api.github.com/repos/redhat-developer/rh-che/commits/${BRANCH} | jq .sha | cut -d"\"" -f 2);
+  url="https://api.github.com/repos/redhat-developer/rh-che/statuses/${git_commit}"
   curl -v -X POST -H "Content-Type: application/json" -H "Authorization: token ${GITHUB_PUSH_TOKEN}" --data "$JSON_STRING" $url
-  
 }
 
 function runCompatibilityTest() {
@@ -162,7 +161,7 @@ function runCompatibilityTest() {
   if [ ! $rebase_return_code -eq 0 ]; then
     echo "There banch ${BRANCH} can't be rebased. Please solve conflicts and rebase a branch. Sending comment to related PR."
     message="Periodic compatibility check failed to rebase a branch ${BRANCH}. Please, resolve conflicts and rebase the branch."
-    commentToPR $message
+    commentToPR "$message"
     setRedStatus
     
     echo $rebase_return_code > compatibility_status
@@ -195,8 +194,8 @@ function runCompatibilityTest() {
   #if test fails, send comment to PR
   if [ $return_code != 0 ]; then
     echo "There were some problems and compatibility check failed. Sending comment to related PR."
-    message="Tests in compatibility check failed."
-    commentToPR $message
+    message="The compatibility check failed."
+    commentToPR "$message"
     setRedStatus
 
     echo $return_code > compatibility_status
