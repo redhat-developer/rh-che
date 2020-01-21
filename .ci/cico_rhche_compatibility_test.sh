@@ -143,8 +143,11 @@ function runCompatibilityTest() {
     fi
   fi
 
+  set +e
   git rebase origin/master "${BRANCH}"
   rebase_return_code=$?
+  set -e
+  
   if [ ! $rebase_return_code -eq 0 ]; then
     echo "Rebase failed with code: $rebase_return_code"
     echo "Aborting rebase..."
