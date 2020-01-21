@@ -16,6 +16,7 @@ import javax.inject.Named;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
 import org.eclipse.che.api.user.server.UserManager;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
+import org.eclipse.che.api.workspace.server.spi.NamespaceResolutionContext;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
@@ -52,10 +53,25 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
 
   @Override
   public OpenShiftProject getOrCreate(RuntimeIdentity identity) throws InfrastructureException {
+    String namespace = evaluateNamespace();
+    return new OpenShiftProject(clientFactory, namespace, identity.getWorkspaceId());
+  }
+
+  @Override
+  public String evaluateNamespaceName(NamespaceResolutionContext resolutionCtx)
+      throws InfrastructureException {
+    return evaluateNamespace();
+  }
+
+  @Override
+  public String evaluateLegacyNamespaceName(NamespaceResolutionContext resolutionCtx)
+      throws InfrastructureException {
+    return evaluateNamespace();
+  }
+
+  private String evaluateNamespace() throws InfrastructureException {
     Subject currentSubject = EnvironmentContext.getCurrent().getSubject();
-
-    String workspacesNamespace = envProvider.getWorkspacesOpenshiftNamespace(currentSubject);
-
-    return new OpenShiftProject(clientFactory, workspacesNamespace, identity.getWorkspaceId());
+    String namespace = envProvider.getWorkspacesOpenshiftNamespace(currentSubject);
+    return namespace;
   }
 }
