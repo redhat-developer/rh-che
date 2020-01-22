@@ -5,7 +5,7 @@
 # http://www.eclipse.org/legal/epl-v10.html
 
 ARG TAG=latest
-FROM docker.io/eclipse/che-e2e:$TAG
+FROM quay.io/eclipse/che-e2e:$TAG
 
 ENV LANG=en_US.utf8 \
     DISPLAY=:99 \

@@ -183,11 +183,13 @@ function getActiveToken() {
 function getVersionFromProdPreview() {
   token=$(getActiveToken)
   version=$(curl -s -X OPTIONS --header "Content-Type: application/json" --header "Authorization: Bearer ${token}" https://che.prod-preview.openshift.io/api/ | jq '.buildInfo')
-  echo ${version//\"/}
+  version=${version//\"/}
+  echo $version
 }
 
 function getVersionFromProd() {
   token=$(getActiveToken)
   version=$(curl -s -X OPTIONS --header "Content-Type: application/json" --header "Authorization: Bearer ${token}" https://che.openshift.io/api/ | jq '.buildInfo')
-  echo ${version//\"/}
+  version=${version//\"/}
+  echo $version
 }
