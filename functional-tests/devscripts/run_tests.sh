@@ -111,7 +111,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
     echo "RH-Che test image with tag ${version} found on docker. Reusing image."
 	else
     echo "Could not found RH-Che tests image with tag ${version}."
-    if [ -n $(curl -X GET https://quay.io/api/v1/repository/eclipse/che-e2e/tag/${version}/images | jq .status) ]; then
+    if [ $(curl -X GET https://quay.io/api/v1/repository/eclipse/che-e2e/tag/${version}/images | jq .status) == null ]; then
       echo "Upstream image with tag ${version} found. Building own RH-Che image based on Che image with ${version} tag."
       docker build --build-arg TAG=${version} -t e2e_tests dockerfiles/e2e-saas
       rhche_image=e2e_tests
