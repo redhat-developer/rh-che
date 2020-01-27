@@ -188,6 +188,8 @@ function runCompatibilityTest() {
 
   echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
   set +e
+  #variable USE_CHE_LATEST_SNAPSHOT enables to use rhel-rhchestage-rh-che-automation image instead of rhel-rhchestage-rh-che-server 
+  export USE_CHE_LATEST_SNAPSHOT="true"
   .ci/cico_build_deploy_test_rhche.sh
   return_code=$?
   set -e
