@@ -12,7 +12,7 @@ def silent_sh(cmd) {
 }
 
 pipeline {
-    agent { label 'osioche-crw-jenkins-node' }
+    agent { label 'osioche-qe-workspace-startup-pvc-slave' }
     environment {
         USERS_PROPERTIES_FILE = credentials('${USERS_PROPERTIES_FILE_ID}')
         LOG_DIR = ""
@@ -30,7 +30,7 @@ pipeline {
         }
         stage ("Running worksapce test") {
             options {
-                timeout(time: JOB_TIMEOUT, unit: 'MINUTES') 
+                timeout(time: JOB_TIMEOUT, unit: 'MINUTES')
             }
             steps {
                 script {
