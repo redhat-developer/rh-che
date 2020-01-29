@@ -49,7 +49,7 @@ workspaceStartupNames.each { workspaceStartupJobName ->
       pipelineTriggers {
         triggers {
           cron {
-            spec('H/5 * * * *')
+            spec('H * * * *')
           }
         }
       }
@@ -77,7 +77,7 @@ pipelineJob("${workspaceStartupReporterJobName}") {
   }
   parameters {
     stringParam('ZABBIX_URL', 'https://zabbix.devshift.net:9443/zabbix', 'URL for zabbix server endpoint')
-    stringParam('SLACK_CHANNEL', '#devtools-che', 'Slack channel to send the reports to')
+    stringParam('SLACK_CHANNEL', '#forum-hosted-che', 'Slack channel to send the reports to')
     credentialsParam('SLACK_URL_ID') {
       type('org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl')
       required()
@@ -105,7 +105,7 @@ pipelineJob("${workspaceStartupReporterJobName}") {
     pipelineTriggers {
       triggers {
         cron {
-          spec('H 10 * * *')
+          spec('0 7 * * *')
         }
       }
     }
