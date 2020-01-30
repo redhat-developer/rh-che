@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 
- import { ICheLoginPage, inversifyConfig, TYPES, CLASSES, Dashboard } from 'e2e';
-import { Container } from 'inversify';
+ import { ICheLoginPage, TYPES, CLASSES, Dashboard } from 'e2e';
+import { rhcheContainer } from '../../inversify.config';
 
- const e2eContainer: Container = inversifyConfig.e2eContainer;
- const loginPage: ICheLoginPage = e2eContainer.get<ICheLoginPage>(TYPES.CheLogin);
- const dashboard: Dashboard = e2eContainer.get(CLASSES.Dashboard);
+ const loginPage: ICheLoginPage = rhcheContainer.get<ICheLoginPage>(TYPES.CheLogin);
+ const dashboard: Dashboard = rhcheContainer.get(CLASSES.Dashboard);
 
 suite('Login and wait dashboard', async () => {
     test('Login', async () => {

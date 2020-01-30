@@ -1,6 +1,6 @@
 --timeout 120000
 --reporter 'node_modules/e2e/dist/driver/CheReporter.js'
 -u tdd
---spec ./node_modules/e2e/dist/tests/login/Login.spec.js
+--spec ./dist/tests/login/Login.spec.js
 --spec ./node_modules/e2e/dist/tests/devfiles/JavaVertx.spec.js
 --spec ./node_modules/e2e/dist/tests/devfiles/JavaMaven.spec.js
