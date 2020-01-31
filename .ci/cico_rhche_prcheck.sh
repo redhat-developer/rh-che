@@ -19,7 +19,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^KEYCLOAK \
         ^BUILD_NUMBER$ \
         ^JOB_NAME$ \
-        ^ghprb \
+        ^ghprbPullId \
         ^RH_CHE \
         ^GIT_COMMIT)"
         

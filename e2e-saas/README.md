@@ -64,4 +64,4 @@ Java Vert.x test flow is following:
 - Stop workspace
 - Delete workspace
 
-Java Vert.x tests is saved in upstream and is only reused on Hosted Che side. Test for Java Maven should be moved to upstream too. 
+Java Vert.x and Java Maven tests are saved in upstream and are only reused on Hosted Che side. Login test is used from downstream repo.
