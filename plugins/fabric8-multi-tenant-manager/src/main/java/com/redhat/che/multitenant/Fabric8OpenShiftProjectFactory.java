@@ -24,9 +24,12 @@ import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientConfigF
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProject;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author Sergii Leshchenko */
 public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(Fabric8OpenShiftProjectFactory.class);
 
   private final OpenShiftClientFactory clientFactory;
   private final Fabric8WorkspaceEnvironmentProvider envProvider;
@@ -67,6 +70,26 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
   public String evaluateLegacyNamespaceName(NamespaceResolutionContext resolutionCtx)
       throws InfrastructureException {
     return evaluateNamespace();
+  }
+
+  @Override
+  protected String evalPlaceholders(String namespace, NamespaceResolutionContext ctx) {
+    return evalPlaceholders();
+  }
+
+  @Override
+  protected String evalPlaceholders(String namespace, Subject currentUser, String workspaceId) {
+    return evalPlaceholders();
+  }
+
+  private String evalPlaceholders() {
+    String placeholder = null;
+    try {
+      placeholder = evaluateNamespace();
+    } catch (InfrastructureException e) {
+      LOG.error("Failed to evaluate placeholder for '*-che' namespace: {}", e.getMessage());
+    }
+    return placeholder;
   }
 
   private String evaluateNamespace() throws InfrastructureException {
