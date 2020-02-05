@@ -1,5 +1,5 @@
 [![Master Build Status](https://ci.centos.org/buildStatus/icon?subject=master&job=devtools-rh-che-build-che-credentials-master/)](https://ci.centos.org/job/devtools-rh-che-build-che-credentials-master/)
-[![Compatibility Build Status](https://ci.centos.org/buildStatus/icon?subject=nightly&job=devtools-rh-che-build-master/)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-build-master/)
+[![Compatibility Build Status](https://ci.centos.org/buildStatus/icon?subject=compatibility&job=devtools-rh-che-build-master/)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-build-master/)
 
 # Eclipse Che on OpenShift 
 
