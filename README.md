@@ -3,6 +3,8 @@
 
 # Eclipse Che on OpenShift 
 
+[![Contribute](https://che.openshift.io/factory/resources/factory-contribute.svg)](https://che.openshift.io/f?url=https://raw.githubusercontent.com/redhat-developer/rh-che/master/devfile.yaml)
+
 ## Table Of Contents
 
 * [Job statuses](#job-statuses)
