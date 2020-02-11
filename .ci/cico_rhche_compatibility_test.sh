@@ -188,9 +188,16 @@ function runCompatibilityTest() {
 
   echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
   set +e
-  #variable USE_CHE_LATEST_SNAPSHOT enables to use rhel-rhchestage-rh-che-automation image instead of rhel-rhchestage-rh-che-server 
-  export USE_CHE_LATEST_SNAPSHOT="true"
+ 
   .ci/cico_build_deploy_test_rhche.sh
+
+  echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
+  echo "USE_CHE_LATEST_SNAPSHOT: ${USE_CHE_LATEST_SNAPSHOT}"
+  echo "PR_CHECK_BUILD: ${PR_CHECK_BUILD}"
+  length=${#RH_TAG_DIST_SUFFIX}
+  echo "RH_TAG_DIST_SUFFIX $(echo $RH_TAG_DIST_SUFFIX | cut -c1-3) $(echo $RH_TAG_DIST_SUFFIX | cut -c4-$length)"
+
+
   return_code=$?
   set -e
 
@@ -211,6 +218,8 @@ function runCompatibilityTest() {
   echo $return_code > compatibility_status
 }
 
+#variable USE_CHE_LATEST_SNAPSHOT enables to use rhel-rhchestage-rh-che-automation image instead of rhel-rhchestage-rh-che-server 
+export USE_CHE_LATEST_SNAPSHOT="true"
 run_tests_timeout_seconds=${RUN_TEST_TIMEOUT:-2400}
 # SECONDS is an internal bash variable that is increased by one every second that a shell is executing a command/script
 # It is being reset here to zero to be used as a counter for our timeout
@@ -237,5 +246,5 @@ while true; do
     rm compatibility_status
     exit 1
   fi
-  sleep 1
+  sleep 10
 done
