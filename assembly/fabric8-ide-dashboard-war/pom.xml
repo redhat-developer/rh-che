@@ -47,10 +47,9 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <classifier>sources</classifier>
                             <failOnMissingClassifierArtifact>true</failOnMissingClassifierArtifact>
                             <outputDirectory>${project.build.directory}/sources</outputDirectory>
-                            <type>jar</type>
+                            <type>war</type>
                         </configuration>
                     </execution>
                 </executions>
@@ -58,22 +57,6 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
-                    <!--   1.5 Log a diff of the ./src directory vs the unpacked    -->
-                    <!--       upstream dependency's source tree                    -->
-                    <execution>
-                        <id>diff-source-trees</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <exec executable="diff" osfamily="Unix" output="${project.build.directory}/src_tree.diff">
-                                    <arg line="-u -r ${basedir}/src ${basedir}/target/sources/src" />
-                                </exec>
-                            </target>
-                        </configuration>
-                    </execution>
                     <!--   2. Copy src directory over top of extracted upstream    -->
                     <!--      sources from step 1.                                 -->
                     <execution>
@@ -85,16 +68,14 @@
                         <configuration>
                             <target>
                                 <copy overwrite="true" todir="${basedir}/target/sources/" verbose="true">
-                                    <fileset dir="${basedir}">
-                                        <include name="src/**" />
-                                        <include name="index.d.ts" />
+                                    <fileset dir="${basedir}/src">
+                                        <include name="assets/**" />
                                     </fileset>
                                 </copy>
                             </target>
                         </configuration>
                     </execution>
-                    <!-- Note steps 3-4 occur in profiles -->
-                    <!--   5. Update base path for index.html to /dashboard/       -->
+                    <!--   3. Update base path for index.html to /dashboard/       -->
                     <!--      This step is identical to upstream build             -->
                     <execution>
                         <id>update-href</id>
@@ -105,7 +86,7 @@
                         <configuration>
                             <target>
                                 <!-- Change base HREF of the application that will be hosted on /dashboard -->
-                                <replace file="${basedir}/target/dist/index.html">
+                                <replace file="${basedir}/target/sources/index.html">
                                     <replacetoken><![CDATA[<base href="/">]]></replacetoken>
                                     <replacevalue><![CDATA[<base href="/dashboard/">]]></replacevalue>
                                 </replace>
@@ -114,177 +95,19 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- 6. Build war file as in upstream build. See profiles for build steps  -->
+            <!-- 4. Build war file as in upstream build. See profiles for build steps  -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <webResources>
                         <resource>
-                            <directory>target/dist</directory>
+                            <directory>target/sources</directory>
                         </resource>
                     </webResources>
-                    <webXml>${basedir}/target/sources/src/webapp/WEB-INF/web.xml</webXml>
-                    <packagingExcludes>/webapp/</packagingExcludes>
+                    <webXml>${basedir}/target/sources/WEB-INF/web.xml</webXml>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <!-- Default docker build. To use native build, use -Pnative -->
-            <id>docker</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <!--   3. Build dashboard as in upstream, using docker image   -->
-                            <execution>
-                                <id>build-image</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <!-- build user dashboard with maven -->
-                                        <exec dir="${basedir}" executable="docker" failonerror="true">
-                                            <arg value="build" />
-                                            <arg value="-t" />
-                                            <arg value="eclipse-che-dashboard" />
-                                            <arg value="--build-arg" />
-                                            <arg value="SOURCES_DIR=./target/sources" />
-                                            <arg value="." />
-                                        </exec>
-                                    </target>
-                                </configuration>
-                            </execution>
-                            <!--   4. Get 'compiled' dashboard from dockerfile, extract to -->
-                            <!--      ${project.build.directory}/dist                      -->
-                            <!--      This step is identical to the upstream build         -->
-                            <execution>
-                                <id>unpack-docker-build</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <!-- build user dashboard with docker -->
-                                        <exec executable="bash">
-                                            <arg value="-c" />
-                                            <arg value="docker run --rm eclipse-che-dashboard | tar -C target/ -xf -" />
-                                        </exec>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!-- Upstream native build. Activate with -Pnative             -->
-            <!-- Note there are a few differences from the upstream build  -->
-            <!-- due to the source files being in ./target/sources:        -->
-            <!-- 1. The clean step from upstream is removed, as the entire -->
-            <!--    source dir is cleaned by the default clean step        -->
-            <!-- 2. The "change href" step (Step 5 above) is skipped as it -->
-            <!--    is included in the default build step above            -->
-            <id>native</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>${basedir}/target/sources/node_modules</directory>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <!-- Use yarn to get dependencies -->
-                            <execution>
-                                <id>install-yarn</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
-                                            <arg value="install" />
-                                            <arg value="--ignore-optional" />
-                                        </exec>
-                                    </target>
-                                </configuration>
-                            </execution>
-                            <!--   3. Build dashboard locally using yarn build    -->
-                            <execution>
-                                <id>build-dashboard</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <!-- build user dashboard -->
-                                        <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
-                                            <arg value="build" />
-                                        </exec>
-                                    </target>
-                                </configuration>
-                            </execution>
-                            <!--   4. Native build will create 'compiled' files in ./target/sources/target/dist -->
-                            <!--      since we run npm install in that directory. The remainder of the build    -->
-                            <!--      (updating href and building war) assumes files are in ./target/dist so we -->
-                            <!--      need to copy them from ${basedir}/target/sources/target/dist to           -->
-                            <!--      ${basedir}/target/dist                                                    -->
-                            <execution>
-                                <id>copy-dist-from-sources-dir</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <copy overwrite="true" todir="${basedir}/target/" verbose="true">
-                                            <fileset dir="${basedir}/target/sources/target/">
-                                                <include name="dist/**" />
-                                            </fileset>
-                                        </copy>
-                                    </target>
-                                </configuration>
-                            </execution>
-                            <!--   3.5 Run npm tests locally                                -->
-                            <!-- <execution>
-                                <id>test-dashboard</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target unless="skipTests">
-                                        Run unit tests
-                                        <exec dir="${basedir}/target/sources" executable="yarn" failonerror="true">
-                                            <arg value="test" />
-                                        </exec>
-                                    </target>
-                                </configuration>
-                            </execution> -->
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
