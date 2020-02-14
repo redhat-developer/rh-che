@@ -3,7 +3,7 @@
 
 # Eclipse Che on OpenShift 
 
-[![Contribute](https://che.openshift.io/factory/resources/factory-contribute.svg)](https://che.openshift.io/f?url=https://raw.githubusercontent.com/redhat-developer/rh-che/master/devfile.yaml)
+[![Contribute](https://che.openshift.io/factory/resources/factory-contribute.svg)](https://che.openshift.io/f?url=https://github.com/redhat-developer/rh-che)
 
 ## Table Of Contents
 
