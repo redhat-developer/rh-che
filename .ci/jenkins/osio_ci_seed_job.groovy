@@ -56,6 +56,11 @@ workspaceStartupNames.each { workspaceStartupJobName ->
       durabilityHint {
         hint('MAX_SURVIVABILITY')
       }
+      disableConcurrentBuilds()
+      cachetJobProperty {
+        requiredResources(true)
+        resources(["paas.psi.redhat.com"])
+      }
     }
   }
 }
@@ -109,6 +114,11 @@ pipelineJob("${workspaceStartupReporterJobName}") {
         }
       }
     }
+    disableConcurrentBuilds()
+    cachetJobProperty {
+      requiredResources(true)
+      resources(["paas.psi.redhat.com"])
+    }
   }
 }
 
@@ -155,6 +165,11 @@ mountVolumeNames.each { mountVolumeJobName ->
             spec('H */2 * * *')
           }
         }
+      }
+      disableConcurrentBuilds()
+      cachetJobProperty {
+        requiredResources(true)
+        resources(["paas.psi.redhat.com"])
       }
     }
   }
