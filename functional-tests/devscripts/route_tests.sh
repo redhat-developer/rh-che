@@ -159,6 +159,9 @@ if ! $hard_failed; then
 	done
 fi
 
+echo "--------------- EVENTS -----------------"
+oc get events
+
 if $SEND_TO_ZABBIX; then
     echo "--------------- Send time to Zabbix -----------------"
     ZABBIX_HOST=""
