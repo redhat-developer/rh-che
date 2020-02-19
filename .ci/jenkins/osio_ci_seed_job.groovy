@@ -49,7 +49,7 @@ workspaceStartupNames.each { workspaceStartupJobName ->
       pipelineTriggers {
         triggers {
           cron {
-            spec('H * * * *')
+            spec('0 */3 * * *')
           }
         }
       }
