@@ -16,12 +16,11 @@ function printHelp {
   GREEN="\\033[32;1m"
   NC="\\033[0m" # No Color
   
-  echo -e "${YELLOW}$(basename "$0") ${WHITE}[-u <username>] [-p <passwd>] [-m <email>] [-r <url>]" 
+  echo -e "${YELLOW}$(basename "$0") ${WHITE}[-u <username>] [-p <passwd>] [-r <url>]" 
   echo -e "\n${NC}Script for running functional tests against production or prod-preview environment."
   echo -e "${GREEN}where:${WHITE}"
   echo -e "-u    username for openshift account"
   echo -e "-p    password for openshift account"
-  echo -e "-m    email for openshift account"
   echo -e "-r    URL of Rh-che"
   echo -e "${NC}All paramters are mandatory.\n"
 }
@@ -34,8 +33,6 @@ while getopts "hu:p:m:o:r:" opt; do
     u) export USERNAME=$OPTARG
       ;;
     p) export PASSWORD=$OPTARG
-      ;;
-    m) export EMAIL=$OPTARG
       ;;
     o) export OFFLINE_TOKEN=$OPTARG
       ;;
@@ -62,7 +59,7 @@ fi
 events_file="events_report.txt"
 touch $events_file
 
-if [[ "$PR_CHECK_BUILD" == "true" ]]; then
+if [[ "$PR_CHECK_BUILD" == "true" || "$USE_CHE_LATEST_SNAPSHOT" == true ]]; then
   OC_CLUSTER_URL=$(curl -s -X GET --header 'Accept: application/json' "$API_SERVER_URL/api/users?filter\\[username\\]=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME" | jq '.data[0].attributes.cluster')
   OC_CLUSTER_URL="$(echo "${OC_CLUSTER_URL//\"/}")"
   oc login -u $RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME -p $RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD $OC_CLUSTER_URL
@@ -139,7 +136,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   cp -r ./report ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
 
 else
-  if [[ -z $USERNAME || -z $PASSWORD || -z $EMAIL || -z $HOST_URL ]]; then
+  if [[ -z $USERNAME || -z $PASSWORD || -z $HOST_URL ]]; then
       echo "Please check if all credentials for user are set."
       exit 1
   fi
