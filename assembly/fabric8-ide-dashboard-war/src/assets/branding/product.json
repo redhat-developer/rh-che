@@ -30,7 +30,7 @@
       "disabled": ["organizations", "factories"]
     }, 
     "features": {
-      "disabled": ["workspaceSharing","kubernetesNamespaceSelector"]
+      "disabled": ["workspaceSharing", "kubernetesNamespaceSelector"]
     },
     "prefetch": {
       "cheCDN":"/api/cdn-support/paths"
