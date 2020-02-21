@@ -48,6 +48,16 @@ function commentToPR() {
   curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
 }
 
+function commentToRunTest() {
+  job_url="https://ci.centos.org/job/devtools-rh-che-rh-che-compatibility-test-dev.rdu2c.fabric8.io/${BUILD_NUMBER}/console"
+  message="[test]"
+  url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"${RELATED_PR_TITLE}\") | .url" | sed 's/pulls/issues/g')
+  url=$(echo "${url}" | cut -d"\"" -f 2)
+  url="${url}/comments"
+  
+  curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
+}
+
 function setRedStatus() {
   setStatus "failure" 
 }
@@ -78,7 +88,7 @@ function runCompatibilityTest() {
   source ./.ci/functional_tests_utils.sh
 
   echo "Installing dependencies:"
-  installDependencies
+  installDependenciesForCompatibilityCheck
 
   export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
   CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | xq -r '.project.version')
@@ -171,51 +181,10 @@ function runCompatibilityTest() {
     exit $rebase_return_code
   fi
 
-  echo "Setting image tags for pushing to quay."
-  #Get last commit short hash from upstream che
-  longHashUpstream=$(curl -s https://api.github.com/repos/eclipse/che/commits/master | jq .sha)
-  shortHashUpstream=${longHashUpstream:1:7}
+  #comment [test] to run tests
+  commentToRunTest
+  echo "0" > compatibility_status
 
-  #Get last commit short hash from rh-che branch 
-  longHashDownstream=$(git log | grep -m 1 commit | head -1 | cut -d" " -f 2)
-  shortHashDownstream=${longHashDownstream:0:7}
-
-  #DOCKER_IMAGE_TAG is used for running tests
-  #DOCKER_IMAGE_TAG_WITH_SHORTHASHES is used for tracking changes
-  export DOCKER_IMAGE_TAG="upstream-check-latest"	
-  export DOCKER_IMAGE_TAG_WITH_SHORTHASHES="upstream-check-${shortHashUpstream}-${shortHashDownstream}"
-  export PROJECT_NAMESPACE=compatibility-check
-
-  echo "********** Environment is set. Running build, deploy to dev cluster and tests. **********"
-  set +e
- 
-  .ci/cico_build_deploy_test_rhche.sh
-
-  echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
-  echo "USE_CHE_LATEST_SNAPSHOT: ${USE_CHE_LATEST_SNAPSHOT}"
-  echo "PR_CHECK_BUILD: ${PR_CHECK_BUILD}"
-  length=${#RH_TAG_DIST_SUFFIX}
-  echo "RH_TAG_DIST_SUFFIX $(echo $RH_TAG_DIST_SUFFIX | cut -c1-3) $(echo $RH_TAG_DIST_SUFFIX | cut -c4-$length)"
-
-
-  return_code=$?
-  set -e
-
-  echo " --- After build-deploy-test phase. Result status is: ${return_code} --- "
-
-  #if test fails, send comment to PR
-  if [ $return_code != 0 ]; then
-    echo "There were some problems and compatibility check failed. Sending comment to related PR."
-    message="The compatibility check failed."
-    commentToPR "$message"
-    setRedStatus
-
-    echo $return_code > compatibility_status
-    exit $return_code
-  fi
-
-  setGreenStatus
-  echo $return_code > compatibility_status
 }
 
 #variable USE_CHE_LATEST_SNAPSHOT enables to use rhel-rhchestage-rh-che-automation image instead of rhel-rhchestage-rh-che-server 

@@ -76,6 +76,18 @@ function installDependencies() {
   installNodejs
 }
 
+function installDependenciesForCompatibilityCheck() {
+  installEpelRelease
+  installYQ
+  installJQ
+  installGit  
+  # Getting dependencies ready
+  yum install --assumeyes -d1 \
+              java-1.8.0-openjdk \
+              java-1.8.0-openjdk-devel 
+  installMvn
+}
+
 function checkAllCreds() {
   CREDS_NOT_SET="false"
 
