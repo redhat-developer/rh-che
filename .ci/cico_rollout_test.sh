@@ -16,7 +16,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^JOB_NAME$ \
         ^RH_CHE \
         ^CHE)"
-		
+
 # --- SETTING ENVIRONMENT VARIABLES ---
 export PROJECT=testing-rollout
 export CHE_INFRASTRUCTURE=openshift
@@ -130,7 +130,7 @@ fi
 # --- GET USER ACTIVE TOKEN ---
 length=${#CHE_TESTUSER_NAME}
 echo "Trying to find token for $USERNAME_TO_PRINT"  
-    
+
 #verify environment - if production or prod-preview
 #variable preview is used to differ between prod and prod-preview urls
 rm -rf cookie-file loginfile.html
@@ -145,8 +145,8 @@ data=$(echo "$response" | jq .data)
 if [ "$data" == "[]" ]; then
   echo -e "${RED}Can not find active token for user $CHE_TESTUSER_NAME. Please check settings. ${NC}"
   exit 1
-fi 
-		
+fi
+
 #get html of developers login page
 curl -sX GET -L -c cookie-file -b cookie-file "https://auth.${preview}openshift.io/api/login?redirect=https://che.openshift.io" > loginfile.html
 
@@ -160,18 +160,18 @@ set +e
 url=$(curl -w '%{redirect_url}' -s -X POST -c cookie-file -b cookie-file -d "$dataUrl" "$url")
 found=$(echo "$url" | grep "token_json")
 
-while true 
+while true
 do
-	url=$(curl -c cookie-file -b cookie-file -s -o /dev/null -w '%{redirect_url}' "$url")
-	if [[ ${#url} == 0 ]]; then
-		#all redirects were done but token was not found
-		break
-	fi
-	found=$(echo "$url" | grep "token_json")
-	if [[ ${#found} -gt 0 ]]; then
-		#some redirects were done and token was found as a part of url
-		break
-	fi
+  url=$(curl -c cookie-file -b cookie-file -s -o /dev/null -w '%{redirect_url}' "$url")
+  if [[ ${#url} == 0 ]]; then
+    #all redirects were done but token was not found
+    break
+  fi
+  found=$(echo "$url" | grep "token_json")
+  if [[ ${#found} -gt 0 ]]; then
+    #some redirects were done and token was found as a part of url
+    break
+  fi
 done
 set -e
 
@@ -179,19 +179,20 @@ set -e
 token=$(echo "$url" | grep -o "ey.[^%]*" | head -1)
 if [[ ${#token} -gt 0 ]]; then
   #save each token into file tokens.txt in format: token;username;["","prod-preview"]
-	export USER_TOKEN=${token}
-	echo "Token set successfully."
+  export USER_TOKEN=${token}
+  echo "Token set successfully."
 else
-	echo -e "${RED}Failed to obtain token for $USERNAME! Probably user password is incorrect. Continue with other users. ${NC}"
-	exit 1
+  echo -e "${RED}Failed to obtain token for $USERNAME! Probably user password is incorrect. Continue with other users. ${NC}"
+  exit 1
 fi
 
 # --- CREATE AND START WORKSPACE ---
 # create
 echo "Creating and starting workspace..."
-
+echo "Downloading devfile from prod-preview registry"
 curl -Lso devfile.yaml https://che-devfile-registry.prod-preview.openshift.io/devfiles/nodejs/devfile.yaml
 
+echo "Creating and starting workspace using downloaded devfile"
 response=$(curl -X POST -s \
   --header 'Content-Type: text/yaml' \
   --header 'Accept: application/json' \
@@ -199,6 +200,7 @@ response=$(curl -X POST -s \
   --data-binary "@devfile.yaml" \
   $RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL/api/workspace/devfile?start-after-create=true)
 
+echo "Check whether workspace was created"
 status=$(echo "$response" | jq .status) 
 if [ $status != "\"STOPPED\"" ]; then
   echo "Can not create workspace. Response:"
@@ -237,6 +239,7 @@ name=$(oc get dc | grep che | awk '{print $1}')
 #get revision
 revision=$(oc get dc | grep che | awk '{print $2}')
 
+echo "Rolling out che server..."
 oc rollout latest "$name"
 
 failed=0
