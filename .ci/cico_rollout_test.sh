@@ -9,6 +9,8 @@
 #This script expects this environment variables set:
 # CHE_TESTUSER_NAME, CHE_TESTUSER_PASSWORD, CHE_TESTUSER_EMAIL, RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN
 
+set +x
+
 eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^BUILD_NUMBER$ \
         ^JOB_NAME$ \

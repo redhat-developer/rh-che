@@ -9,6 +9,8 @@
 # 1 - missing credentials
 # 2 - OpenShift login failed
 
+set +x
+
 export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
 
 source ./.ci/functional_tests_utils.sh

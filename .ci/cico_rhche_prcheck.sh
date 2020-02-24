@@ -5,6 +5,7 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+set +x
 set -e
 
 echo "****** Starting RH-Che PR check $(date) ******"
@@ -22,7 +23,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^ghprbPullId \
         ^RH_CHE \
         ^GIT_COMMIT)"
-        
+
 source ./config
 source .ci/functional_tests_utils.sh
 

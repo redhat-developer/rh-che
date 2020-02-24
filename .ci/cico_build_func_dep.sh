@@ -6,6 +6,8 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+set +x
+
 ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCKER_PATH=${ABSOLUTE_PATH}/../dockerfiles/
 REGISTRY="quay.io"
