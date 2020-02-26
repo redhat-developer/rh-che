@@ -46,7 +46,7 @@ function checkPrereq {
 		
 	if $SEND_TO_ZABBIX; then
 		rpm -ivh https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/zabbix-release-3.0-1.el7.noarch.rpm
-		yum install -y zabbix-sender
+		yum install -y --nogpgcheck zabbix-sender
 	fi
 }
 
