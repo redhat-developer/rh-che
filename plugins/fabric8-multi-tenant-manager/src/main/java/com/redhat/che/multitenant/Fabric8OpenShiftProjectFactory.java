@@ -20,6 +20,7 @@ import org.eclipse.che.api.workspace.server.spi.NamespaceResolutionContext;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.workspace.infrastructure.kubernetes.util.KubernetesSharedPool;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientConfigFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProject;
@@ -40,7 +41,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       @Nullable @Named("che.infra.kubernetes.namespace.default") String defaultNamespaceName,
       OpenShiftClientFactory clientFactory,
       Fabric8WorkspaceEnvironmentProvider envProvider,
-      UserManager userManager) {
+      UserManager userManager,
+      KubernetesSharedPool sharedPool) {
     super(
         projectName,
         null,
@@ -49,7 +51,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         false,
         clientFactory,
         new OpenShiftClientConfigFactory(),
-        userManager);
+        userManager,
+        sharedPool);
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
@@ -57,7 +60,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
   @Override
   public OpenShiftProject getOrCreate(RuntimeIdentity identity) throws InfrastructureException {
     String namespace = evaluateNamespace();
-    return new OpenShiftProject(clientFactory, namespace, identity.getWorkspaceId());
+    return new OpenShiftProject(
+        clientFactory, sharedPool.getExecutor(), namespace, identity.getWorkspaceId());
   }
 
   @Override
