@@ -1,0 +1,13 @@
+--- ./pageobjects/dashboard/Dashboard.ts	2020-02-27 16:38:40.167786069 +0100
++++ ./pageobjects/dashboard/Dashboard2.ts	2020-02-27 16:39:10.067174761 +0100
+@@ -64,10 +64,8 @@
+     async waitPage(timeout: number = TestConstants.TS_SELENIUM_LOAD_PAGE_TIMEOUT) {
+         Logger.debug('Dashboard.waitPage');
+ 
+-        await this.driverHelper.waitVisibility(By.css(Dashboard.DASHBOARD_BUTTON_CSS), timeout);
+         await this.driverHelper.waitVisibility(By.css(Dashboard.WORKSPACES_BUTTON_CSS), timeout);
+         await this.driverHelper.waitVisibility(By.css(Dashboard.STACKS_BUTTON_CSS), timeout);
+-        await this.driverHelper.waitVisibility(By.css(Dashboard.FACTORIES_BUTTON_CSS), timeout);
+     }
+ 
+     async clickDashboardButton(timeout: number = TestConstants.TS_SELENIUM_DEFAULT_TIMEOUT) {

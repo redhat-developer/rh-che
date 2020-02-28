@@ -11,7 +11,6 @@ import { Container } from 'inversify';
 import { inversifyConfig, TYPES, ICheLoginPage, ITestWorkspaceUtil, CLASSES } from 'e2e';
 import { RhCheLoginPage } from './pageobjects/RhCheLoginPage';
 import { RhCheTestWorkspaceUtils } from './utils/RhCheTestWorkspaceUtils';
-import { RhCheProjectTree } from './pageobjects/RhCheProjectTree';
 
 const rhcheContainer: Container = inversifyConfig.e2eContainer;
 
@@ -20,8 +19,5 @@ rhcheContainer.bind<ICheLoginPage>(TYPES.CheLogin).to(RhCheLoginPage).inSingleto
 
 rhcheContainer.unbind(TYPES.WorkspaceUtil);
 rhcheContainer.bind<ITestWorkspaceUtil>(TYPES.WorkspaceUtil).to(RhCheTestWorkspaceUtils).inSingletonScope();
-
-rhcheContainer.unbind(CLASSES.ProjectTree);
-rhcheContainer.bind(CLASSES.ProjectTree).to(RhCheProjectTree).inSingletonScope();
 
 export { rhcheContainer };

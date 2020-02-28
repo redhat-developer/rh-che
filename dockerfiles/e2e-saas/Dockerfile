@@ -26,5 +26,6 @@ RUN cd ../ && \
     
 WORKDIR /tmp/
 COPY docker-entrypoint.sh /tmp/
+COPY test_patches/* /tmp/test_patches/
 
 ENTRYPOINT ["/tmp/docker-entrypoint.sh"]
