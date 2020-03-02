@@ -4,8 +4,6 @@
   "description": "Tests for RH-Che with Theia IDE",
   "main": "index.ts",
   "scripts": {
-    "test-java-maven": "npm run lint && npm run tsc && mocha --opts mocha-java-maven.opts",
-    "test-java-vertx": "npm run lint && npm run tsc && mocha --opts mocha-java-vertx.opts",
     "test-all": "npm run lint && npm run tsc && mocha --opts mocha-all.opts",
     "tsc": "rm -rf dist && tsc -p .",
     "lint": "tslint --fix -p .",
@@ -26,6 +24,7 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.4",
+    "@types/rimraf": "^2.0.3",
     "@types/selenium-webdriver": "^3.0.16",
     "axios": "0.17.1",
     "chai": "^4.2.0",
