@@ -64,7 +64,7 @@ export class RhCheTestWorkspaceUtils implements ITestWorkspaceUtil {
     public async waitPluginAdding(namespace: string, workspaceName: string, pluginName: string) {
         const workspaceStatusApiUrl: string = `${TestConstants.TS_SELENIUM_BASE_URL}/api/workspace/${namespace}:${workspaceName}`;
         const attempts: number = TestConstants.TS_SELENIUM_PLUGIN_PRECENCE_ATTEMPTS;
-        const polling: number = TestConstants.TS_SELENIUM_PLUGIN_PRECENCE_POLLING;
+        const polling: number = TestConstants.TS_SELENIUM_DEFAULT_POLLING;
 
         for (let i = 0; i < attempts; i++) {
             const response: rm.IRestResponse<any> = await this.rest.get(workspaceStatusApiUrl, {additionalHeaders: {'Authorization' : 'Bearer ' + RhCheTestConstants.E2E_SAAS_TESTS_USER_TOKEN } });
@@ -112,7 +112,7 @@ export class RhCheTestWorkspaceUtils implements ITestWorkspaceUtil {
     public async removeWorkspaceById(id: string) {
         const getInfoURL: string = `${TestConstants.TS_SELENIUM_BASE_URL}/api/workspace/${id}`;
         const attempts: number = TestConstants.TS_SELENIUM_PLUGIN_PRECENCE_ATTEMPTS;
-        const polling: number = TestConstants.TS_SELENIUM_PLUGIN_PRECENCE_POLLING;
+        const polling: number = TestConstants.TS_SELENIUM_DEFAULT_POLLING;
 
         let stopped : Boolean = false;
         for (let i = 0; i < attempts; i++) {
