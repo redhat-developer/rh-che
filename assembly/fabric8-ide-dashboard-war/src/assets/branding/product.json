@@ -12,7 +12,8 @@
   "oauthDocs": "Configure OAuth in the che.properties file.",
   "workspace": {
     "priorityStacks": ["Java", "Java-MySQL", "Blank"],
-    "defaultStack": "java-mysql"
+    "defaultStack": "java-mysql",
+    "creationLink": "#/create-workspace"
   },
   "cli" : {
     "configName" : "che.env",
