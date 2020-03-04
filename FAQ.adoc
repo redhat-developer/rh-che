@@ -32,17 +32,6 @@ There is a dedicated status page - https://che.statuspage.io/
 
 == Troubleshooting
 
-=== Can not start an existing Che 6 workspace - `This workspace is using old definition format which is not compatible anymore`
-
-This is a UX issue we are having on che.openshift.io after update to the `7.0.0-beta-5.0` upstream version. 
-Basically, it is still possible to create and run a brand-new Che 6 workspace, but not possible to start an existing one from the User Dashboard. In reality, one can still run an existing Che 6 workspace by navigating to the workspace links directly from the browser (even though, `Run` buttons are disabled navigation to the direct workspace link will start an existing workspace):
-
-image::https://user-images.githubusercontent.com/1461122/59588096-1c690300-90e7-11e9-8a72-512f5f9bb8e3.gif[Existing Che 6 workspace startup]
-
-We are going to address this UX issue in the `7.0.0-RC-1.1` release https://github.com/eclipse/che/issues/13553[#13553].
-
-**"Migrating an old Che 6 workspace to Che 7"** docs will be provided by the GA release as part of the - https://github.com/eclipse/che/issues/12974[#12974].
-
 ===  Can not login to che.openshift.io - `Authorization token is missed`
 
 To authenticate in https://che.openshift.io, you need to allow cookies from
