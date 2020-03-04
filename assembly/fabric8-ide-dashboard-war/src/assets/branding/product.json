@@ -1,6 +1,6 @@
 {
-  "title": "Eclipse Che ",
-  "name": "Eclipse Che",
+  "title": "Eclipse Che Hosted by Red Hat",
+  "name": "Eclipse Che Hosted by Red Hat",
   "logoFile": "che-logo.svg",
   "logoTextFile": "che-logo-text.svg",
   "favicon": "favicon.ico",
@@ -28,7 +28,7 @@
   },
   "configuration": {
     "menu": {
-      "disabled": ["organizations", "factories"]
+      "disabled": ["organizations"]
     }, 
     "features": {
       "disabled": ["workspaceSharing", "kubernetesNamespaceSelector"]
