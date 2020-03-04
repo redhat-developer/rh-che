@@ -41,7 +41,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAcco
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSshKeysProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.RamLimitRequestProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.ServersConverter;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftEnvironmentProvisioner;
@@ -82,7 +82,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       EnvVarsConverter envVarsConverter,
       RestartPolicyRewriter restartPolicyRewriter,
       WorkspaceVolumesStrategy volumesStrategy,
-      RamLimitRequestProvisioner ramLimitProvisioner,
+      ContainerResourceProvisioner containerResourceProvisioner,
       LogsVolumeMachineProvisioner logsVolumeMachineProvisioner,
       OpenshiftUserTokenProvider openshiftUserTokenProvider,
       TenantDataProvider tenantDataProvider,
@@ -105,7 +105,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         envVarsConverter,
         restartPolicyRewriter,
         volumesStrategy,
-        ramLimitProvisioner,
+        containerResourceProvisioner,
         logsVolumeMachineProvisioner,
         podTerminationGracePeriodProvisioner,
         imagePullSecretProvisioner,
