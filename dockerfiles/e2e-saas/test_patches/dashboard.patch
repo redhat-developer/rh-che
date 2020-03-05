@@ -1,6 +1,17 @@
---- ./pageobjects/dashboard/Dashboard.ts	2020-02-27 16:38:40.167786069 +0100
-+++ ./pageobjects/dashboard/Dashboard2.ts	2020-02-27 16:39:10.067174761 +0100
-@@ -64,10 +64,8 @@
+From 713e978505ab4f736e735b7c6be1a91347f9500e Mon Sep 17 00:00:00 2001
+From: kkanova <kkanova@redhat.com>
+Date: Fri, 6 Mar 2020 09:13:51 +0100
+Subject: [PATCH] WIP
+
+---
+ tests/e2e/pageobjects/dashboard/Dashboard.ts | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/e2e/pageobjects/dashboard/Dashboard.ts b/tests/e2e/pageobjects/dashboard/Dashboard.ts
+index 7260e4dc3c..503a8bc099 100644
+--- a/tests/e2e/pageobjects/dashboard/Dashboard.ts
++++ b/tests/e2e/pageobjects/dashboard/Dashboard.ts
+@@ -65,10 +65,8 @@ export class Dashboard {
      async waitPage(timeout: number = TestConstants.TS_SELENIUM_LOAD_PAGE_TIMEOUT) {
          Logger.debug('Dashboard.waitPage');
  
@@ -8,6 +19,9 @@
          await this.driverHelper.waitVisibility(By.css(Dashboard.WORKSPACES_BUTTON_CSS), timeout);
          await this.driverHelper.waitVisibility(By.css(Dashboard.STACKS_BUTTON_CSS), timeout);
 -        await this.driverHelper.waitVisibility(By.css(Dashboard.FACTORIES_BUTTON_CSS), timeout);
+         await this.driverHelper.waitVisibility(By.xpath(Dashboard.GET_STARTED_BUTTON_XPATH), timeout);
      }
  
-     async clickDashboardButton(timeout: number = TestConstants.TS_SELENIUM_DEFAULT_TIMEOUT) {
+-- 
+2.24.1
+
