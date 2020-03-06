@@ -15,7 +15,6 @@ import { ITokenHandler } from 'e2e';
 @injectable()
 export class RhCheTokenHandler implements ITokenHandler {
     async get(): Promise<string> {
-        console.log('Getting token rh-che way');
         return String(RhCheTestConstants.E2E_SAAS_TESTS_USER_TOKEN);
     }
 }
