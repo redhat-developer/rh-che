@@ -102,6 +102,7 @@ export TS_SELENIUM_USERNAME=$USERNAME
 export TS_SELENIUM_PASSWORD=$PASSWORD
 export TS_SELENIUM_BASE_URL=$URL
 export TS_SELENIUM_MULTIUSER=true
+export TS_SELENIUM_LOG_LEVEL=DEBUG
 
 # Launch selenium server
 /usr/bin/supervisord --configuration /etc/supervisord.conf & \

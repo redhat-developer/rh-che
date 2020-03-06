@@ -18,5 +18,6 @@ const rhcheContainer: Container = inversifyConfig.e2eContainer;
 rhcheContainer.rebind<ICheLoginPage>(TYPES.CheLogin).to(RhCheLoginPage);
 rhcheContainer.rebind<ITestWorkspaceUtil>(TYPES.WorkspaceUtil).to(RhCheTestWorkspaceUtils);
 rhcheContainer.rebind<ITokenHandler>(TYPES.ITokenHandler).to(RhCheTokenHandler);
+console.log("ITokenHandler rebinded to the downstream implementation.");
 
 export { rhcheContainer };
