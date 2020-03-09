@@ -108,11 +108,14 @@ installMvn
 
 ln -s /usr/local/bin/oc /tmp
 
+echo "oc login from rollout_test.sh"
 oc login "${DEV_CLUSTER_URL}" --insecure-skip-tls-verify \
                                --token "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}";
-
+echo "setting project"
 oc new-project "${PROJECT}" --display-name="PR ${RH_PULL_REQUEST_ID} - Automated Deployment" > /dev/null 2>&1
+echo "adding roles to project"
 oc policy add-role-to-user edit Katka92 ScrewTSW rhopp tomgeorge ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT
+echo "switching to project"
 oc project $PROJECT
 
 # --- DEPLOY RH-CHE ON DEVCLUSTER ---
