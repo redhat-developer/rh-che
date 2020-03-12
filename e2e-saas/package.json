@@ -9,7 +9,8 @@
     "test-all": "npm run lint && npm run tsc && mocha --opts mocha-all.opts",
     "tsc": "rm -rf dist && tsc -p .",
     "lint": "tslint --fix -p .",
-    "test_without_lint": "npm run tsc && mocha --opts mocha.opts"
+    "test_without_lint": "npm run tsc && mocha --opts mocha.opts",
+    "pr-check": "npm run lint && npm run tsc && mocha --opts mocha-pr-check.opts"
   },
   "repository": {
     "type": "git",
