@@ -40,7 +40,7 @@ export RH_CHE_DEPLOY_SCRIPT_CLEANUP="true";
 export RH_CHE_WIPE_SQL="false";
 export RH_CHE_IS_V_FIVE="false";
 export RH_CHE_OPENSHIFT_USE_TOKEN="false";
-export RH_CHE_OPENSHIFT_URL=https://devtools-dev.ext.devshift.net:8443;
+export RH_CHE_OPENSHIFT_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443;
 export RH_CHE_OPENSHIFT_URL_PROTOCOL="$(echo ${RH_CHE_OPENSHIFT_URL} | grep :// | sed -e's,^\(.*://\).*,\1,g')"
 export RH_CHE_OPENSHIFT_URL_HOSTNAME="$(echo ${RH_CHE_OPENSHIFT_URL/$RH_CHE_OPENSHIFT_URL_PROTOCOL/} | sed 's,:.*,,g')"
 export RH_CHE_JDBC_USERNAME=pgche;
@@ -278,7 +278,7 @@ fi
 
 # Due to bug in dev-cluster, volume must be changed to emptyDir
 # https://gitlab.cee.redhat.com/dtsd/housekeeping/issues/2570
-if [ "$RH_CHE_OPENSHIFT_URL" == "https://devtools-dev.ext.devshift.net:8443" ]; then
+if [ "$RH_CHE_OPENSHIFT_URL" == "https://api.che-dev.x6e0.p1.openshiftapps.com:6443" ]; then
   cp postgres-template.yaml postgres-template_tmp.yaml
   yq --yaml-output 'del(.objects[0].spec.template.spec.volumes[0].persistentVolumeClaim) | .objects[0].spec.template.spec.volumes[0] += {"emptyDir":{}}' postgres-template_tmp.yaml > postgres-template.yaml
 fi
@@ -389,10 +389,10 @@ CHE_CONFIG_YAML=$(yq ".\"data\".\"CHE_KEYCLOAK_REALM\" = \"NULL\" |
                       .\"data\".\"CHE_LOGS_APPENDERS_IMPL\" = \"plaintext\" " ${RH_CHE_CONFIG})
 
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                  yq ".\"data\".\"CHE_HOST\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net\" |
-                      .\"data\".\"CHE_API\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api\" |
-                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket\" |
-                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT__MINOR\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/api/websocket-minor\" |
+                  yq ".\"data\".\"CHE_HOST\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com\" |
+                      .\"data\".\"CHE_API\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api\" |
+                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api/websocket\" |
+                      .\"data\".\"CHE_WEBSOCKET_ENDPOINT__MINOR\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api/websocket-minor\" |
                       .\"metadata\".\"name\" = \"rhche\" |
                       .\"data\".\"CHE_INFRA_OPENSHIFT_TLS__ENABLED\" = \"$RH_CHE_USE_TLS\" ")
 
@@ -464,7 +464,7 @@ else
   echo -e "Annotating route skipped"
 fi
 
-echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttp$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/\\033[0m"
+echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttp$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/\\033[0m"
 
 # CLEANUP
 if [ "$RH_CHE_DEPLOY_SCRIPT_CLEANUP" = true ]; then

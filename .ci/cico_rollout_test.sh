@@ -23,8 +23,8 @@ export CHE_INFRASTRUCTURE=openshift
 export CHE_MULTIUSER=true
 export CHE_OSIO_AUTH_ENDPOINT=https://auth.prod-preview.openshift.io
 export PROTOCOL=http
-export OPENSHIFT_URL=https://devtools-dev.ext.devshift.net:8443
-export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-$PROJECT.devtools-dev.ext.devshift.net
+export OPENSHIFT_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443
+export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-$PROJECT.apps.che-dev.x6e0.p1.openshiftapps.com
 export OPENSHIFT_TOKEN=$RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN
 
 function getStatus {

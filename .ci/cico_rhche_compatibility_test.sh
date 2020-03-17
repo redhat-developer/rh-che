@@ -90,7 +90,7 @@ function runCompatibilityTest() {
   echo "Installing dependencies:"
   installDependenciesForCompatibilityCheck
 
-  export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
+  export DEV_CLUSTER_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443/
   CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | xq -r '.project.version')
   export CHE_VERSION
   if [[ -z $CHE_VERSION ]]; then

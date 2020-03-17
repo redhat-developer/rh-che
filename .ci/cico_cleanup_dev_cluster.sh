@@ -11,7 +11,7 @@
 
 set +x
 
-export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
+export DEV_CLUSTER_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443/
 
 source ./.ci/functional_tests_utils.sh
 installJQ

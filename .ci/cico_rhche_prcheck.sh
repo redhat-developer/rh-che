@@ -12,7 +12,7 @@ echo "****** Starting RH-Che PR check $(date) ******"
 total_start_time=$(date +%s)
 export PR_CHECK_BUILD="true"
 export BASEDIR=$(pwd)
-export DEV_CLUSTER_URL=https://devtools-dev.ext.devshift.net:8443/
+export DEV_CLUSTER_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443/
 
 eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^DEVSHIFT_TAG_LEN$ \
