@@ -114,7 +114,7 @@ oc login "${DEV_CLUSTER_URL}" --insecure-skip-tls-verify \
 echo "setting project"
 oc new-project "${PROJECT}" --display-name="PR ${RH_PULL_REQUEST_ID} - Automated Deployment" > /dev/null 2>&1
 echo "adding roles to project"
-oc policy add-role-to-user edit Katka92 ScrewTSW rhopp tomgeorge ibuziuk amisevsk davidfestal skabashnyuk -n $PROJECT
+oc policy add-role-to-user edit ibuziuk -n $PROJECT
 echo "switching to project"
 oc project $PROJECT
 
