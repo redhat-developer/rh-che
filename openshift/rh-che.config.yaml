@@ -34,7 +34,7 @@ data:
   CHE_INFRA_KUBERNETES_PVC_PRECREATE__SUBPATHS: "true"
   CHE_INFRA_OPENSHIFT_TLS__ENABLED: "true"
   JAVA_OPTS: "-XX:MaxRAMFraction=2 -XX:+UseParallelGC -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true"
-  CHE_SERVER_SECURE__EXPOSER_JWTPROXY_IMAGE: "quay.io/eclipse/che-jwtproxy:32eda93"
+  CHE_SERVER_SECURE__EXPOSER_JWTPROXY_IMAGE: "quay.io/eclipse/che-jwtproxy:264ddd8"
   CHE_SYSTEM_ADMIN__NAME: "admin"
   CHE_SYSTEM_SUPER__PRIVILEGED__MODE: "true"
   CHE_WEBSOCKET_ENDPOINT: "wss://che.prod-preview.openshift.io/api/websocket"
