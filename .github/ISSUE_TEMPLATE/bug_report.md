@@ -23,12 +23,3 @@ version: (help/about menu)
 **Reproduction Steps:**
 
 Describe how to reproduce the problem
-
-**Runtime:**
-
-runtime used:
-   - [ ] minishift (include output of `minishift version`)
-   - [ ] OpenShift.io
-   - [ ] Openshift Container Platform (include output of `oc version`)
-
-<!-- paste output of the runtime here -->
