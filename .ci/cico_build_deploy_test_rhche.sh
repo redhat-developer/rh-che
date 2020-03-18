@@ -67,11 +67,11 @@ if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_
                                          -S "${QUAY_SECRET_JSON}" \
                                          -V "${CHE_VERSION}" \
                                          -R \
-                                         -s \
-                                         -U;
+                                         -s;
+
 then
   echo "Che successfully deployed."
-  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-$PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/
+  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-$PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/
 else
   echo "Custom che deployment failed. Error code:$?"
   exit 4
