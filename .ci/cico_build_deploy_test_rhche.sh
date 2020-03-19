@@ -70,7 +70,7 @@ if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_
 
 then
   echo "Che successfully deployed."
-  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-$PROJECT_NAMESPACE.devtools-dev.ext.devshift.net/
+  export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-$PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/
 else
   echo "Custom che deployment failed. Error code:$?"
   exit 4
