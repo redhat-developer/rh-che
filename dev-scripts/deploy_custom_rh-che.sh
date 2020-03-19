@@ -331,6 +331,13 @@ if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
     yq --yaml-output ".parameters = (.parameters | map((select(.name == \"IMAGE_TAG\") | .value) |= \"${RH_CHE_CUSTOM_REGISTRIES_VERSION}\"))" che-devfile-registry.yaml > che-devfile-registry-tmp.yaml
     mv che-devfile-registry-tmp.yaml che-devfile-registry.yaml -f
   fi
+  if [ "${RH_CHE_USE_TLS}" == "true" ]; then
+    echo "Enabling TLS for routes of devfile and plugin registries"
+    yq --yaml-output "(.objects[] | select(.kind == \"Route\").spec) += {tls: {insecureEdgeTerminationPolicy: \"Redirect\", termination: \"edge\"}}" che-plugin-registry.yaml > che-plugin-registry-tmp.yaml
+    mv che-plugin-registry-tmp.yaml che-plugin-registry.yaml -f
+    yq --yaml-output "(.objects[] | select(.kind == \"Route\").spec) += {tls: {insecureEdgeTerminationPolicy: \"Redirect\", termination: \"edge\"}}" che-devfile-registry.yaml > che-devfile-registry-tmp.yaml
+    mv che-devfile-registry-tmp.yaml che-devfile-registry.yaml -f
+  fi
   echo "Deploying plugin registry"
   if ! (oc process -f che-plugin-registry.yaml | oc apply -f - > /dev/null 2>&1); then
     echo -e "\\033[0;91;1mFailed to deploy Che plugin registry\\033[0m"
@@ -391,8 +398,8 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
 
 if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/v3\" |
-                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/\" ")
+                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" ")
 fi
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
@@ -448,18 +455,6 @@ if [ ${CHE_STARTUP_TIMEOUT} == 0 ]; then
   echo -e "Getting events from deployment:"
   oc get events -n ${RH_CHE_PROJECT_NAMESPACE}
   exit 1
-fi
-
-if [ "${RH_CHE_USE_TLS}" == "true" ]; then
-  echo -e "Annotating route"
-  oc annotate --overwrite=true route/rhche kubernetes.io/tls-acme=true
-  if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
-    echo -e "Annotating routes for plugin and devfile registries"
-    oc annotate --overwrite=true route/che-devfile-registry kubernetes.io/tls-acme=true
-    oc annotate --overwrite=true route/che-plugin-registry kubernetes.io/tls-acme=true
-  fi
-else
-  echo -e "Annotating route skipped"
 fi
 
 echo -e "\\033[92;1mSUCCESS: Rh-Che deployed on \\033[34mhttp$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/\\033[0m"
