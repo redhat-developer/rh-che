@@ -66,6 +66,7 @@ if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_
                                          -e "${PROJECT_NAMESPACE}" \
                                          -S "${QUAY_SECRET_JSON}" \
                                          -V "${CHE_VERSION}" \
+                                         -R \
                                          -s;
 
 then

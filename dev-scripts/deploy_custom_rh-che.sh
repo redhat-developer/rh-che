@@ -391,8 +391,8 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
 
 if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/v3\" |
-                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/\" ")
+                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.${RH_CHE_OPENSHIFT_URL_HOSTNAME}/\" ")
 fi
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
@@ -453,6 +453,11 @@ fi
 if [ "${RH_CHE_USE_TLS}" == "true" ]; then
   echo -e "Annotating route"
   oc annotate --overwrite=true route/rhche kubernetes.io/tls-acme=true
+  if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
+    echo -e "Annotating routes for plugin and devfile registries"
+    oc annotate --overwrite=true route/che-devfile-registry kubernetes.io/tls-acme=true
+    oc annotate --overwrite=true route/che-plugin-registry kubernetes.io/tls-acme=true
+  fi
 else
   echo -e "Annotating route skipped"
 fi
