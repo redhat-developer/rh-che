@@ -61,8 +61,10 @@ class RhCheReporter extends mocha.reporters.Spec {
       console.log(launchInformation);
 
       rm.sync(TestConstants.TS_SELENIUM_REPORT_FOLDER);
-      CheApiRequestHandler.enableRequestInteceptor();
-      CheApiRequestHandler.enableResponseInterceptor();
+      if (TestConstants.TS_SELENIUM_LOG_LEVEL === "TRACE") {
+        CheApiRequestHandler.enableRequestInteceptor();
+        CheApiRequestHandler.enableResponseInterceptor();
+      }
       preferencesHalder.setConfirmExit(AskForConfirmationType.never);
     });
 

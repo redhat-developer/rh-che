@@ -31,6 +31,9 @@ fi
 if [ -z $DEBUG_LEVEL ]; then
   DEBUG_LEVEL="DEBUG"
 fi
+if [ -z $DEBUG_LEVEL ]; then
+  DEBUG_LEVEL="DEBUG"
+fi
 
 cd rh-che
 length=${#USERNAME}
@@ -145,7 +148,6 @@ echo "Applying patches..."
 # currently in /tmp/rh-che folder
 patch -u ../e2e/pageobjects/dashboard/Dashboard.ts -i ../test_patches/Dashboard.patch
 patch -u ../e2e/utils/requestHandlers/CheApiRequestHandler.ts -i ../test_patches/CheApiRequestHandler.patch
-patch -u ../e2e/package.json -i ../test_patches/upstream_package.patch
 
 # rebuild upstream patched code
 cd ../e2e && npm i && tsc && cd ../rh-che
