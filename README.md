@@ -83,7 +83,7 @@ DEP IMAGE: [![Build Status](https://ci.centos.org/view/Devtools/job/devtools-rh-
 - PR_Check job : https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/buildTimeTrend
 - Dependency image build job: https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-build-dep/buildTimeTrend
 
-While deploying rh-che to ```devtools-dev.ext.devshift.net```, the Postgre is deployed too. There is service account doing the deploy. 
+While deploying rh-che to the che-dev OSD 4 cluster, the Postgre is deployed too. There is service account doing the deploy. 
 A special test suite is used for PR check. It contains basic tests to ensure workspaces are working and the project can be build and run. You can find 
 that suite [here](https://github.com/redhat-developer/rh-che/blob/master/functional-tests/src/test/resources/suites/prcheck.xml).
 
