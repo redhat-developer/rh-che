@@ -1,12 +1,3 @@
-From 713e978505ab4f736e735b7c6be1a91347f9500e Mon Sep 17 00:00:00 2001
-From: kkanova <kkanova@redhat.com>
-Date: Fri, 6 Mar 2020 09:13:51 +0100
-Subject: [PATCH] WIP
-
----
- tests/e2e/pageobjects/dashboard/Dashboard.ts | 2 --
- 1 file changed, 2 deletions(-)
-
 diff --git a/tests/e2e/pageobjects/dashboard/Dashboard.ts b/tests/e2e/pageobjects/dashboard/Dashboard.ts
 index 7260e4dc3c..503a8bc099 100644
 --- a/tests/e2e/pageobjects/dashboard/Dashboard.ts
@@ -22,6 +13,3 @@ index 7260e4dc3c..503a8bc099 100644
          await this.driverHelper.waitVisibility(By.xpath(Dashboard.GET_STARTED_BUTTON_XPATH), timeout);
      }
  
--- 
-2.24.1
-

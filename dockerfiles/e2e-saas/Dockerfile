@@ -13,17 +13,17 @@ ENV LANG=en_US.utf8 \
 
 # currently in tmp/e2e
 RUN npm run tsc
-    
+
 # install git
 RUN apt-get update &&\
     apt-get install -y git
- 
+
 # Download rh-che
 RUN cd ../ && \
     git clone https://github.com/redhat-developer/rh-che.git && \
     cd rh-che/e2e-saas && \
     npm --silent i
-    
+
 WORKDIR /tmp/
 COPY docker-entrypoint.sh /tmp/
 COPY test_patches/* /tmp/test_patches/

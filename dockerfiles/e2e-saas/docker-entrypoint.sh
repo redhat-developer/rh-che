@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-
 # ------------------------------------------------------------------------------------------
 # ------------------------------- VALIDATE ALL REQUIRED PARAMETERS -------------------------
 # ------------------------------------------------------------------------------------------
@@ -29,6 +28,9 @@ fi
 if [ -z $TEST_SUITE ]; then
   TEST_SUITE="test-java-maven"
 fi
+if [ -z $DEBUG_LEVEL ]; then
+  DEBUG_LEVEL="DEBUG"
+fi
 
 cd rh-che
 length=${#USERNAME}
@@ -37,8 +39,8 @@ length=${#USERNAME}
 # ------------------------------- GET TOKEN FOR A USER -------------------------------------
 # ------------------------------------------------------------------------------------------
 
-echo "Trying to find token for $(echo $USERNAME | cut -c1-3) $(echo $USERNAME | cut -c4-$length)"  
-    
+echo "Trying to find token for $(echo $USERNAME | cut -c1-3) $(echo $USERNAME | cut -c4-$length)"
+
 #verify environment - if production or prod-preview
 #variable preview is used to differ between prod and prod-preview urls
 rm -rf cookie-file loginfile.html
@@ -53,8 +55,8 @@ data=$(echo "$response" | jq .data)
 if [ "$data" == "[]" ]; then
   echo -e "${RED}Can not find active token for user $USERNAME. Please check settings. ${NC}"
   exit 1
-fi 
-		
+fi
+
 #get html of developers login page
 curl -sX GET -L -c cookie-file -b cookie-file "https://auth.${preview}openshift.io/api/login?redirect=https://che.openshift.io" > loginfile.html
 
@@ -63,35 +65,35 @@ url=$(grep "form id" loginfile.html | grep -o 'http.*.tab_id=.[^\"]*')
 dataUrl="username=$USERNAME&password=$PASSWORD&login=Log+in"
 url=${url//\&amp;/\&}
 
-#send login and follow redirects  
+#send login and follow redirects
 set +e
 url=$(curl -w '%{redirect_url}' -s -X POST -c cookie-file -b cookie-file -d "$dataUrl" "$url")
 found=$(echo "$url" | grep "token_json")
 
-while true 
+while true
 do
-	url=$(curl -c cookie-file -b cookie-file -s -o /dev/null -w '%{redirect_url}' "$url")
-	if [[ ${#url} == 0 ]]; then
-		#all redirects were done but token was not found
-		break
-	fi
-	found=$(echo "$url" | grep "token_json")
-	if [[ ${#found} -gt 0 ]]; then
-		#some redirects were done and token was found as a part of url
-		break
-	fi
+  url=$(curl -c cookie-file -b cookie-file -s -o /dev/null -w '%{redirect_url}' "$url")
+  if [[ ${#url} == 0 ]]; then
+    #all redirects were done but token was not found
+    break
+  fi
+  found=$(echo "$url" | grep "token_json")
+  if [[ ${#found} -gt 0 ]]; then
+    #some redirects were done and token was found as a part of url
+    break
+  fi
 done
 set -e
 
 #extract active token
 token=$(echo "$url" | grep -o "ey.[^%]*" | head -1)
 if [[ ${#token} -gt 0 ]]; then
-    #save each token into file tokens.txt in format: token;username;["","prod-preview"]
-	export E2E_SAAS_TESTS_USER_TOKEN=${token}
-	echo "Token set successfully."
+  #save each token into file tokens.txt in format: token;username;["","prod-preview"]
+  export E2E_SAAS_TESTS_USER_TOKEN=${token}
+  echo "Token set successfully."
 else
-	echo -e "${RED}Failed to obtain token for $USERNAME! Probably user password is incorrect. Continue with other users. ${NC}"
-	exit 1
+  echo -e "${RED}Failed to obtain token for $USERNAME! Probably user password is incorrect. Continue with other users. ${NC}"
+  exit 1
 fi
 
 # ------------------------------------------------------------------------------------------
@@ -102,7 +104,7 @@ export TS_SELENIUM_USERNAME=$USERNAME
 export TS_SELENIUM_PASSWORD=$PASSWORD
 export TS_SELENIUM_BASE_URL=$URL
 export TS_SELENIUM_MULTIUSER=true
-export TS_SELENIUM_LOG_LEVEL=DEBUG
+export TS_SELENIUM_LOG_LEVEL=$DEBUG_LEVEL
 
 # Launch selenium server
 /usr/bin/supervisord --configuration /etc/supervisord.conf & \
@@ -141,10 +143,12 @@ export DISPLAY=:1.0
 
 echo "Applying patches..."
 # currently in /tmp/rh-che folder
-patch -u ../e2e/pageobjects/dashboard/Dashboard.ts -i ../test_patches/dashboard.patch 
+patch -u ../e2e/pageobjects/dashboard/Dashboard.ts -i ../test_patches/Dashboard.patch
+patch -u ../e2e/utils/requestHandlers/CheApiRequestHandler.ts -i ../test_patches/CheApiRequestHandler.patch
+patch -u ../e2e/package.json -i ../test_patches/upstream_package.patch
 
 # rebuild upstream patched code
-cd ../e2e && tsc && cd ../rh-che
+cd ../e2e && npm i && tsc && cd ../rh-che
 
 # ------------------------------------------------------------------------------------------
 #----------------------------------- RUN TESTS ---------------------------------------------
@@ -160,19 +164,19 @@ hostname=$(hostname -I)
 echo "You can watch localy using VNC with IP: ${hostname}:0"
 
 if mount | grep 'local_tests'; then
-	echo "The local scripts are mounted. Executing local scripts."
-	cd local_tests
-	rm -rf node_modules dist
-	#When mounting local code, there can be local dependency to e2e set - this would cause script to fail.
-	sed -i '/e2e/d' package.json 
-	npm --silent i
-	echo "Local scripts successfully built."
+  echo "The local scripts are mounted. Executing local scripts."
+  cd local_tests
+  rm -rf node_modules dist
+  #When mounting local code, there can be local dependency to e2e set - this would cause script to fail.
+  sed -i '/e2e/d' package.json
+  npm --silent i
+  echo "Local scripts successfully built."
 else
-	cd e2e-saas
+  cd e2e-saas
 fi
 
 echo "Installing upstream dependency."
 npm --silent i ../../e2e/
 
-echo "Running test suite: $TEST_SUITE" 
+echo "Running test suite: $TEST_SUITE"
 npm run $TEST_SUITE
