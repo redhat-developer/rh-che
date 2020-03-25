@@ -2,8 +2,6 @@
 apiVersion: 1.0.0
 metadata:
   generateName: rh-che-
-attributes:
-  persistVolumes: 'false'
 components:
   -
     type: chePlugin
