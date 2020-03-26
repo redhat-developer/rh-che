@@ -26,7 +26,7 @@ else
 fi
 
 if [ -z $TEST_SUITE ]; then
-  TEST_SUITE="test-java-maven"
+  TEST_SUITE="test-all"
 fi
 if [ -z $DEBUG_LEVEL ]; then
   DEBUG_LEVEL="DEBUG"
