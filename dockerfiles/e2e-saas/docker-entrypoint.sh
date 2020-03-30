@@ -146,7 +146,6 @@ export DISPLAY=:1.0
 
 echo "Applying patches..."
 # currently in /tmp/rh-che folder
-patch -u ../e2e/pageobjects/dashboard/Dashboard.ts -i ../test_patches/Dashboard.patch
 patch -u ../e2e/utils/requestHandlers/CheApiRequestHandler.ts -i ../test_patches/CheApiRequestHandler.patch
 
 # rebuild upstream patched code
