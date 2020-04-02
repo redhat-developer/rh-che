@@ -28,7 +28,7 @@
   },
   "configuration": {
     "menu": {
-      "disabled": ["organizations"]
+      "disabled": ["organizations", "factories"]
     }, 
     "features": {
       "disabled": ["workspaceSharing", "kubernetesNamespaceSelector"]
