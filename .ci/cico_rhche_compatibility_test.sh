@@ -181,6 +181,9 @@ function runCompatibilityTest() {
     exit $rebase_return_code
   fi
 
+  #rebase was successful, push rebased branch
+  git push origin "${BRANCH}" -f
+
   #comment [test] to run tests
   commentToRunTest
   echo "0" > compatibility_status
