@@ -126,7 +126,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
      -e USERNAME=$RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME \
      -e PASSWORD=$RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD \
      -e URL=https://$HOST_URL \
-     -e TEST_SUITE=pr-check \
+     -e TEST_SUITE=test-java-maven \
      -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
      --shm-size=256m \
   $rhche_image
@@ -157,7 +157,7 @@ else
         -e USERNAME=$USERNAME \
         -e PASSWORD=$PASSWORD \
         -e URL=https://$HOST_URL \
-        -e TEST_SUITE=test-all \
+        -e TEST_SUITE=test-java-maven \
         -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
@@ -168,7 +168,7 @@ else
         -e USERNAME=$USERNAME \
         -e PASSWORD=$PASSWORD \
         -e URL=https://$HOST_URL \
-        -e TEST_SUITE=test-all \
+        -e TEST_SUITE=test-java-maven \
         -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
@@ -193,7 +193,7 @@ else
       -e USERNAME=$USERNAME \
       -e PASSWORD=$PASSWORD \
       -e URL=https://$HOST_URL \
-      -e TEST_SUITE=test-all \
+      -e TEST_SUITE=test-java-maven \
       -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
       --shm-size=256m \
     quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
