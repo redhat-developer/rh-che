@@ -56,6 +56,15 @@ function installGit(){
   yum install --assumeyes -d1 git
 }
 
+function installScl(){
+  if yum repolist | grep centos-release-scl; then
+    echo "SCL already installed, skipping instalation."
+  else
+    echo "SCL not installed, installing..."
+    yum install --assumeyes -d1 centos-release-scl
+  fi
+}
+
 function installDependencies() {
   installEpelRelease
   installYQ
@@ -63,6 +72,7 @@ function installDependencies() {
   installJQ
   installOC
   installGit  
+  installScl
   # Getting dependencies ready
   yum install --assumeyes -d1 \
               patch \

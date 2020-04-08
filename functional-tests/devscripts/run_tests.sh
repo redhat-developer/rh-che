@@ -49,6 +49,9 @@ while getopts "hu:p:m:o:r:" opt; do
   esac
 done
 
+#install scl on demand, to prevent "scl: command not found" issue
+installScl
+
 #Get cluster to be able to get logs. Related to issue: https://github.com/redhat-developer/che-functional-tests/issues/476
 if [[ "$USERNAME" == *"preview"* ]] || [[ "$PR_CHECK_BUILD" == "true" ]] || [[ "$JOB_NAME" == *"saas"* ]]; then
   API_SERVER_URL="https://api.prod-preview.openshift.io"
