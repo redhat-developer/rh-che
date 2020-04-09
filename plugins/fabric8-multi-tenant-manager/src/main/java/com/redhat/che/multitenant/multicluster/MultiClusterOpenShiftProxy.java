@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class MultiClusterOpenShiftProxy {
   private static final Logger LOG = LoggerFactory.getLogger(MultiClusterOpenShiftProxy.class);
-  private String url;
+  private final String url;
 
   @Inject
   public MultiClusterOpenShiftProxy(

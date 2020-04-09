@@ -28,7 +28,6 @@ public class Fabric8MultiTenantModule extends AbstractModule {
   @Override
   protected void configure() {
     LOGGER.info("Configuring {}", this.getClass().getName());
-
     bind(OpenShiftClientFactory.class).to(Fabric8OpenShiftClientFactory.class);
     bind(KubernetesClientFactory.class).to(Fabric8OpenShiftClientFactory.class);
     bind(OpenShiftProjectFactory.class).to(Fabric8OpenShiftProjectFactory.class);

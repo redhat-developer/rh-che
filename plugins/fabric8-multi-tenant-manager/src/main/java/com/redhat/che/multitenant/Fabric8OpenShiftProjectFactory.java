@@ -25,6 +25,7 @@ import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientConfigF
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProject;
 import org.eclipse.che.workspace.infrastructure.openshift.project.OpenShiftProjectFactory;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftStopWorkspaceRoleProvisioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       @Nullable @Named("che.infra.openshift.project") String projectName,
       @Nullable @Named("che.infra.kubernetes.namespace.default") String defaultNamespaceName,
       OpenShiftClientFactory clientFactory,
+      OpenShiftStopWorkspaceRoleProvisioner openShiftStopWorkspaceRoleProvisioner,
       Fabric8WorkspaceEnvironmentProvider envProvider,
       UserManager userManager,
       KubernetesSharedPool sharedPool) {
@@ -51,6 +53,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         false,
         clientFactory,
         new OpenShiftClientConfigFactory(),
+        openShiftStopWorkspaceRoleProvisioner,
         userManager,
         sharedPool);
     this.clientFactory = clientFactory;
