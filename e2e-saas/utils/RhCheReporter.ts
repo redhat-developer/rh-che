@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import * as mocha from 'mocha';
-import { TYPES, IDriver, DriverHelper, CLASSES, ScreenCatcher, ITestWorkspaceUtil, PreferencesHandler, TestConstants, AskForConfirmationType, CheApiRequestHandler } from 'e2e';
+import { TYPES, IDriver, DriverHelper, CLASSES, ScreenCatcher, ITestWorkspaceUtil, PreferencesHandler, TestConstants, AskForConfirmationType, } from 'e2e';
 import { logging } from 'selenium-webdriver';
 import fs from 'fs';
 import rm from 'rimraf';
@@ -61,10 +61,6 @@ class RhCheReporter extends mocha.reporters.Spec {
       console.log(launchInformation);
 
       rm.sync(TestConstants.TS_SELENIUM_REPORT_FOLDER);
-      if (TestConstants.TS_SELENIUM_LOG_LEVEL === "TRACE") {
-        CheApiRequestHandler.enableRequestInteceptor();
-        CheApiRequestHandler.enableResponseInterceptor();
-      }
       preferencesHalder.setConfirmExit(AskForConfirmationType.never);
     });
 
