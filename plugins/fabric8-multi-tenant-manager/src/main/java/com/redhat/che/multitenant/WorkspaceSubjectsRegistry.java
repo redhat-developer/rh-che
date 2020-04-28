@@ -14,11 +14,10 @@ package com.redhat.che.multitenant;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.HashMap;
+import com.google.common.collect.Multimaps;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.che.api.core.NotFoundException;
@@ -54,9 +53,9 @@ import org.eclipse.che.commons.subject.Subject;
 @Singleton
 public class WorkspaceSubjectsRegistry implements EventSubscriber<WorkspaceStatusEvent> {
 
-  private final ReadWriteLock lock = new ReentrantReadWriteLock();
-  private final Map<String, Subject> workspaceStarters = new HashMap<>();
-  private final Multimap<String, String> userIdToWorkspaces = ArrayListMultimap.create();
+  private final Map<String, Subject> workspaceStarters = new ConcurrentHashMap<>();
+  private final Multimap<String, String> userIdToWorkspaces =
+      Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
 
   @VisibleForTesting
   @Inject
@@ -114,14 +113,9 @@ public class WorkspaceSubjectsRegistry implements EventSubscriber<WorkspaceStatu
       // to the front-end application and create the workspace
       return;
     }
-    lock.readLock().lock();
-    try {
-      String userId = subject.getUserId();
-      for (String workspaceId : userIdToWorkspaces.get(userId)) {
-        workspaceStarters.put(workspaceId, subject);
-      }
-    } finally {
-      lock.readLock().unlock();
+    String userId = subject.getUserId();
+    for (String workspaceId : userIdToWorkspaces.get(userId)) {
+      workspaceStarters.put(workspaceId, subject);
     }
   }
 }
