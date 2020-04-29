@@ -8,7 +8,6 @@ ARG TAG=latest
 FROM quay.io/eclipse/che-e2e:$TAG
 
 ENV LANG=en_US.utf8 \
-    DISPLAY=:99 \
     FABRIC8_USER_NAME=fabric8
 
 # currently in tmp/e2e

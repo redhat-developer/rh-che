@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 set -e
 
+stopRecording(){
+  echo "Killing ffmpeg with PID=$ffmpeg_pid"
+  kill -2 "$ffmpeg_pid"
+  set +e
+  wait "$ffmpeg_pid"
+  set -e
+  return 0
+}
+
+startRecording() {
+  ffmpeg_path="./report/ffmpeg_report"
+  mkdir -p $ffmpeg_path
+  nohup ffmpeg -y -video_size 1920x1080 -framerate 24 -f x11grab -i $DISPLAY.$SCREEN $ffmpeg_path/output.mp4 2> $ffmpeg_path/ffmpeg_err.txt > $ffmpeg_path/ffmpeg_std.txt & 
+  ffmpeg_pid=$!
+  trap stopRecording 2 15
+}
+
+
 # ------------------------------------------------------------------------------------------
 # ------------------------------- VALIDATE ALL REQUIRED PARAMETERS -------------------------
 # ------------------------------------------------------------------------------------------
@@ -106,6 +124,14 @@ export TS_SELENIUM_BASE_URL=$URL
 export TS_SELENIUM_MULTIUSER=true
 export TS_SELENIUM_LOG_LEVEL=$DEBUG_LEVEL
 
+echo "Running Xvfb"
+
+export DISPLAY=:20
+export SCREEN="0"
+
+/usr/bin/Xvfb $DISPLAY -screen $SCREEN 1920x1080x16 +extension RANDR > /dev/null 2>&1 &
+x11vnc -display $DISPLAY -N -forever > /dev/null 2>&1 &
+
 # Launch selenium server
 /usr/bin/supervisord --configuration /etc/supervisord.conf & \
 export TS_SELENIUM_REMOTE_DRIVER_URL=http://localhost:4444/wd/hub
@@ -131,11 +157,6 @@ do
   sleep 1
 done
 
-echo "Running Xvfb"
-/usr/bin/Xvfb :1 -screen 0 1920x1080x24 +extension RANDR > /dev/null 2>&1 &
-
-x11vnc -display :1.0 > /dev/null 2>&1 &
-export DISPLAY=:1.0
 
 # ------------------------------------------------------------------------------------------
 #----------------------------------- RUN TESTS ---------------------------------------------
@@ -165,5 +186,18 @@ fi
 echo "Installing upstream dependency."
 npm --silent i ../../e2e/
 
+startRecording
+
+set +e
 echo "Running test suite: $TEST_SUITE"
 npm run $TEST_SUITE
+RESULT=$?
+set -e
+
+stopRecording
+
+if [[ $RESULT == 0 ]]; then
+  rm -rf $ffmpeg_path
+fi
+echo "Exiting docker entrypoint with status $RESULT"
+exit $RESULT

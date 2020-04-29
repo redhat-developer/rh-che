@@ -48,7 +48,7 @@ echo "Build, tag and push lasted $build_tag_push_duration seconds."
 # Deploy rh-che image
 echo "Deploying image with tag ${DOCKER_IMAGE_TAG} from ${DOCKER_IMAGE_URL}"
 
-#create project before deployment script to be able to set policy
+# create project before deployment script to be able to set policy
 if oc project "${PROJECT_NAMESPACE}" > /dev/null 2>&1;
 then
   echo "Switched to project ${PROJECT_NAMESPACE}"

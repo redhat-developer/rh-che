@@ -97,7 +97,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   #check version in rh-che pom.xml to use correct version of tests.
   getMavenVersion # Checking the maven version for debugging https://github.com/redhat-developer/rh-che/issues/1716
   version=$(getVersionFromPom)
-  if [[ -z "${version}" ]]; then
+  if [ -z "${version}" ]; then
     echo "[ERROR]: Could not find version in pom.xml."
     exit 1
   fi
@@ -108,8 +108,10 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
   docker_pull_exit_code=$?
 
   if [[ $docker_pull_exit_code == 0 ]]; then
-    echo "RH-Che test image with tag ${version} found on docker. Reusing image."
-	else
+      echo "Rebuilding test image based on ${version} upstream version."
+      docker build --build-arg TAG=${version} -t e2e_tests dockerfiles/e2e-saas
+      rhche_image=e2e_tests
+  else
     echo "Could not found RH-Che tests image with tag ${version}."
     if [ $(curl -X GET https://quay.io/api/v1/repository/eclipse/che-e2e/tag/${version}/images | jq .status) == null ]; then
       echo "Upstream image with tag ${version} found. Building own RH-Che image based on Che image with ${version} tag."
