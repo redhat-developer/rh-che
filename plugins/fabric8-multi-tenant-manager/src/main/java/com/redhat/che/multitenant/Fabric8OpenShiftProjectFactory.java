@@ -44,7 +44,9 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       OpenShiftStopWorkspaceRoleProvisioner openShiftStopWorkspaceRoleProvisioner,
       Fabric8WorkspaceEnvironmentProvider envProvider,
       UserManager userManager,
-      KubernetesSharedPool sharedPool) {
+      KubernetesSharedPool sharedPool,
+      @Nullable @Named("che.infra.openshift.oauth_identity_provider")
+          String oAuthIdentityProvider) {
     super(
         projectName,
         null,
@@ -55,7 +57,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         new OpenShiftClientConfigFactory(),
         openShiftStopWorkspaceRoleProvisioner,
         userManager,
-        sharedPool);
+        sharedPool,
+        oAuthIdentityProvider);
     this.clientFactory = clientFactory;
     this.envProvider = envProvider;
   }
