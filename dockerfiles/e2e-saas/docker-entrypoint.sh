@@ -18,6 +18,30 @@ startRecording() {
   trap stopRecording 2 15
 }
 
+setURLs() {
+  if [ -z $ACCOUNT_ENV ]; then
+    echo "ACCOUNT_ENV variable is not set, retrieving env from username."
+
+    #verify environment - if production or prod-preview
+    #variable preview is used to differ between prod and prod-preview urls
+    rm -rf cookie-file loginfile.html
+    if [[ "$USERNAME" == *"preview"* ]] || [[ "$USERNAME" == *"saas"* ]]; then
+      export USER_INFO_URL="https://api.prod-preview.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.prod-preview.openshift.io/api/login?redirect=https://che.openshift.io"
+    else
+      export USER_INFO_URL="https://api.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.openshift.io/api/login?redirect=https://che.openshift.io"
+    fi
+  else 
+    if [ "$ACCOUNT_ENV" == "prod" ]; then
+      export USER_INFO_URL="https://api.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.openshift.io/api/login?redirect=https://che.openshift.io"
+    else 
+      export USER_INFO_URL="https://api.prod-preview.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.prod-preview.openshift.io/api/login?redirect=https://che.openshift.io"
+    fi
+  fi
+}
 
 # ------------------------------------------------------------------------------------------
 # ------------------------------- VALIDATE ALL REQUIRED PARAMETERS -------------------------
@@ -59,16 +83,9 @@ length=${#USERNAME}
 
 echo "Trying to find token for $(echo $USERNAME | cut -c1-3) $(echo $USERNAME | cut -c4-$length)"
 
-#verify environment - if production or prod-preview
-#variable preview is used to differ between prod and prod-preview urls
-rm -rf cookie-file loginfile.html
-if [[ "$USERNAME" == *"preview"* ]] || [[ "$USERNAME" == *"saas"* ]]; then
-  preview="prod-preview."
-else
-  preview=""
-fi
+setURLs
 
-response=$(curl -s -g -X GET --header 'Accept: application/json' "https://api.${preview}openshift.io/api/users?filter[username]=$USERNAME")
+response=$(curl -s -g -X GET --header 'Accept: application/json' ${USER_INFO_URL})
 data=$(echo "$response" | jq .data)
 if [ "$data" == "[]" ]; then
   echo -e "${RED}Can not find active token for user $USERNAME. Please check settings. ${NC}"
@@ -76,7 +93,7 @@ if [ "$data" == "[]" ]; then
 fi
 
 #get html of developers login page
-curl -sX GET -L -c cookie-file -b cookie-file "https://auth.${preview}openshift.io/api/login?redirect=https://che.openshift.io" > loginfile.html
+curl -sX GET -L -c cookie-file -b cookie-file ${LOGIN_PAGE_URL} > loginfile.html
 
 #get url for login from form
 url=$(grep "form id" loginfile.html | grep -o 'http.*.tab_id=.[^\"]*')
@@ -106,11 +123,10 @@ set -e
 #extract active token
 token=$(echo "$url" | grep -o "ey.[^%]*" | head -1)
 if [[ ${#token} -gt 0 ]]; then
-  #save each token into file tokens.txt in format: token;username;["","prod-preview"]
   export E2E_SAAS_TESTS_USER_TOKEN=${token}
   echo "Token set successfully."
 else
-  echo -e "${RED}Failed to obtain token for $USERNAME! Probably user password is incorrect. Continue with other users. ${NC}"
+  echo -e "${RED}Failed to obtain token for $USERNAME! Probably user password is incorrect. ${NC}"
   exit 1
 fi
 
