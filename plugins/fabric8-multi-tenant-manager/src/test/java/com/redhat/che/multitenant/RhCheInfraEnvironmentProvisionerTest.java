@@ -49,7 +49,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeM
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSshKeysProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.SshKeysProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
@@ -86,7 +86,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private ImagePullSecretProvisioner imagePullSecretProvisioner;
   @Mock private ProxySettingsProvisioner proxySettingsProvisioner;
   @Mock private CertificateProvisioner certificateProvisioner;
-  @Mock private VcsSshKeysProvisioner vcsSshKeysProvisioner;
+  @Mock private SshKeysProvisioner sshKeysProvisioner;
   @Mock private GitConfigProvisioner gitConfigProvisioner;
   @Mock private OpenShiftPreviewUrlExposer openshiftPreviewUrlExposer;
 
@@ -128,7 +128,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             proxySettingsProvisioner,
             serviceAccountProvisioner,
             certificateProvisioner,
-            vcsSshKeysProvisioner,
+            sshKeysProvisioner,
             gitConfigProvisioner,
             openshiftPreviewUrlExposer,
             vcsSslCertificateProvisioner,

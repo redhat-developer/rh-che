@@ -38,7 +38,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeM
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
-import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSshKeysProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.SshKeysProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
@@ -91,7 +91,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       ProxySettingsProvisioner proxySettingsProvisioner,
       ServiceAccountProvisioner serviceAccountProvisioner,
       CertificateProvisioner certificateProvisioner,
-      VcsSshKeysProvisioner vcsSshKeysProvisioner,
+      SshKeysProvisioner sshKeysProvisioner,
       GitConfigProvisioner gitConfigProvisioner,
       OpenShiftPreviewUrlExposer previewUrlEndpointsProvisioner,
       VcsSslCertificateProvisioner vcsSslCertificateProvisioner,
@@ -112,7 +112,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         proxySettingsProvisioner,
         serviceAccountProvisioner,
         certificateProvisioner,
-        vcsSshKeysProvisioner,
+        sshKeysProvisioner,
         gitConfigProvisioner,
         previewUrlEndpointsProvisioner,
         vcsSslCertificateProvisioner);
