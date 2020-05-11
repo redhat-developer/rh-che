@@ -12,6 +12,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^JOB_NAME$ \
         ^RH_CHE \
         ^CHE \
+        USERNAME PASSWORD EMAIL \
         ghprbCommentBody)"
 
 ACCOUNT_ENV="prod-preview"
@@ -26,9 +27,16 @@ installStartDocker
 installJQ
 
 token=$(getActiveToken)
-curl -s -X OPTIONS --header "Content-Type: application/json" --header "Authorization: Bearer ${token}" $TEST_URL/api/ 
+if [ -z $token ]; then
+    echo "Can not obtain user token. Failing job."
+fi
 version=$(curl -s -X OPTIONS --header "Content-Type: application/json" --header "Authorization: Bearer ${token}" $TEST_URL/api/ | jq '.buildInfo')
 version=${version//\"/}
+
+if [ -z $version ]; then
+    echo "Version is not set. Failing job."
+    exit 1
+fi
 
 rhche_image="quay.io/openshiftio/rhchestage-rh-che-e2e-tests:${version}"
 

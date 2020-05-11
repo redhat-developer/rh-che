@@ -27,7 +27,8 @@ If you would like to save screenshots and reports, you can mount a volume to ` /
 Default testsuite is `test-java-maven` suite. It can be changed by setting parametr `TEST_SUITE` in docker run command.
 
 ## Test flow
-The tests are end-to-end tests that should represent Happy path through a product. Current tests are testing Java Maven stack and Java Vert.x stack. 
+### PR check
+The tests are end-to-end tests that should represent Happy path through a product. Current tests are testing Java Maven on a PR check. 
 
 Pre-test:
 - Login
@@ -49,19 +50,11 @@ Java Maven flow:
 - Stop workspace
 - Delete workspace
 
-Java Vert.x test flow is following:
+### Pre-release test suite
+The pre-release test suite includes devfiles that are implemented upstream. See https://github.com/eclipse/che/tree/master/tests/e2e/tests/devfiles.
+Those tests can be run by commenting to a PR:
 
-- Create Che 7 workspace based on Java Vert.x devfile with default project
-- Create and open workspace
-- Build application
-- Close the terminal task
-- Check Java Language Server
-  - Open file in editor
-  - Check suggestion invoking
-  - Error highlighting
-  - Autocomplete
-  - Codenavigation
-- Stop workspace
-- Delete workspace
-
-Java Vert.x and Java Maven tests are saved in upstream and are only reused on Hosted Che side. Login test is used from downstream repo.
+```
+<url of a hosted che>
+[pre-release-tests]
+```
