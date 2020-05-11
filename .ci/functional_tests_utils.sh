@@ -151,22 +151,41 @@ function getMavenVersion() {
   echo $version
 }
 
+setURLs() {
+  if [ -z $ACCOUNT_ENV ]; then
+    #ACCOUNT_ENV variable is not set, retrieving env from username.
+    #verify environment - if production or prod-preview
+    rm -rf cookie-file loginfile.html
+    if [[ "$USERNAME" == *"preview"* ]] || [[ "$USERNAME" == *"saas"* ]]; then
+      export USER_INFO_URL="https://api.prod-preview.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.prod-preview.openshift.io/api/login?redirect=https://che.openshift.io"
+    else
+      export USER_INFO_URL="https://api.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.openshift.io/api/login?redirect=https://che.openshift.io"
+    fi
+  else 
+    if [ "$ACCOUNT_ENV" == "prod" ]; then
+      export USER_INFO_URL="https://api.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.openshift.io/api/login?redirect=https://che.openshift.io"
+    else 
+      export USER_INFO_URL="https://api.prod-preview.openshift.io/api/users?filter[username]=$USERNAME"
+      export LOGIN_PAGE_URL="https://auth.prod-preview.openshift.io/api/login?redirect=https://che.openshift.io"
+    fi
+  fi
+}
+
 function getActiveToken() {
   rm -rf cookie-file loginfile.html
-  if [[ "$USERNAME" == *"preview"* ]] || [[ "$USERNAME" == *"saas"* ]]; then
-    preview="prod-preview."
-  else
-    preview=""
-  fi
+  setURLs
 
-  response=$(curl -s -g -X GET --header 'Accept: application/json' "https://api.${preview}openshift.io/api/users?filter[username]=$USERNAME")
+  response=$(curl -s -g -X GET --header 'Accept: application/json' $USER_INFO_URL)
   data=$(echo "$response" | jq .data)
   if [ "$data" == "[]" ]; then
     exit 1
   fi        
 
   #get html of developers login page
-  curl -sX GET -L -c cookie-file -b cookie-file "https://auth.${preview}openshift.io/api/login?redirect=https://che.openshift.io" > loginfile.html
+  curl -sX GET -L -c cookie-file -b cookie-file $LOGIN_PAGE_URL > loginfile.html
 
   #get url for login from form
   url=$(grep "form id" loginfile.html | grep -o 'http.*.tab_id=.[^\"]*')
