@@ -152,3 +152,4 @@ route yml file or you can re-use existing file from ``` devscripts/resources/rou
 They run on private jenkins and report results to zabbix. These tests are located in [che-functional-tests repo](https://github.com/redhat-developer/che-functional-tests).
 
 **Test for mounting volume** verify if it is possible to mount volume in non-che namespace in openshift.io. Tests are creating/starting/stopping/removing pods. More detail information can be found in [tests repo](https://github.com/redhat-developer/che-functional-tests/tree/master/mount-volume).
+

@@ -63,6 +63,10 @@ is dependent on building che credentials master too and is executed right after 
 
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)](https://ci.centos.org/job/devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)
 
+#### Pre-release test
+
+[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-pre-release-test)](https://ci.centos.org/job/devtools-rh-che-pre-release-test)
+
 ## Red Hat Che distribution (Hosted Che)
 
 Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A Che server is running on OpenShift Dedicated, and the user base is spread across multiple OpenShift Online clusters where workspaces are created. The detailed information about the Hosted Che can be found in the official [documentation](https://www.eclipse.org/che/docs/che-7/hosted-che/#about-hosted-che_hosted-che).
@@ -93,3 +97,4 @@ Testing account for that test is on ```us-east-2a``` cluster.
 
 For each PR the deployment on dev cluster is created. Therefore there is a job running once a day that checks current open PRs and remove deployments of closed ones.
 The job can be found [here](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-cleanup/).
+
