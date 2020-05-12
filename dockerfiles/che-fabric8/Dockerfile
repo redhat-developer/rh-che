@@ -3,6 +3,12 @@
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
+ARG CHE_DASHBOARD_VERSION=next
+ARG CHE_WORKSPACE_LOADER_VERSION=next
+
+FROM quay.io/eclipse/che-dashboard:${CHE_DASHBOARD_VERSION} as che_dashboard_base
+FROM quay.io/eclipse/che-workspace-loader:${CHE_WORKSPACE_LOADER_VERSION} as che_workspace_loader_base
+
 
 FROM registry.centos.org/centos/centos:latest
 
@@ -19,9 +25,7 @@ ENV LANG="C.UTF-8" \
     CHE_IN_CONTAINER=true
 
 RUN yum -y update && \
-    yum -y install openssl java-1.8.0-openjdk.i686 sudo && \
-    curl -sSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-${DOCKER_VERSION}" -o /usr/bin/docker && \
-    chmod +x /usr/bin/docker && \
+    yum -y install openssl java-1.8.0-openjdk-headless.i686 sudo && \
     yum -y remove openssl && \
     yum -y install skopeo \
     yum clean all && \
@@ -47,5 +51,8 @@ EXPOSE 44321
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
+COPY --from=che_workspace_loader_base /usr/local/apache2/htdocs/workspace-loader/ /home/user/eclipse-che/tomcat/webapps/workspace-loader
+COPY --from=che_dashboard_base /usr/local/apache2/htdocs/dashboard /home/user/eclipse-che/tomcat/webapps/dashboard
+ADD assets /home/user/eclipse-che/tomcat/webapps/dashboard
 ADD eclipse-che /home/user/eclipse-che
 RUN find /home/user -type d -exec chmod 777 {} \;

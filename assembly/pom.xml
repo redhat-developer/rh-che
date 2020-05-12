@@ -26,8 +26,6 @@
     <modules>
         <module>assembly-wsmaster-war</module>
         <module>assembly-ide-war</module>
-        <module>fabric8-ide-docs</module>
-        <module>fabric8-ide-dashboard-war</module>
         <module>assembly-main</module>
     </modules>
     <build>
