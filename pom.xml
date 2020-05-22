@@ -28,7 +28,6 @@
     <modules>
         <module>plugins</module>
         <module>assembly</module>
-        <module>functional-tests</module>
     </modules>
     <properties>
         <che.version>7.13.0-SNAPSHOT</che.version>
