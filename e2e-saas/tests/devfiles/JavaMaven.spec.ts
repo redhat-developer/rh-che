@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import 'reflect-metadata';
-import { NameGenerator} from 'e2e';
+import { WorkspaceNameHandler } from 'e2e';
 import * as testLibrary from 'e2e';
 
-const workspaceName: string = NameGenerator.generate('wksp-test-', 5);
 const sampleName: string = 'console-java-simple';
 const fileFolderPath: string = `${sampleName}/src/main/java/org/eclipse/che/examples`;
 const tabTitle: string = 'HelloWorld.java';
@@ -19,10 +18,11 @@ const codeNavigationClassName: string = 'String.class';
 const stack : string = 'Java Maven';
 const taskName: string = 'maven build';
 
+
 suite(`${stack} test`, async () => {
-    suite (`Create ${stack} workspace ${workspaceName}`, async () => {
-        testLibrary.createAndOpenWorkspace(workspaceName, stack);
-        testLibrary.waitWorkspaceReadiness(workspaceName, sampleName, 'src');
+    suite (`Create ${stack} workspace`, async () => {
+        testLibrary.createAndOpenWorkspace(stack);
+        testLibrary.waitWorkspaceReadiness(sampleName, 'src');
     });
 
     suite('Validation of workspace build and run', async () => {
@@ -38,8 +38,16 @@ suite(`${stack} test`, async () => {
         testLibrary.codeNavigation(tabTitle, 9, 10, codeNavigationClassName);
     });
 
-    suite ('Stop and remove workspace', async() => {
-        testLibrary.stopWorkspace(workspaceName);
-        testLibrary.removeWorkspace(workspaceName);
+    suite ('Stopping and deleting the workspace', async () => {
+        let workspaceName = 'not defined';
+        suiteSetup( async () => {
+            workspaceName = await WorkspaceNameHandler.getNameFromUrl();
+        });
+        test (`Stop worksapce`, async () => {
+            await testLibrary.stopWorkspace(workspaceName);
+        });
+        test (`Remove workspace`, async () => {
+            await testLibrary.removeWorkspace(workspaceName);
+        });
     });
 });
