@@ -5,9 +5,9 @@ start=$(date +%s)
 set -e
 echo "Installing dependencies..."
 
-source .ci/functional_tests_utils.sh
+source .ci/cico_utils.sh
 installJQ
-installStartDocker
+installDocker
 installOC
 
 export HOST_URL=$HOST_URL

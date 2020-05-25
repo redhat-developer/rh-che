@@ -35,7 +35,7 @@ function installYQ() {
   pip3 install yq
 }
 
-function installStartDocker() {
+function installDocker() {
   yum install --assumeyes -d1 yum-utils device-mapper-persistent-data lvm2
   yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
   yum install --assumeyes -d1 docker-ce
@@ -68,7 +68,7 @@ function installScl(){
 function installDependencies() {
   installEpelRelease
   installYQ
-  installStartDocker
+  installDocker
   installJQ
   installOC
   installGit  

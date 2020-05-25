@@ -23,10 +23,10 @@ source /tmp/export-env
 
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
-source .ci/functional_tests_utils.sh
+source .ci/cico_utils.sh
 yum update --assumeyes
 installMvn
-installStartDocker
+installDocker
 installGit
 SHORT_HASH=$(git rev-parse --short HEAD)
 date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
@@ -60,7 +60,7 @@ date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 # Build and push e2e-tests base image
 
-source .ci/functional_tests_utils.sh
+source .ci/cico_utils.sh
 
 DOCKERFILE="e2e-saas/"
 DOCKER_IMAGE="rh-che-e2e-tests"

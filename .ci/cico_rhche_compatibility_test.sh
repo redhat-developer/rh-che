@@ -85,7 +85,7 @@ function setStatus() {
 
 function runCompatibilityTest() {
   source ./config
-  source ./.ci/functional_tests_utils.sh
+  source ./.ci/cico_utils.sh
 
   echo "Installing dependencies:"
   installDependenciesForCompatibilityCheck

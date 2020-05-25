@@ -99,11 +99,11 @@ echo "User name printed in format: 3 first letters, space, the rest of letters. 
 
 
 # --- INSTALLING NEEDED SOFTWARE ---
-source ./.ci/functional_tests_utils.sh
+source ./.ci/cico_utils.sh
 installJQ
 installOC
 installYQ
-installStartDocker
+installDocker
 installMvn
 
 ln -s /usr/local/bin/oc /tmp

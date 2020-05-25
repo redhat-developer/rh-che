@@ -13,7 +13,7 @@ set +x
 
 export DEV_CLUSTER_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443/
 
-source ./.ci/functional_tests_utils.sh
+source ./.ci/cico_utils.sh
 installJQ
 installOC
 

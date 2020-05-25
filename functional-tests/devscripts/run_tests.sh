@@ -5,7 +5,7 @@
 #   installDependencies
 #   archiveArtifacts
 
-source .ci/functional_tests_utils.sh
+source .ci/cico_utils.sh
 
 echo "****** Starting functional tests $(date) ******"
 start=$(date +%s)

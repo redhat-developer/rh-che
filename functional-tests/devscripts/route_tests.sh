@@ -33,13 +33,13 @@ function checkPrereq {
 	CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 	if ! command -v jq; then
 		if ! type installJQ; then
-			source $CURRENT_DIR/../../.ci/functional_tests_utils.sh
+			source $CURRENT_DIR/../../.ci/cico_utils.sh
 		fi
 		installJQ
 	fi
 	if ! command -v oc; then
 		if ! type installOC; then
-			source $CURRENT_DIR/../../.ci/functional_tests_utils.sh
+			source $CURRENT_DIR/../../.ci/cico_utils.sh
 		fi
 		installOC
 	fi

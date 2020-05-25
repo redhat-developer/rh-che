@@ -17,19 +17,19 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
 
 ACCOUNT_ENV="prod-preview"
 
-source .ci/functional_tests_utils.sh
+source .ci/cico_utils.sh
 
 echo "****** Starting prelease tests $(date) ******"
 TEST_URL="${ghprbCommentBody%%"\r\n"*}"
 
-#get version of tested Hosted Che
-installStartDocker
+installDocker
 installJQ
 
 token=$(getActiveToken)
 if [ -z $token ]; then
     echo "Can not obtain user token. Failing job."
 fi
+# Get version of tested Hosted Che
 version=$(curl -s -X OPTIONS --header "Content-Type: application/json" --header "Authorization: Bearer ${token}" $TEST_URL/api/ | jq '.buildInfo')
 version=${version//\"/}
 

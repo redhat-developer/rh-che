@@ -25,7 +25,7 @@ eval "$(./env-toolkit load -f jenkins-env.json -r \
         ^GIT_COMMIT)"
 
 source ./config
-source .ci/functional_tests_utils.sh
+source .ci/cico_utils.sh
 
 echo "Checking credentials:"
 checkAllCreds

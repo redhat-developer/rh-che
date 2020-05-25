@@ -30,8 +30,12 @@ if [[ "$DeveloperBuild" != "true" && "$PR_CHECK_BUILD" != "true" && "$USE_CHE_LA
 
   set -x
   yum -y update
-  yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang docker
+  yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 golang
   yum -y install rh-maven33 rh-nodejs8
+
+  # Installing the latest version of Docker
+  source .ci/cico_utils.sh
+  installDocker
 
   BuildUser="chebuilder"
 
