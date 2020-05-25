@@ -1,3 +1,4 @@
+
 # Theia tests of Che 7
 
 These tests are written in typescript and serves to test functionality of che.openshift.io and che.prod-preview.openshift.io. It expects MultiUser setup of che. 
