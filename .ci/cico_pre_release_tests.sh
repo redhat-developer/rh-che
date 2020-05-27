@@ -63,7 +63,8 @@ fi
 echo "Running devfile tests against $TEST_URL version $version"
 
 docker run \
-    -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
+    -v $path/report:/tmp/rh-che/local_tests/report:Z \
+    -v $path/e2e-saas/:/tmp/rh-che/local_tests:Z \
     -e USERNAME=$USERNAME \
     -e PASSWORD=$PASSWORD \
     -e URL=$TEST_URL \
