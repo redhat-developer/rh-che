@@ -62,6 +62,7 @@ fi
 #running tests
 echo "Running devfile tests against $TEST_URL version $version"
 
+path="$(pwd)"
 docker run \
     -v $path/report:/tmp/rh-che/local_tests/report:Z \
     -v $path/e2e-saas/:/tmp/rh-che/local_tests:Z \
@@ -74,6 +75,9 @@ docker run \
     --shm-size=256m \
 $rhche_image
 RESULT=$?
+
+mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
+cp -r ./report ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
 
 archiveArtifacts
 
