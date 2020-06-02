@@ -24,7 +24,7 @@ export CHE_MULTIUSER=true
 export CHE_OSIO_AUTH_ENDPOINT=https://auth.prod-preview.openshift.io
 export PROTOCOL=http
 export OPENSHIFT_URL=https://api.che-dev.x6e0.p1.openshiftapps.com:6443
-export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=http://rhche-$PROJECT.apps.che-dev.x6e0.p1.openshiftapps.com
+export RH_CHE_AUTOMATION_SERVER_DEPLOYMENT_URL=https://rhche-$PROJECT.apps.che-dev.x6e0.p1.openshiftapps.com
 export OPENSHIFT_TOKEN=$RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN
 
 function getStatus {
@@ -121,8 +121,7 @@ oc project $PROJECT
 # --- DEPLOY RH-CHE ON DEVCLUSTER ---
 if ./dev-scripts/deploy_custom_rh-che.sh -o "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" \
                                          -e "${PROJECT}" \
-                                         -z \
-                                         -U;
+                                         -z;
 then
   echo "Che successfully deployed."
 else
