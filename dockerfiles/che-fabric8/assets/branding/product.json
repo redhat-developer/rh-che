@@ -24,7 +24,7 @@
     "workspace" : "/docs/che-7/workspaces-overview/",
     "converting": "/docs/che-7/converting-a-che-6-workspace-to-a-che-7-devfile/",
     "general": "/docs/che-7",
-    "faq": "https://github.com/redhat-developer/rh-che/blob/master/FAQ.adoc"
+    "faq": "https://www.eclipse.org/che/docs/che-7/hosted-che/#hosted-che-faq-and-troubleshooting_hosted-che"
   },
   "configuration": {
     "menu": {
