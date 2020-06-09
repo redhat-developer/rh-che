@@ -53,6 +53,8 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 COPY --from=che_workspace_loader_base /usr/local/apache2/htdocs/workspace-loader/ /home/user/eclipse-che/tomcat/webapps/workspace-loader
 COPY --from=che_dashboard_base /usr/local/apache2/htdocs/dashboard /home/user/eclipse-che/tomcat/webapps/dashboard
-ADD assets /home/user/eclipse-che/tomcat/webapps/dashboard
 ADD eclipse-che /home/user/eclipse-che
+# Let's apply Hosted Che specific 'product.json' for the dashboard customization
+COPY assets/branding/product.json /home/user/eclipse-che/tomcat/webapps/dashboard/assets/branding/
+
 RUN find /home/user -type d -exec chmod 777 {} \;
