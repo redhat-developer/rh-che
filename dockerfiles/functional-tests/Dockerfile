@@ -22,7 +22,8 @@ RUN groupadd docker -g 1000 && \
         git \
         unzip \
         docker \
-        centos-release-scl && \
+        centos-release-scl \
+        scl-utils && \
     yum install --assumeyes \
         rh-maven33 \
         rh-nodejs8 && \

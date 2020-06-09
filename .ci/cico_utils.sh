@@ -43,8 +43,18 @@ function installDocker() {
   docker version
 }
 
+function installScl(){
+  if yum repolist | grep centos-release-scl; then
+    echo "SCL already installed, skipping instalation."
+  else
+    echo "SCL not installed, installing..."
+    yum install --assumeyes -d1 centos-release-scl
+    yum install --assumeyes -d1 scl-utils
+  fi
+}
+
 function installMvn() {
-  yum install --assumeyes -d1 centos-release-scl
+  installScl
   yum install --assumeyes -d1 rh-maven33
 }
 
@@ -54,15 +64,6 @@ function installNodejs() {
 
 function installGit(){
   yum install --assumeyes -d1 git
-}
-
-function installScl(){
-  if yum repolist | grep centos-release-scl; then
-    echo "SCL already installed, skipping instalation."
-  else
-    echo "SCL not installed, installing..."
-    yum install --assumeyes -d1 centos-release-scl
-  fi
 }
 
 function installDependencies() {

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 yum -y update
-yum -y install centos-release-scl-rh java-1.8.0-openjdk-devel git 
+yum -y install centos-release-scl-rh scl-utils java-1.8.0-openjdk-devel git 
 yum -y install rh-maven33
 yum install -y yum-utils device-mapper-persistent-data lvm2
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo

@@ -20,6 +20,7 @@ RUN yum update --assumeyes \
         java-1.8.0-openjdk \
         java-1.8.0-openjdk-devel \
         centos-release-scl \
+        scl-utils \
  && curl -sL https://rpm.nodesource.com/setup_6.x | bash - \
  && yum install --assumeyes nodejs \
  && npm install yarn -g \
