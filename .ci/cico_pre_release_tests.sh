@@ -20,7 +20,11 @@ ACCOUNT_ENV="prod-preview"
 source .ci/cico_utils.sh
 
 echo "****** Starting prelease tests $(date) ******"
-TEST_URL="${ghprbCommentBody%%"\r\n"*}"
+if [[ $JOB_NAME == *"saas-openshiftio"* ]]; then
+    TEST_URL="https://che.prod-preview.openshift.io";  
+else
+    TEST_URL="${ghprbCommentBody%%"\r\n"*}";
+fi
 
 installDocker
 installJQ
