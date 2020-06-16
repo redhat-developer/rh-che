@@ -1,8 +1,12 @@
 #!/bin/bash
 
-yum -y update
-yum -y install centos-release-scl-rh scl-utils java-1.8.0-openjdk-devel git 
-yum -y install rh-maven33
+yum -y update &&  yum -y install java-11-openjdk-devel git
+mkdir -p /opt/apache-maven && curl -sSL https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz | tar -xz --strip=1 -C /opt/apache-maven
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+export PATH="/usr/lib/jvm/java-11-openjdk:/opt/apache-maven/bin:/usr/bin:${PATH:-/bin:/usr/bin}"
+export JAVACONFDIRS="/etc/java${JAVACONFDIRS:+:}${JAVACONFDIRS:-}"
+export M2_HOME="/opt/apache-maven"
+
 yum install -y yum-utils device-mapper-persistent-data lvm2
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 curl -sL https://rpm.nodesource.com/setup_10.x | bash -

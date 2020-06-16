@@ -17,17 +17,13 @@ FROM registry.centos.org/centos/centos:latest
 RUN localedef -i en_US -f UTF-8 C.UTF-8
 
 ENV LANG="C.UTF-8" \
-    JAVA_HOME=/usr/lib/jvm/jre-1.8.0 \
+    JAVA_HOME=/usr/lib/jvm/java-11-openjdk \
     PATH=${PATH}:${JAVA_HOME}/bin \
     CHE_HOME=/home/user/che \
-    DOCKER_VERSION=1.6.0 \
-    DOCKER_BUCKET=get.docker.com \
     CHE_IN_CONTAINER=true
 
 RUN yum -y update && \
-    yum -y install openssl java-1.8.0-openjdk-headless.i686 sudo && \
-    yum -y remove openssl && \
-    yum -y install skopeo \
+    yum -y install openssl java-11-openjdk-devel sudo skopeo && \
     yum clean all && \
     echo "%root ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers && \

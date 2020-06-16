@@ -81,8 +81,7 @@ function installDependencies() {
               bzip2 \
               golang \
               make \
-              java-1.8.0-openjdk \
-              java-1.8.0-openjdk-devel 
+              java-11-openjdk-devel
   installMvn
   installNodejs
 }
@@ -94,8 +93,7 @@ function installDependenciesForCompatibilityCheck() {
   installGit  
   # Getting dependencies ready
   yum install --assumeyes -d1 \
-              java-1.8.0-openjdk \
-              java-1.8.0-openjdk-devel 
+              java-11-openjdk-devel
   installMvn
 }
 
@@ -143,12 +141,12 @@ function archiveArtifacts() {
 }
 
 function getVersionFromPom() {
-  version=$(scl enable rh-maven33 "mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn org.apache.maven.plugins:maven-help-plugin:evaluate -q -Dexpression=project.parent.version -DforceStdout")
+  version=$(mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn org.apache.maven.plugins:maven-help-plugin:evaluate -q -Dexpression=project.parent.version -DforceStdout)
   echo $version
 }
 
 function getMavenVersion() {
-  version=$(scl enable rh-maven33 "mvn -v")
+  version=$(mvn -v)
   echo $version
 }
 
