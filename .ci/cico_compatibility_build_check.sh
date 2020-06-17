@@ -18,11 +18,11 @@ set -e
 git rebase origin/master || (echo "ERROR: Rebasing branch 'upstream' on top of 'master' failed"; exit 1)
 
 CHE_VERSION=$(curl -s https://raw.githubusercontent.com/eclipse/che/master/pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}')
-PREV_CHE_VERSION=$(scl enable rh-maven33 'mvn help:evaluate -Dexpression=che.version -q -DforceStdout')
+PREV_CHE_VERSION=$(mvn help:evaluate -Dexpression=che.version -q -DforceStdout)
 echo ">>> current Che version: $PREV_CHE_VERSION"
 echo ">>> change upstream version to: $CHE_VERSION"
-scl enable rh-maven33 'mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[$CHE_VERSION]'
+mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[$CHE_VERSION]
 cat pom.xml | sed -e "s%<che.version>$PREV_CHE_VERSION</che.version>%<che.version>$CHE_VERSION</che.version>%" > pom.xml.updated
 rm pom.xml
 mv pom.xml.updated pom.xml
-scl enable rh-maven33 'mvn clean install'
+mvn clean install

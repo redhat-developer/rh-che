@@ -55,7 +55,9 @@ function installScl(){
 
 function installMvn() {
   installScl
-  yum install --assumeyes -d1 rh-maven33
+  mkdir -p /opt/apache-maven && curl -sSL https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz | tar -xz --strip=1 -C /opt/apache-maven
+  export PATH="/opt/apache-maven/bin:${PATH:-/bin:/usr/bin}"
+  export M2_HOME="/opt/apache-maven"
 }
 
 function installNodejs() {

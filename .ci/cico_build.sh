@@ -30,8 +30,15 @@ if [[ "$DeveloperBuild" != "true" && "$PR_CHECK_BUILD" != "true" && "$USE_CHE_LA
 
   set -x
   yum -y update
-  yum -y install centos-release-scl scl-utils java-1.8.0-openjdk-devel git patch bzip2 golang
-  yum -y install rh-maven33 rh-nodejs8
+  yum -y install centos-release-scl scl-utils java-11-openjdk-devel git patch bzip2 golang
+
+  mkdir -p /opt/apache-maven && curl -sSL https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz | tar -xz --strip=1 -C /opt/apache-maven
+  export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+  export PATH="/usr/lib/jvm/java-11-openjdk:/opt/apache-maven/bin:/usr/bin:${PATH:-/bin:/usr/bin}"
+  export JAVACONFDIRS="/etc/java${JAVACONFDIRS:+:}${JAVACONFDIRS:-}"
+  export M2_HOME="/opt/apache-maven"
+
+  yum -y install rh-nodejs8
 
   # Installing the latest version of Docker
   source .ci/cico_utils.sh

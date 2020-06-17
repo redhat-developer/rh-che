@@ -136,7 +136,7 @@ function runCompatibilityTest() {
     echo "Setting new branch origin"
     git push --set-upstream origin "${BRANCH}"
     echo ">>> change upstream version to: ${CHE_VERSION}"
-    scl enable rh-maven33 "mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U"
+    mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U
   fi
 
   if ( git diff --exit-code ); then
