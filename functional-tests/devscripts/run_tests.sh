@@ -133,6 +133,7 @@ if [[ "$PR_CHECK_BUILD" == "true" ]]; then
      -e URL=https://$HOST_URL \
      -e TEST_SUITE=test-java-maven \
      -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
+     -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
      --shm-size=256m \
   $rhche_image
   RESULT=$?
@@ -164,6 +165,7 @@ else
         -e URL=https://$HOST_URL \
         -e TEST_SUITE=test-java-maven \
         -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
+        -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
       RESULT=$?
@@ -175,6 +177,7 @@ else
         -e URL=https://$HOST_URL \
         -e TEST_SUITE=test-java-maven \
         -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
+        -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
         --shm-size=256m \
       quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
       RESULT=$?
@@ -200,6 +203,7 @@ else
       -e URL=https://$HOST_URL \
       -e TEST_SUITE=test-java-maven \
       -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
+      -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
       --shm-size=256m \
     quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
     RESULT=$?
