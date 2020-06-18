@@ -58,49 +58,6 @@ pipeline {
                 }
             }
         }
-        stage ("Generating zabbix report") {
-            when {
-                expression { currentBuild.currentResult == "SUCCESS" }
-            }
-            steps {
-                script {
-                    def long DATETIME_TAG = System.currentTimeMillis() / 1000L
-                    def test_log_file = readFile("${LOG_DIR}/${EXPORT_FILE}_requests.csv")
-                    def BASE_DIR = pwd()
-                    def lines = test_log_file.split("\n")
-                    sh "touch ${ZABBIX_FILE}"
-                    for (line in lines) {
-                        def elements = line.split(",")
-                        def method = elements[0].replace("\"","")
-                        if (method.equals("Method") || method.equals("None")) {
-                            continue
-                        }
-                        def name_host_metric = elements[1].replace("\"","").split("_")
-                        def name = name_host_metric[0]
-                        if (name.equals("getWorkspaces") | name.equals("getWorkspaceStatus")) {
-                            continue
-                        }
-                        def host = name_host_metric[1]
-                        def int average = elements[5]
-                        def output_basestring = "qa-".concat(host).concat(" ")
-                                                .concat("che-start-workspace.").concat(method).concat(".")
-                                                .concat(name).concat(".eph")
-                        def output = output_basestring.concat(" ")
-                                     .concat(String.valueOf(DATETIME_TAG)).concat(" ")
-                                     .concat(String.valueOf(average))
-                        silent_sh "echo $output >> ${ZABBIX_FILE}"
-                    }
-                }
-            }
-        }
-        stage ("Reporting to zabbix") {
-            when {
-                expression { currentBuild.currentResult == "SUCCESS" }
-            }
-            steps {
-                silent_sh "zabbix_sender -vv -i ${ZABBIX_FILE} -T -z ${ZABBIX_SERVER} -p ${ZABBIX_PORT}"
-            }
-        }
     }
     post("Cleanup") {
         always {
