@@ -97,4 +97,3 @@ Testing account for that test is on ```us-east-2a``` cluster.
 
 For each PR the deployment on dev cluster is created. Therefore there is a job running once a day that checks current open PRs and remove deployments of closed ones.
 The job can be found [here](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-cleanup/).
-
