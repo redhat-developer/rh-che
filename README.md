@@ -1,9 +1,11 @@
 [![Master Build Status](https://ci.centos.org/buildStatus/icon?subject=master&job=devtools-rh-che-build-che-credentials-master/)](https://ci.centos.org/job/devtools-rh-che-build-che-credentials-master/)
 [![Compatibility Build Status](https://ci.centos.org/buildStatus/icon?subject=compatibility&job=devtools-rh-che-build-master/)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-build-master/)
 
-# Eclipse Che on OpenShift 
+# Eclipse Che hosted by Red Hat
 
 [![Contribute](https://che.openshift.io/factory/resources/factory-contribute.svg)](https://che.openshift.io/f?url=https://github.com/redhat-developer/rh-che)
+
+Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A Che server is running on OpenShift Dedicated, and the user base is spread across multiple OpenShift Online clusters where workspaces are created. The detailed information about the Hosted Che can be found in the official [documentation](https://www.eclipse.org/che/docs/che-7/hosted-che/#about-hosted-che_hosted-che).
 
 ## Table Of Contents
 
@@ -67,10 +69,6 @@ is dependent on building che credentials master too and is executed right after 
 
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-pre-release-test)](https://ci.centos.org/job/devtools-rh-che-pre-release-test)
 
-## Red Hat Che distribution (Hosted Che)
-
-Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A Che server is running on OpenShift Dedicated, and the user base is spread across multiple OpenShift Online clusters where workspaces are created. The detailed information about the Hosted Che can be found in the official [documentation](https://www.eclipse.org/che/docs/che-7/hosted-che/#about-hosted-che_hosted-che).
-
 ## Developer Guide
 
 *See*: [the Dev guide](./dev-guide.adoc)
@@ -97,4 +95,3 @@ Testing account for that test is on ```us-east-2a``` cluster.
 
 For each PR the deployment on dev cluster is created. Therefore there is a job running once a day that checks current open PRs and remove deployments of closed ones.
 The job can be found [here](https://ci.centos.org/view/Devtools/job/devtools-rh-che-prcheck-cleanup/).
-
