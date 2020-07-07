@@ -16,11 +16,15 @@ function installJQ() {
   yum install --assumeyes -d1 jq
 }
 
+function installJava() {
+  yum install --assumeyes -d1 java-11-openjdk-devel
+}
+
 function installEpelRelease() {
   if yum repolist | grep epel; then
     echo "Epel already installed, skipping instalation."
   else
-    #excluding mirror1.ci.centos.org 
+    #excluding mirror1.ci.centos.org
     echo "exclude=mirror1.ci.centos.org" >> /etc/yum/pluginconf.d/fastestmirror.conf
     echo "Installing epel..."
     yum install -d1 --assumeyes epel-release
@@ -74,16 +78,16 @@ function installDependencies() {
   installDocker
   installJQ
   installOC
-  installGit  
+  installGit
   installScl
+  installJava
   # Getting dependencies ready
   yum install --assumeyes -d1 \
               patch \
               pcp \
               bzip2 \
               golang \
-              make \
-              java-11-openjdk-devel
+              make
   installMvn
   installNodejs
 }
@@ -92,10 +96,8 @@ function installDependenciesForCompatibilityCheck() {
   installEpelRelease
   installYQ
   installJQ
-  installGit  
-  # Getting dependencies ready
-  yum install --assumeyes -d1 \
-              java-11-openjdk-devel
+  installGit
+  installJava
   installMvn
 }
 
@@ -106,7 +108,7 @@ function checkAllCreds() {
     echo "Docker registry credentials not set"
     CREDS_NOT_SET="true"
   fi
-  
+
   if [[ -z "${RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN}" ]]; then
     echo "RDU2C credentials not set"
     CREDS_NOT_SET="true"
@@ -118,7 +120,7 @@ function checkAllCreds() {
     echo "Prod-preview credentials not set."
     CREDS_NOT_SET="true"
   fi
-  
+
   if [[ "${CREDS_NOT_SET}" = "true" ]]; then
     echo "Failed to parse jenkins secure store credentials"
     exit 2
@@ -164,11 +166,11 @@ setURLs() {
       export USER_INFO_URL="https://api.openshift.io/api/users?filter[username]=$USERNAME"
       export LOGIN_PAGE_URL="https://auth.openshift.io/api/login?redirect=https://che.openshift.io"
     fi
-  else 
+  else
     if [ "$ACCOUNT_ENV" == "prod" ]; then
       export USER_INFO_URL="https://api.openshift.io/api/users?filter[username]=$USERNAME"
       export LOGIN_PAGE_URL="https://auth.openshift.io/api/login?redirect=https://che.openshift.io"
-    else 
+    else
       export USER_INFO_URL="https://api.prod-preview.openshift.io/api/users?filter[username]=$USERNAME"
       export LOGIN_PAGE_URL="https://auth.prod-preview.openshift.io/api/login?redirect=https://che.openshift.io"
     fi
@@ -183,7 +185,7 @@ function getActiveToken() {
   data=$(echo "$response" | jq .data)
   if [ "$data" == "[]" ]; then
     exit 1
-  fi        
+  fi
 
   #get html of developers login page
   curl -sX GET -L -c cookie-file -b cookie-file $LOGIN_PAGE_URL > loginfile.html
@@ -193,12 +195,12 @@ function getActiveToken() {
   dataUrl="username=$USERNAME&password=$PASSWORD&login=Log+in"
   url=${url//\&amp;/\&}
 
-  #send login and follow redirects  
+  #send login and follow redirects
   set +e
   url=$(curl -w '%{redirect_url}' -s -X POST -c cookie-file -b cookie-file -d "$dataUrl" "$url")
   found=$(echo "$url" | grep "token_json")
 
-  while true 
+  while true
   do
     url=$(curl -c cookie-file -b cookie-file -s -o /dev/null -w '%{redirect_url}' "$url")
     if [[ ${#url} == 0 ]]; then

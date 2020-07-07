@@ -25,6 +25,7 @@ date '+DEP-TIMESTAMP: %d.%m.%Y - %H:%M:%S %Z'
 
 source .ci/cico_utils.sh
 yum update --assumeyes
+installJava
 installMvn
 installDocker
 installGit
@@ -39,8 +40,6 @@ else
 fi
 
 # Build and push e2e-tests base image
-
-source .ci/cico_utils.sh
 
 DOCKERFILE="e2e-saas/"
 DOCKER_IMAGE="rh-che-e2e-tests"
