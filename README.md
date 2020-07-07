@@ -25,7 +25,6 @@ Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A C
 | us-east-1a | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-1a)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-prod-1a/) |
 | us-east-1b | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-1b)](https://ci.centos.org/view/Devtools/job/devtools-rh-che-periodic-prod-1b/) |
 | us-east-2a preview | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-periodic-prod-preview-2a/)](https://ci.centos.org/job/devtools-rh-che-periodic-prod-preview-2a/) |
-| us-east-2 flaky | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-flaky-prod-2/)](https://ci.centos.org/job/devtools-rh-che-flaky-prod-2/) | 
 
 #### Periodic route tests
 
@@ -50,7 +49,6 @@ Job ```cleanup``` cleans projects on dev cluster which are created as part of ve
 | Job       | Status    |
 | ------------- |-------------|
 | build che credentials master | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-che-credentials-master)](https://ci.centos.org/job/devtools-rh-che-build-che-credentials-master) |
-| prcheck build-dep | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-prcheck-build-dep)](https://ci.centos.org/job/devtools-rh-che-prcheck-build-dep) |
 | functional build-dep | [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-build-func-dep)](https://ci.centos.org/job/devtools-rh-che-build-func-dep) |
 
 

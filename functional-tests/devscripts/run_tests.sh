@@ -157,31 +157,17 @@ else
     mkdir report
     
     #increase timeout for load page to workaround https://github.com/redhat-developer/rh-che/issues/1604
-    if [[ "$JOB_NAME" == *"flaky"* ]]; then
-      docker run \
-        -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
-        -e USERNAME=$USERNAME \
-        -e PASSWORD=$PASSWORD \
-        -e URL=https://$HOST_URL \
-        -e TEST_SUITE=test-java-maven \
-        -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
-        -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
-        --shm-size=256m \
-      quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
-      RESULT=$?
-    else
-      docker run \
-        -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
-        -e USERNAME=$USERNAME \
-        -e PASSWORD=$PASSWORD \
-        -e URL=https://$HOST_URL \
-        -e TEST_SUITE=test-java-maven \
-        -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
-        -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
-        --shm-size=256m \
-      quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
-      RESULT=$?
-    fi
+    docker run \
+      -v $path/report:/tmp/rh-che/e2e-saas/report:Z \
+      -e USERNAME=$USERNAME \
+      -e PASSWORD=$PASSWORD \
+      -e URL=https://$HOST_URL \
+      -e TEST_SUITE=test-java-maven \
+      -e TS_SELENIUM_LOAD_PAGE_TIMEOUT=180000 \
+      -e TS_SELENIUM_DEFAULT_TIMEOUT=60000 \
+      --shm-size=256m \
+    quay.io/openshiftio/rhchestage-rh-che-e2e-tests:$TAG
+    RESULT=$?
     
     mkdir -p ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
     cp -r ./report/ ./rhche/${JOB_NAME}/${BUILD_NUMBER}/e2e_report
