@@ -8,15 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import { Container } from 'inversify';
-import { inversifyConfig, TYPES, ICheLoginPage, ITestWorkspaceUtil, ITokenHandler } from 'e2e';
+import { inversifyConfig, TYPES, ICheLoginPage, ITokenHandler } from 'e2e';
 import { RhCheLoginPage } from './pageobjects/RhCheLoginPage';
-import { RhCheTestWorkspaceUtils } from './utils/RhCheTestWorkspaceUtils';
 import { RhCheTokenHandler } from './utils/RhCheTokenHandler';
 
 const rhcheContainer: Container = inversifyConfig.e2eContainer;
 
 rhcheContainer.rebind<ICheLoginPage>(TYPES.CheLogin).to(RhCheLoginPage);
-rhcheContainer.rebind<ITestWorkspaceUtil>(TYPES.WorkspaceUtil).to(RhCheTestWorkspaceUtils);
 rhcheContainer.rebind<ITokenHandler>(TYPES.ITokenHandler).to(RhCheTokenHandler);
 console.log('ITokenHandler rebinded to the downstream implementation.');
 
