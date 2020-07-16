@@ -56,6 +56,8 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpolicy.RestartPolicyRewriter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.ServersConverter;
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.AsyncStoragePodInterceptor;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.AsyncStorageProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
@@ -85,6 +87,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner;
   @Mock private ImagePullSecretProvisioner imagePullSecretProvisioner;
   @Mock private ProxySettingsProvisioner proxySettingsProvisioner;
+  @Mock private AsyncStorageProvisioner asyncStorageProvisioner;
+  @Mock private AsyncStoragePodInterceptor asyncStoragePodInterceptor;
   @Mock private CertificateProvisioner certificateProvisioner;
   @Mock private SshKeysProvisioner sshKeysProvisioner;
   @Mock private GitConfigProvisioner gitConfigProvisioner;
@@ -126,6 +130,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
             podTerminationGracePeriodProvisioner,
             imagePullSecretProvisioner,
             proxySettingsProvisioner,
+            asyncStorageProvisioner,
+            asyncStoragePodInterceptor,
             serviceAccountProvisioner,
             certificateProvisioner,
             sshKeysProvisioner,

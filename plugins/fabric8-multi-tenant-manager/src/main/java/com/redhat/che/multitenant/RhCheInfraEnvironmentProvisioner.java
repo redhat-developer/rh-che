@@ -46,6 +46,8 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpoli
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.ServersConverter;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftEnvironmentProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.AsyncStoragePodInterceptor;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.AsyncStorageProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
@@ -89,6 +91,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner,
       ImagePullSecretProvisioner imagePullSecretProvisioner,
       ProxySettingsProvisioner proxySettingsProvisioner,
+      AsyncStorageProvisioner asyncStorageProvisioner,
+      AsyncStoragePodInterceptor asyncStoragePodInterceptor,
       ServiceAccountProvisioner serviceAccountProvisioner,
       CertificateProvisioner certificateProvisioner,
       SshKeysProvisioner sshKeysProvisioner,
@@ -110,6 +114,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         podTerminationGracePeriodProvisioner,
         imagePullSecretProvisioner,
         proxySettingsProvisioner,
+        asyncStorageProvisioner,
+        asyncStoragePodInterceptor,
         serviceAccountProvisioner,
         certificateProvisioner,
         sshKeysProvisioner,
