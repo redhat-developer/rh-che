@@ -206,7 +206,7 @@ while true; do
   COMPATIBILITY_STATUS=$(cat compatibility_status)
   echo "Tick Tock ${SECONDS}"
   if [[ "${COMPATIBILITY_STATUS}" != "" ]]; then
-    echo "Compatibility test finished"
+    echo "Compatibility test finished with exit code $COMPATIBILITY_STATUS"
     kill "$COMPATIBILITY_PID" > /dev/null 2>&1
     rm compatibility_status
     exit "$COMPATIBILITY_STATUS"
