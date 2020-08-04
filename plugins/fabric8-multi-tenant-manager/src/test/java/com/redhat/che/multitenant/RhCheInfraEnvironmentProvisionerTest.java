@@ -52,6 +52,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminat
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.SshKeysProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.TlsProvisionerProvider;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
@@ -77,7 +78,8 @@ public class RhCheInfraEnvironmentProvisionerTest {
   private static final String OSO_TOKEN = "osoToken";
 
   @Mock private OpenShiftUniqueNamesProvisioner uniqueNamesProvisioner;
-  @Mock private RouteTlsProvisioner routeTlsProvisioner;
+  @Mock private RouteTlsProvisioner tlsRouteProvisioner;
+  @Mock private TlsProvisionerProvider<OpenShiftEnvironment> routeTlsProvisionerProvider;
   @Mock private ServersConverter<OpenShiftEnvironment> openShiftServersConverter;
   @Mock private EnvVarsConverter envVarsConverter;
   @Mock private RestartPolicyRewriter restartPolicyRewriter;
@@ -113,12 +115,12 @@ public class RhCheInfraEnvironmentProvisionerTest {
     con1EnvVars = new ArrayList<>();
     con2EnvVars = new ArrayList<>();
     con3EnvVars = new ArrayList<>();
-
+    when(routeTlsProvisionerProvider.get()).thenReturn(tlsRouteProvisioner);
     provisioner =
         new RhCheInfraEnvironmentProvisioner(
             true,
             uniqueNamesProvisioner,
-            routeTlsProvisioner,
+            routeTlsProvisionerProvider,
             openShiftServersConverter,
             envVarsConverter,
             restartPolicyRewriter,
