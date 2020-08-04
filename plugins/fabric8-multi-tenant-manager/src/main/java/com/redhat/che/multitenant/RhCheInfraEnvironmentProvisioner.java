@@ -41,6 +41,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminat
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.SshKeysProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.TlsProvisionerProvider;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
@@ -49,7 +50,6 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.Serv
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftEnvironmentProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
-import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
 import org.slf4j.Logger;
 
@@ -79,7 +79,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
   public RhCheInfraEnvironmentProvisioner(
       @Named("che.infra.kubernetes.pvc.enabled") boolean pvcEnabled,
       OpenShiftUniqueNamesProvisioner uniqueNamesProvisioner,
-      RouteTlsProvisioner routeTlsProvisioner,
+      TlsProvisionerProvider<OpenShiftEnvironment> routeTlsProvisionerProvider,
       ServersConverter<OpenShiftEnvironment> openShiftServersConverter,
       EnvVarsConverter envVarsConverter,
       RestartPolicyRewriter restartPolicyRewriter,
@@ -104,7 +104,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
     super(
         pvcEnabled,
         uniqueNamesProvisioner,
-        routeTlsProvisioner,
+        routeTlsProvisionerProvider,
         openShiftServersConverter,
         envVarsConverter,
         restartPolicyRewriter,
