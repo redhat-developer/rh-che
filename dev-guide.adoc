@@ -368,75 +368,23 @@ The same https://github.com/redhat-developer/rh-che/blob/master/openshift/rh-che
 
 == che-plugin-registry
 
-https://github.com/eclipse/che-plugin-registry[che-plugin-registry] is a standalone service which provides metadata about the available Che plugins:
+https://github.com/eclipse/che-plugin-registry[che-plugin-registry] is a standalone service which provides metadata about the available Che plugins - https://che-plugin-registry.openshift.io/v3/plugins/
 
 .plugins.json
 [source,json]
 ----
 [
   {
-    "publisher": "che-incubator",
-    "name": "theia",
-    "version": "1.0.0",
-    "id": "che-incubator/theia/1.0.0",
-    "type": "Che Editor",
-    "displayName": "Eclipse Theia",
-    "description": "Eclipse Theia",
+    "description": "Eclipse Theia, get the latest release each day.",
+    "displayName": "theia-ide",
+    "id": "eclipse/che-theia/7.0.0-rc-3.0",
     "links": {
-      "self": "/plugins/che-incubator/theia/1.0.0"
-    }
-  },
-  {
-    "publisher": "che-incubator",
-    "name": "theia",
-    "version": "next",
-    "id": "che-incubator/theia/next",
-    "type": "Che Editor",
-    "displayName": "Eclipse Theia",
-    "description": "Eclipse Theia",
-    "links": {
-      "self": "/plugins/che-incubator/theia/next"
-    }
-  },
-  {
-    "publisher": "ws-skeleton",
-    "name": "che-service-plugin",
-    "version": "0.0.1",
-    "id": "ws-skeleton/che-service-plugin/0.0.1",
-    "type": "Che Plugin",
-    "displayName": "Che Service",
-    "description": "Che Plug-in with Theia plug-in and container definition providing a service",
-    "links": {
-      "self": "/plugins/ws-skeleton/che-service-plugin/0.0.1"
-    }
-  },
-  {
-    "publisher": "",
-    "name": "che-dummy-plugin",
-    "version": "0.0.1",
-    "deprecate": {
-      "migrateTo": "ws-skeleton/che-dummy-plugin/0.0.1",
-      "autoMigrate": true
+      "self": "/v3/plugins/eclipse/che-theia/7.0.0-rc-3.0/"
     },
-    "id": "che-dummy-plugin/0.0.1",
-    "type": "Che Plugin",
-    "displayName": "Che dummy plugin",
-    "description": "A hello world theia plug-in wrapped into a Che Plug-in",
-    "links": {
-      "self": "/plugins/che-dummy-plugin/0.0.1"
-    }
-  },
-  {
-    "publisher": "ws-skeleton",
-    "name": "che-dummy-plugin",
-    "version": "0.0.1",
-    "id": "ws-skeleton/che-dummy-plugin/0.0.1",
-    "type": "Che Plugin",
-    "displayName": "Che dummy plugin",
-    "description": "A hello world theia plug-in wrapped into a Che Plug-in",
-    "links": {
-      "self": "/plugins/ws-skeleton/che-dummy-plugin/0.0.1"
-    }
+    "name": "che-theia",
+    "publisher": "eclipse",
+    "type": "Che Editor",
+    "version": "7.0.0-rc-3.0"
   }
 ]
 ----
