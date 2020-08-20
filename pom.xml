@@ -17,7 +17,7 @@
     <parent>
         <artifactId>che-parent</artifactId>
         <groupId>org.eclipse.che</groupId>
-        <version>7.17.2</version>
+        <version>7.18.0</version>
     </parent>
     <groupId>com.redhat.che</groupId>
     <artifactId>fabric8-ide-parent</artifactId>
@@ -30,7 +30,7 @@
         <module>assembly</module>
     </modules>
     <properties>
-        <che.version>7.17.2</che.version>
+        <che.version>7.18.0</che.version>
         <keycloak.version>2.5.0.Final</keycloak.version>
         <redhat.che.version>1.0.0-SNAPSHOT</redhat.che.version>
         <rh.che.plugins.version>1.0.0-SNAPSHOT</rh.che.plugins.version>
