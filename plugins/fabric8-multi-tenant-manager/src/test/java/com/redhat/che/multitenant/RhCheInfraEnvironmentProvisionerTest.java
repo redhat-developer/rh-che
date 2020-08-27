@@ -48,6 +48,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.Certificate
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GitConfigProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.LogsVolumeMachineProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.NodeSelectorProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.PodTerminationGracePeriodProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettingsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
@@ -89,6 +90,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private PodTerminationGracePeriodProvisioner podTerminationGracePeriodProvisioner;
   @Mock private ImagePullSecretProvisioner imagePullSecretProvisioner;
   @Mock private ProxySettingsProvisioner proxySettingsProvisioner;
+  @Mock private NodeSelectorProvisioner nodeSelectorProvisioner;
   @Mock private AsyncStorageProvisioner asyncStorageProvisioner;
   @Mock private AsyncStoragePodInterceptor asyncStoragePodInterceptor;
   @Mock private CertificateProvisioner certificateProvisioner;
@@ -132,6 +134,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             podTerminationGracePeriodProvisioner,
             imagePullSecretProvisioner,
             proxySettingsProvisioner,
+            nodeSelectorProvisioner,
             asyncStorageProvisioner,
             asyncStoragePodInterceptor,
             serviceAccountProvisioner,
