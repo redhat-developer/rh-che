@@ -42,6 +42,7 @@ data:
   CHE_WORKSPACE_WSAGENT__JAVA__OPTIONS: "-XX:MaxRAM=600m -XX:MaxRAMFraction=1 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8 -Djava.security.egd=file:/dev/./urandom -Djava.net.preferIPv4Stack=true"
   CHE_WORKSPACE_PERSIST__VOLUMES_DEFAULT: "false"
   CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT: "900000"
+  CHE_LIMITS_WORKSPACE_RUN_TIMEOUT: "28800000"
   CHE_WORKSPACE_LOGS_ROOT__DIR: "/workspace_logs"
   CHE_WORKSPACE_SERVER_PING__INTERVAL__MILLISECONDS: "500"
   CHE_WORKSPACE_SERVER_PING__SUCCESS__THRESHOLD: "1"
