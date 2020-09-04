@@ -40,10 +40,14 @@ if [[ "$DeveloperBuild" != "true" && "$PR_CHECK_BUILD" != "true" && "$USE_CHE_LA
 
   yum -y install rh-nodejs8
 
-  # Installing the latest version of Docker
   source .ci/cico_utils.sh
-  installDocker
 
+  # Getting the upstream Eclipse Che version
+  CHE_VERSION=$(getVersionFromPom)
+  export CHE_VERSION
+
+  # Installing the latest version of Docker
+  installDocker
   BuildUser="chebuilder"
 
   useradd ${BuildUser}
