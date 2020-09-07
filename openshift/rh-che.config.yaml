@@ -41,7 +41,6 @@ data:
   CHE_WEBSOCKET_ENDPOINT__MINOR: "wss://che.prod-preview.openshift.io/api/websocket-minor"
   CHE_WORKSPACE_STORAGE_PREFERRED__TYPE: "ephemeral"
   CHE_WORKSPACE_WSAGENT__JAVA__OPTIONS: "-XX:MaxRAM=600m -XX:MaxRAMFraction=1 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8 -Djava.security.egd=file:/dev/./urandom -Djava.net.preferIPv4Stack=true"
-  CHE_WORKSPACE_PERSIST__VOLUMES_DEFAULT: "false"
   CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT: "900000"
   CHE_LIMITS_WORKSPACE_RUN_TIMEOUT: "28800000"
   CHE_WORKSPACE_LOGS_ROOT__DIR: "/workspace_logs"
