@@ -39,6 +39,7 @@ data:
   CHE_SYSTEM_SUPER__PRIVILEGED__MODE: "true"
   CHE_WEBSOCKET_ENDPOINT: "wss://che.prod-preview.openshift.io/api/websocket"
   CHE_WEBSOCKET_ENDPOINT__MINOR: "wss://che.prod-preview.openshift.io/api/websocket-minor"
+  CHE_WORKSPACE_STORAGE_PREFERRED__TYPE: "ephemeral"
   CHE_WORKSPACE_WSAGENT__JAVA__OPTIONS: "-XX:MaxRAM=600m -XX:MaxRAMFraction=1 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms50m -Dfile.encoding=UTF8 -Djava.security.egd=file:/dev/./urandom -Djava.net.preferIPv4Stack=true"
   CHE_WORKSPACE_PERSIST__VOLUMES_DEFAULT: "false"
   CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT: "900000"
