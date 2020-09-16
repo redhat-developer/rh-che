@@ -53,7 +53,12 @@ for distribution in `echo ${ABSOLUTE_PATH}/../${distPath}`; do
   fi
   
   echo "Upstream Eclipse Che version: ${CHE_VERSION}"
-  docker build -t ${DOCKER_IMAGE_URL}:${TAG} --build-arg CHE_DASHBOARD_VERSION=${CHE_VERSION} --build-arg CHE_WORKSPACE_LOADER_VERSION=${CHE_VERSION} -f $DIR/${DOCKERFILE} . | cat
+  if [[ "$CHE_VERSION" == *"SNAPSHOT"  ]]; then
+    docker build -t ${DOCKER_IMAGE_URL}:${TAG} --build-arg CHE_DASHBOARD_VERSION="next" --build-arg CHE_WORKSPACE_LOADER_VERSION="next" -f $DIR/${DOCKERFILE} . | cat
+  else 
+    docker build -t ${DOCKER_IMAGE_URL}:${TAG} --build-arg CHE_DASHBOARD_VERSION=${CHE_VERSION} --build-arg CHE_WORKSPACE_LOADER_VERSION=${CHE_VERSION} -f $DIR/${DOCKERFILE} . | cat
+  fi
+
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
     exit 2
