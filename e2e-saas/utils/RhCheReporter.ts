@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import * as mocha from 'mocha';
-import { TYPES, IDriver, DriverHelper, CLASSES, ScreenCatcher, ITestWorkspaceUtil, PreferencesHandler, TestConstants, AskForConfirmationType, } from 'e2e';
+import { TYPES, IDriver, DriverHelper, CLASSES, ScreenCatcher, ITestWorkspaceUtil, PreferencesHandler, TestConstants, AskForConfirmationType, TimeoutConstants } from 'e2e';
 import { logging } from 'selenium-webdriver';
 import fs from 'fs';
 import rm from 'rimraf';
@@ -27,27 +27,16 @@ class RhCheReporter extends mocha.reporters.Spec {
     super(runner, options);
 
     runner.on('start', async (test: mocha.Test) => {
-      console.log(`Using RhCheReporter`);
-      const launchInformation: string =
+      let launchInformation: string =
         `################## Launch Information ##################
 
       TS_SELENIUM_BASE_URL: ${TestConstants.TS_SELENIUM_BASE_URL}
       TS_SELENIUM_HEADLESS: ${TestConstants.TS_SELENIUM_HEADLESS}
 
-      TS_SELENIUM_DEFAULT_ATTEMPTS: ${TestConstants.TS_SELENIUM_DEFAULT_ATTEMPTS}
-      TS_SELENIUM_DEFAULT_POLLING: ${TestConstants.TS_SELENIUM_DEFAULT_POLLING}
-      TS_SELENIUM_DEFAULT_TIMEOUT: ${TestConstants.TS_SELENIUM_DEFAULT_TIMEOUT}
-
-      TS_SELENIUM_LANGUAGE_SERVER_START_TIMEOUT: ${TestConstants.TS_SELENIUM_LANGUAGE_SERVER_START_TIMEOUT}
-      TS_SELENIUM_LOAD_PAGE_TIMEOUT: ${TestConstants.TS_SELENIUM_LOAD_PAGE_TIMEOUT}
-      TS_SELENIUM_START_WORKSPACE_TIMEOUT: ${TestConstants.TS_SELENIUM_START_WORKSPACE_TIMEOUT}
-      TS_SELENIUM_WORKSPACE_STATUS_ATTEMPTS: ${TestConstants.TS_SELENIUM_WORKSPACE_STATUS_ATTEMPTS}
-      TS_SELENIUM_WORKSPACE_STATUS_POLLING: ${TestConstants.TS_SELENIUM_WORKSPACE_STATUS_POLLING}
-      TS_SELENIUM_PLUGIN_PRECENCE_ATTEMPTS: ${TestConstants.TS_SELENIUM_PLUGIN_PRECENCE_ATTEMPTS}
-      TS_SELENIUM_PLUGIN_PRECENCE_POLLING: ${TestConstants.TS_SELENIUM_DEFAULT_POLLING}
-      TS_SELENIUM_HAPPY_PATH_WORKSPACE_NAME: ${TestConstants.TS_SELENIUM_HAPPY_PATH_WORKSPACE_NAME}
       TS_SELENIUM_USERNAME: ${TestConstants.TS_SELENIUM_USERNAME}
       TS_SELENIUM_PASSWORD: ${TestConstants.TS_SELENIUM_PASSWORD}
+
+      TS_SELENIUM_HAPPY_PATH_WORKSPACE_NAME: ${TestConstants.TS_SELENIUM_HAPPY_PATH_WORKSPACE_NAME}
       TS_SELENIUM_DELAY_BETWEEN_SCREENSHOTS: ${TestConstants.TS_SELENIUM_DELAY_BETWEEN_SCREENSHOTS}
       TS_SELENIUM_REPORT_FOLDER: ${TestConstants.TS_SELENIUM_REPORT_FOLDER}
       TS_SELENIUM_EXECUTION_SCREENCAST: ${TestConstants.TS_SELENIUM_EXECUTION_SCREENCAST}
@@ -55,9 +44,18 @@ class RhCheReporter extends mocha.reporters.Spec {
       TS_SELENIUM_REMOTE_DRIVER_URL: ${TestConstants.TS_SELENIUM_REMOTE_DRIVER_URL}
       DELETE_WORKSPACE_ON_FAILED_TEST: ${TestConstants.DELETE_WORKSPACE_ON_FAILED_TEST}
       TS_SELENIUM_LOG_LEVEL: ${TestConstants.TS_SELENIUM_LOG_LEVEL}
+`;
 
-########################################################
-      `;
+      if ( TestConstants.TS_SELENIUM_PRINT_TIMEOUT_VARIABLES ) {
+        launchInformation += `\n      TS_SELENIUM_PRINT_TIMEOUT_VARIABLES is set to true: \n`;
+        Object.entries(TimeoutConstants).forEach(
+          ([key, value]) => launchInformation += `\n         ${key}: ${value}`);
+      } else {
+        launchInformation += `\n      to output timeout variables, set TS_SELENIUM_PRINT_TIMEOUT_VARIABLES to true`;
+      }
+
+      launchInformation += `\n ######################################################## \n`;
+
       console.log(launchInformation);
 
       rm.sync(TestConstants.TS_SELENIUM_REPORT_FOLDER);
