@@ -57,7 +57,7 @@ is dependent on building che credentials master too and is executed right after 
 
 #### Rollout job
 
-[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)](https://ci.centos.org/job/devtools-rh-che-rollout-test-devtools-dev.ext.devshift.net)
+[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-rh-che-rollout-test-apps.che-dev.x6e0.p1.openshiftapps.com)](https://ci.centos.org/job/devtools-rh-che-rollout-test-apps.che-dev.x6e0.p1.openshiftapps.com/)
 
 #### Pre-release test
 
