@@ -14,6 +14,7 @@ package com.redhat.che.multitenant;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.che.api.core.model.workspace.runtime.RuntimeIdentity;
+import org.eclipse.che.api.user.server.PreferenceManager;
 import org.eclipse.che.api.user.server.UserManager;
 import org.eclipse.che.api.workspace.server.spi.InfrastructureException;
 import org.eclipse.che.api.workspace.server.spi.NamespaceResolutionContext;
@@ -44,6 +45,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       OpenShiftStopWorkspaceRoleProvisioner openShiftStopWorkspaceRoleProvisioner,
       Fabric8WorkspaceEnvironmentProvider envProvider,
       UserManager userManager,
+      PreferenceManager preferenceManager,
       KubernetesSharedPool sharedPool,
       @Nullable @Named("che.infra.openshift.oauth_identity_provider")
           String oAuthIdentityProvider) {
@@ -53,10 +55,12 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         null,
         defaultNamespaceName,
         false,
+        false,
         clientFactory,
         new OpenShiftClientConfigFactory(),
         openShiftStopWorkspaceRoleProvisioner,
         userManager,
+        preferenceManager,
         sharedPool,
         oAuthIdentityProvider);
     this.clientFactory = clientFactory;
