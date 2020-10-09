@@ -1,29 +1,7 @@
 {
   "title": "Eclipse Che hosted by Red Hat",
   "name": "Eclipse Che hosted by Red Hat",
-  "logoFile": "che-logo.svg",
-  "logoTextFile": "che-logo-text.svg",
-  "favicon": "favicon.ico",
-  "loader": "loader.svg",
-  "websocketContext": "/api/websocket",
-  "helpPath": "https://www.eclipse.org/che/",
-  "helpTitle": "Community",
-  "supportEmail": "che-dev@eclipse.org",
-  "oauthDocs": "Configure OAuth in the che.properties file.",
-  "workspace": {
-    "priorityStacks": ["Java", "Java-MySQL", "Blank"],
-    "defaultStack": "java-mysql",
-    "creationLink": "#/create-workspace"
-  },
-  "cli" : {
-    "configName" : "che.env",
-    "name" : "CHE"
-  },
   "docs" : {
-    "devfile": "https://www.eclipse.org/che/docs/che-7/making-a-workspace-portable-using-a-devfile/",
-    "workspace": "https://www.eclipse.org/che/docs/che-7/workspaces-overview/",
-    "converting": "https://www.eclipse.org/che/docs/che-7",
-    "general": "https://www.eclipse.org/che/docs/che-7",
     "faq": "https://www.eclipse.org/che/docs/che-7/hosted-che/#hosted-che-faq-and-troubleshooting_hosted-che"
   },
   "configuration": {
