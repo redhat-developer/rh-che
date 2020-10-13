@@ -10,7 +10,7 @@ ARG CHE_DASHBOARD_NEXT_VERSION=next
 ARG CHE_WORKSPACE_LOADER_VERSION=next
 
 FROM quay.io/eclipse/che-dashboard:${CHE_DASHBOARD_VERSION} as che_dashboard_base
-FROM quay.io/che-incubator/che-dashboard-next:${CHE_DASHBOARD_VERSION} as che_dashboard_next_base
+FROM quay.io/che-incubator/che-dashboard-next:${CHE_DASHBOARD_NEXT_VERSION} as che_dashboard_next_base
 FROM quay.io/eclipse/che-workspace-loader:${CHE_WORKSPACE_LOADER_VERSION} as che_workspace_loader_base
 
 
