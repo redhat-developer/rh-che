@@ -56,6 +56,8 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         defaultNamespaceName,
         false,
         false,
+        null,
+        null,
         clientFactory,
         new OpenShiftClientConfigFactory(),
         openShiftStopWorkspaceRoleProvisioner,
