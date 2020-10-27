@@ -32,7 +32,7 @@ public class HttpYamlDownloaderTest {
   private final String EDITOR_CONTAINER_NAME = "theia-ide";
   private final String EDITOR_CONTAINER_IMAGE = "quay.io/eclipse/che-theia:next";
 
-  // @Test
+  @Test
   public void getYamlResponseAndParseOnProd() throws URISyntaxException, IOException {
     getYamlResponseAndParse(EDITOR_PLUGIN_URL_ON_PROD);
   }
