@@ -34,6 +34,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.Workspa
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.AsyncStoragePodInterceptor;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.AsyncStorageProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.DeploymentMetadataProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GatewayRouterProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GitConfigProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
@@ -103,6 +104,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       OpenShiftPreviewUrlExposer previewUrlEndpointsProvisioner,
       VcsSslCertificateProvisioner vcsSslCertificateProvisioner,
       GatewayRouterProvisioner gatewayRouterProvisioner,
+      DeploymentMetadataProvisioner deploymentMetadataProvisioner,
       @Named("che.infra.kubernetes.trust_certs") boolean trustCerts,
       @Named("che.fabric8.wsagent_routing_timeout") String wsAgentRoutingTimeout) {
     super(
@@ -127,7 +129,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         gitConfigProvisioner,
         previewUrlEndpointsProvisioner,
         vcsSslCertificateProvisioner,
-        gatewayRouterProvisioner);
+        gatewayRouterProvisioner,
+        deploymentMetadataProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;

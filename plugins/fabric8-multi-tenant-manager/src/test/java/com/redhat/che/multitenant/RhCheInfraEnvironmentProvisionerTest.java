@@ -45,6 +45,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.namespace.pvc.Workspa
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.AsyncStoragePodInterceptor;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.AsyncStorageProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.CertificateProvisioner;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.DeploymentMetadataProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GatewayRouterProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.GitConfigProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ImagePullSecretProvisioner;
@@ -106,6 +107,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private ServiceAccountProvisioner serviceAccountProvisioner;
   @Mock private VcsSslCertificateProvisioner vcsSslCertificateProvisioner;
   @Mock private GatewayRouterProvisioner gatewayRouterProvisioner;
+  @Mock private DeploymentMetadataProvisioner deploymentMetadataProvisioner;
 
   private List<EnvVar> con1EnvVars;
   private List<EnvVar> con2EnvVars;
@@ -146,6 +148,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             openshiftPreviewUrlExposer,
             vcsSslCertificateProvisioner,
             gatewayRouterProvisioner,
+            deploymentMetadataProvisioner,
             false,
             WSAGENT_ROUTER_TIMEOUT);
 
