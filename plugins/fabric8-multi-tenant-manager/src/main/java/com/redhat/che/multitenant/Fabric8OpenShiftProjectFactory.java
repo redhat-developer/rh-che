@@ -21,6 +21,7 @@ import org.eclipse.che.api.workspace.server.spi.NamespaceResolutionContext;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.workspace.infrastructure.kubernetes.CheServerKubernetesClientFactory;
 import org.eclipse.che.workspace.infrastructure.kubernetes.util.KubernetesSharedPool;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientConfigFactory;
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftClientFactory;
@@ -35,6 +36,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
   private static final Logger LOG = LoggerFactory.getLogger(Fabric8OpenShiftProjectFactory.class);
 
   private final OpenShiftClientFactory clientFactory;
+  private final CheServerKubernetesClientFactory cheServerKubernetesClientFactory;
   private final Fabric8WorkspaceEnvironmentProvider envProvider;
 
   @Inject
@@ -42,6 +44,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
       @Nullable @Named("che.infra.openshift.project") String projectName,
       @Nullable @Named("che.infra.kubernetes.namespace.default") String defaultNamespaceName,
       OpenShiftClientFactory clientFactory,
+      CheServerKubernetesClientFactory cheServerKubernetesClientFactory,
       OpenShiftStopWorkspaceRoleProvisioner openShiftStopWorkspaceRoleProvisioner,
       Fabric8WorkspaceEnvironmentProvider envProvider,
       UserManager userManager,
@@ -59,6 +62,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         null,
         null,
         clientFactory,
+        cheServerKubernetesClientFactory,
         new OpenShiftClientConfigFactory(),
         openShiftStopWorkspaceRoleProvisioner,
         userManager,
@@ -66,6 +70,7 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
         sharedPool,
         oAuthIdentityProvider);
     this.clientFactory = clientFactory;
+    this.cheServerKubernetesClientFactory = cheServerKubernetesClientFactory;
     this.envProvider = envProvider;
   }
 
@@ -73,7 +78,11 @@ public class Fabric8OpenShiftProjectFactory extends OpenShiftProjectFactory {
   public OpenShiftProject getOrCreate(RuntimeIdentity identity) throws InfrastructureException {
     String namespace = evaluateNamespace();
     return new OpenShiftProject(
-        clientFactory, sharedPool.getExecutor(), namespace, identity.getWorkspaceId());
+        clientFactory,
+        cheServerKubernetesClientFactory,
+        sharedPool.getExecutor(),
+        namespace,
+        identity.getWorkspaceId());
   }
 
   @Override
