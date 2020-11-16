@@ -44,7 +44,6 @@ function commentToPR() {
   url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"${RELATED_PR_TITLE}\") | .url" | sed 's/pulls/issues/g')
   url=$(echo "${url}" | cut -d"\"" -f 2)
   url="${url}/comments"
-  
   curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
 }
 
@@ -54,12 +53,11 @@ function commentToRunTest() {
   url=$(curl -s https://api.github.com/repos/redhat-developer/rh-che/pulls?state=open | jq ".[] | select(.title == \"${RELATED_PR_TITLE}\") | .url" | sed 's/pulls/issues/g')
   url=$(echo "${url}" | cut -d"\"" -f 2)
   url="${url}/comments"
-  
   curl -X POST -s -L -u "${GITHUB_AUTH_STRING}" "${url}" -d "{\"body\": \"${message}\"}"
 }
 
 function setRedStatus() {
-  setStatus "failure" 
+  setStatus "failure"
 }
 
 function setGreenStatus() {
@@ -136,7 +134,8 @@ function runCompatibilityTest() {
     echo "Setting new branch origin"
     git push --set-upstream origin "${BRANCH}"
     echo ">>> change upstream version to: ${CHE_VERSION}"
-    mvn versions:update-parent  versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U
+    mvn versions:set-property -Dproperty=che.version -DnewVersion=${CHE_VERSION}
+    mvn versions:update-parent versions:commit -DallowSnapshots=true -DparentVersion=[${CHE_VERSION}] -U
   fi
 
   if ( git diff --exit-code ); then
@@ -157,7 +156,7 @@ function runCompatibilityTest() {
   git rebase origin/master "${BRANCH}"
   rebase_return_code=$?
   set -e
-  
+
   if [ ! $rebase_return_code -eq 0 ]; then
     echo "Rebase failed with code: $rebase_return_code"
     echo "Aborting rebase..."
@@ -176,7 +175,6 @@ function runCompatibilityTest() {
     message="Periodic compatibility check failed to rebase a branch ${BRANCH}. Please, resolve conflicts and rebase the branch."
     commentToPR "$message"
     setRedStatus
-    
     echo $rebase_return_code > compatibility_status
     exit $rebase_return_code
   fi
@@ -190,7 +188,7 @@ function runCompatibilityTest() {
 
 }
 
-#variable USE_CHE_LATEST_SNAPSHOT enables to use rhel-rhchestage-rh-che-automation image instead of rhel-rhchestage-rh-che-server 
+#variable USE_CHE_LATEST_SNAPSHOT enables to use rhel-rhchestage-rh-che-automation image instead of rhel-rhchestage-rh-che-server
 export USE_CHE_LATEST_SNAPSHOT="true"
 run_tests_timeout_seconds=${RUN_TEST_TIMEOUT:-2400}
 # SECONDS is an internal bash variable that is increased by one every second that a shell is executing a command/script
