@@ -3,7 +3,7 @@
 
 # Eclipse Che hosted by Red Hat
 
-[![Contribute](https://che.openshift.io/factory/resources/factory-contribute.svg)](https://che.openshift.io/f?url=https://github.com/redhat-developer/rh-che)
+[![Contribute](https://www.eclipse.org/che/contribute.svg)](https://che.openshift.io/f?url=https://github.com/redhat-developer/rh-che)
 
 Hosted Che is [Eclipse Che](https://www.eclipse.org/che/) hosted by Red Hat. A Che server is running on OpenShift Dedicated, and the user base is spread across multiple OpenShift Online clusters where workspaces are created. The detailed information about the Hosted Che can be found in the official [documentation](https://www.eclipse.org/che/docs/che-7/hosted-che/#about-hosted-che_hosted-che).
 
