@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
 import * as mocha from 'mocha';
-import { TYPES, IDriver, DriverHelper, CLASSES, ScreenCatcher, ITestWorkspaceUtil, PreferencesHandler, TestConstants, AskForConfirmationType, TimeoutConstants } from 'e2e';
+import { TYPES, IDriver, DriverHelper, CLASSES, ScreenCatcher, ITestWorkspaceUtil, PreferencesHandler, TestConstants, AskForConfirmationType, TimeoutConstants, Logger } from 'e2e';
 import { logging } from 'selenium-webdriver';
 import fs from 'fs';
 import rm from 'rimraf';
@@ -105,6 +105,7 @@ class RhCheReporter extends mocha.reporters.Spec {
     });
 
     runner.on('fail', async function (test: mocha.Test) {
+      Logger.error(`RhCheReporter runner.on.fail: ${test.fullTitle()} failed after ${test.duration}ms`);
       // raise flag for keeping the screencast
       deleteScreencast = false;
 
