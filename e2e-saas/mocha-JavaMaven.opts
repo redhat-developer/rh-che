@@ -1,4 +1,4 @@
---timeout 120000
+--timeout 2200000
 --reporter './dist/utils/RhCheReporter.js'
 -u tdd
 --spec ./dist/tests/login/Login.spec
