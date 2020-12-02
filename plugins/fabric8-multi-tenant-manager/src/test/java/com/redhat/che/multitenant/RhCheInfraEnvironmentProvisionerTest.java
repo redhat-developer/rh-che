@@ -63,6 +63,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.restartpoli
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.ServersConverter;
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenshiftTrustedCAProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.RouteTlsProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
 import org.mockito.Mock;
@@ -108,6 +109,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private VcsSslCertificateProvisioner vcsSslCertificateProvisioner;
   @Mock private GatewayRouterProvisioner gatewayRouterProvisioner;
   @Mock private DeploymentMetadataProvisioner deploymentMetadataProvisioner;
+  @Mock private OpenshiftTrustedCAProvisioner openshiftTrustedCAProvisioner;
 
   private List<EnvVar> con1EnvVars;
   private List<EnvVar> con2EnvVars;
@@ -149,6 +151,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             vcsSslCertificateProvisioner,
             gatewayRouterProvisioner,
             deploymentMetadataProvisioner,
+            openshiftTrustedCAProvisioner,
             false,
             WSAGENT_ROUTER_TIMEOUT);
 

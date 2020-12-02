@@ -53,6 +53,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.server.Serv
 import org.eclipse.che.workspace.infrastructure.openshift.OpenShiftEnvironmentProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.environment.OpenShiftEnvironment;
 import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenShiftUniqueNamesProvisioner;
+import org.eclipse.che.workspace.infrastructure.openshift.provision.OpenshiftTrustedCAProvisioner;
 import org.eclipse.che.workspace.infrastructure.openshift.server.OpenShiftPreviewUrlExposer;
 import org.slf4j.Logger;
 
@@ -105,6 +106,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       VcsSslCertificateProvisioner vcsSslCertificateProvisioner,
       GatewayRouterProvisioner gatewayRouterProvisioner,
       DeploymentMetadataProvisioner deploymentMetadataProvisioner,
+      OpenshiftTrustedCAProvisioner openshiftTrustedCAProvisioner,
       @Named("che.infra.kubernetes.trust_certs") boolean trustCerts,
       @Named("che.fabric8.wsagent_routing_timeout") String wsAgentRoutingTimeout) {
     super(
@@ -130,7 +132,8 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         previewUrlEndpointsProvisioner,
         vcsSslCertificateProvisioner,
         gatewayRouterProvisioner,
-        deploymentMetadataProvisioner);
+        deploymentMetadataProvisioner,
+        openshiftTrustedCAProvisioner);
 
     this.openshiftUserTokenProvider = openshiftUserTokenProvider;
     this.tenantDataProvider = tenantDataProvider;
