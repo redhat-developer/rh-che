@@ -42,6 +42,7 @@ import org.eclipse.che.commons.lang.Pair;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakServiceClient;
 import org.eclipse.che.multiuser.keycloak.server.KeycloakSettings;
+import org.eclipse.che.multiuser.keycloak.server.OIDCInfo;
 import org.eclipse.che.multiuser.keycloak.shared.dto.KeycloakErrorResponse;
 
 /**
@@ -66,8 +67,9 @@ public class Fabric8AuthServiceClient extends KeycloakServiceClient {
   public Fabric8AuthServiceClient(
       @Named("che.fabric8.auth.endpoint") String baseAuthUrl,
       KeycloakSettings keycloakSettings,
+      OIDCInfo oidcInfo,
       JwtParser jwtParser) {
-    super(keycloakSettings, jwtParser);
+    super(keycloakSettings, oidcInfo, jwtParser);
     this.githubTokenEndpoint = baseAuthUrl + GITHUB_TOKEN_API_PATH;
     this.githubLinkEndpoint = baseAuthUrl + GITHUB_LINK_API_PATH;
   }
