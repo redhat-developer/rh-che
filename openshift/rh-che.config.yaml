@@ -15,12 +15,14 @@ data:
   CHE_FABRIC8_ANALYTICS_WOOPRA__DOMAIN: 'NULL'
   CHE_FABRIC8_END2END_PROTECT_VERIFY__WITH__IP: "false"
   CHE_API: "https://che.prod-preview.openshift.io/api"
+  CHE_API_INTERNAL: "https://che.prod-preview.openshift.io/api"
   CHE_CORS_ENABLED: "true"
   CHE_FABRIC8_AUTH_ENDPOINT: "https://auth.prod-preview.openshift.io"
   CHE_FABRIC8_MULTICLUSTER_OSO_PROXY_URL: "https://osoproxy.prod-preview.openshift.io"
   CHE_FABRIC8_MULTITENANT: "true"
   CHE_HOST: "che.prod-preview.openshift.io"
   CHE_KEYCLOAK_AUTH__SERVER__URL: "NULL"
+  CHE_KEYCLOAK_AUTH__INTERNAL__SERVER__URL: "NULL"
   CHE_KEYCLOAK_CLIENT__ID: "740650a2-9c44-4db5-b067-a3d1b2cd2d01"
   CHE_KEYCLOAK_JS__ADAPTER__URL: "/api/fabric8-end2end/files/RhCheKeycloak.js"
   CHE_KEYCLOAK_OIDC__PROVIDER: "https://auth.prod-preview.openshift.io/api"
@@ -57,7 +59,9 @@ data:
   CHE_LOGS_APPENDERS_IMPL: "json"
   CHE_MULTIUSER: "true"
   CHE_WORKSPACE_PLUGIN__REGISTRY__URL: 'https://che-plugin-registry.prod-preview.openshift.io/v3'
+  CHE_WORKSPACE_PLUGIN__REGISTRY__INTERNAL__URL: 'https://che-plugin-registry.prod-preview.openshift.io/v3'
   CHE_WORKSPACE_DEVFILE__REGISTRY__URL: 'https://che-devfile-registry.prod-preview.openshift.io/'
+  CHE_WORKSPACE_DEVFILE__REGISTRY__INTERNAL__URL: 'https://che-devfile-registry.prod-preview.openshift.io/'
   CHE_PORT: "8080"
   CHE_DEBUG_SERVER: "false"
   SENTRY_ENVIRONMENT: 'dev'

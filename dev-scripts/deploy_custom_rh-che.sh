@@ -376,6 +376,7 @@ fi
 # APPLY CHE CONFIGMAP
 CHE_CONFIG_YAML=$(yq ".\"data\".\"CHE_KEYCLOAK_REALM\" = \"NULL\" |
                       .\"data\".\"CHE_KEYCLOAK_AUTH__SERVER__URL\" = \"NULL\" |
+                      .\"data\".\"CHE_KEYCLOAK_AUTH__INTERNAL__SERVER__URL\" = \"NULL\" |
                       .\"data\".\"CHE_KEYCLOAK_USE__NONCE\" = \"false\" |
                       .\"data\".\"CHE_KEYCLOAK_CLIENT__ID\" = \"740650a2-9c44-4db5-b067-a3d1b2cd2d01\" |
                       .\"data\".\"CHE_KEYCLOAK_OIDC__PROVIDER\" = \"https://auth.prod-preview.openshift.io/api\" |
@@ -391,6 +392,7 @@ CHE_CONFIG_YAML=$(yq ".\"data\".\"CHE_KEYCLOAK_REALM\" = \"NULL\" |
 CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                   yq ".\"data\".\"CHE_HOST\" = \"rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com\" |
                       .\"data\".\"CHE_API\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api\" |
+                      .\"data\".\"CHE_API_INTERNAL\" = \"http$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api\" |
                       .\"data\".\"CHE_WEBSOCKET_ENDPOINT\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api/websocket\" |
                       .\"data\".\"CHE_WEBSOCKET_ENDPOINT__MINOR\" = \"ws$SECURE://rhche-$RH_CHE_PROJECT_NAMESPACE.apps.che-dev.x6e0.p1.openshiftapps.com/api/websocket-minor\" |
                       .\"metadata\".\"name\" = \"rhche\" |
@@ -399,6 +401,8 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
 if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
                     yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__INTERNAL__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__INTERNAL__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" |
                         .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" ")
 fi
 
