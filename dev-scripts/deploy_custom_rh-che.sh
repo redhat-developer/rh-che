@@ -107,6 +107,7 @@ function checkCheStatus() {
 
 function waitForPostgresToBeDeleted() {
   printf "Waiting for postgres deployment to be deleted"
+  oc delete dc postgres > /dev/null 2>&1
   oc delete all -l app=postgres > /dev/null 2>&1
   oc delete pvc/postgres-data > /dev/null 2>&1
   while (oc get all -l app=postgres 2>&1 | [ "$(wc -l)" -ge 2 ] > /dev/null 2>&1); do
