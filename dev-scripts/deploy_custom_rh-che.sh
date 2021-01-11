@@ -401,10 +401,10 @@ CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
 
 if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
   CHE_CONFIG_YAML=$(echo "$CHE_CONFIG_YAML" | \
-                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
-                        .\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__INTERNAL__URL\" = \"http$SECURE://che-plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
-                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__INTERNAL__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" |
-                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http$SECURE://che-devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" ")
+                    yq ".\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__URL\" = \"http$SECURE://plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_PLUGIN__REGISTRY__INTERNAL__URL\" = \"http$SECURE://plugin-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/v3\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__INTERNAL__URL\" = \"http$SECURE://devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" |
+                        .\"data\".\"CHE_WORKSPACE_DEVFILE__REGISTRY__URL\" = \"http$SECURE://devfile-registry-${RH_CHE_PROJECT_NAMESPACE}.apps.che-dev.x6e0.p1.openshiftapps.com/\" ")
 fi
 
 if ! (echo "$CHE_CONFIG_YAML" | oc apply -f - > /dev/null 2>&1); then
