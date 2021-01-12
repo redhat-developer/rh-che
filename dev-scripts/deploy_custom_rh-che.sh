@@ -441,11 +441,24 @@ if ! (echo "$CHE_APP_CONFIG_YAML" | oc process -f - | oc apply -f - > /dev/null 
   exit 5
 fi
 
+
 # APPLY SECRET IF REQUESTED
 if [ "$RH_CHE_APPLY_SECRET" == "true" ]; then
   echo "$RH_CHE_OC_SECRET" | oc apply -f -
   oc secrets link default quay-dev-deployer --for=pull
   oc secrets link rhche quay-dev-deployer --for=pull
+fi
+
+# CHECK IF THE SECRET IS SET PROPERLY, RE-SET IF NEEDED
+sleep 3
+echo "checking if the pod has quay-dev-deployer secret"
+pod=$(oc get pod -l app=rhche -o name)
+secret_contain=$(oc get -o json ${pod} | jq .spec.imagePullSecrets[] | grep quay-dev-deployer )
+if [ ${#secret_contain} > 0 ]; then
+  echo "Secret is present in the rhche pod, there should not be problem with pulling images."
+else
+  echo "Secret is not present in the rhche pod, removing the pod"
+  oc delete $(oc get pod -l app=rhche -o name)
 fi
 
 CHE_STARTUP_TIMEOUT=300
