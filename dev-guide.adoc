@@ -169,7 +169,6 @@ minishift addon uninstall rhche-prerequisites
 The minishift addon uses the yaml files (`rh-che.app.yaml`, `rh-che.config.yaml`) in `./openshift/minishift-addons/rhche/templates` while the dev-cluster deployment script uses the yaml files in `./openshift`. These templates are slightly different
 ====
 
-
 === Deploying to dev-cluster
 [WARNING]
 ====
