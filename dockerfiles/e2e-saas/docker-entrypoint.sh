@@ -145,7 +145,7 @@ echo "Running Xvfb"
 export DISPLAY=:20
 export SCREEN="0"
 
-/usr/bin/Xvfb $DISPLAY -screen $SCREEN 1920x1080x16 +extension RANDR > /dev/null 2>&1 &
+/usr/bin/Xvfb $DISPLAY -screen $SCREEN 1920x1080x24 +extension RANDR > /dev/null 2>&1 &
 x11vnc -display $DISPLAY -N -forever > /dev/null 2>&1 &
 
 # Launch selenium server
