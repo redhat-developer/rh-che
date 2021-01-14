@@ -4,11 +4,9 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 ARG CHE_DASHBOARD_VERSION=next
-ARG CHE_DASHBOARD_NEXT_VERSION=next
 ARG CHE_WORKSPACE_LOADER_VERSION=next
 
 FROM quay.io/eclipse/che-dashboard:${CHE_DASHBOARD_VERSION} as che_dashboard_base
-FROM quay.io/che-incubator/che-dashboard-next:${CHE_DASHBOARD_NEXT_VERSION} as che_dashboard_next_base
 FROM quay.io/eclipse/che-workspace-loader:${CHE_WORKSPACE_LOADER_VERSION} as che_workspace_loader_base
 
 
@@ -51,7 +49,6 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 COPY --from=che_workspace_loader_base /usr/local/apache2/htdocs/workspace-loader/ /home/user/eclipse-che/tomcat/webapps/workspace-loader
 COPY --from=che_dashboard_base /usr/local/apache2/htdocs/dashboard /home/user/eclipse-che/tomcat/webapps/dashboard
-COPY --from=che_dashboard_next_base /usr/local/apache2/htdocs/dashboard /home/user/eclipse-che/tomcat/webapps/dashboard/next
 ADD eclipse-che /home/user/eclipse-che
 # Let's apply Hosted Che specific 'product.json' for the dashboard customization
 COPY assets/branding/product.json /home/user/eclipse-che/tomcat/webapps/dashboard/assets/branding/

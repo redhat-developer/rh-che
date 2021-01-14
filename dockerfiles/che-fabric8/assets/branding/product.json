@@ -5,12 +5,6 @@
     "faq": "https://www.eclipse.org/che/docs/che-7/hosted-che/#hosted-che-faq-and-troubleshooting_hosted-che"
   },
   "configuration": {
-    "menu": {
-      "disabled": ["organizations", "factories"]
-    }, 
-    "features": {
-      "disabled": ["workspaceSharing", "kubernetesNamespaceSelector"]
-    },
     "prefetch": {
       "cheCDN":"/api/cdn-support/paths"
     }
