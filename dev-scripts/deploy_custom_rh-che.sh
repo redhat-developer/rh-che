@@ -453,8 +453,7 @@ fi
 sleep 3
 echo "checking if the pod has quay-dev-deployer secret"
 pod=$(oc get pod -l app=rhche -o name)
-secret_contain=$(oc get -o json ${pod} | jq .spec.imagePullSecrets[] | grep quay-dev-deployer )
-if [ ${#secret_contain} > 0 ]; then
+if oc get -o json ${pod} | jq .spec.imagePullSecrets[] | grep -q quay-dev-deployer; then
   echo "Secret is present in the rhche pod, there should not be problem with pulling images."
 else
   echo "Secret is not present in the rhche pod, removing the pod"
