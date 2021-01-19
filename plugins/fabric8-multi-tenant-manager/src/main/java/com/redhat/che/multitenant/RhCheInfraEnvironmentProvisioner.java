@@ -45,6 +45,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettin
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.SshKeysProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.TlsProvisionerProvider;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.TolerationsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
@@ -96,6 +97,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
       ImagePullSecretProvisioner imagePullSecretProvisioner,
       ProxySettingsProvisioner proxySettingsProvisioner,
       NodeSelectorProvisioner nodeSelectorProvisioner,
+      TolerationsProvisioner tolerationsProvisioner,
       AsyncStorageProvisioner asyncStorageProvisioner,
       AsyncStoragePodInterceptor asyncStoragePodInterceptor,
       ServiceAccountProvisioner serviceAccountProvisioner,
@@ -123,6 +125,7 @@ public class RhCheInfraEnvironmentProvisioner extends OpenShiftEnvironmentProvis
         imagePullSecretProvisioner,
         proxySettingsProvisioner,
         nodeSelectorProvisioner,
+        tolerationsProvisioner,
         asyncStorageProvisioner,
         asyncStoragePodInterceptor,
         serviceAccountProvisioner,

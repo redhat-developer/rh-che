@@ -56,6 +56,7 @@ import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ProxySettin
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.ServiceAccountProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.SshKeysProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.TlsProvisionerProvider;
+import org.eclipse.che.workspace.infrastructure.kubernetes.provision.TolerationsProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.VcsSslCertificateProvisioner;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.env.EnvVarsConverter;
 import org.eclipse.che.workspace.infrastructure.kubernetes.provision.limits.ram.ContainerResourceProvisioner;
@@ -94,6 +95,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
   @Mock private ImagePullSecretProvisioner imagePullSecretProvisioner;
   @Mock private ProxySettingsProvisioner proxySettingsProvisioner;
   @Mock private NodeSelectorProvisioner nodeSelectorProvisioner;
+  @Mock private TolerationsProvisioner tolerationsProvisioner;
   @Mock private AsyncStorageProvisioner asyncStorageProvisioner;
   @Mock private AsyncStoragePodInterceptor asyncStoragePodInterceptor;
   @Mock private CertificateProvisioner certificateProvisioner;
@@ -141,6 +143,7 @@ public class RhCheInfraEnvironmentProvisionerTest {
             imagePullSecretProvisioner,
             proxySettingsProvisioner,
             nodeSelectorProvisioner,
+            tolerationsProvisioner,
             asyncStorageProvisioner,
             asyncStoragePodInterceptor,
             serviceAccountProvisioner,
