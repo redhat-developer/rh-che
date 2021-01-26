@@ -3,7 +3,7 @@
 :toc-title:
 
 == Building rh-che
-rh-che is a straightforward maven project. For additional information on the build process for the dashboard component, see link:assembly/fabric8-ide-dashboard-war/README.md[README.md] in the dashboard subcomponent.
+rh-che is a straightforward maven project.
 
 [NOTE]
 ====
