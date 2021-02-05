@@ -303,15 +303,15 @@ echo -e "\\033[92;1mGetting deployment scripts done.\\033[0m"
 if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
   echo "Deploying che registries for che version ${RH_CHE_VERSION}"
   echo "Removing previous deployment if exists"
-  if (oc get dc che-devfile-registry > /dev/null 2>&1); then
+  if (oc get dc devfile-registry > /dev/null 2>&1); then
     echo "Deleting devfile registry"
-    oc delete dc che-devfile-registry --force=true --grace-period=0 > /dev/null 2>&1
-    oc delete configmap che-devfile-registry > /dev/null 2>&1
+    oc delete dc devfile-registry --force=true --grace-period=0 > /dev/null 2>&1
+    oc delete configmap devfile-registry > /dev/null 2>&1
   fi
-  if (oc get dc che-plugin-registry > /dev/null 2>&1); then
+  if (oc get dc plugin-registry > /dev/null 2>&1); then
     echo "Deleting plugin registry"
-    oc delete dc che-plugin-registry --force=true --grace-period=0 > /dev/null 2>&1
-    oc delete configmap che-plugin-registry > /dev/null 2>&1
+    oc delete dc plugin-registry --force=true --grace-period=0 > /dev/null 2>&1
+    oc delete configmap plugin-registry > /dev/null 2>&1
   fi
   echo "Downloading che plugin registry yaml"
   if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-plugin-registry/master/deploy/openshift/che-plugin-registry.yml -o che-plugin-registry.yaml > /dev/null 2>&1); then
