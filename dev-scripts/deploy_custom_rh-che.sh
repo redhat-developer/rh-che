@@ -314,12 +314,12 @@ if [ "$RH_CHE_USE_CUSTOM_REGISTRIES" == "true" ]; then
     oc delete configmap plugin-registry > /dev/null 2>&1
   fi
   echo "Downloading che plugin registry yaml"
-  if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-plugin-registry/master/deploy/openshift/che-plugin-registry.yml -o che-plugin-registry.yaml > /dev/null 2>&1); then
+  if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-plugin-registry/7.26.0/deploy/openshift/che-plugin-registry.yml -o che-plugin-registry.yaml > /dev/null 2>&1); then
     echo -e "\\033[91;1mCould not download che-plugin-registry yaml!\\033[0m"
     exit 2
   fi
   echo "Downloading che devfile registry yaml"
-  if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-devfile-registry/master/deploy/openshift/che-devfile-registry.yaml -o che-devfile-registry.yaml > /dev/null 2>&1); then
+  if ! (curl -L0fs https://raw.githubusercontent.com/eclipse/che-devfile-registry/7.26.0/deploy/openshift/che-devfile-registry.yaml -o che-devfile-registry.yaml > /dev/null 2>&1); then
     echo -e "\\033[91;1mCould not download che-devfile-registry yaml!\\033[0m"
     exit 2
   fi
