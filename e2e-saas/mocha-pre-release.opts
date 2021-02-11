@@ -2,5 +2,5 @@
 --reporter './dist/utils/RhCheReporter.js'
 -u tdd
 --spec ./dist/tests/login/Login.spec
---spec ./node_modules/e2e/dist/tests/devfiles/*.spec.js
+--spec ./node_modules/e2e/dist/tests/devfiles/!(Scala).spec.js
 --spec ./node_modules/e2e/dist/tests/e2e/FactoryUrl.spec.js
