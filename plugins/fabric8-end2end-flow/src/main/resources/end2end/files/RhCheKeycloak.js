@@ -315,10 +315,9 @@ function initAnalytics(writeKey){
                         return Promise.reject(message);
                     });
                 } else {
-                    sessionStorage.removeItem('osio-provisioning-notification-message');
-                    var message = "Error while checking account linking";
-                    logRequest(message, request);
-                    return Promise.reject(message);
+                   // Redirecting new users to the Developer Sandbox
+                   setStatusMessage(osio_msg_eol);
+                   redirect('https://developers.redhat.com/developer-sandbox#assembly-field-sections-59571');
                 }
             });
         });
@@ -593,8 +592,9 @@ function initAnalytics(writeKey){
                         } else {
                             errorMessage = error;
                         }
-                        setStatusMessage(osio_msg_error_no_resources);
-                        finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
+                        // Redirecting new users to the Developer Sandbox
+                        setStatusMessage(osio_msg_eol);
+                        redirect('https://developers.redhat.com/developer-sandbox#assembly-field-sections-59571');
                     });
                 }).error((data) => {
                     sessionStorage.removeItem('osio-provisioning-timeout-failure');
