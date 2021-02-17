@@ -10,6 +10,7 @@
  *   Red Hat, Inc. - initial API and implementation
  */
 const osio_msg_relogin_or_contact_support = "<br>You may want to <a href='' onclick='return osioProvisioningLogout()'>use a different account</a><br>or <a href='https://mattermost.eclipse.org/eclipse/channels/eclipse-che'>contact support</a>.";
+const osio_msg_eol = "Eclipse Che hosted by Red Hat on OpenShift is going to be shut down on <strong>March 1, 2021 at 00:01 GMT</strong>.<br> A new service based on <a href='https://developers.redhat.com/developer-sandbox#assembly-field-sections-59571'>CodeReady Workspaces</a> is available now. <a href='https://developers.redhat.com/developer-sandbox'>Developer Sandbox for Red Hat OpenShift</a> provides more details about the new service.";
 const osio_msg_provisioning = "Creating your <strong>OpenShift</strong> account";
 const osio_msg_linking_account = "Linking your <strong>OpenShift</strong> account";
 const osio_msg_setting_up_namespaces = "Setting up your <strong>OpenShift.io</strong> environment";
@@ -339,6 +340,14 @@ function initAnalytics(writeKey){
         });
     }
 
+    // Redirects to the URL after 5 seconds
+    function redirect(url) {
+        console.log("Redirect URL: ", url)
+        setTimeout(function() {
+            window.location.href = url;
+        }, 5000);
+    }
+
     function checkNamespacesCreated(keycloak, timeLimit) {
         setStatusMessage(osio_msg_setting_up_namespaces);
         return get(osioAuthURL + "/user/services", keycloak.token)
@@ -452,7 +461,8 @@ function initAnalytics(writeKey){
     addReadonlyProp(window.osioCheLoginFlow, "osio_msg_error_user_verification", osio_msg_error_user_verification);
     addReadonlyProp(window.osioCheLoginFlow, "telemetry_event_enter_provisioning_page_for_che", telemetry_event_enter_provisioning_page_for_che);
     addReadonlyProp(window.osioCheLoginFlow, "osio_msg_provisioning", osio_msg_provisioning);
-    
+    addReadonlyProp(window.osioCheLoginFlow, "osio_msg_eol", osio_msg_eol);
+
     var scripts = document.getElementsByTagName("script");
     var originalKeycloakScript;
     var provisioningPage;
@@ -593,74 +603,9 @@ function initAnalytics(writeKey){
                     }
 
                     if (osioUserToApprove) {
-                        var lastProvisioningDate = sessionStorage.getItem('osio-provisioning');
-                        var isProvisioning = false;
-                        var provisioningTimeoutFailure = false;
-                        if (lastProvisioningDate) {
-                            if (new Date().getTime() < parseInt(lastProvisioningDate) + provisioningTimeout) {
-                                isProvisioning = true;
-                            } else {
-                                provisioningTimeoutFailure = true;
-                            }
-                        }
-
-                        if (provisioningTimeoutFailure) {
-                            log('Timeout while waiting for OSIO provisioning after opening the `manage.openshift.com` page for user: ' + osioUserToApprove);
-                            sessionStorage.setItem('osio-provisioning-timeout-failure', 'true');
-                            sessionStorage.removeItem('osio-provisioning');
-                            sessionStorage.removeItem('osio-provisioning-notification-message');
-                            setStatusMessage(osio_msg_error_no_resources);
-                            finalPromise.setError({ error: 'invalid_request', error_description: 'Timeout while waiting for OSIO provisioning' });
-                        } else {
-                            var provisioningFailure = sessionStorage.getItem('osio-provisioning-failure');
-                            if (provisioningFailure) {
-                                log("Provisioning failure: " + provisioningFailure);
-                                sessionStorage.removeItem('osio-provisioning');
-                                sessionStorage.removeItem('osio-provisioning-notification-message');
-                                sessionStorage.removeItem('osio-provisioning-failure');
-                                setStatusMessage(provisioningFailure);
-                                finalPromise.setError(data);
-                            } else if (!isProvisioning) {
-                                get(provisioningPage)
-                                .then((request) => {
-                                    var contentType = request.getResponseHeader('content-type');
-                                    if ( contentType && contentType.includes('html')) {
-                                        var provisioningMessageDiv = document.createElement('div');
-                                        provisioningMessageDiv.style = "height: 100%; z-index: 999; position:fixed; padding:0; margin:0; top:0; left:0; width: 100%; height: 100%; background:rgba(255,255,255,1);";
-                                        provisioningMessageDiv.innerHTML = '<iframe id="osio-provisioning-frame" style="border: 0px; width: 100%; height: 100%"></iframe>';
-                                        document.body.appendChild(provisioningMessageDiv);
-                                        var htmlContent;
-                                        htmlContent = request.responseText.replace('<span id="osio-user-value"></span>', '<span id="osio-user-value">' + osioUserToApprove + '</span>');
-                                        if (osioUserToApprove == 'unknown') {
-                                            htmlContent = htmlContent.replace('<span id="osio-user-placeholder">', '<span id="osio-user-placeholder" style="display: none;">');
-                                        }
-                                        var osioProvisioningFrameDocument = document.getElementById('osio-provisioning-frame').contentWindow.document;
-                                        osioProvisioningFrameDocument.open();
-                                        osioProvisioningFrameDocument.write(htmlContent);
-                                        osioProvisioningFrameDocument.close();
-                                        track(telemetry_event_display_provisioning_page_for_che, { user: osioUserToApprove });
-                                    } else {
-                                        const errorMessage = 'OSIO provisioning page loaded at URL: ' + provisioningPage + ' should be valid HTML';
-                                        log(errorMessage + ' for user ' + osioUserToApprove);
-                                        sessionStorage.removeItem('osio-provisioning-notification-message');
-                                        setStatusMessage(osio_msg_error_no_resources);
-                                        finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
-                                    }
-                                }, (request) => {
-                                    const errorMessage = "OSIO provisioning page could not be loaded at URL: " + provisioningPage;
-                                    logRequest(errorMessage + ' for user ' + osioUserToApprove, request);
-                                    sessionStorage.removeItem('osio-provisioning-notification-message');
-                                    setStatusMessage(osio_msg_error_no_resources);
-                                    finalPromise.setError({ error: 'invalid_request', error_description: errorMessage });
-                                });
-                            } else {
-                                setStatusMessage(osio_msg_provisioning);
-                                sessionStorage.setItem('osio-provisioning-notification-message', osio_msg_provisioning);
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, provisioningWaitDelay);
-                            }
-                        }
+                      // Redirecting new users to the Developer Sandbox
+                      setStatusMessage(osio_msg_eol);
+                      redirect('https://developers.redhat.com/developer-sandbox#assembly-field-sections-59571');
                     } else {
                         var errorMessage;
                         var warning = false;
