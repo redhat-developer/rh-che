@@ -328,7 +328,6 @@ function initAnalytics(writeKey){
         .catch((request) => {
             sessionStorage.removeItem('osio-provisioning-notification-message');
             track(telemetry_event_setup_namespaces);
-            setStatusMessage(osio_msg_setting_up_namespaces);
             return get(osioAuthURL + "/user", keycloak.token)
             .then((request) => checkNamespacesCreated(keycloak, new Date().getTime() + 30000),
             (request) => {
@@ -348,7 +347,6 @@ function initAnalytics(writeKey){
     }
 
     function checkNamespacesCreated(keycloak, timeLimit) {
-        setStatusMessage(osio_msg_setting_up_namespaces);
         return get(osioAuthURL + "/user/services", keycloak.token)
         .catch((request) => {
             if (new Date().getTime() < timeLimit) {
